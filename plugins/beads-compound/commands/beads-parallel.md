@@ -463,13 +463,22 @@ Where `max_workers` defaults to 4, overridden by `--workers N`.
 **Display mode:** Configured at the Claude Code level, not by this command. Users set `teammateMode` in `settings.json` (`"in-process"` or `"tmux"`) or pass `--teammate-mode` when launching `claude`. Default is `"auto"` (split panes if already in tmux, otherwise in-process).
 
 **Create team and spawn workers:**
+
+First, create the team:
 ```
-Create agent team "epic-{EPIC_ID}" (or "parallel-{first-bead-id}" for non-epic input).
-Spawn {N} worker teammates with the prompt template below.
-Enable delegate mode (Shift+Tab) -- the lead is purely supervisory.
+TeamCreate(team_name="epic-{EPIC_ID}", description="Parallel bead workers for {EPIC_ID}")
+```
+(Use `team_name="parallel-{first-bead-id}"` for non-epic input.)
+
+Then spawn N workers in a single message using the Task tool with `team_name` and `name` to enroll them in the team. Pass the filled-in worker prompt (see template below) as the `prompt` parameter:
+```
+Task(subagent_type="general-purpose", team_name="epic-{EPIC_ID}", name="worker-1", prompt="...filled worker prompt...")
+Task(subagent_type="general-purpose", team_name="epic-{EPIC_ID}", name="worker-2", prompt="...filled worker prompt...")
 ```
 
-**Worker prompt template:**
+The lead's role is purely supervisory after spawning — do not implement beads yourself.
+
+**Worker prompt template** (fill in all `{placeholders}` before passing as `prompt`):
 
 ```
 You are a persistent engineering teammate working on beads in parallel.
@@ -645,9 +654,15 @@ The lead does NOT implement beads. Its role is purely supervisory. Process inbox
 2. Decide: retry later, reassign, or abort epic.
 
 **On ROTATION:**
-1. Collect worker's context digest (knowledge found, patterns, test facts)
-2. Shut down the worker gracefully
-3. Spawn a fresh replacement with the digest injected into its spawn prompt
+1. Collect the worker's context digest (knowledge found, patterns, test facts)
+2. Shut down the worker gracefully:
+   ```
+   SendMessage(type="shutdown_request", recipient="worker-{N}", content="Context rotation requested")
+   ```
+3. Spawn a fresh replacement with the digest prepended to the worker prompt:
+   ```
+   Task(subagent_type="general-purpose", team_name="{team_name}", name="worker-{N}", prompt="[ROTATION DIGEST]\n{digest}\n\n[WORKER PROMPT]\n...filled worker prompt...")
+   ```
 
 **Silence timeout (5 minutes):**
 If no worker messages received for 5 minutes:
@@ -666,9 +681,16 @@ KNOWLEDGE_BROADCAST:
 ```
 
 **Shutdown (when all beads done or abort):**
-1. Send SHUTDOWN to all workers
+1. Send shutdown requests to all workers:
+   ```
+   SendMessage(type="shutdown_request", recipient="worker-1", content="All beads complete, shutting down")
+   SendMessage(type="shutdown_request", recipient="worker-2", content="All beads complete, shutting down")
+   ```
 2. Wait for shutdown approvals (max 5 minutes, then force-terminate)
-3. Clean up the team
+3. Delete the team:
+   ```
+   TeamDelete()
+   ```
 4. Proceed to section 10.
 
 ## 10. Verify Results
