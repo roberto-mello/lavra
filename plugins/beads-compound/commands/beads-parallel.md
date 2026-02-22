@@ -6,7 +6,7 @@ argument-hint: "[epic bead ID, list of bead IDs, or empty for all ready beads] [
 
 Work on multiple beads in parallel, giving each subagent the full beads-work treatment.
 
-**--ralph mode**: Enables autonomous iterative parallel execution. Subagents self-loop (implement -> verify -> fix -> retry) until completion criteria are met or retries are exhausted. Single approval at start, then autonomous execution with inter-wave knowledge transfer.
+**--ralph mode**: Enables autonomous iterative parallel execution. Subagents self-loop (implement -> verify -> fix -> retry) until completion criteria are met or retries are exhausted. Single approval at start, then autonomous execution with inter-wave knowledge transfer. Subagents run in `bypassPermissions` mode so they do not prompt for tool approvals.
 
 **--teams mode**: Uses Claude Code's experimental agent teams feature. Instead of fire-and-forget subagents, spawns persistent worker teammates that self-organize through multiple beads, accumulating context and communicating via inbox messages. Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` to be enabled.
 
@@ -430,7 +430,17 @@ When done, output exactly: <promise>DONE</promise>
 BEAD_ID: {BEAD_ID}
 ```
 
-Launch all agents for the current wave in a single message:
+Launch all agents for the current wave in a single message.
+
+**When --ralph mode**, spawn with `bypassPermissions` so agents run autonomously without prompting:
+
+```
+Task(general-purpose, mode="bypassPermissions", "...prompt for BD-001...")
+Task(general-purpose, mode="bypassPermissions", "...prompt for BD-002...")
+Task(general-purpose, mode="bypassPermissions", "...prompt for BD-003...")
+```
+
+**When NOT --ralph mode**, spawn normally (default permissions):
 
 ```
 Task(general-purpose, "...prompt for BD-001...")
