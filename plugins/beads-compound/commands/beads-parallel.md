@@ -337,13 +337,15 @@ cross-cutting changes after the wave completes.
    - Write tests for new functionality
    - Run tests after changes
 
-5. Log at least one knowledge comment:
+5. Log knowledge inline as you work — required, not optional:
+   Log a comment the moment you hit a trigger: surprising code, a non-obvious choice, an error you figured out, a constraint that limits your options. Do not batch these for the end.
    ```
    bd comments add {BEAD_ID} "LEARNED: {key insight}"
    bd comments add {BEAD_ID} "DECISION: {choice made and why}"
    bd comments add {BEAD_ID} "FACT: {constraint or gotcha}"
    bd comments add {BEAD_ID} "PATTERN: {pattern followed}"
    ```
+   You MUST log at least one comment. If you finish with nothing logged, you skipped this step.
 
 6. When done, report what changed and any issues encountered. Do NOT run git commit or git add at any point -- the orchestrator handles that.
 
@@ -424,7 +426,9 @@ When done, output exactly: <promise>DONE</promise>
      - Report the failure -- do NOT mark the bead as done
      - Do NOT output <promise>DONE</promise>
 
-8. Log knowledge (at least one entry, only on final success or final failure):
+8. Verify knowledge was captured (required gate before reporting):
+   You must have logged at least one comment inline during steps 4-7. Do NOT wait until this step to log — by now the details are stale.
+   If the bead has zero comments, add them now, then treat this as a process failure to correct going forward.
    bd comments add {BEAD_ID} "LEARNED: {key insight}"
    bd comments add {BEAD_ID} "DECISION: {choice made and why}"
    bd comments add {BEAD_ID} "FACT: {constraint or gotcha}"
@@ -587,11 +591,13 @@ Repeat until no beads remain or you receive a shutdown request:
       - Do NOT revert yourself -- the lead handles reverts using git diff.
       - Move to step 1
 
-5. Log knowledge (MANDATORY -- at least one entry):
+5. Log knowledge inline as you work (MANDATORY — not at the end):
+   Log a comment the moment you hit a trigger: surprising code, a non-obvious choice, an error you figured out, a constraint that limits your options. Do NOT batch these until step 5.
    ```bash
    bd comments add {BEAD_ID} "LEARNED: {insight}"
    ```
    Use LEARNED/DECISION/FACT/PATTERN/INVESTIGATION as appropriate.
+   You MUST log at least one comment. The lead will not accept the bead without it.
 
 6. Request completion:
    Message lead: "COMPLETED: {BEAD_ID}. {N} files changed. Knowledge: {prefix}."

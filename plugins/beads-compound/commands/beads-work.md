@@ -83,19 +83,26 @@ This command takes a bead (or specification) and executes it systematically. The
    fi
    ```
 
-   **If already on a feature branch** (not the default branch):
-   - Ask: "Continue working on `[current_branch]`, or create a new branch?"
-   - If continuing, proceed to next step
+   Use **AskUserQuestion tool** to ask how to proceed:
 
-   **If on the default branch**, choose how to proceed:
+   **Question:** "How do you want to handle branching for this work?"
 
-   **Option A: Create a new branch** (include bead ID in name)
+   **Options:**
+   1. **Work on current branch** - Continue on `[current_branch]` as-is
+   2. **Create a feature branch** - `bd-{BEAD_ID}/{short-description}`
+   3. **Use a worktree** - Isolated copy for parallel development
+
+   Then execute the chosen option:
+
+   **Work on current branch:** proceed to next step
+
+   **Create a feature branch:**
    ```bash
    git pull origin [default_branch]
    git checkout -b bd-{BEAD_ID}/{short-description}
    ```
 
-   **Option B: Use a worktree (recommended for parallel development)**
+   **Use a worktree:**
    ```bash
    skill: git-worktree
    ```
@@ -151,9 +158,17 @@ This command takes a bead (or specification) and executes it systematically. The
    git commit -m "feat(scope): description of this unit"
    ```
 
-3. **Log Knowledge as You Work**
+3. **Log Knowledge as You Work** *(required — inline, not at the end)*
 
-   When you discover something worth remembering:
+   **This is mandatory.** Log a comment the moment you encounter any of these triggers. Do not batch them for later — by the time you finish the task, the details are stale and you will skip it.
+
+   | Trigger | Prefix | Example |
+   |---------|--------|---------|
+   | Read code that surprises you | `FACT:` | Column is a string `'kg'\|'lbs'`, not a boolean |
+   | Make a non-obvious implementation choice | `DECISION:` | Chose 2.5 lb rounding because smaller increments cause UI jitter |
+   | Hit an error and figure out why | `LEARNED:` | Enum comparison fails unless you cast to string first |
+   | Notice a pattern you'll want to reuse | `PATTERN:` | Service uses `.tap` to log before returning |
+   | Find a constraint that limits options | `FACT:` | API rate-limits to 10 req/s per tenant |
 
    ```bash
    bd comments add {BEAD_ID} "LEARNED: {key technical insight}"
@@ -161,6 +176,8 @@ This command takes a bead (or specification) and executes it systematically. The
    bd comments add {BEAD_ID} "FACT: {constraint or gotcha discovered}"
    bd comments add {BEAD_ID} "PATTERN: {coding pattern followed}"
    ```
+
+   **You MUST log at least one comment per task completed.** Non-trivial work always produces an insight. If you finish a task with nothing logged, you skipped this step — go back and add it before marking the task complete.
 
 4. **Follow Existing Patterns**
 
@@ -249,9 +266,9 @@ This command takes a bead (or specification) and executes it systematically. The
    "
    ```
 
-3. **Capture Final Knowledge**
+3. **Verify Knowledge Was Captured** *(required gate — do not skip)*
 
-   Log at least one knowledge comment summarizing the work:
+   You must have logged at least one knowledge comment per task during Phase 2. **Do not proceed to the PR until this is true.** Run `bd show {BEAD_ID}` and check the comments. If there are none, add them now — but treat this as a process failure and correct the habit going forward.
 
    ```bash
    bd comments add {BEAD_ID} "LEARNED: {most important insight from this work}"
