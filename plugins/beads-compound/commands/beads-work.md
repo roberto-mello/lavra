@@ -47,7 +47,7 @@ This command takes a bead (or specification) and executes it systematically. The
    - Get user approval to proceed
    - **Do not skip this** - better to ask questions now than build the wrong thing
 
-2. **Recall Relevant Knowledge**
+2. **Recall Relevant Knowledge** *(required — do not skip)*
 
    ```bash
    # Search memory for relevant context
@@ -55,7 +55,7 @@ This command takes a bead (or specification) and executes it systematically. The
    .beads/memory/recall.sh "{tech stack keywords}"
    ```
 
-   Present any relevant LEARNED/DECISION/FACT/PATTERN entries.
+   **You MUST output the recall results here before continuing.** If recall returns nothing, output: "No relevant knowledge found." Do not proceed to step 3 until this is done. This step exists to prevent repeating solved problems — skipping it defeats the purpose of the memory system.
 
 3. **Check Dependencies & Related Beads**
 
