@@ -156,7 +156,7 @@ SQL
 
 # Incremental sync from JSONL files into SQLite FTS5
 # Compares line counts to import only new entries. Safe to call every session.
-# First-time: also imports knowledge-prefixed comments from beads.db.
+# First-time: also imports knowledge-prefixed comments from beads (via bd sql).
 kb_sync() {
   local DB_PATH="$1"
   local MEMORY_DIR="$2"
@@ -170,38 +170,38 @@ kb_sync() {
   local DB_COUNT
   DB_COUNT=$(sqlite3 "$DB_PATH" "SELECT count(*) FROM knowledge;" 2>/dev/null || echo "0")
 
-  # First-time: import from beads.db comments (only when SQLite is empty)
-  if [[ "$DB_COUNT" -eq 0 ]]; then
-    local BEADS_DB
-    BEADS_DB="${CLAUDE_PROJECT_DIR:-.}/.beads/beads.db"
+  # First-time: import from beads comments (only when SQLite is empty)
+  if [[ "$DB_COUNT" -eq 0 ]] && command -v bd &>/dev/null && command -v jq &>/dev/null; then
+    local COMMENT_JSON
+    COMMENT_JSON=$(bd sql --json "SELECT issue_id, text FROM comments WHERE text LIKE 'LEARNED:%' OR text LIKE 'DECISION:%' OR text LIKE 'FACT:%' OR text LIKE 'PATTERN:%' OR text LIKE 'INVESTIGATION:%'" 2>/dev/null || true)
 
-    if [[ -f "$BEADS_DB" ]] && command -v sqlite3 &>/dev/null; then
-      local COMMENTS
-      COMMENTS=$(sqlite3 "$BEADS_DB" "SELECT text FROM comments WHERE text LIKE 'LEARNED:%' OR text LIKE 'DECISION:%' OR text LIKE 'FACT:%' OR text LIKE 'PATTERN:%' OR text LIKE 'INVESTIGATION:%';" 2>/dev/null || true)
+    if [[ -n "$COMMENT_JSON" ]] && [[ "$COMMENT_JSON" != "[]" ]]; then
+      local ROW_COUNT
+      ROW_COUNT=$(echo "$COMMENT_JSON" | jq 'length' 2>/dev/null || echo "0")
 
-      if [[ -n "$COMMENTS" ]]; then
-        while IFS= read -r COMMENT; do
-          [[ -z "$COMMENT" ]] && continue
+      for (( i=0; i<ROW_COUNT; i++ )); do
+        local ISSUE_ID COMMENT_TEXT PREFIX TYPE CONTENT SLUG KEY
 
-          local PREFIX TYPE CONTENT SLUG KEY
+        ISSUE_ID=$(echo "$COMMENT_JSON" | jq -r ".[$i].issue_id // empty" 2>/dev/null)
+        COMMENT_TEXT=$(echo "$COMMENT_JSON" | jq -r ".[$i].text // empty" 2>/dev/null)
+        [[ -z "$COMMENT_TEXT" ]] && continue
 
-          for P in INVESTIGATION LEARNED DECISION FACT PATTERN; do
-            if echo "$COMMENT" | grep -q "^${P}:"; then
-              PREFIX="$P"
-              break
-            fi
-          done
+        PREFIX=""
+        for P in INVESTIGATION LEARNED DECISION FACT PATTERN; do
+          if echo "$COMMENT_TEXT" | grep -q "^${P}:"; then
+            PREFIX="$P"
+            break
+          fi
+        done
+        [[ -z "$PREFIX" ]] && continue
 
-          [[ -z "$PREFIX" ]] && continue
+        TYPE=$(echo "$PREFIX" | tr '[:upper:]' '[:lower:]')
+        CONTENT=$(echo "$COMMENT_TEXT" | sed "s/^${PREFIX}:[[:space:]]*//" | head -c 2048)
+        SLUG=$(echo "$CONTENT" | head -c 60 | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//;s/-$//')
+        KEY="${TYPE}-${SLUG}"
 
-          TYPE=$(echo "$PREFIX" | tr '[:upper:]' '[:lower:]')
-          CONTENT=$(echo "$COMMENT" | sed "s/^${PREFIX}:[[:space:]]*//" | head -c 2048)
-          SLUG=$(echo "$CONTENT" | head -c 60 | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//;s/-$//')
-          KEY="${TYPE}-${SLUG}"
-
-          kb_insert "$DB_PATH" "$KEY" "$TYPE" "$CONTENT" "backfill" "" "$(date +%s)" ""
-        done <<< "$COMMENTS"
-      fi
+        kb_insert "$DB_PATH" "$KEY" "$TYPE" "$CONTENT" "backfill" "" "$(date +%s)" "$ISSUE_ID"
+      done
     fi
 
     # Re-read count after beads import
