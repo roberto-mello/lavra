@@ -174,21 +174,45 @@ Run the Task code-simplicity-reviewer() to see if we can simplify the code.
 
 <critical_requirement> ALL findings MUST be stored as child beads of the reviewed bead. Create beads immediately after synthesis - do NOT present findings for user approval first. </critical_requirement>
 
-#### Step 1: Synthesize All Findings
+#### Step 1: Build Agent Finding Inventory
+
+Before synthesizing, build a complete inventory of what each agent returned:
+
+```
+From kieran-rails-reviewer: [finding 1], [finding 2], ...
+From dhh-rails-reviewer: [finding 1], [finding 2], ...
+From security-sentinel: [finding 1], [finding 2], ...
+From performance-oracle: [finding 1], [finding 2], ...
+... (one row per agent that ran)
+```
+
+This inventory is the source of truth for synthesis. Do not proceed to Step 2 until every agent's output is listed.
+
+#### Step 2: Synthesize All Findings
 
 <thinking>
 Consolidate all agent reports into a categorized list of findings.
 Remove duplicates, prioritize by severity and impact.
 </thinking>
 
-- [ ] Collect findings from all parallel agents
+- [ ] Collect findings from the inventory above
 - [ ] Discard any findings that recommend deleting or gitignoring files in `.beads/memory/` (see Protected Artifacts above)
 - [ ] Categorize by type: security, performance, architecture, quality, etc.
 - [ ] Assign severity levels: P1 CRITICAL, P2 IMPORTANT, P3 NICE-TO-HAVE
 - [ ] Remove duplicate or overlapping findings
 - [ ] Estimate effort for each finding (Small/Medium/Large)
 
-#### Step 2: Create Beads for All Findings
+#### Step 2a: Completeness Verification
+
+Before creating beads, verify no agent output was silently dropped:
+
+- [ ] Every finding in the inventory is either included in the categorized list OR explicitly marked as duplicate/inapplicable with a reason
+- [ ] Count: inventory total findings vs. categorized findings + discarded — they must reconcile
+- [ ] If any inventory items are unaccounted for, categorize them now
+
+**Do not proceed to bead creation until the inventory is fully accounted for.**
+
+#### Step 3: Create Beads for All Findings
 
 For each finding, create a child bead:
 
@@ -224,7 +248,7 @@ bd create "{finding title}" \
 - P2 IMPORTANT -> priority 2 (should fix before closing)
 - P3 NICE-TO-HAVE -> priority 3-5 (can defer)
 
-#### Step 3: Link Critical Issues
+#### Step 4: Link Critical Issues
 
 For P1 findings, create blocking dependencies:
 
@@ -234,7 +258,7 @@ bd dep relate {FINDING_BEAD_ID} {ORIGINAL_BEAD_ID}
 
 This ensures the original bead cannot be closed until critical issues are resolved.
 
-#### Step 4: Log Knowledge
+#### Step 5: Log Knowledge
 
 For significant findings, log knowledge:
 
@@ -243,7 +267,7 @@ bd comments add {BEAD_ID} "LEARNED: {key insight from review}"
 bd comments add {BEAD_ID} "PATTERN: {pattern issue discovered}"
 ```
 
-#### Step 5: Summary Report
+#### Step 6: Summary Report
 
 After creating all beads, present comprehensive summary:
 
