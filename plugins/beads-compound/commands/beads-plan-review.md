@@ -116,3 +116,70 @@ After presenting the review, use the **AskUserQuestion tool** to present these o
 2. **Run `/beads-deepen`** - Enhance plan with additional research
 3. **Start `/beads-work`** - Begin implementing (accept plan as-is)
 4. **Dismiss** - Acknowledge review without changes
+
+## Applying Feedback (when option 1 is selected)
+
+**Do not proceed informally.** Follow this exact protocol.
+
+### Step A: Build the Recommendation Checklist
+
+Before touching any bead, extract every actionable recommendation from the review report. Number them sequentially:
+
+```
+RECOMMENDATIONS TO APPLY:
+[ ] 1. [Exact recommendation from Architecture section]
+[ ] 2. [Exact recommendation from Architecture section]
+[ ] 3. [Exact recommendation from Simplicity section]
+[ ] 4. [Exact recommendation from Security section]
+[ ] 5. [Exact recommendation from Performance section]
+...
+```
+
+Print this numbered list to the user before starting. If the review had a "Recommended Changes" section, include all items from it. Also include any critical/important issues from each category.
+
+**Total count:** State how many recommendations you found (e.g., "Found 12 recommendations. Applying now.")
+
+### Step B: Apply Each Recommendation
+
+Work through the list one at a time. For each recommendation:
+
+1. **Identify the target bead** - Which child bead (or epic) does this apply to?
+2. **Read the current description**: `bd show {BEAD_ID}`
+3. **Update it**: `bd update {BEAD_ID} -d "{updated description with recommendation applied}"`
+4. **Mark complete** in your working list: `[x] 1. ...`
+
+If a recommendation applies to multiple beads, update each one.
+
+If a recommendation is architectural (affects the whole plan), update the epic description.
+
+If a recommendation is contradictory or inapplicable, mark it `[SKIPPED: reason]` — do NOT silently omit it.
+
+### Step C: Completeness Verification
+
+After applying all changes, do a completeness pass:
+
+1. Re-read the original review report
+2. Compare each recommendation against your working checklist
+3. For any item not marked `[x]` or `[SKIPPED]`, apply it now
+
+Then print the final checklist state:
+
+```
+APPLIED:
+[x] 1. [recommendation] -> Updated {BEAD_ID}
+[x] 2. [recommendation] -> Updated {BEAD_ID}
+[x] 3. [recommendation] -> Updated {EPIC_ID}
+
+SKIPPED:
+[SKIPPED: contradicts architectural decision] 4. [recommendation]
+
+TOTAL: {N} applied, {M} skipped out of {N+M} recommendations
+```
+
+**Do not say "done" until every recommendation is either marked applied or explicitly skipped with a reason.**
+
+### Step D: Log Changes
+
+```bash
+bd comments add {EPIC_ID} "DECISION: Applied plan review feedback. {N} recommendations applied across {K} beads. Key changes: {top 3 changes}"
+```

@@ -341,13 +341,33 @@ bd comments add {EPIC_ID} "INVESTIGATION: Plan deepened with research from [coun
 
 ## Quality Checks
 
-Before finalizing:
+Before finalizing, do a completeness pass:
+
+**Step 1: Build agent finding inventory**
+
+For each agent that ran, list the concrete recommendations it returned. Group by child bead:
+
+```
+BEAD {CHILD_ID}: {title}
+  From architecture-strategist: [recommendation 1]
+  From security-sentinel: [recommendation 2]
+  From performance-oracle: [recommendation 3]
+  ...
+```
+
+**Step 2: Verify each was applied**
+
+Re-read each updated child bead description (`bd show {CHILD_ID}`) and confirm each recommendation from the inventory above is reflected. If any are missing, apply them now.
+
+**Step 3: Final checklist**
+
 - [ ] All original content preserved in child beads
+- [ ] Every agent recommendation either applied or explicitly noted as inapplicable
 - [ ] Research insights clearly marked and attributed
-- [ ] Code examples are syntactically correct
-- [ ] Links are valid and relevant
 - [ ] No contradictions between sections
 - [ ] Enhancement summary accurately reflects changes
+
+**Do not report completion until the inventory is fully accounted for.**
 
 ## Post-Enhancement Options
 
