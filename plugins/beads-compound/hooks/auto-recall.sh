@@ -41,6 +41,17 @@ BOOTSTRAP
   exit 0
 fi
 
+# Warn if .beads/ is gitignored at the project level -- this means beads
+# issues, comments, and knowledge are not tracked and will be lost if the
+# local copy is deleted. Emit every session until fixed so it's not missed.
+GITIGNORE="$PROJECT_DIR/.gitignore"
+if [[ -f "$GITIGNORE" ]] && grep -qE '^\s*\.beads/?(\s|$)' "$GITIGNORE" 2>/dev/null; then
+  cat << 'WARN'
+{"hookSpecificOutput":{"systemMessage":"## Warning: Beads Data Not Tracked by Git\n\nYour `.gitignore` contains `.beads/`, which means your beads issues, comments, and knowledge are **not committed to git**. If you lose your local copy, this data will be permanently lost.\n\nTo fix: re-run the installer interactively:\n```\nbash /path/to/beads-compound-plugin/install.sh\n```\nOr manually remove `.beads/` from `.gitignore`, then `git add .beads/`.\n\nIf you intentionally want beads invisible to collaborators, use `bd init --stealth` instead (stores the ignore in `.git/info/exclude`, which keeps data safe)."}}
+WARN
+  exit 0
+fi
+
 # Memory directory exists -- proceed with recall
 MEMORY_DIR="$PROJECT_DIR/.beads/memory"
 KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
