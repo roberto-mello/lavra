@@ -15,6 +15,9 @@
 # Resolve script directory early (works for both native plugin and manual install)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# Version of beads-compound that wrote this hook (updated by installer)
+BEADS_COMPOUND_VERSION="0.6.7"
+
 # Exit silently if bd is not installed
 if ! command -v bd &>/dev/null; then
   exit 0
@@ -53,8 +56,20 @@ WARN
   exit 0
 fi
 
-# Memory directory exists -- proceed with recall
+# Warn if hooks are out of date with the installed plugin version
 MEMORY_DIR="$PROJECT_DIR/.beads/memory"
+VERSION_FILE="$MEMORY_DIR/.beads-compound-version"
+if [[ -f "$VERSION_FILE" ]]; then
+  INSTALLED_VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
+  if [[ "$INSTALLED_VERSION" != "$BEADS_COMPOUND_VERSION" ]]; then
+    cat << EOF
+{"hookSpecificOutput":{"systemMessage":"## beads-compound update available\n\nThis project has beads-compound **$INSTALLED_VERSION** but the plugin is now **$BEADS_COMPOUND_VERSION**. Re-run the installer to get the latest hooks and fixes:\n\n\`\`\`\nbash /path/to/beads-compound-plugin/install.sh $(pwd)\n\`\`\`"}}
+EOF
+    exit 0
+  fi
+fi
+
+# Memory directory exists -- proceed with recall
 KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 
 # Get currently open beads

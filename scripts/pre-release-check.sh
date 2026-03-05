@@ -49,6 +49,18 @@ else
 fi
 
 echo ""
+echo "=== Hook version constants ==="
+
+HOOK_VERSION=$(grep 'BEADS_COMPOUND_VERSION=' plugins/beads-compound/hooks/auto-recall.sh | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+PROVISION_VERSION=$(grep 'echo "' plugins/beads-compound/hooks/provision-memory.sh | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+
+echo "  auto-recall.sh:       $HOOK_VERSION"
+echo "  provision-memory.sh:  $PROVISION_VERSION"
+
+[[ "$HOOK_VERSION" == "$PLUGIN_VERSION" ]] && { echo "  PASS  auto-recall.sh version"; ((PASS++)) || true; } || fail "auto-recall.sh version" "has $HOOK_VERSION, expected $PLUGIN_VERSION"
+[[ "$PROVISION_VERSION" == "$PLUGIN_VERSION" ]] && { echo "  PASS  provision-memory.sh version"; ((PASS++)) || true; } || fail "provision-memory.sh version" "has $PROVISION_VERSION, expected $PLUGIN_VERSION"
+
+echo ""
 echo "=== Conversion outputs ==="
 echo "  Generating OpenCode and Gemini outputs..."
 (cd scripts && bun install --frozen-lockfile --silent && bun run convert-opencode.ts && bun run convert-gemini.ts) || {

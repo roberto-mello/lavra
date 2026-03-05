@@ -44,6 +44,9 @@ provision_memory_dir() {
     echo "knowledge.archive.jsonl merge=union" >> "$GITATTR"
   fi
 
+  # Write installed version for staleness detection by auto-recall.sh
+  echo "0.6.7" > "$MEMORY_DIR/.beads-compound-version"
+
   # Create .beads/memory/.gitignore to ignore the SQLite FTS cache
   # (rebuilt from knowledge.jsonl on first use — no need to commit it)
   local MEMORY_GITIGNORE="$MEMORY_DIR/.gitignore"
@@ -106,6 +109,7 @@ EOF
       .beads/memory/knowledge.jsonl \
       .beads/memory/.gitattributes \
       .beads/memory/.gitignore \
+      .beads/memory/.beads-compound-version \
       .beads/memory/recall.sh \
       .beads/memory/knowledge-db.sh \
       2>/dev/null) || true

@@ -10,10 +10,14 @@ git pull --rebase
 
 ## 2. Verify versions are set correctly
 
-- `plugins/beads-compound/.claude-plugin/plugin.json` — must have the target version
-- `.claude-plugin/marketplace.json` — must match `plugin.json` version exactly
+These four locations must all have the target version:
 
-Fix either file if they don't match before continuing.
+- `plugins/beads-compound/.claude-plugin/plugin.json`
+- `.claude-plugin/marketplace.json` — must match `plugin.json` exactly
+- `BEADS_COMPOUND_VERSION` constant in `plugins/beads-compound/hooks/auto-recall.sh`
+- Version string in `plugins/beads-compound/hooks/provision-memory.sh` (the `echo "X.Y.Z"` line)
+
+The pre-release check (step 3) will catch any mismatch, but fix them before running it.
 
 ## 3. Run pre-release checks (MUST PASS before tagging)
 
