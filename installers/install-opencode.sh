@@ -55,7 +55,7 @@ fi
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
 
-echo "📦 beads-compound OpenCode Installer"
+echo "beads-compound OpenCode Installer"
 echo ""
 echo "Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
@@ -83,7 +83,7 @@ fi
 
 # Step 1: Model selection (interactive unless --yes)
 if [ "$AUTO_YES" = false ] && command -v opencode &>/dev/null; then
-  echo "🎯 Step 1/6: Model selection..."
+  echo "[1/6] Model selection..."
   echo ""
   echo "Would you like to customize model selections for each tier?"
   echo "(haiku/sonnet/opus)"
@@ -97,12 +97,12 @@ if [ "$AUTO_YES" = false ] && command -v opencode &>/dev/null; then
     echo ""
   fi
 else
-  echo "🎯 Step 1/6: Using default model configuration..."
+  echo "[1/6] Using default model configuration..."
   echo ""
 fi
 
 # Step 2: Run conversion scripts
-echo "🔄 Step 2/6: Converting files to OpenCode format..."
+echo "[2/6] Converting files to OpenCode format..."
 echo ""
 
 # Check if Bun is available
@@ -122,7 +122,7 @@ fi
 echo ""
 
 # Step 3: Install TypeScript plugin
-echo "🔧 Step 3/6: Installing TypeScript plugin..."
+echo "[3/6] Installing TypeScript plugin..."
 
 # Determine plugin directory: global uses $TARGET/plugins, project uses $TARGET/.opencode/plugins
 if [ "$GLOBAL_INSTALL" = true ]; then
@@ -140,20 +140,20 @@ cp "$PLUGIN_DIR/opencode-src/package.json" "$PLUGINS_DIR/"
 chmod 644 "$PLUGINS_DIR/plugin.ts"
 chmod 644 "$PLUGINS_DIR/package.json"
 
-echo "  ✓ Installed plugin.ts and package.json"
+echo "  - Installed plugin.ts and package.json"
 
 # Install plugin dependencies
 cd "$PLUGINS_DIR"
 if ! bun install --frozen-lockfile 2>/dev/null; then
-  echo "  ⚠️  Frozen lockfile not found, running regular install..."
+  echo "  - Frozen lockfile not found, running regular install..."
   bun install
 fi
 
-echo "  ✓ Installed plugin dependencies"
+echo "  - Installed plugin dependencies"
 echo ""
 
 # Step 4: Copy hooks
-echo "📂 Step 4/6: Installing hooks..."
+echo "[4/6] Installing hooks..."
 
 # Determine base directory: global uses $TARGET directly, project uses $TARGET/.opencode
 if [ "$GLOBAL_INSTALL" = true ]; then
@@ -167,13 +167,13 @@ create_dir_with_symlink_handling "$HOOKS_DIR"
 for hook in auto-recall.sh memory-capture.sh subagent-wrapup.sh; do
   cp "$PLUGIN_DIR/hooks/$hook" "$HOOKS_DIR/"
   chmod 755 "$HOOKS_DIR/$hook"
-  echo "  ✓ $hook"
+  echo "  - $hook"
 done
 
 echo ""
 
 # Step 5: Copy converted files
-echo "📋 Step 5/6: Installing commands, agents, and skills..."
+echo "[5/6] Installing commands, agents, and skills..."
 
 # Determine base directory: global uses $TARGET directly, project uses $TARGET/.opencode
 if [ "$GLOBAL_INSTALL" = true ]; then
@@ -189,7 +189,7 @@ create_dir_with_symlink_handling "$COMMANDS_DIR"
 find "$PLUGIN_DIR/opencode/commands" -name "*.md" -exec cp {} "$COMMANDS_DIR/" \;
 find "$COMMANDS_DIR" -type f -exec chmod 644 {} \;
 
-echo "  ✓ Installed $(find "$PLUGIN_DIR/opencode/commands" -name "*.md" | wc -l | tr -d ' ') commands"
+echo "  - Installed $(find "$PLUGIN_DIR/opencode/commands" -name "*.md" | wc -l | tr -d ' ') commands"
 
 # Agents
 AGENTS_DIR="$BASE_DIR/agents"
@@ -204,7 +204,7 @@ done
 
 find "$AGENTS_DIR" -type f -exec chmod 644 {} \;
 
-echo "  ✓ Installed $(find "$PLUGIN_DIR/opencode/agents" -name "*.md" | wc -l | tr -d ' ') agents"
+echo "  - Installed $(find "$PLUGIN_DIR/opencode/agents" -name "*.md" | wc -l | tr -d ' ') agents"
 
 # Skills
 SKILLS_DIR="$BASE_DIR/skills"
@@ -219,41 +219,28 @@ for skill_dir in "$PLUGIN_DIR/opencode/skills"/*; do
   fi
 done
 
-echo "  ✓ Installed $(find "$PLUGIN_DIR/opencode/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ') skills"
+echo "  - Installed $(find "$PLUGIN_DIR/opencode/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ') skills"
 echo ""
 
 # Step 6: Provision memory (only for project-specific installs)
 if [ "$GLOBAL_INSTALL" = true ]; then
-  echo "💾 Step 6/6: Skipping memory system (global install)"
+  echo "[6/6] Skipping memory system (global install)"
   echo "  Memory system will be provisioned per-project when using OpenCode"
   echo ""
 else
-  echo "💾 Step 6/6: Provisioning memory system..."
+  echo "[6/6] Provisioning memory system..."
 
-  BEADS_MEMORY_DIR="$TARGET/.beads/memory"
-  mkdir -p "$BEADS_MEMORY_DIR"
+  source "$PLUGIN_DIR/hooks/provision-memory.sh"
+  provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
 
-  # Copy recall scripts
-  cp "$PLUGIN_DIR/hooks/recall.sh" "$BEADS_MEMORY_DIR/"
-  cp "$PLUGIN_DIR/hooks/knowledge-db.sh" "$BEADS_MEMORY_DIR/"
-
-  chmod 755 "$BEADS_MEMORY_DIR/recall.sh"
-  chmod 755 "$BEADS_MEMORY_DIR/knowledge-db.sh"
-
-  # Create knowledge.jsonl if it doesn't exist
-  if [ ! -f "$BEADS_MEMORY_DIR/knowledge.jsonl" ]; then
-    touch "$BEADS_MEMORY_DIR/knowledge.jsonl"
-    chmod 644 "$BEADS_MEMORY_DIR/knowledge.jsonl"
-  fi
-
-  echo "  ✓ Memory system ready"
+  echo "  - Memory system ready"
   echo ""
 fi
 
 # Installation complete
-echo "✅ Installation complete!"
+echo "Done."
 echo ""
-echo "📚 Next steps:"
+echo "Next steps:"
 echo ""
 echo "1. Configure MCP servers (optional):"
 echo "   See: $PLUGIN_DIR/opencode/docs/MCP_SETUP.md"

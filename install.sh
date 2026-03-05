@@ -124,7 +124,7 @@ fi
 # Export SCRIPT_DIR so sourced installer can use it
 export BEADS_MARKETPLACE_ROOT="$SCRIPT_DIR"
 
-echo "🔄 Installing beads-compound for $PLATFORM..."
+echo "Installing beads-compound for $PLATFORM..."
 echo ""
 
 source "$INSTALLER" "$@"

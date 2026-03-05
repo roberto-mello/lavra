@@ -1,0 +1,5 @@
+# SQLite FTS cache (rebuilt from knowledge.jsonl on first use)
+knowledge.db
+knowledge.db-journal
+knowledge.db-wal
+knowledge.db-shm

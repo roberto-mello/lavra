@@ -55,7 +55,7 @@ fi
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
 
-echo "📦 beads-compound Gemini CLI Installer"
+echo "beads-compound Gemini CLI Installer"
 echo ""
 echo "Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
@@ -82,7 +82,7 @@ if [[ "$TARGET_OWNER" != "$USER" ]]; then
 fi
 
 # Step 1: Run conversion scripts
-echo "🔄 Step 1/4: Converting files to Gemini CLI format..."
+echo "[1/4] Converting files to Gemini CLI format..."
 echo ""
 
 # Check if Bun is available
@@ -102,7 +102,7 @@ fi
 echo ""
 
 # Step 2: Copy hooks
-echo "📂 Step 2/4: Installing hooks..."
+echo "[2/4] Installing hooks..."
 
 HOOKS_DIR="$TARGET/hooks"
 create_dir_with_symlink_handling "$HOOKS_DIR"
@@ -110,13 +110,13 @@ create_dir_with_symlink_handling "$HOOKS_DIR"
 for hook in auto-recall.sh memory-capture.sh subagent-wrapup.sh; do
   cp "$PLUGIN_DIR/hooks/$hook" "$HOOKS_DIR/"
   chmod 755 "$HOOKS_DIR/$hook"
-  echo "  ✓ $hook"
+  echo "  - $hook"
 done
 
 echo ""
 
 # Step 3: Copy converted files
-echo "📋 Step 3/4: Installing commands, agents, and skills..."
+echo "[3/4] Installing commands, agents, and skills..."
 
 # Commands (.toml format)
 COMMANDS_DIR="$TARGET/commands"
@@ -125,7 +125,7 @@ create_dir_with_symlink_handling "$COMMANDS_DIR"
 find "$PLUGIN_DIR/gemini/commands" -name "*.toml" -exec cp {} "$COMMANDS_DIR/" \;
 find "$COMMANDS_DIR" -type f -exec chmod 644 {} \;
 
-echo "  ✓ Installed $(find "$PLUGIN_DIR/gemini/commands" -name "*.toml" | wc -l | tr -d ' ') commands (.toml)"
+echo "  - Installed $(find "$PLUGIN_DIR/gemini/commands" -name "*.toml" | wc -l | tr -d ' ') commands (.toml)"
 
 # Agents
 AGENTS_DIR="$TARGET/agents"
@@ -140,7 +140,7 @@ done
 
 find "$AGENTS_DIR" -type f -exec chmod 644 {} \;
 
-echo "  ✓ Installed $(find "$PLUGIN_DIR/gemini/agents" -name "*.md" | wc -l | tr -d ' ') agents"
+echo "  - Installed $(find "$PLUGIN_DIR/gemini/agents" -name "*.md" | wc -l | tr -d ' ') agents"
 
 # Skills
 SKILLS_DIR="$TARGET/skills"
@@ -155,41 +155,28 @@ for skill_dir in "$PLUGIN_DIR/gemini/skills"/*; do
   fi
 done
 
-echo "  ✓ Installed $(find "$PLUGIN_DIR/gemini/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ') skills"
+echo "  - Installed $(find "$PLUGIN_DIR/gemini/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ') skills"
 echo ""
 
 # Step 4: Provision memory (only for project-specific installs)
 if [ "$GLOBAL_INSTALL" = true ]; then
-  echo "💾 Step 4/4: Skipping memory system (global install)"
+  echo "[4/4] Skipping memory system (global install)"
   echo "  Memory system will be provisioned per-project when using Gemini CLI"
   echo ""
 else
-  echo "💾 Step 4/4: Provisioning memory system..."
+  echo "[4/4] Provisioning memory system..."
 
-  BEADS_MEMORY_DIR="$TARGET/.beads/memory"
-  mkdir -p "$BEADS_MEMORY_DIR"
+  source "$PLUGIN_DIR/hooks/provision-memory.sh"
+  provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
 
-  # Copy recall scripts
-  cp "$PLUGIN_DIR/hooks/recall.sh" "$BEADS_MEMORY_DIR/"
-  cp "$PLUGIN_DIR/hooks/knowledge-db.sh" "$BEADS_MEMORY_DIR/"
-
-  chmod 755 "$BEADS_MEMORY_DIR/recall.sh"
-  chmod 755 "$BEADS_MEMORY_DIR/knowledge-db.sh"
-
-  # Create knowledge.jsonl if it doesn't exist
-  if [ ! -f "$BEADS_MEMORY_DIR/knowledge.jsonl" ]; then
-    touch "$BEADS_MEMORY_DIR/knowledge.jsonl"
-    chmod 644 "$BEADS_MEMORY_DIR/knowledge.jsonl"
-  fi
-
-  echo "  ✓ Memory system ready"
+  echo "  - Memory system ready"
   echo ""
 fi
 
 # Installation complete
-echo "✅ Installation complete!"
+echo "Done."
 echo ""
-echo "📚 Next steps:"
+echo "Next steps:"
 echo ""
 echo "1. Configure hooks in settings.json:"
 echo "   See: $PLUGIN_DIR/gemini-src/settings.json for hook configuration"

@@ -436,26 +436,10 @@ SETTINGS_EOF
   fi
 fi
 
-# Update .gitignore (only for project-specific installs)
-if [ "$GLOBAL_INSTALL" = false ]; then
-  GITIGNORE="$TARGET/.gitignore"
-
-  if [ -f "$GITIGNORE" ]; then
-    if ! grep -qE '^\.beads/?$' "$GITIGNORE" 2>/dev/null; then
-      echo "" >> "$GITIGNORE"
-      echo "# Beads (ephemeral task data)" >> "$GITIGNORE"
-      echo ".beads/" >> "$GITIGNORE"
-      echo "  - Updated .gitignore"
-    fi
-  else
-    cat > "$GITIGNORE" << 'EOF'
-# Beads (ephemeral task data)
-.beads/
-.mcp.json
-EOF
-    echo "  - Created .gitignore"
-  fi
-fi
+# Note: we do NOT add .beads/ to .gitignore.
+# bd init manages .beads/ visibility via .beads/.gitignore and (for stealth mode)
+# .git/info/exclude. Adding .beads/ to the project .gitignore would silently
+# prevent issues.jsonl and comments from being committed, causing data loss.
 
 # Check for recommended frontend skills
 FRONTEND_SKILLS_MISSING=()

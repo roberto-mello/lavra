@@ -6,7 +6,6 @@ __pycache__
 tasks/
 
 # Beads (ephemeral task data)
-.beads/
 .mcp.json
 plans/
 

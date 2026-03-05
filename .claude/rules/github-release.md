@@ -30,13 +30,98 @@ This replicates the CI `verify-release` job locally:
 
 **Do not proceed if any check fails.**
 
-## 4. Push commits
+## 4. Run installer smoke tests (MUST PASS before tagging)
+
+### Claude installer
+
+Create a fresh test project, run the installer, and verify the memory system:
+
+```bash
+mkdir -p /tmp/test-beads-install && cd /tmp/test-beads-install
+git init -q && bd init --quiet 2>/dev/null
+bash ~/Documents/projects/beads-compound-plugin/install.sh /tmp/test-beads-install
+```
+
+Verify the memory directory:
+
+```bash
+ls /tmp/test-beads-install/.beads/memory/
+# Must contain: knowledge.jsonl, recall.sh, knowledge-db.sh, .gitattributes, .gitignore
+
+cat /tmp/test-beads-install/.beads/memory/.gitignore
+# Must contain: knowledge.db (and journal/wal/shm variants)
+
+cat /tmp/test-beads-install/.beads/memory/.gitattributes
+# Must contain: knowledge.jsonl merge=union
+
+cat /tmp/test-beads-install/.gitignore 2>/dev/null || echo "(no project .gitignore -- correct)"
+# Must NOT contain .beads/
+```
+
+Verify the .beads/ warning prompt fires when .gitignore already has .beads/:
+
+```bash
+echo ".beads/" >> /tmp/test-beads-install/.gitignore
+bash ~/Documents/projects/beads-compound-plugin/install.sh /tmp/test-beads-install 2>&1 | grep -A5 '\[!\] Warning'
+# Must show the data loss warning and [non-interactive] message
+```
+
+### OpenCode installer
+
+Tests conversion + file installation. Does not require OpenCode to be installed.
+
+```bash
+mkdir -p /tmp/test-opencode-install && cd /tmp/test-opencode-install
+git init -q && bd init --quiet 2>/dev/null
+bash ~/Documents/projects/beads-compound-plugin/install.sh -opencode --yes /tmp/test-opencode-install
+```
+
+Verify:
+
+```bash
+ls /tmp/test-opencode-install/.opencode/hooks/
+# Must contain: auto-recall.sh, memory-capture.sh, subagent-wrapup.sh
+
+ls /tmp/test-opencode-install/.beads/memory/
+# Must contain: knowledge.jsonl, recall.sh, knowledge-db.sh, .gitattributes, .gitignore
+```
+
+### Gemini installer
+
+Tests conversion + file installation. Does not require Gemini CLI to be installed.
+
+```bash
+mkdir -p /tmp/test-gemini-install && cd /tmp/test-gemini-install
+git init -q && bd init --quiet 2>/dev/null
+bash ~/Documents/projects/beads-compound-plugin/install.sh -gemini --yes /tmp/test-gemini-install
+```
+
+Verify:
+
+```bash
+ls /tmp/test-gemini-install/hooks/
+# Must contain: auto-recall.sh, memory-capture.sh, subagent-wrapup.sh
+
+ls /tmp/test-gemini-install/.beads/memory/
+# Must contain: knowledge.jsonl, recall.sh, knowledge-db.sh, .gitattributes, .gitignore
+```
+
+### Clean up
+
+```bash
+rm -rf /tmp/test-beads-install /tmp/test-opencode-install /tmp/test-gemini-install
+cd ~/Documents/projects/beads-compound-plugin
+```
+
+**Do not proceed if any verification fails.**
+
+## 5. Push commits
 
 ```bash
 git push
 ```
 
-## 5. Tag and release
+## 6. Tag and release
 
 ```bash
 git tag vX.Y.Z
@@ -44,7 +129,7 @@ git push origin vX.Y.Z
 gh release create vX.Y.Z --title "vX.Y.Z" --generate-notes
 ```
 
-## 6. Verify CI passes
+## 7. Verify CI passes
 
 ```bash
 gh run list --limit 5

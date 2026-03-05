@@ -44,15 +44,57 @@ provision_memory_dir() {
     echo "knowledge.archive.jsonl merge=union" >> "$GITATTR"
   fi
 
-  # Ensure .beads/memory/ is not gitignored
-  # Many projects gitignore .beads/ for the daemon/cache files,
-  # but memory files need to be tracked for cross-machine persistence
+  # Create .beads/memory/.gitignore to ignore the SQLite FTS cache
+  # (rebuilt from knowledge.jsonl on first use — no need to commit it)
+  local MEMORY_GITIGNORE="$MEMORY_DIR/.gitignore"
+  if [[ ! -f "$MEMORY_GITIGNORE" ]]; then
+    cat > "$MEMORY_GITIGNORE" << 'EOF'
+# SQLite FTS cache (rebuilt from knowledge.jsonl on first use)
+knowledge.db
+knowledge.db-journal
+knowledge.db-wal
+knowledge.db-shm
+EOF
+  fi
+
+  # Check if project .gitignore contains a .beads/ pattern, which would cause
+  # all beads issue/comment data to be untracked (data loss risk on new clones).
+  # bd init no longer adds .beads/ to project .gitignore — if it's there, it's
+  # from an older version of beads-compound or a manual addition.
   if git -C "$PROJECT_DIR" rev-parse --git-dir &>/dev/null 2>&1; then
     local GITIGNORE="$PROJECT_DIR/.gitignore"
-    if [[ -f "$GITIGNORE" ]] && grep -q '\.beads' "$GITIGNORE" 2>/dev/null; then
-      if ! grep -q '!\.beads/memory/' "$GITIGNORE" 2>/dev/null; then
-        printf '\n# beads-compound: persist knowledge across machines\n!.beads/memory/\n!.beads/memory/**\n' >> "$GITIGNORE"
+    if [[ -f "$GITIGNORE" ]] && grep -qE '^\s*\.beads/?(\s|$)' "$GITIGNORE" 2>/dev/null; then
+      echo ""
+      echo "[!] Warning: .beads/ is listed in your project .gitignore."
+      echo "    This means your beads issues, comments, and knowledge are not"
+      echo "    tracked by git. If you lose your local copy, all of this data"
+      echo "    will be permanently lost."
+      echo ""
+      echo "    Modern beads (bd init) no longer adds .beads/ to .gitignore."
+      echo "    If you want .beads/ to be invisible to git, use: bd init --stealth"
+      echo "    (which uses .git/info/exclude instead, keeping data safe)."
+      echo ""
+      if [[ "${BEADS_AUTO_YES:-false}" == "true" ]] || ! [[ -t 0 ]]; then
+        # Non-interactive mode (hook context or --yes flag): warn but don't modify
+        echo "    [non-interactive] Leaving .gitignore unchanged. Re-run install to fix interactively."
+      else
+        read -r -p "    Remove .beads/ from .gitignore? [Y/n] " response
+        case "${response:-Y}" in
+          [nN]|[nN][oO])
+            echo "    Left unchanged. Your beads data may not be committed to git."
+            ;;
+          *)
+            # Remove lines matching .beads/ (with optional trailing slash and whitespace)
+            local TMPFILE
+            TMPFILE=$(mktemp)
+            grep -vE '^\s*\.beads/?(\s|$)' "$GITIGNORE" > "$TMPFILE"
+            mv "$TMPFILE" "$GITIGNORE"
+            echo "    Removed .beads/ from .gitignore."
+            echo "    Run: git add .beads/ && git commit -m 'track beads data'"
+            ;;
+        esac
       fi
+      echo ""
     fi
   fi
 
@@ -62,6 +104,7 @@ provision_memory_dir() {
     (cd "$PROJECT_DIR" && git add -f \
       .beads/memory/knowledge.jsonl \
       .beads/memory/.gitattributes \
+      .beads/memory/.gitignore \
       .beads/memory/recall.sh \
       .beads/memory/knowledge-db.sh \
       2>/dev/null) || true
