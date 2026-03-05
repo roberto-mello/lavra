@@ -14,6 +14,7 @@ All notable changes to the beads-compound plugin are documented here.
 - **Installer smoke tests in release checklist** - `.claude/rules/github-release.md` now documents required smoke tests for all three platforms (Claude, OpenCode, Gemini) that must pass before tagging a release.
 
 ### Fixed
+- **Context7 MCP not configured on global install** - The Claude installer was writing to `~/.claude/.mcp.json` (not read by Claude Code) instead of merging into `~/.claude.json` under `mcpServers`. OpenCode and Gemini installers were only printing a link to manual setup docs. All three now auto-configure Context7 using HTTP transport: Claude merges into `~/.claude.json`, OpenCode into `~/.config/opencode/opencode.json` (`type: "remote"`), Gemini into `~/.config/gemini/settings.json` (`type: "http"`).
 - **Beads data silently untracked** - The installer was adding `.beads/` to the project `.gitignore`, which caused beads issues, comments, and knowledge to never be committed. Modern `bd init` no longer does this — the installer now leaves `.beads/` alone and warns when it finds the pattern already present.
 - **False positive gitignore warning** - The `.beads/` gitignore warning correctly ignores cases where `!.beads/memory/` negation rules are already present, avoiding spurious warnings on older installs that used the previous negation approach.
 - **Emoji removed from installer output** - All user-facing messages in `install.sh`, `install-claude.sh`, `install-opencode.sh`, and `install-gemini.sh` now use plain text.
