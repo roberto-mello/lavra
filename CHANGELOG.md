@@ -2,6 +2,26 @@
 
 All notable changes to the beads-compound plugin are documented here.
 
+## [0.6.8] - 2026-03-05
+
+### Added
+- **Installed version tracking** - `provision-memory.sh` now writes `.beads/memory/.beads-compound-version` on every install. `auto-recall.sh` embeds its own version constant and emits a session warning when the installed hooks are out of date, telling the user exactly which command to run to upgrade.
+- **`.beads/memory/.gitignore`** - The installer now creates a scoped `.gitignore` inside `.beads/memory/` to exclude the SQLite FTS cache (`knowledge.db` and variants). This is our directory — we own its ignore rules rather than relying on beads' `.beads/.gitignore` which can be overwritten by `bd init` or `bd doctor --fix`.
+- **Session warning for gitignored beads data** - `auto-recall.sh` now detects when `.beads/` is listed in the project `.gitignore` without negation rules and emits a prominent session warning explaining the data loss risk and how to fix it. Fires every session until resolved.
+- **Installer prompt for gitignored beads data** - `provision-memory.sh` detects the same condition and interactively offers to remove the `.beads/` line from `.gitignore`. Non-interactive contexts (hooks, `--yes` flag) warn but don't modify.
+- **OpenCode and Gemini installers now use `provision_memory_dir`** - Both platform installers previously duplicated inline memory setup. They now call the shared `provision_memory_dir` function and get all memory fixes automatically.
+- **Hook version check in pre-release checks** - `scripts/pre-release-check.sh` now verifies that the `BEADS_COMPOUND_VERSION` constant in `auto-recall.sh` and the version string in `provision-memory.sh` both match `plugin.json`. Prevents shipping hooks that advertise the wrong version.
+- **Installer smoke tests in release checklist** - `.claude/rules/github-release.md` now documents required smoke tests for all three platforms (Claude, OpenCode, Gemini) that must pass before tagging a release.
+
+### Fixed
+- **Beads data silently untracked** - The installer was adding `.beads/` to the project `.gitignore`, which caused beads issues, comments, and knowledge to never be committed. Modern `bd init` no longer does this — the installer now leaves `.beads/` alone and warns when it finds the pattern already present.
+- **False positive gitignore warning** - The `.beads/` gitignore warning correctly ignores cases where `!.beads/memory/` negation rules are already present, avoiding spurious warnings on older installs that used the previous negation approach.
+- **Emoji removed from installer output** - All user-facing messages in `install.sh`, `install-claude.sh`, `install-opencode.sh`, and `install-gemini.sh` now use plain text.
+
+### Changed
+- **`.beads/` no longer added to project `.gitignore`** - The installer previously added `.beads/` as "ephemeral task data". This was incorrect: beads JSONL files (issues, comments) should be committed. The installer now leaves `.gitignore` alone. Use `bd init --stealth` if you want `.beads/` invisible to collaborators (it uses `.git/info/exclude` which keeps data safe).
+- **Memory provisioning consolidated** - The four locations that must be kept in sync on a version bump are now documented: `plugin.json`, `marketplace.json`, `auto-recall.sh` (`BEADS_COMPOUND_VERSION`), and `provision-memory.sh` (version string).
+
 ## [0.6.7] - 2026-03-04
 
 ### Fixed

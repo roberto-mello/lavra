@@ -12,3 +12,7 @@ plans/
 # Build artifacts (generated at install time)
 plugins/beads-compound/opencode/
 plugins/beads-compound/gemini/
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db
