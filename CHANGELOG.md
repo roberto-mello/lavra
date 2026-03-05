@@ -2,6 +2,16 @@
 
 All notable changes to the beads-compound plugin are documented here.
 
+## [0.6.7] - 2026-03-04
+
+### Fixed
+- **`/beads-review` agent findings inventory** - Added explicit inventory step before synthesis to prevent silently dropping agent output when building final review
+- **`/beads-plan-review` apply-feedback protocol** - Replaced vague "Apply feedback" option with explicit Steps A-D: build numbered checklist of all recommendations, apply each one-by-one marking done or skipped with reason, completeness verification pass, then log a DECISION comment summarizing what changed
+- **`/beads-deepen` completeness verification** - Now builds per-bead inventory of agent findings before finalizing, preventing missed recommendations during synthesis
+- **`/beads-work` knowledge logging requirements** - Added trigger table showing exactly when to log (surprises, choices, errors, patterns, constraints); logging is now mandatory per task with explicit gate before marking task complete
+- **`/beads-parallel` knowledge logging framing** - Fixed ralph prompt which said "only on final success or failure", actively encouraging batching; aligned teams worker prompt with inline-first framing
+- **Branching strategy** - `beads-work` now asks user about branching strategy instead of always creating a feature branch
+
 ## [0.6.4] - 2026-02-20
 
 ### Added
