@@ -289,7 +289,7 @@ fi
 # Install MCP configuration
 echo "[8/9] Configuring MCP servers..."
 
-if [ "$GLOBALLY_INSTALLED" = true ]; then
+if [ "$GLOBAL_INSTALL" = true ]; then
   # Global install: merge into ~/.claude.json (user-level MCP config)
   CLAUDE_JSON="$HOME/.claude.json"
   if ! command -v jq &>/dev/null; then
@@ -436,20 +436,6 @@ fi
 # .git/info/exclude. Adding .beads/ to the project .gitignore would silently
 # prevent issues.jsonl and comments from being committed, causing data loss.
 
-# Check for recommended frontend skills
-FRONTEND_SKILLS_MISSING=()
-
-GLOBAL_SKILLS="$HOME/.claude/skills"
-PROJECT_SKILLS="$TARGET/.claude/skills"
-
-if [ ! -f "$GLOBAL_SKILLS/web-design-guidelines.md" ] && [ ! -f "$PROJECT_SKILLS/web-design-guidelines.md" ]; then
-  FRONTEND_SKILLS_MISSING+=("web-design-guidelines")
-fi
-
-if [ ! -f "$GLOBAL_SKILLS/vercel-react-best-practices.md" ] && [ ! -f "$PROJECT_SKILLS/vercel-react-best-practices.md" ]; then
-  FRONTEND_SKILLS_MISSING+=("vercel-react-best-practices")
-fi
-
 echo ""
 echo "Done. Installed:"
 echo ""
@@ -483,25 +469,6 @@ echo "  MCP Servers:"
 echo "    - Context7 (framework documentation)"
 echo ""
 
-if [ ${#FRONTEND_SKILLS_MISSING[@]} -gt 0 ]; then
-  echo "Recommended (frontend projects):"
-  for skill in "${FRONTEND_SKILLS_MISSING[@]}"; do
-    echo "  - Install $skill skill for enhanced review capabilities"
-  done
-  echo ""
-  echo "  Install globally:"
-  for skill in "${FRONTEND_SKILLS_MISSING[@]}"; do
-    echo "    claude-code skill add $skill"
-  done
-  echo ""
-  echo "  Or per-project:"
-  echo "    cd $TARGET"
-  for skill in "${FRONTEND_SKILLS_MISSING[@]}"; do
-    echo "    claude-code skill add $skill --project"
-  done
-  echo ""
-fi
-
 if [ "$GLOBAL_INSTALL" = true ]; then
   echo "Global installation complete!"
   echo ""
@@ -509,6 +476,11 @@ if [ "$GLOBAL_INSTALL" = true ]; then
   echo ""
   echo "For beads integration (memory system + hooks):"
   echo "  bash $SCRIPT_DIR/install.sh /path/to/your-project"
+  echo ""
+  echo "[!] IMPORTANT: If you have existing projects with a previous version of"
+  echo "    beads-compound installed, re-run the installer on each to update hooks:"
+  echo "    bash $SCRIPT_DIR/install.sh /path/to/your-project"
+  echo "    (Auto-provisioning only installs hooks for the first time, not updates.)"
   echo ""
 else
   echo "Usage:"
