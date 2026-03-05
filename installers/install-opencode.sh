@@ -237,13 +237,34 @@ else
   echo ""
 fi
 
+# Configure MCP servers
+echo "[7/6] Configuring MCP servers..."
+
+OPENCODE_CONFIG="$HOME/.config/opencode/opencode.json"
+if ! command -v jq &>/dev/null; then
+  echo "  [!] jq not found -- skipping MCP config (add context7 to $OPENCODE_CONFIG manually)"
+elif [ -f "$OPENCODE_CONFIG" ] && jq -e '.mcp["context7"]' "$OPENCODE_CONFIG" &>/dev/null; then
+  echo "  - Context7 already in $OPENCODE_CONFIG -- skipping"
+else
+  CONTEXT7_ENTRY='{"type":"remote","url":"https://mcp.context7.com/mcp"}'
+  if [ -f "$OPENCODE_CONFIG" ]; then
+    UPDATED=$(jq --argjson c7 "$CONTEXT7_ENTRY" '.mcp = ((.mcp // {}) + {"context7": $c7})' "$OPENCODE_CONFIG")
+    echo "$UPDATED" > "$OPENCODE_CONFIG"
+    echo "  - Added Context7 to $OPENCODE_CONFIG"
+  else
+    mkdir -p "$(dirname "$OPENCODE_CONFIG")"
+    printf '{"mcp":{"context7":%s}}\n' "$CONTEXT7_ENTRY" > "$OPENCODE_CONFIG"
+    echo "  - Created $OPENCODE_CONFIG with Context7 MCP server"
+  fi
+fi
+echo ""
+
 # Installation complete
 echo "Done."
 echo ""
 echo "Next steps:"
 echo ""
-echo "1. Configure MCP servers (optional):"
-echo "   See: $PLUGIN_DIR/opencode/docs/MCP_SETUP.md"
+echo "1. Context7 MCP server configured (framework documentation lookup)"
 echo ""
 echo "2. The TypeScript plugin will automatically load on next OpenCode session"
 echo ""

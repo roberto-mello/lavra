@@ -16,6 +16,9 @@
 # Disable daemon for RPC communication (forces direct database access)
 no-daemon: true
 
+# Disable dolt sql-server auto-start (v0.58+)
+dolt.auto-start: false
+
 # Disable auto-flush of database to JSONL after mutations
 # no-auto-flush: false
 

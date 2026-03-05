@@ -173,6 +173,28 @@ else
   echo ""
 fi
 
+# Configure MCP servers
+echo "[5/4] Configuring MCP servers..."
+
+GEMINI_CONFIG="$HOME/.config/gemini/settings.json"
+if ! command -v jq &>/dev/null; then
+  echo "  [!] jq not found -- skipping MCP config (add context7 to $GEMINI_CONFIG manually)"
+elif [ -f "$GEMINI_CONFIG" ] && jq -e '.mcpServers["context7"]' "$GEMINI_CONFIG" &>/dev/null; then
+  echo "  - Context7 already in $GEMINI_CONFIG -- skipping"
+else
+  CONTEXT7_ENTRY='{"url":"https://mcp.context7.com/mcp","type":"http"}'
+  if [ -f "$GEMINI_CONFIG" ]; then
+    UPDATED=$(jq --argjson c7 "$CONTEXT7_ENTRY" '.mcpServers = ((.mcpServers // {}) + {"context7": $c7})' "$GEMINI_CONFIG")
+    echo "$UPDATED" > "$GEMINI_CONFIG"
+    echo "  - Added Context7 to $GEMINI_CONFIG"
+  else
+    mkdir -p "$(dirname "$GEMINI_CONFIG")"
+    printf '{"mcpServers":{"context7":%s}}\n' "$CONTEXT7_ENTRY" > "$GEMINI_CONFIG"
+    echo "  - Created $GEMINI_CONFIG with Context7 MCP server"
+  fi
+fi
+echo ""
+
 # Installation complete
 echo "Done."
 echo ""
@@ -181,8 +203,7 @@ echo ""
 echo "1. Configure hooks in settings.json:"
 echo "   See: $PLUGIN_DIR/gemini-src/settings.json for hook configuration"
 echo ""
-echo "2. Configure MCP servers (optional):"
-echo "   See: $PLUGIN_DIR/gemini/docs/MCP_SETUP.md"
+echo "2. Context7 MCP server configured (framework documentation lookup)"
 echo ""
 echo "3. Commands are available as slash commands:"
 echo "   - /beads-plan, /beads-work, /beads-review, etc."

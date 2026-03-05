@@ -2,9 +2,7 @@
 
 The beads-compound plugin uses the Context7 MCP server for framework documentation.
 
-## Manual Configuration Required
-
-Gemini CLI does not support automatic MCP server installation. You need to manually add the server to your Gemini configuration.
+The installer automatically configures Context7 in `~/.config/gemini/settings.json`. If you need to add it manually:
 
 ### Configuration File
 
@@ -14,9 +12,8 @@ Add to `~/.config/gemini/settings.json`:
 {
   "mcpServers": {
     "context7": {
-      "command": "npx",
-      "args": ["-y", "@upwithcrowd/context7-mcp@latest"],
-      "env": {}
+      "url": "https://mcp.context7.com/mcp",
+      "type": "http"
     }
   }
 }
@@ -24,18 +21,6 @@ Add to `~/.config/gemini/settings.json`:
 
 ### What Context7 Provides
 
-- Semantic search across PostgreSQL and TimescaleDB documentation
-- Framework-specific best practices and patterns
+- Framework documentation lookup
 - API reference lookups
-
-### Usage in Gemini CLI
-
-Once configured, use the `@context7` MCP tool to search documentation:
-
-```
-@context7 search_docs source=postgres query="create hypertable" search_type=semantic
-```
-
-## Security Note
-
-The Context7 MCP server runs as a subprocess with access to your environment. Only install if you trust the source.
+- Best practices and patterns for popular libraries

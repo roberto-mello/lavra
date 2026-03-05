@@ -2,47 +2,27 @@
 
 The beads-compound plugin uses the Context7 MCP server for framework documentation.
 
-## Manual Configuration Required
-
-OpenCode does not support automatic MCP server installation. You need to manually add the server to your OpenCode configuration.
+The installer automatically configures Context7 in `~/.config/opencode/opencode.json`. If you need to add it manually:
 
 ### Configuration File
 
-Add to `~/.config/opencode/config.json` or your project's `opencode.json`:
+Add to `~/.config/opencode/opencode.json` or your project's `opencode.json`:
 
 ```json
 {
-  "mcpServers": {
+  "mcp": {
     "context7": {
-      "command": "npx",
-      "args": ["-y", "@upwithcrowd/context7-mcp@latest"],
-      "env": {}
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp"
     }
   }
 }
 ```
 
+Note: OpenCode uses the `mcp` key (not `mcpServers`) and `type: "remote"` for HTTP servers.
+
 ### What Context7 Provides
 
-- Semantic search across PostgreSQL and TimescaleDB documentation
-- Framework-specific best practices and patterns
+- Framework documentation lookup
 - API reference lookups
-
-### Usage in OpenCode
-
-Once configured, agents can use the Context7 tools to search documentation:
-
-```typescript
-// Example: Search PostgreSQL docs
-await mcp.call("context7", "search_docs", {
-  source: "postgres",
-  search_type: "semantic",
-  query: "create hypertable with compression",
-  version: "latest",
-  limit: 5
-});
-```
-
-## Security Note
-
-The Context7 MCP server runs as a subprocess with access to your environment. Only install if you trust the source.
+- Best practices and patterns for popular libraries

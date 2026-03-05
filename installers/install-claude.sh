@@ -290,27 +290,22 @@ fi
 echo "[8/9] Configuring MCP servers..."
 
 if [ "$GLOBALLY_INSTALLED" = true ]; then
-  # Check if MCP is already configured globally
-  if [ -f "$HOME/.mcp.json" ] && command -v jq &>/dev/null; then
-    if jq -e '.mcpServers["context7"]' "$HOME/.mcp.json" &>/dev/null; then
-      echo "  - Already configured globally -- skipping"
-    else
-      # Global install exists but MCP wasn't set up -- install it
-      if [ -f "$PLUGIN_DIR/.mcp.json" ]; then
-        if [ -f "$TARGET/.mcp.json" ]; then
-          EXISTING=$(cat "$TARGET/.mcp.json")
-          PLUGIN_MCP=$(cat "$PLUGIN_DIR/.mcp.json")
-          MERGED=$(printf '%s\n%s\n' "$EXISTING" "$PLUGIN_MCP" | jq -s '.[0].mcpServers = ((.[0].mcpServers // {}) * .[1].mcpServers) | .[0]')
-          echo "$MERGED" > "$TARGET/.mcp.json"
-          echo "  - Merged MCP servers into existing .mcp.json"
-        else
-          cp "$PLUGIN_DIR/.mcp.json" "$TARGET/.mcp.json"
-          echo "  - Created .mcp.json with Context7 MCP server"
-        fi
-      fi
-    fi
+  # Global install: merge into ~/.claude.json (user-level MCP config)
+  CLAUDE_JSON="$HOME/.claude.json"
+  if ! command -v jq &>/dev/null; then
+    echo "  [!] jq not found -- skipping MCP config (add context7 to ~/.claude.json manually)"
+  elif [ -f "$CLAUDE_JSON" ] && jq -e '.mcpServers["context7"]' "$CLAUDE_JSON" &>/dev/null; then
+    echo "  - Context7 already in ~/.claude.json -- skipping"
   else
-    echo "  - Already installed globally -- skipping"
+    CONTEXT7_ENTRY='{"type":"http","url":"https://mcp.context7.com/mcp"}'
+    if [ -f "$CLAUDE_JSON" ]; then
+      UPDATED=$(jq --argjson c7 "$CONTEXT7_ENTRY" '.mcpServers = ((.mcpServers // {}) + {"context7": $c7})' "$CLAUDE_JSON")
+      echo "$UPDATED" > "$CLAUDE_JSON"
+      echo "  - Added Context7 to ~/.claude.json"
+    else
+      printf '{"mcpServers":{"context7":%s}}\n' "$CONTEXT7_ENTRY" > "$CLAUDE_JSON"
+      echo "  - Created ~/.claude.json with Context7 MCP server"
+    fi
   fi
 else
   if [ -f "$PLUGIN_DIR/.mcp.json" ]; then
