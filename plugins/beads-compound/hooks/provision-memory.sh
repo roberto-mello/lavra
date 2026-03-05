@@ -63,7 +63,8 @@ EOF
   # from an older version of beads-compound or a manual addition.
   if git -C "$PROJECT_DIR" rev-parse --git-dir &>/dev/null 2>&1; then
     local GITIGNORE="$PROJECT_DIR/.gitignore"
-    if [[ -f "$GITIGNORE" ]] && grep -qE '^\s*\.beads/?(\s|$)' "$GITIGNORE" 2>/dev/null; then
+    if [[ -f "$GITIGNORE" ]] && grep -qE '^\s*\.beads/?(\s|$)' "$GITIGNORE" 2>/dev/null \
+      && ! grep -qE '^\s*!\.beads/' "$GITIGNORE" 2>/dev/null; then
       echo ""
       echo "[!] Warning: .beads/ is listed in your project .gitignore."
       echo "    This means your beads issues, comments, and knowledge are not"
