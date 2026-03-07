@@ -28,6 +28,7 @@ jobs:
           cd scripts
           bun run convert-opencode.ts
           bun run convert-gemini.ts
+          bun run convert-cortex.ts
 
       - name: Run compatibility tests
         run: cd scripts && bun run test-compatibility.ts
@@ -101,6 +102,7 @@ jobs:
           bun install
           bun run convert-opencode.ts
           bun run convert-gemini.ts
+          bun run convert-cortex.ts
 
       - name: Verify version consistency
         run: |
