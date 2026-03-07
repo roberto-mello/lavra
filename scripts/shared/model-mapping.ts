@@ -24,6 +24,11 @@ try {
       sonnet: "gemini-2.5-pro",
       opus: "gemini-2.5-pro",
     },
+    cortex: {
+      haiku: "haiku",
+      sonnet: "sonnet",
+      opus: "opus",
+    },
   };
 }
 
@@ -44,6 +49,12 @@ export const MODEL_TIERS = {
     haiku: modelConfig.gemini.haiku,
     sonnet: modelConfig.gemini.sonnet,
     opus: modelConfig.gemini.opus, // Gemini has no equivalent to Opus, use Pro
+    inherit: "inherit",
+  },
+  cortex: {
+    haiku: modelConfig.cortex?.haiku ?? "haiku",
+    sonnet: modelConfig.cortex?.sonnet ?? "sonnet",
+    opus: modelConfig.cortex?.opus ?? "opus",
     inherit: "inherit",
   },
 } as const;
@@ -93,4 +104,26 @@ export function mapToGemini(claudeModel: string): string {
 
   // Default to gemini-2.5-pro if unknown
   return "gemini-2.5-pro";
+}
+
+/**
+ * Maps a Claude Code model tier to Cortex Code model tier
+ * Identity mapping: Cortex uses the same tier names as Claude
+ */
+export function mapToCortex(claudeModel: string): string {
+  const model = claudeModel.toLowerCase();
+
+  // If it's "inherit", keep it
+  if (model === "inherit") {
+    return "inherit";
+  }
+
+  // Map tier to Cortex model tier (identity mapping)
+  const tier = model as keyof typeof MODEL_TIERS.cortex;
+  if (tier in MODEL_TIERS.cortex) {
+    return MODEL_TIERS.cortex[tier];
+  }
+
+  // Default to sonnet if unknown
+  return "sonnet";
 }

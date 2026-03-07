@@ -23,7 +23,11 @@ if ! command -v bd &>/dev/null; then
   exit 0
 fi
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
+# Read hook input (Cortex Code provides cwd in stdin JSON)
+INPUT=$(cat)
+CWD=$(echo "$INPUT" | jq -r '.cwd // empty' 2>/dev/null)
+
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-${CWD:-.}}"
 
 # If .beads/ doesn't exist, hint to run bd init
 if [[ ! -d "$PROJECT_DIR/.beads" ]]; then

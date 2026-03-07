@@ -63,7 +63,7 @@ echo "  provision-memory.sh:  $PROVISION_VERSION"
 echo ""
 echo "=== Conversion outputs ==="
 echo "  Generating OpenCode and Gemini outputs..."
-(cd scripts && bun install --frozen-lockfile --silent && bun run convert-opencode.ts && bun run convert-gemini.ts) || {
+(cd scripts && bun install --frozen-lockfile --silent && bun run convert-opencode.ts && bun run convert-gemini.ts && bun run convert-cortex.ts) || {
   fail "Conversion scripts" "bun run failed"
 }
 
@@ -94,6 +94,7 @@ echo "=== Conversion output files ==="
 
 check "opencode/ directory" test -d plugins/beads-compound/opencode
 check "gemini/ directory"   test -d plugins/beads-compound/gemini
+check "cortex/ directory"   test -d plugins/beads-compound/cortex
 
 OPENCODE_COMMANDS=$(find plugins/beads-compound/opencode/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 GEMINI_TOML=$(find plugins/beads-compound/gemini/commands -name "*.toml" 2>/dev/null | wc -l | tr -d ' ')
@@ -103,6 +104,10 @@ echo "  Gemini .toml commands: $GEMINI_TOML (need 25+)"
 
 [[ "$OPENCODE_COMMANDS" -ge 25 ]] && { echo "  PASS  OpenCode commands"; ((PASS++)) || true; } || fail "OpenCode commands" "$OPENCODE_COMMANDS < 25"
 [[ "$GEMINI_TOML"       -ge 25 ]] && { echo "  PASS  Gemini commands";   ((PASS++)) || true; } || fail "Gemini commands"   "$GEMINI_TOML < 25"
+
+CORTEX_COMMANDS=$(find plugins/beads-compound/cortex/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+echo "  Cortex .md commands:   $CORTEX_COMMANDS (need 25+)"
+[[ "$CORTEX_COMMANDS" -ge 25 ]] && { echo "  PASS  Cortex commands"; ((PASS++)) || true; } || fail "Cortex commands" "$CORTEX_COMMANDS < 25"
 
 echo ""
 echo "=== Compatibility tests ==="

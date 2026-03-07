@@ -65,13 +65,13 @@ The plugin captures knowledge as agents work, stores it in the filesystem, and r
 
 ## What's Included
 
-**beads-compound** works with **Claude Code, OpenCode, and Gemini CLI**:
+**beads-compound** works with **Claude Code, OpenCode, Gemini CLI, and Cortex Code**:
 
 - **Automatic Memory** - Capture knowledge from comments, recall based on current work
 - **28 Specialized Agents** - Research, security, performance, architecture analysis
 - **26 Commands** - Plan features, execute work, review code, capture knowledge, recall mid-session
 - **15 Skills** - Git worktrees, Rails style, DSPy integration, browser automation
-- **3 Platform Support** - Claude Code, OpenCode, Gemini CLI
+- **4 Platform Support** - Claude Code, OpenCode, Gemini CLI, Cortex Code
 
 ## This Might Not Be For You If...
 
@@ -138,6 +138,7 @@ cd beads-compound-plugin
 ./install.sh               # Installs to ~/.claude
 OR ./install.sh --opencode # Installs to ~/.config/opencode/
 OR ./install.sh --gemini   # Installs to ~/.config/gemini/
+OR ./install.sh --cortex   # Installs to ~/.snowflake/cortex/
 # Restart agent
 ```
 
@@ -203,6 +204,32 @@ For OpenCode, you can customize which Claude models to use for each performance 
 - Interactive model selection during installation
 - Manual model configuration via `scripts/select-opencode-models.sh`
 - Editing `scripts/shared/model-config.json` directly
+
+#### Cortex Code
+
+**Install:**
+```bash
+# Global install (to ~/.snowflake/cortex)
+./install.sh --cortex
+
+# Or project-specific install
+./install.sh --cortex /path/to/project
+```
+
+The installer copies hooks to `~/.snowflake/cortex/hooks/` (global) or `.cortex/hooks/` (project-specific). Commands, agents, and skills use `.md` format (same as Claude Code). Hooks are configured via `~/.snowflake/cortex/hooks.json`. Context7 MCP is not installed automatically — to enable framework documentation lookup, add it manually to `~/.snowflake/cortex/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "url": "https://mcp.context7.com/mcp",
+      "type": "http"
+    }
+  }
+}
+```
+
+> **Note:** Cortex Code also reads `.claude/` directories for compatibility, but native `.cortex/` paths are preferred.
 
 #### Codex CLI / Antigravity
 
@@ -727,6 +754,18 @@ ls -la .beads/memory/
 bd comments add <BEAD_ID> "LEARNED: Testing memory capture"
 tail -1 .beads/memory/knowledge.jsonl
 ```
+
+#### Cortex Code
+
+**Hooks not loading:**
+- Check `~/.snowflake/cortex/hooks.json` exists and has SessionStart/PostToolUse/SubagentStop entries
+- For project-specific installs, check `.cortex/hooks/` directory exists
+
+**Memory not capturing:**
+- Ensure `.cortex/hooks/memory-capture.sh` (project) or `~/.snowflake/cortex/hooks/memory-capture.sh` (global) exists and is executable
+
+**Agent model selection:**
+- Uses haiku/sonnet/opus in Task tool (same tier names as Claude)
 
 ### Common Issues
 

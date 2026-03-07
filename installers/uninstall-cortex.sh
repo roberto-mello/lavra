@@ -1,0 +1,230 @@
+#!/bin/bash
+#
+# Uninstall beads-compound plugin from Cortex Code
+#
+# What this removes:
+#   - Hooks from .cortex/hooks/ (or ~/.snowflake/cortex/hooks/)
+#   - Commands from .cortex/commands/ (or ~/.snowflake/cortex/commands/)
+#   - Agents from .cortex/agents/ (or ~/.snowflake/cortex/agents/)
+#   - Skills from .cortex/skills/ (or ~/.snowflake/cortex/skills/)
+#   - Hook configuration from ~/.snowflake/cortex/hooks.json
+#
+# What this PRESERVES:
+#   - .beads/ directory and all data
+#   - .beads/memory/ and knowledge.jsonl (your accumulated knowledge)
+#   - Any beads you created
+#
+# Usage:
+#   Global uninstall:
+#     ./uninstall-cortex.sh                         # uninstalls from ~/.snowflake/cortex
+#
+#   Project-specific uninstall:
+#     ./uninstall-cortex.sh /path/to/your-project
+#
+#   From anywhere:
+#     bash /path/to/beads-compound-plugin/installers/uninstall-cortex.sh
+#     bash /path/to/beads-compound-plugin/installers/uninstall-cortex.sh /path/to/your-project
+#
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Default to ~/.snowflake/cortex if no argument provided
+if [ $# -eq 0 ]; then
+  TARGET="$HOME/.snowflake/cortex"
+  GLOBAL_UNINSTALL=true
+else
+  TARGET="${1}"
+  GLOBAL_UNINSTALL=false
+fi
+
+TARGET="$(cd "$TARGET" && pwd)"
+
+echo "beads-compound plugin uninstaller (Cortex Code)"
+if [ "$GLOBAL_UNINSTALL" = true ]; then
+  echo "Target: $TARGET (global)"
+else
+  echo "Target: $TARGET (project-specific)"
+fi
+echo ""
+
+REMOVED_COUNT=0
+
+# Remove hooks
+echo "[1/5] Removing hooks..."
+
+if [ "$GLOBAL_UNINSTALL" = true ]; then
+  HOOKS_DIR="$TARGET/hooks"
+else
+  HOOKS_DIR="$TARGET/.cortex/hooks"
+fi
+
+if [ -d "$HOOKS_DIR" ]; then
+  for hook in memory-capture.sh auto-recall.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh check-memory.sh; do
+    if [ -f "$HOOKS_DIR/$hook" ]; then
+      rm "$HOOKS_DIR/$hook"
+      echo "  - Removed $hook"
+      ((REMOVED_COUNT++))
+    fi
+  done
+else
+  echo "  - No hooks directory found"
+fi
+
+# Remove global source path sentinel
+if [ "$GLOBAL_UNINSTALL" = true ] && [ -f "$TARGET/.beads-compound-source" ]; then
+  rm "$TARGET/.beads-compound-source"
+  echo "  - Removed plugin source path"
+  ((REMOVED_COUNT++))
+fi
+
+# Remove commands (all plugin commands)
+echo "[2/5] Removing workflow commands..."
+
+if [ "$GLOBAL_UNINSTALL" = true ]; then
+  COMMANDS_DIR="$TARGET/commands"
+else
+  COMMANDS_DIR="$TARGET/.cortex/commands"
+fi
+
+if [ -d "$COMMANDS_DIR" ]; then
+  PLUGIN_COMMANDS=(
+    beads-plan.md beads-work.md beads-parallel.md beads-review.md beads-checkpoint.md
+    beads-brainstorm.md beads-compound.md
+    beads-deepen.md beads-plan-review.md beads-triage.md
+    agent-native-audit.md changelog.md create-agent-skill.md deploy-docs.md
+    feature-video.md generate-command.md heal-skill.md lfg.md
+    release-docs.md report-bug.md reproduce-bug.md
+    resolve-pr-parallel.md resolve-todo-parallel.md
+    test-browser.md xcode-test.md
+  )
+
+  for cmd in "${PLUGIN_COMMANDS[@]}"; do
+    if [ -f "$COMMANDS_DIR/$cmd" ]; then
+      rm "$COMMANDS_DIR/$cmd"
+      echo "  - Removed /${cmd%.md} command"
+      ((REMOVED_COUNT++))
+    fi
+  done
+else
+  echo "  - No commands directory found"
+fi
+
+# Remove agents
+echo "[3/5] Removing agents..."
+
+if [ "$GLOBAL_UNINSTALL" = true ]; then
+  AGENTS_DIR="$TARGET/agents"
+else
+  AGENTS_DIR="$TARGET/.cortex/agents"
+fi
+
+if [ -d "$AGENTS_DIR" ]; then
+  AGENT_CATEGORIES=(review research design docs workflow)
+
+  for category in "${AGENT_CATEGORIES[@]}"; do
+    if [ -d "$AGENTS_DIR/$category" ]; then
+      agent_count=$(find "$AGENTS_DIR/$category" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+      rm -rf "$AGENTS_DIR/$category"
+      echo "  - Removed $category/ ($agent_count agents)"
+      ((REMOVED_COUNT++))
+    fi
+  done
+
+  # Remove agents dir if empty
+  if [ -d "$AGENTS_DIR" ] && [ -z "$(ls -A "$AGENTS_DIR" 2>/dev/null)" ]; then
+    rmdir "$AGENTS_DIR"
+    echo "  - Removed empty agents directory"
+  fi
+else
+  echo "  - No agents directory found"
+fi
+
+# Remove skills
+echo "[4/5] Removing skills..."
+
+if [ "$GLOBAL_UNINSTALL" = true ]; then
+  SKILLS_DIR="$TARGET/skills"
+else
+  SKILLS_DIR="$TARGET/.cortex/skills"
+fi
+
+if [ -d "$SKILLS_DIR" ]; then
+  PLUGIN_SKILLS=(git-worktree brainstorming create-agent-skills agent-native-architecture beads-knowledge agent-browser andrew-kane-gem-writer dhh-rails-style dspy-ruby every-style-editor file-todos frontend-design gemini-imagegen rclone skill-creator)
+
+  for skill in "${PLUGIN_SKILLS[@]}"; do
+    if [ -L "$SKILLS_DIR/$skill" ]; then
+      echo "  - Kept $skill (symlink, not ours)"
+    elif [ -d "$SKILLS_DIR/$skill" ]; then
+      if [ -f "$SKILLS_DIR/$skill/.beads-compound" ]; then
+        rm -rf "$SKILLS_DIR/$skill"
+        echo "  - Removed $skill skill"
+        ((REMOVED_COUNT++))
+      else
+        echo "  - Kept $skill (not managed by this plugin)"
+      fi
+    fi
+  done
+
+  # Remove skills dir if empty
+  if [ -d "$SKILLS_DIR" ] && [ -z "$(ls -A "$SKILLS_DIR" 2>/dev/null)" ]; then
+    rmdir "$SKILLS_DIR"
+    echo "  - Removed empty skills directory"
+  fi
+else
+  echo "  - No skills directory found"
+fi
+
+# Update hooks.json to remove hook configuration
+echo "[5/5] Updating hooks.json..."
+
+# Cortex hooks are always global at ~/.snowflake/cortex/hooks.json
+HOOKS_JSON="$HOME/.snowflake/cortex/hooks.json"
+
+if [ -f "$HOOKS_JSON" ]; then
+  if command -v jq &>/dev/null; then
+    EXISTING=$(cat "$HOOKS_JSON")
+
+    # Remove our hooks from configuration and clean up empty/null arrays
+    UPDATED=$(echo "$EXISTING" | jq '
+      .hooks.SessionStart = [(.hooks.SessionStart // [])[] | select(.hooks[]?.command | (contains("auto-recall") or contains("check-memory")) | not)] |
+      if (.hooks.SessionStart | length) == 0 then del(.hooks.SessionStart) else . end |
+      .hooks.PostToolUse = [(.hooks.PostToolUse // [])[] | select(.hooks[]?.command | contains("memory-capture") | not)] |
+      if (.hooks.PostToolUse | length) == 0 then del(.hooks.PostToolUse) else . end |
+      .hooks.SubagentStop = [(.hooks.SubagentStop // [])[] | select(.hooks[]?.command | contains("subagent-wrapup") | not)] |
+      if (.hooks.SubagentStop | length) == 0 then del(.hooks.SubagentStop) else . end |
+      # Remove null hook arrays if they exist
+      if .hooks.PreToolUse == null then del(.hooks.PreToolUse) else . end |
+      # Remove hooks object if empty
+      if (.hooks | to_entries | length) == 0 then del(.hooks) else . end
+    ')
+
+    echo "$UPDATED" > "$HOOKS_JSON"
+    echo "  - Removed hook configuration from hooks.json"
+    ((REMOVED_COUNT++))
+  else
+    echo "  [!] jq not found -- manual hooks.json cleanup required"
+    echo "      Remove SessionStart, PostToolUse, and SubagentStop hooks manually"
+  fi
+else
+  echo "  - No hooks.json found"
+fi
+
+# Summary
+echo ""
+if [ $REMOVED_COUNT -gt 0 ]; then
+  echo "Uninstall complete. Removed $REMOVED_COUNT component(s)."
+  echo ""
+  echo "PRESERVED:"
+  echo "  - .beads/ directory with all your data"
+  echo "  - .beads/memory/knowledge.jsonl with accumulated knowledge"
+  echo "  - All beads you created"
+  echo ""
+  echo "To completely remove beads data:"
+  echo "  rm -rf $TARGET/.beads/"
+  echo ""
+  echo "Restart Cortex Code to complete uninstallation."
+else
+  echo "Nothing to uninstall. beads-compound may not be installed here."
+fi

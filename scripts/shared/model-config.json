@@ -8,5 +8,10 @@
     "haiku": "gemini-2.5-flash",
     "sonnet": "gemini-2.5-pro",
     "opus": "gemini-2.5-pro"
+  },
+  "cortex": {
+    "haiku": "haiku",
+    "sonnet": "sonnet",
+    "opus": "opus"
   }
 }

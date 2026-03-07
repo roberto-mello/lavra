@@ -10,7 +10,7 @@
 INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
 
-[[ "$TOOL_NAME" != "Bash" ]] && exit 0
+[[ "$TOOL_NAME" != "Bash" && "$TOOL_NAME" != "bash" ]] && exit 0
 
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 [[ -z "$COMMAND" ]] && exit 0
@@ -86,7 +86,7 @@ ENTRY=$(jq -cn \
 [[ -z "$ENTRY" ]] && exit 0
 echo "$ENTRY" | jq . >/dev/null 2>&1 || exit 0
 
-MEMORY_DIR="${CLAUDE_PROJECT_DIR:-.}/.beads/memory"
+MEMORY_DIR="${CLAUDE_PROJECT_DIR:-${CWD:-.}}/.beads/memory"
 mkdir -p "$MEMORY_DIR"
 KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 
