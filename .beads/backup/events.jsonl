@@ -696,3 +696,5 @@
 {"actor":"Roberto Mello","comment":null,"created_at":"2026-03-10T09:28:29Z","event_type":"closed","id":696,"issue_id":"medsimples-g8zx","new_value":"Closed","old_value":""}
 {"actor":"Roberto Mello","comment":null,"created_at":"2026-03-10T09:28:29Z","event_type":"closed","id":697,"issue_id":"medsimples-6yy1","new_value":"Closed","old_value":""}
 {"actor":"Roberto Mello","comment":null,"created_at":"2026-03-10T09:28:29Z","event_type":"closed","id":698,"issue_id":"medsimples-djld","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-10T11:11:28Z","event_type":"created","id":699,"issue_id":"medsimples-bugl","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":"Added label: brainstorm","created_at":"2026-03-10T11:11:28Z","event_type":"label_added","id":700,"issue_id":"medsimples-bugl","new_value":null,"old_value":null}
