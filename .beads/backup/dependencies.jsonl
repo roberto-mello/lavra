@@ -231,6 +231,9 @@
 {"created_at":"2026-02-19T20:40:17Z","created_by":"bootstrap","depends_on_id":"medsimples-31","issue_id":"medsimples-37","type":"parent-child"}
 {"created_at":"2026-02-19T20:40:17Z","created_by":"bootstrap","depends_on_id":"medsimples-34","issue_id":"medsimples-37","type":"blocks"}
 {"created_at":"2026-02-19T20:40:17Z","created_by":"bootstrap","depends_on_id":"medsimples-36","issue_id":"medsimples-37","type":"blocks"}
+{"created_at":"2026-03-10T11:40:44Z","created_by":"Roberto Mello","depends_on_id":"medsimples-38cw","issue_id":"medsimples-38cw.1","type":"parent-child"}
+{"created_at":"2026-03-10T12:14:13Z","created_by":"Roberto Mello","depends_on_id":"medsimples-38cw","issue_id":"medsimples-38cw.2","type":"parent-child"}
+{"created_at":"2026-03-10T12:14:18Z","created_by":"Roberto Mello","depends_on_id":"medsimples-38cw","issue_id":"medsimples-38cw.3","type":"parent-child"}
 {"created_at":"2026-02-19T20:40:17Z","created_by":"bootstrap","depends_on_id":"medsimples-38","issue_id":"medsimples-39","type":"parent-child"}
 {"created_at":"2026-02-19T20:40:17Z","created_by":"bootstrap","depends_on_id":"medsimples-hc2d","issue_id":"medsimples-3ccz","type":"parent-child"}
 {"created_at":"2026-02-19T20:40:17Z","created_by":"bootstrap","depends_on_id":"medsimples-38","issue_id":"medsimples-40","type":"parent-child"}
