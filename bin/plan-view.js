@@ -498,6 +498,7 @@ function run(rootBeadId) {
     process.stdin.pause();
   }
 
+  process.on("exit", cleanup);
   process.on("SIGINT", () => {
     cleanup();
     process.exit(0);
