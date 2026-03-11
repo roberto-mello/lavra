@@ -16,7 +16,7 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Version of beads-compound that wrote this hook (updated by installer)
-BEADS_COMPOUND_VERSION="0.6.7"
+BEADS_COMPOUND_VERSION="0.6.8"
 
 # Exit silently if bd is not installed
 if ! command -v bd &>/dev/null; then

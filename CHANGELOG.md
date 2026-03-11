@@ -25,6 +25,7 @@ All notable changes to the beads-compound plugin are documented here.
 ### Changed
 - **`.beads/` no longer added to project `.gitignore`** - The installer previously added `.beads/` as "ephemeral task data". This was incorrect: beads JSONL files (issues, comments) should be committed. The installer now leaves `.gitignore` alone. Use `bd init --stealth` if you want `.beads/` invisible to collaborators (it uses `.git/info/exclude` which keeps data safe).
 - **Memory provisioning consolidated** - The four locations that must be kept in sync on a version bump are now documented: `plugin.json`, `marketplace.json`, `auto-recall.sh` (`BEADS_COMPOUND_VERSION`), and `provision-memory.sh` (version string).
+- **`bd sync` replaced with `bd backup`** - `bd sync` was removed in beads v0.56.0 (superseded by Dolt-native push/pull). All plugin commands (`beads-checkpoint`, `beads-parallel`) and project CLAUDE.md files now use `bd backup` for local JSONL export. Stale beads workflow sections removed from project CLAUDE.md files since `bd prime` injects this context automatically at session start.
 
 ## [0.6.7] - 2026-03-04
 
