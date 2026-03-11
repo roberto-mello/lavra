@@ -21,7 +21,7 @@ const path = require("path");
 
 const args = process.argv.slice(2);
 
-function usage() {
+function usage(exitCode = 1) {
   console.error("");
   console.error("  bd-plan-export - Export a plan tree as markdown");
   console.error("");
@@ -33,10 +33,13 @@ function usage() {
   console.error("    --output, -o <path>   Write to file instead of stdout");
   console.error("    --help, -h            Show this help");
   console.error("");
-  process.exit(1);
+  process.exit(exitCode);
 }
 
-if (args.includes("--help") || args.includes("-h") || args.length === 0) {
+if (args.includes("--help") || args.includes("-h")) {
+  usage(0);
+}
+if (args.length === 0) {
   usage();
 }
 
@@ -76,7 +79,7 @@ if (!beadId) {
 
 function bdExecFile(args) {
   try {
-    return execFileSync("bd", args, { encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
+    return execFileSync("bd", args, { encoding: "utf8", stdio: ["pipe", "pipe", "pipe"], timeout: 30000 });
   } catch (err) {
     const stderr = err.stderr ? err.stderr.trim() : err.message;
     console.error(`  Error running: bd ${args.join(" ")}`);

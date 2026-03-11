@@ -498,7 +498,6 @@ function run(rootBeadId) {
     process.stdin.pause();
   }
 
-  process.on("exit", cleanup);
   process.on("SIGINT", () => {
     cleanup();
     process.exit(0);
@@ -512,7 +511,7 @@ function run(rootBeadId) {
     const { cols, rows } = getTermSize();
     const leftWidth = Math.floor(cols * 0.4);
     const rightWidth = cols - leftWidth - 1; // 1 for divider
-    const contentHeight = rows - 3; // header + footer
+    const contentHeight = Math.max(0, rows - 3); // header + footer
 
     const flatNodes = flattenTree(tree);
 
@@ -571,7 +570,7 @@ function run(rootBeadId) {
       const detailLines = renderDetailPanel(
         selectedNode,
         rightWidth,
-        contentHeight + 20 // extra for scrolling
+        Math.max(contentHeight * 4, 80) // generous buffer for scrolling long descriptions
       );
 
       // Clamp detail scroll

@@ -49,9 +49,8 @@ const FLAG = {
 };
 
 // Positional argument: optional target directory path
-const TARGET_PATH = args.find((a) => !a.startsWith("-"))
-  ? path.resolve(args.find((a) => !a.startsWith("-")))
-  : null;
+const _positional = args.find((a) => !a.startsWith("-"));
+const TARGET_PATH = _positional ? path.resolve(_positional) : null;
 
 // ---------------------------------------------------------------------------
 // Helpers

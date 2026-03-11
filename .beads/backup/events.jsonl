@@ -86,3 +86,20 @@
 {"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T15:18:17Z","event_type":"closed","id":86,"issue_id":"bdcompound-ic5","new_value":"Closed","old_value":""}
 {"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T15:18:17Z","event_type":"closed","id":87,"issue_id":"bdcompound-62k","new_value":"Closed","old_value":""}
 {"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T15:18:22Z","event_type":"closed","id":88,"issue_id":"bdcompound-8nm","new_value":"Implemented as part of holistic redesign","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:32:23Z","event_type":"created","id":89,"issue_id":"bdcompound-807","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:33:48Z","event_type":"created","id":90,"issue_id":"bdcompound-807.1","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:33:57Z","event_type":"created","id":91,"issue_id":"bdcompound-807.2","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:34:03Z","event_type":"created","id":92,"issue_id":"bdcompound-807.3","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:34:10Z","event_type":"created","id":93,"issue_id":"bdcompound-807.4","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:34:19Z","event_type":"created","id":94,"issue_id":"bdcompound-807.5","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:34:26Z","event_type":"created","id":95,"issue_id":"bdcompound-807.6","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:34:30Z","event_type":"created","id":96,"issue_id":"bdcompound-807.7","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:34:39Z","event_type":"created","id":97,"issue_id":"bdcompound-807.8","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:37:30Z","event_type":"closed","id":98,"issue_id":"bdcompound-807.1","new_value":"Fixed in this session","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:37:30Z","event_type":"closed","id":99,"issue_id":"bdcompound-807.2","new_value":"Fixed in this session","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:37:31Z","event_type":"closed","id":100,"issue_id":"bdcompound-807.3","new_value":"Fixed in this session","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:37:31Z","event_type":"closed","id":101,"issue_id":"bdcompound-807.4","new_value":"Fixed in this session","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:37:31Z","event_type":"closed","id":102,"issue_id":"bdcompound-807.5","new_value":"Fixed in this session","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:37:31Z","event_type":"closed","id":103,"issue_id":"bdcompound-807.6","new_value":"Fixed in this session","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:37:31Z","event_type":"closed","id":104,"issue_id":"bdcompound-807.7","new_value":"Fixed in this session","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-11T16:37:31Z","event_type":"closed","id":105,"issue_id":"bdcompound-807.8","new_value":"Fixed in this session","old_value":""}
