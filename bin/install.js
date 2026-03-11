@@ -264,6 +264,7 @@ async function main() {
   if (FLAG.global) scope = "global";
   else if (FLAG.local) scope = "local";
   else if (TARGET_PATH) scope = "local"; // path argument implies local
+  else if (FLAG.yes) scope = "local";   // --yes with no scope defaults to local
 
   // Interactive prompts if needed
   if (!runtime || !scope) {

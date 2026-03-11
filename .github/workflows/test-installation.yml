@@ -40,6 +40,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.6"
+
+      - name: Install script dependencies
+        run: cd scripts && bun install --frozen-lockfile
+
       - name: Install beads CLI
         run: brew install beads
 
