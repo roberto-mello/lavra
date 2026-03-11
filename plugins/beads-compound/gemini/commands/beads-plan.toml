@@ -5,16 +5,11 @@ description = "Transform feature descriptions into well-structured beads with pa
 
 prompt = """
 
-# Create a plan for a new feature or bug fix
+<objective>
+Transform feature descriptions, bug reports, or improvement ideas into well-structured beads with comprehensive research and multi-phase planning. Provides flexible detail levels to match your needs.
+</objective>
 
-## Introduction
-
-**Note: The current year is 2026.** Use this when dating plans and searching for recent documentation.
-
-Transform feature descriptions, bug reports, or improvement ideas into well-structured beads with comprehensive research and multi-phase planning. This command provides flexible detail levels to match your needs.
-
-## Feature Description
-
+<execution_context>
 <raw_argument> #{{args}} </raw_argument>
 
 **First, determine if the argument is a bead ID or a feature description:**
@@ -49,6 +44,13 @@ Check if the argument matches a bead ID pattern:
 - Ask: "What would you like to plan? Please provide either a bead ID (e.g., 'bikiniup-xhr') or describe the feature, bug fix, or improvement you have in mind."
 
 Do not proceed until you have a clear feature description from the user.
+</execution_context>
+
+<context>
+**Note: The current year is 2026.** Use this when dating plans and searching for recent documentation.
+</context>
+
+<process>
 
 ### 0. Idea Refinement
 
@@ -98,8 +100,6 @@ Refine the idea through collaborative dialogue using the **AskUserQuestion tool*
 
 **Skip option:** If the feature description is already detailed, offer:
 "Your description is clear. Should I proceed with research, or would you like to refine it further?"
-
-## Main Tasks
 
 ### 1. Local Research (Always Runs - Parallel)
 
@@ -340,8 +340,30 @@ This checks for:
 
 Address any warnings before finalizing the plan.
 
-## Post-Generation Options
+</process>
 
+<success_criteria>
+- Epic bead created with clear, searchable title
+- All child bead descriptions include What/Context/Testing/Validation/Files/Dependencies sections
+- No two independent child beads modify the same files
+- Dependencies correctly set between beads
+- Research findings captured as knowledge comments (INVESTIGATION/PATTERN/FACT)
+- `bd swarm validate {EPIC_ID}` passes without warnings
+- Each child bead is reviewable and closeable based solely on its description
+</success_criteria>
+
+<guardrails>
+- Don't create vague beads like "Add authentication" with no testing criteria, "Fix the bug" with no validation approach, or "Refactor code" with no acceptance criteria
+- Do create thorough beads like "Implement OAuth2 login flow" with specific test scenarios, validation criteria, and constraints from research
+- All research findings are logged to the epic bead with appropriate prefixes
+- Knowledge is auto-captured and will be available in future sessions
+- Child beads can be worked on independently with `/beads-work`
+- Use `bd ready` to see which child beads are ready to work on
+- Each child bead should be reviewable and closeable based solely on its description's testing/validation criteria
+- NEVER CODE! Just research and write the plan.
+</guardrails>
+
+<handoff>
 After creating the epic and child beads, use the **AskUserQuestion tool** to present these options:
 
 **Question:** "Plan ready as epic `{EPIC_ID}`: {title}. What would you like to do next?"
@@ -350,42 +372,20 @@ After creating the epic and child beads, use the **AskUserQuestion tool** to pre
 1. **Run `/beads-deepen`** - Enhance each child bead with parallel research agents
 2. **Run `/beads-plan-review`** - Get feedback from reviewers on the plan
 3. **Start `/beads-work`** - Begin implementing the first child bead
-4. **Simplify** - Reduce detail level
+4. **Run `/beads-parallel`** - Work on multiple child beads in parallel
+5. **Simplify** - Reduce detail level
 
 Based on selection:
 - **`/beads-deepen`** -> Call the /beads-deepen command with the epic bead ID
 - **`/beads-plan-review`** -> Call the /beads-plan-review command with the epic bead ID
 - **`/beads-work`** -> Call the /beads-work command with the first ready child bead ID
+- **`/beads-parallel`** -> Call the /beads-parallel command with the epic bead ID
 - **Simplify** -> Ask "What should I simplify?" then regenerate simpler descriptions
 - **Other** (automatically provided) -> Accept free text for rework or specific changes
 
-Loop back to options after Simplify or Other changes until user selects `/beads-work` or `/beads-plan-review`.
+**Tip:** If this plan originated from `/beads-brainstorm`, the brainstorm's locked decisions are already embedded in child bead descriptions.
 
-## Quality Requirements
-
-**Each child bead description MUST include:**
-- Clear implementation requirements (What)
-- Context from research (Why)
-- Specific testing criteria with test cases
-- Concrete validation/acceptance criteria
-- Dependencies clearly stated
-
-**Don't create vague beads like:**
-- "Add authentication" with no testing criteria
-- "Fix the bug" with no validation approach
-- "Refactor code" with no acceptance criteria
-
-**Do create thorough beads like:**
-- "Implement OAuth2 login flow" with specific test scenarios (valid tokens, expired tokens, invalid redirect URIs), validation criteria (works with Google/GitHub, handles errors gracefully), and constraints from research (OWASP guidelines, token rotation requirements)
-
-## Notes
-
-- All research findings are logged to the epic bead with appropriate prefixes
-- Knowledge is auto-captured and will be available in future sessions
-- Child beads can be worked on independently with `/beads-work`
-- Use `bd ready` to see which child beads are ready to work on
-- Each child bead should be reviewable and closeable based solely on its description's testing/validation criteria
-
-NEVER CODE! Just research and write the plan.
+Loop back to options after Simplify or Other changes until user selects `/beads-work`, `/beads-parallel`, or `/beads-plan-review`.
+</handoff>
 
 """

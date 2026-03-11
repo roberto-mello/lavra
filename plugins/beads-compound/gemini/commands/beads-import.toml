@@ -5,19 +5,15 @@ description = "Import a markdown plan into beads as an epic with child tasks"
 
 prompt = """
 
-# Import Markdown Plan Command
+<objective>
+Import a markdown plan document into beads as an epic with child task beads. Automatically extracts research findings, decisions, and implementation steps from the markdown structure.
+</objective>
 
-Import a markdown plan document into beads as an epic with child task beads.
-
-## Introduction
-
-This command takes a markdown plan file and creates a structured epic bead with child task beads for each implementation step. It automatically extracts research findings, decisions, and implementation steps from the markdown structure.
-
-## Input
-
+<execution_context>
 <input_document> #{{args}} </input_document>
+</execution_context>
 
-## Execution Workflow
+<process>
 
 ### Phase 1: Parse Arguments
 
@@ -122,24 +118,9 @@ This command takes a markdown plan file and creates a structured epic bead with 
      bd list --parent {EPIC_ID}
    ```
 
-2. **Suggest Next Steps**
+</process>
 
-   Use **AskUserQuestion tool** to present these options:
-
-   **Question:** "Plan imported as epic `{EPIC_ID}`. What would you like to do next?"
-
-   **Options:**
-   1. **Run `/beads-deepen {EPIC_ID}`** - Enhance each child bead with parallel research agents
-   2. **Run `/beads-plan-review {EPIC_ID}`** - Get feedback from reviewers on the plan
-   3. **Start `/beads-work {EPIC_ID}.1`** - Begin implementing the first child bead
-   4. **View epic** - Show the full epic bead details
-
-   Based on selection:
-   - **`/beads-deepen`** -> Call the /beads-deepen command with the epic ID
-   - **`/beads-plan-review`** -> Call the /beads-plan-review command with the epic ID
-   - **`/beads-work`** -> Call the /beads-work command with the first child bead ID
-   - **View epic** -> Run `bd show {EPIC_ID}` and display the output
-   - **Other** -> Accept free text for other actions
+<context>
 
 ## Expected Markdown Format
 
@@ -190,20 +171,27 @@ Details about UI changes...
 - Research and decision sections are captured as knowledge comments on the epic
 - Child bead descriptions are extracted from the content between `###` headers
 - The script expects the plan to have an "Implementation Steps" section with `###` subheadings
+</context>
 
-## Quality Requirements
-
-**Successful import requires:**
+<success_criteria>
 - Valid markdown file with clear structure
 - At least one `#` header for the title (or title provided as argument)
-- An "Implementation Steps" section with at least one `###` step
-- Each step should have descriptive content below the `###` header
+- An "Implementation Steps" section with at least one `### Step`
+- Each step has descriptive content below the `###` header
+- File path validated before calling the script
+- Title extracted from markdown if not provided
+- Clear progress and results displayed
+- Actionable next steps suggested
+- Errors handled gracefully with helpful messages
+</success_criteria>
 
-**The command should:**
-- Validate file path before calling the script
-- Extract title from markdown if not provided
-- Display clear progress and results
-- Suggest actionable next steps
-- Handle errors gracefully with helpful messages
+<handoff>
+Plan imported as epic `{EPIC_ID}`. What would you like to do next?
+
+1. **Run `/beads-deepen {EPIC_ID}`** - Enhance each child bead with parallel research agents
+2. **Run `/beads-plan-review {EPIC_ID}`** - Get feedback from reviewers on the plan
+3. **Start `/beads-work {EPIC_ID}.1`** - Begin implementing the first child bead
+4. **View epic** - Show the full epic bead details
+</handoff>
 
 """

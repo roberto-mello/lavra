@@ -1,0 +1,45 @@
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Validate version consistency
+        run: |
+          PKG_VERSION=$(jq -r '.version' package.json)
+          PLUGIN_VERSION=$(jq -r '.version' plugins/beads-compound/.claude-plugin/plugin.json)
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+
+          echo "package.json: $PKG_VERSION"
+          echo "plugin.json: $PLUGIN_VERSION"
+          echo "git tag: $TAG_VERSION"
+
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "ERROR: package.json ($PKG_VERSION) != tag ($TAG_VERSION)"
+            exit 1
+          fi
+
+          if [ "$PKG_VERSION" != "$PLUGIN_VERSION" ]; then
+            echo "ERROR: package.json ($PKG_VERSION) != plugin.json ($PLUGIN_VERSION)"
+            exit 1
+          fi
+
+          echo "All versions match: $PKG_VERSION"
+
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

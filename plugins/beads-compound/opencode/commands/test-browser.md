@@ -9,37 +9,23 @@ argument-hint: [PR number, branch name, or 'current' for current branch]
 disable-model-invocation: true
 ---
 
-# Browser Test Command
+<objective>
+Run end-to-end browser tests on pages affected by a PR or branch changes using the agent-browser CLI, catching JavaScript integration bugs, CSS/layout regressions, user workflow breakages, and console errors.
+</objective>
 
-<command_purpose>Run end-to-end browser tests on pages affected by a PR or branch changes using agent-browser CLI.</command_purpose>
+<execution_context>
+<test_target> $ARGUMENTS </test_target>
+</execution_context>
 
-## CRITICAL: Use agent-browser CLI Only
+<context>
 
-**DO NOT use Chrome MCP tools (mcp__claude-in-chrome__*).**
+### Prerequisites
 
-This command uses the `agent-browser` CLI exclusively. The agent-browser CLI is a Bash-based tool from Vercel that runs headless Chromium. It is NOT the same as Chrome browser automation via MCP.
-
-If you find yourself calling `mcp__claude-in-chrome__*` tools, STOP. Use `agent-browser` Bash commands instead.
-
-## Introduction
-
-<role>QA Engineer specializing in browser-based end-to-end testing</role>
-
-This command tests affected pages in a real browser, catching issues that unit tests miss:
-- JavaScript integration bugs
-- CSS/layout regressions
-- User workflow breakages
-- Console errors
-
-## Prerequisites
-
-<requirements>
 - Local development server running (e.g., `bin/dev`, `rails server`, `npm run dev`)
 - agent-browser CLI installed (see Setup below)
 - Git repository with changes to test
-</requirements>
 
-## Setup
+### Setup
 
 **Check installation:**
 ```bash
@@ -54,9 +40,52 @@ agent-browser install  # Downloads Chromium (~160MB)
 
 See the `agent-browser` skill for detailed usage.
 
-## Main Tasks
+### agent-browser CLI Reference
 
-### 0. Verify agent-browser Installation
+```bash
+# Navigation
+agent-browser open <url>           # Navigate to URL
+agent-browser back                 # Go back
+agent-browser close                # Close browser
+
+# Snapshots (get element refs)
+agent-browser snapshot -i          # Interactive elements with refs (@e1, @e2, etc.)
+agent-browser snapshot -i --json   # JSON output
+
+# Interactions (use refs from snapshot)
+agent-browser click @e1            # Click element
+agent-browser fill @e1 "text"      # Fill input
+agent-browser type @e1 "text"      # Type without clearing
+agent-browser press Enter          # Press key
+
+# Screenshots
+agent-browser screenshot out.png       # Viewport screenshot
+agent-browser screenshot --full out.png # Full page screenshot
+
+# Headed mode (visible browser)
+agent-browser --headed open <url>      # Open with visible browser
+agent-browser --headed click @e1       # Click in visible browser
+
+# Wait
+agent-browser wait @e1             # Wait for element
+agent-browser wait 2000            # Wait milliseconds
+```
+
+</context>
+
+<guardrails>
+
+**DO NOT use Chrome MCP tools (mcp__claude-in-chrome__*).**
+
+This command uses the `agent-browser` CLI exclusively. The agent-browser CLI is a Bash-based tool from Vercel that runs headless Chromium. It is NOT the same as Chrome browser automation via MCP.
+
+If you find yourself calling `mcp__claude-in-chrome__*` tools, STOP. Use `agent-browser` Bash commands instead.
+
+</guardrails>
+
+<process>
+
+## 0. Verify agent-browser Installation
 
 Before starting ANY browser testing, verify agent-browser is installed:
 
@@ -66,9 +95,7 @@ command -v agent-browser >/dev/null 2>&1 && echo "Ready" || (echo "Installing...
 
 If installation fails, inform the user and stop.
 
-### 1. Ask Browser Mode
-
-<ask_browser_mode>
+## 1. Ask Browser Mode
 
 Before starting tests, ask user if they want to watch the browser:
 
@@ -80,13 +107,7 @@ Use AskUserQuestion with:
 
 Store the choice and use `--headed` flag when user selects "Headed".
 
-</ask_browser_mode>
-
-### 2. Determine Test Scope
-
-<test_target> $ARGUMENTS </test_target>
-
-<determine_scope>
+## 2. Determine Test Scope
 
 **If PR number provided:**
 ```bash
@@ -103,11 +124,7 @@ git diff --name-only main...HEAD
 git diff --name-only main...[branch]
 ```
 
-</determine_scope>
-
-### 3. Map Files to Routes
-
-<file_to_route_mapping>
+## 3. Map Files to Routes
 
 Map changed files to testable routes:
 
@@ -125,11 +142,7 @@ Map changed files to testable routes:
 
 Build a list of URLs to test based on the mapping.
 
-</file_to_route_mapping>
-
-### 4. Verify Server is Running
-
-<check_server>
+## 4. Verify Server is Running
 
 Before testing, verify the local server is accessible:
 
@@ -149,11 +162,7 @@ Please start your development server:
 Then run `/test-browser` again.
 ```
 
-</check_server>
-
-### 5. Test Each Affected Page
-
-<test_pages>
+## 5. Test Each Affected Page
 
 For each affected route, use agent-browser CLI commands (NOT Chrome MCP):
 
@@ -188,11 +197,7 @@ agent-browser screenshot page-name.png
 agent-browser screenshot --full page-name-full.png  # Full page
 ```
 
-</test_pages>
-
-### 6. Human Verification (When Required)
-
-<human_verification>
+## 6. Human Verification (When Required)
 
 Pause for human input when testing touches:
 
@@ -217,11 +222,7 @@ Did it work correctly?
 2. No - describe the issue
 ```
 
-</human_verification>
-
-### 7. Handle Failures
-
-<failure_handling>
+## 7. Handle Failures
 
 When a test fails:
 
@@ -256,11 +257,7 @@ When a test fails:
    - Log as skipped
    - Continue testing
 
-</failure_handling>
-
-### 8. Test Summary
-
-<test_summary>
+## 8. Test Summary
 
 After all tests complete, present summary:
 
@@ -295,58 +292,18 @@ After all tests complete, present summary:
 ### Result: [PASS / FAIL / PARTIAL]
 ```
 
-</test_summary>
+</process>
 
-## Post-Test Options
+<success_criteria>
+- [ ] All affected pages tested with agent-browser CLI
+- [ ] Each page has a Pass/Fail/Skip status
+- [ ] Console errors captured and reported
+- [ ] Screenshots taken for key pages
+- [ ] Failures documented with reproduction steps
+</success_criteria>
 
-After presenting the summary, offer:
-
+<handoff>
 1. **Run `/beads-review`** - Full code review of the changes
 2. **Fix failures** - Address test failures now
 3. **Done** - Accept results
-
-## Quick Usage Examples
-
-```bash
-# Test current branch changes
-/test-browser
-
-# Test specific PR
-/test-browser 847
-
-# Test specific branch
-/test-browser feature/new-dashboard
-```
-
-## agent-browser CLI Reference
-
-**ALWAYS use these Bash commands. NEVER use mcp__claude-in-chrome__* tools.**
-
-```bash
-# Navigation
-agent-browser open <url>           # Navigate to URL
-agent-browser back                 # Go back
-agent-browser close                # Close browser
-
-# Snapshots (get element refs)
-agent-browser snapshot -i          # Interactive elements with refs (@e1, @e2, etc.)
-agent-browser snapshot -i --json   # JSON output
-
-# Interactions (use refs from snapshot)
-agent-browser click @e1            # Click element
-agent-browser fill @e1 "text"      # Fill input
-agent-browser type @e1 "text"      # Type without clearing
-agent-browser press Enter          # Press key
-
-# Screenshots
-agent-browser screenshot out.png       # Viewport screenshot
-agent-browser screenshot --full out.png # Full page screenshot
-
-# Headed mode (visible browser)
-agent-browser --headed open <url>      # Open with visible browser
-agent-browser --headed click @e1       # Click in visible browser
-
-# Wait
-agent-browser wait @e1             # Wait for element
-agent-browser wait 2000            # Wait milliseconds
-```
+</handoff>

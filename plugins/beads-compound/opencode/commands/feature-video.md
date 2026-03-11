@@ -9,31 +9,36 @@ argument-hint: "[PR number or 'current'] [optional: base URL, default localhost:
 disable-model-invocation: true
 ---
 
-# Feature Video Walkthrough
+<objective>
+Record a video walkthrough demonstrating a feature, upload it, and add it to the PR description.
+</objective>
 
-<command_purpose>Record a video walkthrough demonstrating a feature, upload it, and add it to the PR description.</command_purpose>
+<execution_context>
 
-## Introduction
+**Arguments:** $ARGUMENTS
 
-<role>Developer Relations Engineer creating feature demo videos</role>
+Parse the input:
+- First argument: PR number or "current" (defaults to current branch's PR)
+- Second argument: Base URL (defaults to `http://localhost:3000`)
 
-This command creates professional video walkthroughs of features for PR documentation:
-- Records browser interactions using agent-browser CLI
-- Demonstrates the complete user flow
-- Uploads the video for easy sharing
-- Updates the PR description with an embedded video
+```bash
+# Get PR number for current branch if needed
+gh pr view --json number -q '.number'
+```
 
-## Prerequisites
+</execution_context>
 
-<requirements>
+<context>
+
+### Prerequisites
+
 - Local development server running (e.g., `bin/dev`, `rails server`)
 - agent-browser CLI installed
 - Git repository with a PR to document
 - `ffmpeg` installed (for video conversion)
 - `rclone` configured (optional, for cloud upload - see rclone skill)
-</requirements>
 
-## Setup
+### Setup
 
 **Check installation:**
 ```bash
@@ -47,28 +52,11 @@ npm install -g agent-browser && agent-browser install
 
 See the `agent-browser` skill for detailed usage.
 
-## Main Tasks
+</context>
 
-### 1. Parse Arguments
+<process>
 
-<parse_args>
-
-**Arguments:** $ARGUMENTS
-
-Parse the input:
-- First argument: PR number or "current" (defaults to current branch's PR)
-- Second argument: Base URL (defaults to `http://localhost:3000`)
-
-```bash
-# Get PR number for current branch if needed
-gh pr view --json number -q '.number'
-```
-
-</parse_args>
-
-### 2. Gather Feature Context
-
-<gather_context>
+## 1. Gather Feature Context
 
 **Get PR details:**
 ```bash
@@ -80,7 +68,7 @@ gh pr view [number] --json title,body,files,headRefName -q '.'
 gh pr view [number] --json files -q '.files[].path'
 ```
 
-**Map files to testable routes** (same as playwright-test):
+**Map files to testable routes:**
 
 | File Pattern | Route(s) |
 |-------------|----------|
@@ -89,11 +77,7 @@ gh pr view [number] --json files -q '.files[].path'
 | `app/javascript/controllers/*_controller.js` | Pages using that Stimulus controller |
 | `app/components/*_component.rb` | Pages rendering that component |
 
-</gather_context>
-
-### 3. Plan the Video Flow
-
-<plan_flow>
+## 2. Plan the Video Flow
 
 Before recording, create a shot list:
 
@@ -126,11 +110,7 @@ Does this look right?
 3. Add specific interactions to demonstrate
 ```
 
-</plan_flow>
-
-### 4. Setup Video Recording
-
-<setup_recording>
+## 3. Setup Video Recording
 
 **Create videos directory:**
 ```bash
@@ -145,11 +125,7 @@ agent-browser captures screenshots at key moments, then combine into video using
 ffmpeg -framerate 2 -pattern_type glob -i 'tmp/screenshots/*.png' -vf "scale=1280:-1" tmp/videos/feature-demo.gif
 ```
 
-</setup_recording>
-
-### 5. Record the Walkthrough
-
-<record_walkthrough>
+## 4. Record the Walkthrough
 
 Execute the planned flow, capturing each step:
 
@@ -205,11 +181,7 @@ ffmpeg -y -framerate 0.5 -pattern_type glob -i 'tmp/screenshots/*.png' \
 - The `-2` in MP4 scale ensures height is divisible by 2 (required for H.264)
 - Preview GIF uses 640px width and 128 colors to keep file size small (~100-200KB)
 
-</record_walkthrough>
-
-### 6. Upload the Video
-
-<upload_video>
+## 5. Upload the Video
 
 **Upload with rclone:**
 
@@ -226,11 +198,7 @@ rclone copy tmp/screenshots/ r2:your-bucket/pr-videos/pr-[number]/screenshots/ -
 rclone ls r2:your-bucket/pr-videos/pr-[number]/
 ```
 
-</upload_video>
-
-### 7. Update PR Description
-
-<update_pr>
+## 6. Update PR Description
 
 **Get current PR body:**
 ```bash
@@ -265,11 +233,7 @@ gh pr comment [number] --body "## Feature Demo
 _Automated walkthrough of the changes in this PR_"
 ```
 
-</update_pr>
-
-### 8. Cleanup
-
-<cleanup>
+## 7. Cleanup
 
 ```bash
 # Optional: Clean up screenshots
@@ -279,58 +243,24 @@ rm -rf tmp/screenshots
 echo "Video retained at: tmp/videos/feature-demo.gif"
 ```
 
-</cleanup>
+</process>
 
-### 9. Summary
+<success_criteria>
+- [ ] Video/GIF captures the complete user flow for the feature
+- [ ] PR description updated with embedded video section
+- [ ] Video uploaded to cloud storage (or local path noted)
+- [ ] All shots from the planned flow are captured
+</success_criteria>
 
-<summary>
+<guardrails>
+- Keep it short: 10-30 seconds is ideal for PR demos
+- Focus on the change: Don't include unrelated UI
+- Show before/after: If fixing a bug, show the broken state first (if possible)
+- Annotate if needed: Add text overlays for complex features
+</guardrails>
 
-Present completion summary:
-
-```markdown
-## Feature Video Complete
-
-**PR:** #[number] - [title]
-**Video:** [url or local path]
-**Duration:** ~[X] seconds
-**Format:** [GIF/MP4]
-
-### Shots Captured
-1. [Starting point] - [description]
-2. [Navigation] - [description]
-3. [Feature demo] - [description]
-4. [Result] - [description]
-
-### PR Updated
-- [x] Video section added to PR description
-- [ ] Ready for review
-
-**Next steps:**
+<handoff>
 - Review the video to ensure it accurately demonstrates the feature
 - Share with reviewers for context
-```
-
-</summary>
-
-## Quick Usage Examples
-
-```bash
-# Record video for current branch's PR
-/feature-video
-
-# Record video for specific PR
-/feature-video 847
-
-# Record with custom base URL
-/feature-video 847 http://localhost:5000
-
-# Record for staging environment
-/feature-video current https://staging.example.com
-```
-
-## Tips
-
-- **Keep it short**: 10-30 seconds is ideal for PR demos
-- **Focus on the change**: Don't include unrelated UI
-- **Show before/after**: If fixing a bug, show the broken state first (if possible)
-- **Annotate if needed**: Add text overlays for complex features
+- Run `/beads-review` for a full code review of the changes
+</handoff>

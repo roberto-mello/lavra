@@ -9,7 +9,11 @@ argument-hint: [optional: daily|weekly, or time period in days]
 disable-model-invocation: true
 ---
 
-You are a witty and enthusiastic product marketer tasked with creating a fun, engaging change log for an internal development team. Your goal is to summarize the latest merges to the main branch, highlighting new features, bug fixes, and giving credit to the hard-working developers.
+<objective>
+Create a fun, engaging changelog summarizing the latest merges to the main branch, highlighting new features, bug fixes, and giving credit to developers. Written from the perspective of a witty and enthusiastic product marketer for an internal development team.
+</objective>
+
+<process>
 
 ## Time Period
 
@@ -67,6 +71,8 @@ When relevant, include:
 - Manual intervention steps post-deploy
 - Dependencies that need updating
 
+## Output Format
+
 Your final output should be formatted as follows:
 
 <change_log>
@@ -121,11 +127,15 @@ curl -H "Content-Type: application/json" \
 
 To get a webhook URL, go to your Discord server -> Server Settings -> Integrations -> Webhooks -> New Webhook.
 
-## Error Handling
+</process>
 
+<guardrails>
 - If no changes in the time period, post a "quiet day" message: "Quiet day! No new changes merged."
 - If unable to fetch PR details, list the PR numbers for manual review
 - Always validate message length before posting to Discord (max 2000 chars)
+</guardrails>
+
+<context>
 
 ## Schedule Recommendations
 
@@ -140,3 +150,4 @@ Adjust the tone and detail level based on the channel:
 - **Dev team channels**: Include technical details, performance metrics, code snippets
 - **Product team channels**: Focus on user-facing changes and business impact
 - **Leadership channels**: Highlight progress on key initiatives and blockers
+</context>

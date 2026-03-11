@@ -4,17 +4,11 @@ description: Save session progress by filing beads, capturing knowledge, and syn
 disable-model-invocation: true
 ---
 
-# Beads Checkpoint
-
+<objective>
 Save session progress by filing beads for work done and capturing knowledge comments, without ending the session.
+</objective>
 
-## Usage
-
-```
-/beads-checkpoint
-```
-
-## Workflow
+<process>
 
 ### Step 1: Review Session Work
 
@@ -119,9 +113,30 @@ Remaining in-progress:
 Session continues. Use /beads-checkpoint again to save more progress.
 ```
 
-## Notes
+</process>
 
-- Context is preserved - you can keep working
+<success_criteria>
+- All distinct work units have corresponding beads (created or existing)
+- At least one knowledge comment logged per bead worked on
+- Uncommitted changes committed
+- Beads synced via `bd backup`
+- Summary report printed with beads created, closed, and in-progress
+</success_criteria>
+
+<guardrails>
+- Context is preserved - you can keep working after checkpoint
 - Use this frequently during long sessions
 - All knowledge is auto-captured and will be available next session
 - Beads are synced but not pushed (use `bd push` separately if needed)
+</guardrails>
+
+<handoff>
+After the checkpoint report, use the **AskUserQuestion tool** to present next steps:
+
+**Question:** "Checkpoint saved. What would you like to do next?"
+
+**Options:**
+1. **Continue `/beads-work`** - Resume implementing the current bead
+2. **Run `/beads-review`** - Multi-agent code review on changes so far
+3. **Keep working** - Continue the session without a specific command
+</handoff>

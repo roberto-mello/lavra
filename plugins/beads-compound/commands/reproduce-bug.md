@@ -5,9 +5,15 @@ argument-hint: [GitHub issue number]
 disable-model-invocation: true
 ---
 
-# Reproduce Bug Command
+<objective>
+Reproduce and investigate a bug by reading the GitHub issue, analyzing logs, visually reproducing it in a browser, and documenting findings with screenshots and code references.
+</objective>
 
+<execution_context>
 Look at github issue #$ARGUMENTS and read the issue description and comments.
+</execution_context>
+
+<process>
 
 ## Phase 1: Log Investigation
 
@@ -65,8 +71,6 @@ Reproduce the exact steps from the issue:
 
 ## Phase 3: Document Findings
 
-**Reference Collection:**
-
 - [ ] Document all research findings with specific file paths (e.g., `app/services/example_service.rb:42`)
 - [ ] Include screenshots showing the bug reproduction
 - [ ] List console errors if any
@@ -81,3 +85,13 @@ Add a comment to the issue with:
 3. **Screenshots** - Visual evidence of the bug (upload captured screenshots)
 4. **Relevant Code** - File paths and line numbers
 5. **Suggested Fix** - If you have one
+
+</process>
+
+<success_criteria>
+- [ ] GitHub issue read and understood
+- [ ] Log investigation completed (rails console + appsignal)
+- [ ] Bug visually reproduced (if UI-related) with screenshots
+- [ ] Findings documented with specific file paths and line numbers
+- [ ] Comment added to the GitHub issue with findings
+</success_criteria>

@@ -5,16 +5,11 @@ description = "Explore requirements and approaches through collaborative dialogu
 
 prompt = """
 
-# Brainstorm a Feature or Improvement
+<objective>
+Brainstorm a feature or improvement through collaborative dialogue. Brainstorming helps answer **WHAT** to build, surfaces gray areas that need decisions, and breaks the vision into implementation phases filed as child beads. It precedes `/beads-design`, which answers **HOW** to build each phase.
+</objective>
 
-**Note: The current year is 2026.** Use this when dating brainstorm documents.
-
-Brainstorming helps answer **WHAT** to build through collaborative dialogue. It precedes `/beads-plan`, which answers **HOW** to build it.
-
-**Process knowledge:** Load the `brainstorming` skill for detailed question techniques, approach exploration patterns, and YAGNI principles.
-
-## Feature Description
-
+<execution_context>
 <raw_argument> #{{args}} </raw_argument>
 
 **First, determine if the argument is a bead ID or a feature description:**
@@ -49,8 +44,15 @@ Check if the argument matches a bead ID pattern:
 - Ask: "What would you like to explore? Please provide either a bead ID (e.g., 'bikiniup-xhr') or describe the feature, problem, or improvement you're thinking about."
 
 Do not proceed until you have a clear feature description from the user.
+</execution_context>
 
-## Execution Flow
+<context>
+**Note: The current year is 2026.** Use this when dating brainstorm documents.
+
+**Process knowledge:** Load the `brainstorming` skill for detailed question techniques, approach exploration patterns, and YAGNI principles.
+</context>
+
+<process>
 
 ### Phase 0: Assess Requirements Clarity
 
@@ -85,82 +87,206 @@ Search for relevant knowledge from past sessions:
 
 Present any relevant entries that might inform the brainstorm.
 
-#### 1.3 Collaborative Dialogue
+#### 1.3 Collaborative Dialogue (Deep Questioning)
 
-Use the **AskUserQuestion tool** to ask questions **one at a time**.
+Use the **AskUserQuestion tool** to ask questions **one at a time**. Keep asking until the picture is clear -- do not rush this phase.
 
 **Guidelines (see `brainstorming` skill for detailed techniques):**
 - Prefer multiple choice when natural options exist
-- Start broad (purpose, users) then narrow (constraints, edge cases)
-- Validate assumptions explicitly
-- Ask about success criteria
+- Start broad, then narrow progressively
 
-**Exit condition:** Continue until the idea is clear OR user says "proceed"
+**Questioning progression:**
 
-### Phase 2: Explore Approaches
+1. **Vision exploration** (start here):
+   - "What does success look like when this is done?"
+   - "Who is this for? What's their day-to-day context?"
+   - "What triggered this idea -- a pain point, an opportunity, or something else?"
 
-Propose **2-3 concrete approaches** based on research and conversation.
+2. **Constraint discovery** (narrow down):
+   - Tech stack preferences or requirements
+   - Timeline pressure (is this urgent or exploratory?)
+   - Team size and skill distribution
+   - Existing patterns in the codebase to follow or avoid
+   - Dependencies on other systems or features
+
+3. **Scope sharpening** (lock boundaries):
+   - "What should this explicitly NOT do?"
+   - "What's the smallest version that would still be valuable?"
+   - Validate assumptions explicitly: "I'm assuming X. Is that correct?"
+
+4. **Success criteria** (close the loop):
+   - "How will you know this feature is working well?"
+   - "What's the happy path? What's the worst failure mode?"
+
+**Exit condition:** Continue until the picture is clear (vision, constraints, scope, and success criteria are all addressed) OR user says "proceed."
+
+### Phase 2: Gray Area Identification
+
+Scan the entire conversation so far for ambiguities where reasonable developers might choose differently.
+
+**2.1 Present gray areas:**
+
+Use **AskUserQuestion tool** to present a numbered list:
+
+"Before we explore approaches, I see these areas where we need a decision:
+
+1. {Gray area 1} -- e.g., should X be synchronous or async?
+2. {Gray area 2} -- e.g., do we handle Y at the API layer or the client?
+3. {Gray area 3} -- ...
+
+Which would you like to discuss? (Pick numbers, or 'all', or 'skip' if none matter yet)"
+
+**2.2 Explore selected gray areas:**
+
+For each selected gray area, ask 3-4 targeted questions using **AskUserQuestion tool** (one at a time) to drive toward a decision.
+
+**2.3 Capture decisions immediately:**
+
+After each gray area is resolved, log it right away -- do not wait for the capture phase:
+
+```bash
+bd comments add {BEAD_ID} "DECISION: {gray area} -- chose {option} because {rationale}. Alternatives considered: {list}"
+```
+
+If no bead exists yet, queue the decisions for Phase 5.
+
+### Phase 3: Explore Approaches
+
+Propose **2-3 concrete approaches** based on research, conversation, and resolved gray areas.
 
 For each approach, provide:
 - Brief description (2-3 sentences)
 - Pros and cons
 - When it's best suited
 
-Lead with your recommendation and explain why. Apply YAGNI - prefer simpler solutions.
+Lead with your recommendation and explain why. Apply YAGNI -- prefer simpler solutions.
 
 Use **AskUserQuestion tool** to ask which approach the user prefers.
 
-### Phase 3: Capture the Design
+### Phase 4: Phase Identification
 
-Create a brainstorm bead and log findings as comments:
+Based on requirements, decisions, and the chosen approach, identify logical implementation phases.
+
+**4.1 Present phases:**
+
+Use **AskUserQuestion tool** to present the proposed phases:
+
+"Based on our discussion, here are the implementation phases I'd suggest:
+
+Phase 1: {title} -- {one-line scope}
+Phase 2: {title} -- {one-line scope}
+Phase 3: {title} -- {one-line scope}
+
+Would you like to reorder, merge, split, or adjust any of these?"
+
+**4.2 File phases as child beads:**
+
+After confirmation, create the epic bead (if not already created) and file each phase:
 
 ```bash
-# Create brainstorm bead
-bd create "Brainstorm: {topic}" --type chore --labels brainstorm -d "{summary of what we're exploring}"
+# Create epic bead if it doesn't exist yet
+bd create --title="Brainstorm: {topic}" --type=epic --labels=brainstorm -d "{structured description -- see Phase 5}"
 
-# Log key decisions
-bd comments add {BEAD_ID} "DECISION: {approach chosen and why}"
-bd comments add {BEAD_ID} "INVESTIGATION: {key findings from exploration}"
-bd comments add {BEAD_ID} "FACT: {constraints discovered}"
-bd comments add {BEAD_ID} "PATTERN: {patterns to follow}"
+# File each phase as a child bead
+bd create --title="Phase 1: {title}" --description="{scope + goals + locked decisions relevant to this phase}" --type=task --parent={EPIC_BEAD_ID}
+bd create --title="Phase 2: {title}" --description="{scope + goals + locked decisions relevant to this phase}" --type=task --parent={EPIC_BEAD_ID}
+bd create --title="Phase 3: {title}" --description="{scope + goals + locked decisions relevant to this phase}" --type=task --parent={EPIC_BEAD_ID}
 ```
 
-### Phase 4: Handoff
+Each phase bead description should include:
+- Scope: what's in and out for this phase
+- Goals: what's done when this phase is complete
+- Locked decisions: relevant decisions from Phase 2 that apply to this phase
+
+### Phase 5: Capture the Design
+
+Update the epic bead description with structured requirements:
+
+```bash
+bd update {EPIC_BEAD_ID} -d "$(cat <<'EOF'
+## Vision
+{What success looks like -- 1-2 sentences}
+
+## Requirements
+1. {Must-have requirement}
+2. {Must-have requirement}
+3. ...
+
+## Non-Requirements
+- {Explicitly excluded scope}
+- {Things this does NOT do}
+
+## Locked Decisions
+- {Decision from gray area exploration}
+- {Decision from gray area exploration}
+
+## Phases
+- {PHASE_1_BEAD_ID}: Phase 1 -- {title}
+- {PHASE_2_BEAD_ID}: Phase 2 -- {title}
+- {PHASE_3_BEAD_ID}: Phase 3 -- {title}
+EOF
+)"
+```
+
+Log remaining knowledge comments:
+
+```bash
+bd comments add {EPIC_BEAD_ID} "INVESTIGATION: {key findings from exploration}"
+bd comments add {EPIC_BEAD_ID} "FACT: {constraints discovered}"
+bd comments add {EPIC_BEAD_ID} "PATTERN: {patterns to follow}"
+```
+
+### Phase 6: Handoff
 
 Use **AskUserQuestion tool** to present next steps:
 
-**Question:** "Brainstorm captured as {BEAD_ID}. What would you like to do next?"
+**Question:** "Brainstorm captured as {EPIC_BEAD_ID} with {N} phases filed as child beads. What would you like to do next?"
 
 **Options:**
-1. **Proceed to planning** - Run `/beads-plan` (will auto-detect this brainstorm's knowledge)
-2. **Refine design further** - Continue exploring
-3. **Done for now** - Return later
+1. **Proceed to design** -- Run `/beads-design {EPIC_BEAD_ID}` to design all phases
+2. **Refine further** -- Continue exploring
+3. **Done for now** -- Return later
 
-## Output Summary
+</process>
 
-When complete, display:
+<success_criteria>
+- Feature description is clear and well-understood (vision, constraints, scope, success criteria)
+- Gray areas were identified and resolved with the user
+- 2-3 approaches were explored with pros/cons
+- An epic bead was created with structured description (vision, requirements, non-requirements, locked decisions, phases)
+- Implementation phases were identified, confirmed, and filed as child beads
+- Key decisions captured as DECISION comments immediately when resolved
+- Additional knowledge logged as INVESTIGATION/FACT/PATTERN comments
+- User was offered clear next steps (with `/beads-design` as primary option)
+</success_criteria>
 
+<guardrails>
+- **Stay focused on WHAT, not HOW** - Implementation details belong in the plan
+- **Ask one question at a time** - Don't overwhelm
+- **Apply YAGNI** - Prefer simpler approaches
+- **Keep outputs concise** - 200-300 words per section max
+- NEVER CODE! Just explore and document decisions.
+</guardrails>
+
+<handoff>
 ```
 Brainstorm complete!
 
-Bead: {BEAD_ID} - Brainstorm: {topic}
+Epic: {EPIC_BEAD_ID} - Brainstorm: {topic}
 
-Key decisions:
+Phases:
+- {PHASE_1_BEAD_ID}: Phase 1 -- {title}
+- {PHASE_2_BEAD_ID}: Phase 2 -- {title}
+- {PHASE_3_BEAD_ID}: Phase 3 -- {title}
+
+Locked decisions:
 - [Decision 1]
 - [Decision 2]
 
 Knowledge captured: {count} entries logged to knowledge.jsonl
 
-Next: Run `/beads-plan` when ready to implement.
+Next: Run `/beads-design {EPIC_BEAD_ID}` to design all phases.
 ```
-
-## Important Guidelines
-
-- **Stay focused on WHAT, not HOW** - Implementation details belong in the plan
-- **Ask one question at a time** - Don't overwhelm
-- **Apply YAGNI** - Prefer simpler approaches
-- **Keep outputs concise** - 200-300 words per section max
-
-NEVER CODE! Just explore and document decisions.
+</handoff>
 
 """

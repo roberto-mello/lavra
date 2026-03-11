@@ -5,35 +5,32 @@ argument-hint: [scheme name or 'current' to use default]
 disable-model-invocation: true
 ---
 
-# Xcode Test Command
+<objective>
+Build, install, and test iOS apps on the simulator using XcodeBuildMCP. Captures screenshots, logs, and verifies app behavior.
+</objective>
 
-<command_purpose>Build, install, and test iOS apps on the simulator using XcodeBuildMCP. Captures screenshots, logs, and verifies app behavior.</command_purpose>
+<context>
 
-## Introduction
+### Prerequisites
 
-<role>iOS QA Engineer specializing in simulator-based testing</role>
-
-This command tests iOS/macOS apps by:
-- Building for simulator
-- Installing and launching the app
-- Taking screenshots of key screens
-- Capturing console logs for errors
-- Supporting human verification for external flows
-
-## Prerequisites
-
-<requirements>
 - Xcode installed with command-line tools
 - XcodeBuildMCP server connected
 - Valid Xcode project or workspace
 - At least one iOS Simulator available
-</requirements>
 
-## Main Tasks
+### Integration with /beads-review
 
-### 0. Verify XcodeBuildMCP is Installed
+When reviewing PRs that touch iOS code, the `/beads-review` command can spawn this as a subagent:
 
-<check_mcp_installed>
+```
+Task general-purpose("Run /xcode-test for scheme [name]. Build, install on simulator, test key screens, check for crashes.")
+```
+
+</context>
+
+<process>
+
+## 0. Verify XcodeBuildMCP is Installed
 
 **First, check if XcodeBuildMCP tools are available.**
 
@@ -59,11 +56,7 @@ Then restart Claude Code and run `/xcode-test` again.
 
 **Do NOT proceed** until XcodeBuildMCP is confirmed working.
 
-</check_mcp_installed>
-
-### 1. Discover Project and Scheme
-
-<discover_project>
+## 1. Discover Project and Scheme
 
 **Find available projects:**
 ```
@@ -79,11 +72,7 @@ mcp__xcodebuildmcp__list_schemes({ project_path: "/path/to/Project.xcodeproj" })
 - Use the specified scheme name
 - Or "current" to use the default/last-used scheme
 
-</discover_project>
-
-### 2. Boot Simulator
-
-<boot_simulator>
+## 2. Boot Simulator
 
 **List available simulators:**
 ```
@@ -98,11 +87,7 @@ mcp__xcodebuildmcp__boot_simulator({ simulator_id: "[uuid]" })
 **Wait for simulator to be ready:**
 Check simulator state before proceeding with installation.
 
-</boot_simulator>
-
-### 3. Build the App
-
-<build_app>
+## 3. Build the App
 
 **Build for iOS Simulator:**
 ```
@@ -121,11 +106,7 @@ mcp__xcodebuildmcp__build_ios_sim_app({
 - Note the built app path for installation
 - Proceed to installation step
 
-</build_app>
-
-### 4. Install and Launch
-
-<install_launch>
+## 4. Install and Launch
 
 **Install app on simulator:**
 ```
@@ -151,11 +132,7 @@ mcp__xcodebuildmcp__capture_sim_logs({
 })
 ```
 
-</install_launch>
-
-### 5. Test Key Screens
-
-<test_screens>
+## 5. Test Key Screens
 
 For each key screen in the app:
 
@@ -184,11 +161,7 @@ Look for:
 - Error-level log messages
 - Failed network requests
 
-</test_screens>
-
-### 6. Human Verification (When Required)
-
-<human_verification>
+## 6. Human Verification (When Required)
 
 Pause for human input when testing touches:
 
@@ -213,11 +186,7 @@ Did it work correctly?
 2. No - describe the issue
 ```
 
-</human_verification>
-
-### 7. Handle Failures
-
-<failure_handling>
+## 7. Handle Failures
 
 When a test fails:
 
@@ -248,11 +217,7 @@ When a test fails:
    - Create bead: `bd create "Xcode test failure: {description}" --type bug --priority 1`
    - Continue testing
 
-</failure_handling>
-
-### 8. Test Summary
-
-<test_summary>
+## 8. Test Summary
 
 After all tests complete, present summary:
 
@@ -290,11 +255,7 @@ After all tests complete, present summary:
 ### Result: [PASS / FAIL / PARTIAL]
 ```
 
-</test_summary>
-
-### 9. Cleanup
-
-<cleanup>
+## 9. Cleanup
 
 After testing:
 
@@ -308,33 +269,19 @@ mcp__xcodebuildmcp__stop_log_capture({ simulator_id: "[uuid]" })
 mcp__xcodebuildmcp__shutdown_simulator({ simulator_id: "[uuid]" })
 ```
 
-</cleanup>
+</process>
 
-## Post-Test Options
+<success_criteria>
+- [ ] XcodeBuildMCP confirmed working before proceeding
+- [ ] App builds successfully for simulator
+- [ ] App installs and launches on simulator
+- [ ] Key screens tested with screenshots captured
+- [ ] Console logs checked for crashes and errors
+- [ ] Test summary report with Pass/Fail/Skip per screen
+</success_criteria>
 
-After presenting the summary, offer:
-
+<handoff>
 1. **Run `/beads-review`** - Full code review of the changes
 2. **Fix failures** - Address test failures now
 3. **Done** - Accept results
-
-## Quick Usage Examples
-
-```bash
-# Test with default scheme
-/xcode-test
-
-# Test specific scheme
-/xcode-test MyApp-Debug
-
-# Test after making changes
-/xcode-test current
-```
-
-## Integration with /beads-review
-
-When reviewing PRs that touch iOS code, the `/beads-review` command can spawn this as a subagent:
-
-```
-Task general-purpose("Run /xcode-test for scheme [name]. Build, install on simulator, test key screens, check for crashes.")
-```
+</handoff>

@@ -4,12 +4,11 @@ description: Have multiple specialized agents review a plan in parallel
 argument-hint: "[epic bead ID]"
 ---
 
-# Plan Review
-
+<objective>
 Review an epic plan using multiple specialized agents in parallel to catch issues before implementation begins.
+</objective>
 
-## Epic Bead
-
+<execution_context>
 <epic_bead_id> #$ARGUMENTS </epic_bead_id>
 
 **If the epic bead ID above is empty:**
@@ -17,8 +16,11 @@ Review an epic plan using multiple specialized agents in parallel to catch issue
 2. Ask the user: "Which epic plan would you like reviewed? Please provide the bead ID (e.g., `BD-001`)."
 
 Do not proceed until you have a valid epic bead ID.
+</execution_context>
 
-## Step 1: Load the Plan
+<process>
+
+### Step 1: Load the Plan
 
 ```bash
 # Read the epic
@@ -36,7 +38,7 @@ bd show {CHILD_ID}
 
 Assemble the full plan content from epic description + all child bead descriptions.
 
-## Step 2: Recall Relevant Knowledge
+### Step 2: Recall Relevant Knowledge
 
 ```bash
 # Search for knowledge related to the plan's topic
@@ -46,7 +48,7 @@ Assemble the full plan content from epic description + all child bead descriptio
 
 Include any relevant LEARNED/DECISION/FACT/PATTERN entries as context for reviewers.
 
-## Step 3: Dispatch Review Agents in Parallel
+### Step 3: Dispatch Review Agents in Parallel
 
 Run these 4 agents simultaneously, passing the full plan content to each:
 
@@ -55,7 +57,7 @@ Run these 4 agents simultaneously, passing the full plan content to each:
 3. Task security-sentinel("Review this plan for security vulnerabilities, missing auth checks, data exposure risks. Plan: [full plan content]")
 4. Task performance-oracle("Review this plan for performance bottlenecks, N+1 queries, missing caching, scalability issues. Plan: [full plan content]")
 
-## Step 4: Synthesize Findings
+### Step 4: Synthesize Findings
 
 After all agents complete, synthesize their feedback into a categorized report:
 
@@ -97,7 +99,7 @@ After all agents complete, synthesize their feedback into a categorized report:
 3. [Third most impactful]
 ```
 
-## Step 5: Log Key Findings
+### Step 5: Log Key Findings
 
 For significant findings, log knowledge:
 
@@ -105,8 +107,17 @@ For significant findings, log knowledge:
 bd comments add {EPIC_ID} "LEARNED: Plan review found: {key insight}"
 ```
 
-## Post-Review Options
+</process>
 
+<success_criteria>
+- All 4 review agents dispatched and completed
+- Findings synthesized into categorized report with severity levels
+- Critical issues clearly identified
+- Top 3 recommended changes listed
+- Key findings logged as knowledge comments
+</success_criteria>
+
+<handoff>
 After presenting the review, use the **AskUserQuestion tool** to present these options:
 
 **Question:** "Plan review complete for `{EPIC_ID}`. What would you like to do next?"
@@ -114,8 +125,9 @@ After presenting the review, use the **AskUserQuestion tool** to present these o
 **Options:**
 1. **Apply feedback** - Update child beads with review suggestions
 2. **Run `/beads-deepen`** - Enhance plan with additional research
-3. **Start `/beads-work`** - Begin implementing (accept plan as-is)
-4. **Dismiss** - Acknowledge review without changes
+3. **Start `/beads-work`** - Begin implementing the first child bead
+4. **Run `/beads-parallel`** - Work on multiple child beads in parallel
+5. **Dismiss** - Acknowledge review without changes
 
 ## Applying Feedback (when option 1 is selected)
 
@@ -152,7 +164,7 @@ If a recommendation applies to multiple beads, update each one.
 
 If a recommendation is architectural (affects the whole plan), update the epic description.
 
-If a recommendation is contradictory or inapplicable, mark it `[SKIPPED: reason]` — do NOT silently omit it.
+If a recommendation is contradictory or inapplicable, mark it `[SKIPPED: reason]` -- do NOT silently omit it.
 
 ### Step C: Completeness Verification
 
@@ -183,3 +195,4 @@ TOTAL: {N} applied, {M} skipped out of {N+M} recommendations
 ```bash
 bd comments add {EPIC_ID} "DECISION: Applied plan review feedback. {N} recommendations applied across {K} beads. Key changes: {top 3 changes}"
 ```
+</handoff>

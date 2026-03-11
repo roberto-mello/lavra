@@ -81,12 +81,43 @@ jobs:
           name: installation-test-logs
           path: /tmp/beads-install-test-*/
 
+  test-npx-installer:
+    name: npx Installer Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Test --help flag
+        run: node bin/install.js --help
+
+      - name: Test non-interactive Claude Code installation
+        run: |
+          mkdir -p /tmp/test-npx && cd /tmp/test-npx
+          git init -q
+          node $GITHUB_WORKSPACE/bin/install.js --claude --yes
+
+      - name: Verify installation produced expected files
+        run: |
+          test -d /tmp/test-npx/.claude/hooks || { echo "Missing .claude/hooks"; exit 1; }
+          test -d /tmp/test-npx/.claude/commands || { echo "Missing .claude/commands"; exit 1; }
+          test -d /tmp/test-npx/.claude/agents || { echo "Missing .claude/agents"; exit 1; }
+          echo "All expected directories present"
+
+      - name: Clean up
+        if: always()
+        run: rm -rf /tmp/test-npx
+
   verify-release:
     # SYNC: This job must stay in sync with scripts/pre-release-check.sh.
     # When modifying either file, update the other to match.
     name: Verify Release Readiness
     runs-on: ubuntu-latest
-    needs: [test-compatibility, test-installation]
+    needs: [test-compatibility, test-installation, test-npx-installer]
     if: github.event_name == 'release'
     steps:
       - uses: actions/checkout@v4

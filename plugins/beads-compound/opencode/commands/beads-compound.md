@@ -8,33 +8,42 @@ description: Document a recently solved problem to compound your team's knowledg
 argument-hint: "[optional: brief context about the fix or bead ID]"
 ---
 
-# /beads-compound
+<objective>
+Coordinate multiple subagents working in parallel to document a recently solved problem. Captures problem solutions while context is fresh, creating structured knowledge entries in `.beads/memory/knowledge.jsonl` for searchability and future reference.
+</objective>
 
-Coordinate multiple subagents working in parallel to document a recently solved problem.
-
-## Purpose
-
-Captures problem solutions while context is fresh, creating structured knowledge entries in `.beads/memory/knowledge.jsonl` for searchability and future reference. Uses parallel subagents for maximum efficiency.
-
+<context>
 **Why "compound"?** Each documented solution compounds your team's knowledge. The first time you solve a problem takes research. Document it, and the next occurrence takes minutes. Knowledge compounds.
 
-## Usage
-
+**Usage:**
 ```bash
 /beads-compound                    # Document the most recent fix
 /beads-compound BD-007             # Document solution for specific bead
 /beads-compound [brief context]    # Provide additional context hint
 ```
 
-<critical_requirement>
+**The Compounding Philosophy:**
+
+1. First time you solve "N+1 query in brief generation" -> Research (30 min)
+2. Document the solution -> knowledge.jsonl entries (5 min)
+3. Next time similar issue occurs -> Auto-recalled (instant)
+4. Knowledge compounds -> Team gets smarter
+
+**Each unit of engineering work should make subsequent units of work easier - not harder.**
+
+**Preconditions:**
+- Problem has been solved (not in-progress)
+- Solution has been verified working
+- Non-trivial problem (not simple typo or obvious error)
+</context>
+
+<guardrails>
 **Research subagents return TEXT DATA only - NO file writes.**
 
 Subagents in Phase 1 (research) must NOT use Write, Edit, or create any files. They analyze and return text data to the orchestrator. Only knowledge entries via `bd comments add` should be written (which triggers automatic capture via the memory-capture hook).
-</critical_requirement>
+</guardrails>
 
-## Execution Strategy: Parallel Subagents
-
-This command launches multiple specialized subagents IN PARALLEL to maximize efficiency:
+<process>
 
 ### 1. **Context Analyzer** (Parallel)
    - Extracts conversation history
@@ -110,13 +119,15 @@ bd comments add {BEAD_ID} "DECISION: {what was chosen and why, with alternatives
 
 Each entry is auto-tagged based on content keywords and stored in `knowledge.jsonl`.
 
-## Preconditions
+</process>
 
-- Problem has been solved (not in-progress)
-- Solution has been verified working
-- Non-trivial problem (not simple typo or obvious error)
-
-## Success Output
+<success_criteria>
+- All 6 parallel subagents completed successfully
+- At least one knowledge entry per type (LEARNED, PATTERN, INVESTIGATION) created
+- Knowledge entries linked to the relevant bead
+- Root cause analysis documented
+- Prevention strategies captured
+- Related knowledge cross-referenced
 
 ```
 Knowledge documentation complete!
@@ -141,26 +152,17 @@ Linked to bead: {BEAD_ID}
 
 This knowledge will be searchable for future reference when similar
 issues occur.
+```
+</success_criteria>
 
+<handoff>
 What's next?
 1. Continue workflow (recommended)
-2. View knowledge entries: .beads/memory/recall.sh "{keyword}"
+2. View knowledge entries: `.beads/memory/recall.sh "{keyword}"`
 3. Other
-```
 
-## The Compounding Philosophy
-
-This creates a compounding knowledge system:
-
-1. First time you solve "N+1 query in brief generation" -> Research (30 min)
-2. Document the solution -> knowledge.jsonl entries (5 min)
-3. Next time similar issue occurs -> Auto-recalled (instant)
-4. Knowledge compounds -> Team gets smarter
-
-**Each unit of engineering work should make subsequent units of work easier - not harder.**
-
-## Related Commands
-
+**Related Commands:**
 - `/beads-plan` - Planning workflow (references documented knowledge)
 - `/beads-checkpoint` - Quick knowledge capture during work
 - `/beads-deepen` - Enhance plans with parallel research
+</handoff>

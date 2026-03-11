@@ -5,18 +5,13 @@ description = "Resolve all PR comments using parallel processing"
 
 prompt = """
 
-Resolve all PR comments using parallel processing.
+<objective>
+Resolve all unresolved PR comments by spawning parallel pr-comment-resolver agents for each comment, then committing and pushing the changes.
+</objective>
 
-Claude Code automatically detects and understands your git context:
+<process>
 
-- Current branch detection
-- Associated PR context
-- All PR comments and review threads
-- Can work with any PR by specifying the PR number, or ask it.
-
-## Workflow
-
-### 1. Analyze
+## 1. Analyze
 
 Get all unresolved comments for PR
 
@@ -25,11 +20,11 @@ gh pr status
 bin/get-pr-comments PR_NUMBER
 ```
 
-### 2. Plan
+## 2. Plan
 
 Create a task list (using TaskCreate) of all unresolved items grouped by type.
 
-### 3. Implement (PARALLEL)
+## 3. Implement (PARALLEL)
 
 Spawn a pr-comment-resolver agent for each unresolved item in parallel.
 
@@ -41,12 +36,21 @@ So if there are 3 comments, it will spawn 3 pr-comment-resolver agents in parall
 
 Always run all in parallel subagents/Tasks for each Todo item.
 
-### 4. Commit & Resolve
+## 4. Commit & Resolve
 
 - Commit changes
 - Run bin/resolve-pr-thread THREAD_ID_1
 - Push to remote
 
 Last, check bin/get-pr-comments PR_NUMBER again to see if all comments are resolved. They should be, if not, repeat the process from 1.
+
+</process>
+
+<success_criteria>
+- [ ] All unresolved PR comments identified
+- [ ] Each comment resolved by a parallel pr-comment-resolver agent
+- [ ] Changes committed and pushed to remote
+- [ ] Re-check confirms all comments are resolved
+</success_criteria>
 
 """

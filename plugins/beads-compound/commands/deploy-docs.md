@@ -4,9 +4,11 @@ description: Validate and prepare documentation for GitHub Pages deployment
 disable-model-invocation: true
 ---
 
-# Deploy Documentation Command
+<objective>
+Validate the documentation site structure, check component counts and JSON validity, and prepare for GitHub Pages deployment.
+</objective>
 
-Validate the documentation site and prepare it for GitHub Pages deployment.
+<process>
 
 ## Step 1: Validate Documentation
 
@@ -49,13 +51,9 @@ After merging to `main`, the docs will auto-deploy. Or:
 2. Select "Deploy Documentation to GitHub Pages"
 3. Click "Run workflow"
 
-## Step 4: Report Status
+</process>
 
-Provide a summary:
-
-```
-## Deployment Readiness
-
+<success_criteria>
 - All HTML pages present
 - JSON files valid
 - Component counts match
@@ -64,4 +62,4 @@ Provide a summary:
 - [ ] Commit any pending changes
 - [ ] Push to main branch
 - [ ] Verify GitHub Pages workflow exists
-```
+</success_criteria>

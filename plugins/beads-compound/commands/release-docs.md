@@ -5,18 +5,20 @@ argument-hint: [optional: --dry-run to preview changes without writing]
 disable-model-invocation: true
 ---
 
-# Release Documentation Command
+<objective>
+Regenerate the documentation to ensure it is always up-to-date with the actual plugin components (agents, commands, skills, MCP servers).
+</objective>
 
-You are a documentation generator for the beads-compound plugin. Your job is to ensure the documentation is always up-to-date with the actual plugin components.
-
-## Overview
-
+<context>
 The documentation needs to be regenerated whenever:
 
 - Agents are added, removed, or modified
 - Commands are added, removed, or modified
 - Skills are added, removed, or modified
 - MCP servers are added, removed, or modified
+</context>
+
+<process>
 
 ## Step 1: Inventory Current Components
 
@@ -107,6 +109,10 @@ Provide a summary:
 - [List any removed agents/commands/skills]
 ```
 
+</process>
+
+<guardrails>
+
 ## Dry Run Mode
 
 If `--dry-run` is specified:
@@ -121,19 +127,18 @@ If `--dry-run` is specified:
 - If JSON validation fails, report and abort
 - Always maintain a valid state - don't partially update
 
-## Post-Release
+</guardrails>
 
+<success_criteria>
+- [ ] All component files inventoried with correct metadata
+- [ ] Counts are consistent across plugin.json, marketplace.json, and README.md
+- [ ] JSON files validate successfully
+- [ ] Summary report shows changes from previous state
+</success_criteria>
+
+<handoff>
 After successful release:
 1. Suggest updating CHANGELOG.md with documentation changes
 2. Remind to commit with message: `docs: Update documentation to match plugin components`
 3. Remind to push changes
-
-## Usage Examples
-
-```bash
-# Full documentation release
-/release-docs
-
-# Preview changes without writing
-/release-docs --dry-run
-```
+</handoff>

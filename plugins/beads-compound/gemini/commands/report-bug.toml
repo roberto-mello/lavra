@@ -5,9 +5,11 @@ description = "Report a bug in the beads-compound plugin"
 
 prompt = """
 
-# Report a Beads-Compound Plugin Bug
+<objective>
+Report bugs encountered while using the beads-compound plugin by gathering structured information and creating a GitHub issue for the maintainer.
+</objective>
 
-Report bugs encountered while using the beads-compound plugin. This command gathers structured information and creates a GitHub issue for the maintainer.
+<process>
 
 ## Step 1: Gather Bug Information
 
@@ -122,17 +124,17 @@ After the issue is created:
 2. Thank them for reporting the bug
 3. Let them know the maintainer will be notified
 
-## Output Format
+</process>
 
-```
-Bug report submitted successfully!
+<success_criteria>
+- [ ] All six bug information questions answered
+- [ ] Environment information collected automatically
+- [ ] Bug report formatted with all sections
+- [ ] GitHub issue created successfully
+- [ ] Issue URL displayed to user
+</success_criteria>
 
-Issue: https://github.com/rbm/beads-compound-plugin/issues/[NUMBER]
-Title: [beads-compound] Bug: [description]
-
-Thank you for helping improve the beads-compound plugin!
-The maintainer will review your report and respond as soon as possible.
-```
+<guardrails>
 
 ## Error Handling
 
@@ -149,5 +151,7 @@ This command does NOT collect:
 - File paths beyond basic OS info
 
 Only technical information about the bug is included in the report.
+
+</guardrails>
 
 """

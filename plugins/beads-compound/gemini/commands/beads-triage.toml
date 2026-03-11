@@ -5,19 +5,11 @@ description = "Triage and categorize beads for prioritization"
 
 prompt = """
 
-Present all findings, decisions, or issues one by one for triage. The goal is to go through each bead and decide whether to keep, modify, dismiss, or defer it.
+<objective>
+Present all findings, decisions, or issues one by one for triage. Go through each bead and decide whether to keep, modify, dismiss, or defer it. Useful for triaging code review findings, security audit results, performance analysis, or any categorized findings that need tracking.
+</objective>
 
-**IMPORTANT: DO NOT CODE ANYTHING DURING TRIAGE!**
-
-This command is for:
-
-- Triaging code review findings (from `/beads-review`)
-- Processing security audit results
-- Reviewing performance analysis
-- Handling any categorized findings that need tracking
-
-## Input
-
+<execution_context>
 <bead_input> #{{args}} </bead_input>
 
 **First, determine if the argument is a bead ID or empty:**
@@ -62,8 +54,9 @@ Read each bead's full details:
 ```bash
 bd show {BEAD_ID}
 ```
+</execution_context>
 
-## Workflow
+<process>
 
 ### Step 1: Present Each Bead
 
@@ -147,35 +140,22 @@ After all items processed:
 
 ### Deferred Beads:
 - {BD-AAA}: {title} - Reason: {reason}
-
-### Next Steps:
-
-1. Start work on approved items:
-   ```bash
-   /beads-parallel    # Work on multiple beads efficiently
-   ```
-2. Or pick individual items:
-   ```bash
-   /beads-work {BD-XXX}
-   ```
 ```
 
-## Post-Triage Options
+</process>
 
-When done, present these options:
+<guardrails>
+- DO NOT implement fixes or write code during triage
+- Triage is for decisions only
+- Implementation happens in `/beads-parallel` or `/beads-work`
+</guardrails>
 
-```markdown
+<handoff>
 What would you like to do next?
 
 1. Run /beads-parallel to resolve the approved beads
 2. Run /beads-work on a specific bead
 3. Nothing for now
-```
-
-## Important Notes
-
-- DO NOT implement fixes or write code during triage
-- Triage is for decisions only
-- Implementation happens in `/beads-parallel` or `/beads-work`
+</handoff>
 
 """

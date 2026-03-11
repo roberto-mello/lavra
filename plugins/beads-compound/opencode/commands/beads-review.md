@@ -8,15 +8,12 @@ description: Perform exhaustive code reviews using multi-agent analysis and ultr
 argument-hint: "[bead ID, PR number, GitHub URL, branch name, or latest]"
 ---
 
-# Review Command
+<objective>
+Perform exhaustive code reviews using multi-agent analysis, ultra-thinking, and Git worktrees for deep local inspection.
+</objective>
 
-<command_purpose> Perform exhaustive code reviews using multi-agent analysis, ultra-thinking, and Git worktrees for deep local inspection. </command_purpose>
-
-## Introduction
-
-<role>Senior Code Review Architect with expertise in security, performance, architecture, and quality assurance</role>
-
-## Prerequisites
+<execution_context>
+<review_target> #$ARGUMENTS </review_target>
 
 <requirements>
 - Git repository with GitHub CLI (`gh`) installed and authenticated
@@ -24,12 +21,11 @@ argument-hint: "[bead ID, PR number, GitHub URL, branch name, or latest]"
 - Proper permissions to create worktrees and access the repository
 - `bd` CLI installed for bead management
 </requirements>
+</execution_context>
 
-## Main Tasks
+<process>
 
 ### 1. Determine Review Target & Setup (ALWAYS FIRST)
-
-<review_target> #$ARGUMENTS </review_target>
 
 <thinking>
 First, I need to determine the review target type and set up the code for analysis.
@@ -64,7 +60,6 @@ Present any relevant LEARNED/DECISION/FACT/PATTERN entries that reviewers should
 
 #### Protected Artifacts
 
-<protected_artifacts>
 The following paths are beads-compound pipeline artifacts and must never be flagged for deletion, removal, or gitignore by any review agent:
 
 - `.beads/memory/knowledge.jsonl` -- Persistent knowledge store
@@ -72,11 +67,8 @@ The following paths are beads-compound pipeline artifacts and must never be flag
 - `.beads/memory/recall.sh` -- Knowledge search script
 
 If a review agent flags any file in `.beads/memory/` for cleanup or removal, discard that finding during synthesis. Do not create a bead for it.
-</protected_artifacts>
 
 ### 3. Dispatch Review Agents in Parallel
-
-<parallel_tasks>
 
 Run ALL or most of these agents at the same time:
 
@@ -93,11 +85,7 @@ Run ALL or most of these agents at the same time:
 11. Task agent-native-reviewer(PR content)
 12. Task julik-frontend-races-reviewer(PR content)
 
-</parallel_tasks>
-
 #### Conditional Agents (Run if applicable):
-
-<conditional_agents>
 
 These agents are run ONLY when the PR matches specific criteria. Check the PR files list to determine if they apply:
 
@@ -113,17 +101,15 @@ These agents are run ONLY when the PR matches specific criteria. Check the PR fi
 - PR changes how data is read/written
 - PR title/body mentions: migration, backfill, data transformation, ID mapping
 
-</conditional_agents>
-
 ### 4. Ultra-Thinking Deep Dive Phases
 
-<ultrathink_instruction> For each phase below, spend maximum cognitive effort. Think step by step. Consider all angles. Question assumptions. And bring all reviews in a synthesis to the user.</ultrathink_instruction>
+For each phase below, spend maximum cognitive effort. Think step by step. Consider all angles. Question assumptions. And bring all reviews in a synthesis to the user.
 
 #### Phase A: Stakeholder Perspective Analysis
 
-<thinking_prompt> ULTRA-THINK: Put yourself in each stakeholder's shoes. What matters to them? What are their pain points? </thinking_prompt>
-
-<stakeholder_perspectives>
+<thinking>
+ULTRA-THINK: Put yourself in each stakeholder's shoes. What matters to them? What are their pain points?
+</thinking>
 
 1. **Developer Perspective**
    - How easy is this to understand and modify?
@@ -149,13 +135,11 @@ These agents are run ONLY when the PR matches specific criteria. Check the PR fi
    - How is data protected?
    - What are the audit capabilities?
 
-</stakeholder_perspectives>
-
 #### Phase B: Scenario Exploration
 
-<thinking_prompt> ULTRA-THINK: Explore edge cases and failure scenarios. What could go wrong? How does the system behave under stress? </thinking_prompt>
-
-<scenario_checklist>
+<thinking>
+ULTRA-THINK: Explore edge cases and failure scenarios. What could go wrong? How does the system behave under stress?
+</thinking>
 
 - [ ] **Happy Path**: Normal operation with valid inputs
 - [ ] **Invalid Inputs**: Null, empty, malformed data
@@ -168,15 +152,13 @@ These agents are run ONLY when the PR matches specific criteria. Check the PR fi
 - [ ] **Data Corruption**: Partial writes, inconsistency
 - [ ] **Cascading Failures**: Downstream service issues
 
-</scenario_checklist>
-
 ### 5. Simplification and Minimalism Review
 
 Run the Task code-simplicity-reviewer() to see if we can simplify the code.
 
 ### 6. Findings Synthesis and Bead Creation
 
-<critical_requirement> ALL findings MUST be stored as child beads of the reviewed bead. Create beads immediately after synthesis - do NOT present findings for user approval first. </critical_requirement>
+ALL findings MUST be stored as child beads of the reviewed bead. Create beads immediately after synthesis - do NOT present findings for user approval first.
 
 #### Step 1: Build Agent Finding Inventory
 
@@ -211,7 +193,7 @@ Remove duplicates, prioritize by severity and impact.
 Before creating beads, verify no agent output was silently dropped:
 
 - [ ] Every finding in the inventory is either included in the categorized list OR explicitly marked as duplicate/inapplicable with a reason
-- [ ] Count: inventory total findings vs. categorized findings + discarded — they must reconcile
+- [ ] Count: inventory total findings vs. categorized findings + discarded -- they must reconcile
 - [ ] If any inventory items are unaccounted for, categorize them now
 
 **Do not proceed to bead creation until the inventory is fully accounted for.**
@@ -306,15 +288,14 @@ After creating all beads, present comprehensive summary:
 ### Next Steps:
 
 1. **Address P1 Findings**: CRITICAL - must be fixed before closing
-   - /beads-work {P1_BEAD_ID} for each critical finding
-2. **Triage remaining**: /beads-triage {BEAD_ID}
-3. **Resolve in parallel**: /beads-parallel {BEAD_ID}
-4. **View all findings**: bd list --tags "review,{BEAD_ID}"
+   - `/beads-work {P1_BEAD_ID}` for each critical finding
+2. **Close bead** (if no P1/P2 findings): `bd close {BEAD_ID}`
+3. **Resolve in parallel**: `/beads-parallel {BEAD_ID}`
+4. **Triage remaining**: `/beads-triage {BEAD_ID}`
+5. **View all findings**: `bd list --tags "review,{BEAD_ID}"`
 ```
 
 ### 7. End-to-End Testing (Optional)
-
-<detect_project_type>
 
 **First, detect the project type from PR files:**
 
@@ -323,8 +304,6 @@ After creating all beads, present comprehensive summary:
 | `*.xcodeproj`, `*.xcworkspace`, `Package.swift` | iOS/macOS |
 | `Gemfile`, `package.json`, `app/views/*` | Web |
 | Both iOS files AND web files | Hybrid |
-
-</detect_project_type>
 
 After presenting the Summary Report, offer appropriate testing based on project type:
 
@@ -338,15 +317,23 @@ After presenting the Summary Report, offer appropriate testing based on project 
 1. Yes - run Xcode tests
 2. No - skip
 
-### Important: P1 Findings Block Closure
+</process>
 
-Any P1 (CRITICAL) findings must be addressed before closing the bead. These are linked as blocking dependencies and will prevent `bd close {BEAD_ID}` from succeeding until resolved.
+<success_criteria>
+- All review agents dispatched and findings collected
+- Complete agent finding inventory built before synthesis
+- Every finding accounted for (applied, deduplicated, or explicitly discarded with reason)
+- All findings stored as child beads with severity, validation criteria, and testing steps
+- P1 findings linked as blocking dependencies
+- Knowledge logged for significant findings
+- Summary report presented with next-step options
+</success_criteria>
 
-## Notes
-
+<guardrails>
+- P1 (CRITICAL) findings must be addressed before closing the bead -- they are linked as blocking dependencies
 - Each reviewer creates beads for issues found (not markdown files or comments)
 - Each bead has a thorough description with severity level, validation criteria, and testing steps
-- Critical issues (P1) automatically block the original bead via dependencies
 - Beads are tagged with `review,{BEAD_ID}` for easy filtering
 - Use `/beads-work {ISSUE_BEAD_ID}` to fix issues found
 - The original bead cannot be closed until all blocking dependencies are resolved
+</guardrails>

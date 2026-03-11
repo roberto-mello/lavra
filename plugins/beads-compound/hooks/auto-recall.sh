@@ -76,6 +76,14 @@ fi
 # Memory directory exists -- proceed with recall
 KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 
+# First-run detection: if knowledge file is empty or missing, show orientation
+if [ ! -f "$KNOWLEDGE_FILE" ] || [ ! -s "$KNOWLEDGE_FILE" ]; then
+  cat << 'ONBOARD'
+{"hookSpecificOutput":{"systemMessage":"## Beads Compound is ready.\n\n| Goal | Command |\n|------|---------|\n| New feature | `/beads-brainstorm \"describe your feature\"` |\n| Plan from spec | `/beads-plan \"feature description\"` |\n| Existing beads | `/beads-work` |\n| Explore ideas | `/beads-brainstorm \"your idea\"` |\n\nKnowledge you capture will appear here automatically in future sessions."}}
+ONBOARD
+  exit 0
+fi
+
 # Get currently open beads
 OPEN_BEADS=$(bd list --status=open --json 2>/dev/null | jq -r '.[].id' 2>/dev/null | head -5)
 IN_PROGRESS=$(bd list --status=in_progress --json 2>/dev/null | jq -r '.[].id' 2>/dev/null | head -5)

@@ -5,6 +5,12 @@ description = "Full autonomous engineering workflow"
 
 prompt = """
 
+<objective>
+Run the full autonomous engineering workflow end-to-end: plan, deepen, work, review, resolve TODOs, browser test, and record a feature video.
+</objective>
+
+<process>
+
 Run these slash commands in order. Do not do anything else.
 
 1. `/beads-plan {{args}}`
@@ -16,5 +22,7 @@ Run these slash commands in order. Do not do anything else.
 7. `/feature-video`
 
 Start with step 1 now.
+
+</process>
 
 """

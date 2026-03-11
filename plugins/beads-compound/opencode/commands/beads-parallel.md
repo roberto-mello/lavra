@@ -8,15 +8,15 @@ description: Work on multiple beads in parallel using subagents with full beads-
 argument-hint: "[epic bead ID, list of bead IDs, or empty for all ready beads] [--ralph] [--teams] [--workers N] [--retries N] [--max-turns N] [--yes]"
 ---
 
-Work on multiple beads in parallel, giving each subagent the full beads-work treatment.
+<objective>
+Work on multiple beads in parallel, giving each subagent the full beads-work treatment. Supports three modes: default subagent mode, --ralph mode (autonomous iterative execution with self-loop retry), and --teams mode (persistent worker teammates that self-organize through multiple beads).
+</objective>
 
-**--ralph mode**: Enables autonomous iterative parallel execution. Subagents self-loop (implement -> verify -> fix -> retry) until completion criteria are met or retries are exhausted. Single approval at start, then autonomous execution with inter-wave knowledge transfer. Subagents run in `bypassPermissions` mode so they do not prompt for tool approvals.
-
-**--teams mode**: Uses Claude Code's experimental agent teams feature. Instead of fire-and-forget subagents, spawns persistent worker teammates that self-organize through multiple beads, accumulating context and communicating via inbox messages. Requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` to be enabled.
-
-## Input
-
+<execution_context>
 <bead_input> #$ARGUMENTS </bead_input>
+</execution_context>
+
+<process>
 
 ## 1. Parse Arguments
 
@@ -34,6 +34,16 @@ If both `--ralph` and `--teams` are set, abort with error.
 Remaining arguments (after removing flags) are the bead input (epic ID, comma-separated IDs, or empty).
 
 Echo parsed config: `Configuration: ralph={true|false}, teams={true|false}, workers={N}, retries={N}, max-turns={N}`
+
+## 1b. Permission Check (ralph/teams mode)
+
+When `--ralph` or `--teams` is enabled, check whether the current permission mode will support autonomous execution. Subagents and teammates need Bash, Write, and Edit tool access without human approval -- restricted permissions cause workers to stall silently.
+
+If tool permissions appear restricted:
+- Warn: "ralph/teams mode works best with tool permissions pre-approved. See docs/AUTONOMOUS_EXECUTION.md"
+- Suggest granular permissions in `settings.json` or `--dangerously-skip-permissions` as a last resort.
+
+This is a warning only -- continue regardless of the result.
 
 ## 2. Resolve Completion Promise & Test Command (ralph/teams mode)
 
@@ -255,9 +265,9 @@ If `--yes` is set, skip this approval and proceed automatically.
 **When NOT --ralph or --teams mode:**
 Present the plan including any conflict-forced orderings and get user approval before proceeding (existing per-wave approval behavior).
 
-## 8. Recall Knowledge *(required — do not skip)*
+## 8. Recall Knowledge *(required -- do not skip)*
 
-Search memory once for all beads to prime context. This is separate from the SessionStart hook (`auto-recall.sh`), which primes the lead's context. Section 8 targets the specific beads being worked on so results can be injected into agent/worker prompts — subagents and teammates don't receive the session-start recall.
+Search memory once for all beads to prime context. This is separate from the SessionStart hook (`auto-recall.sh`), which primes the lead's context. Section 8 targets the specific beads being worked on so results can be injected into agent/worker prompts -- subagents and teammates don't receive the session-start recall.
 
 ```bash
 # Extract keywords from all bead titles
@@ -266,7 +276,7 @@ Search memory once for all beads to prime context. This is separate from the Ses
 
 **You MUST output the recall results here before building agent prompts.** If recall returns nothing, output: "No relevant knowledge found for these beads."
 
-**The `{recall_results}` placeholder in every agent prompt template below is a required fill.** Leaving it empty or with a comment like "none" without actually running recall is a protocol violation. Subagents have no access to session-start recall — this step is their only source of prior knowledge.
+**The `{recall_results}` placeholder in every agent prompt template below is a required fill.** Leaving it empty or with a comment like "none" without actually running recall is a protocol violation. Subagents have no access to session-start recall -- this step is their only source of prior knowledge.
 
 ## 9. Execute
 
@@ -341,7 +351,7 @@ cross-cutting changes after the wave completes.
    - Write tests for new functionality
    - Run tests after changes
 
-5. Log knowledge inline as you work — required, not optional:
+5. Log knowledge inline as you work -- required, not optional:
    Log a comment the moment you hit a trigger: surprising code, a non-obvious choice, an error you figured out, a constraint that limits your options. Do not batch these for the end.
    ```
    bd comments add {BEAD_ID} "LEARNED: {key insight}"
@@ -431,7 +441,7 @@ When done, output exactly: <promise>DONE</promise>
      - Do NOT output <promise>DONE</promise>
 
 8. Verify knowledge was captured (required gate before reporting):
-   You must have logged at least one comment inline during steps 4-7. Do NOT wait until this step to log — by now the details are stale.
+   You must have logged at least one comment inline during steps 4-7. Do NOT wait until this step to log -- by now the details are stale.
    If the bead has zero comments, add them now, then treat this as a process failure to correct going forward.
    bd comments add {BEAD_ID} "LEARNED: {key insight}"
    bd comments add {BEAD_ID} "DECISION: {choice made and why}"
@@ -496,7 +506,7 @@ Task(subagent_type="general-purpose", team_name="epic-{EPIC_ID}", name="worker-1
 Task(subagent_type="general-purpose", team_name="epic-{EPIC_ID}", name="worker-2", prompt="...filled worker prompt...")
 ```
 
-The lead's role is purely supervisory after spawning — do not implement beads yourself.
+The lead's role is purely supervisory after spawning -- do not implement beads yourself.
 
 **Worker prompt template** (fill in all `{placeholders}` before passing as `prompt`):
 
@@ -595,7 +605,7 @@ Repeat until no beads remain or you receive a shutdown request:
       - Do NOT revert yourself -- the lead handles reverts using git diff.
       - Move to step 1
 
-5. Log knowledge inline as you work (MANDATORY — not at the end):
+5. Log knowledge inline as you work (MANDATORY -- not at the end):
    Log a comment the moment you hit a trigger: surprising code, a non-obvious choice, an error you figured out, a constraint that limits your options. Do NOT batch these until step 5.
    ```bash
    bd comments add {BEAD_ID} "LEARNED: {insight}"
@@ -882,17 +892,19 @@ After all waves complete and push is approved:
 - {count} entries logged across all beads
 ```
 
-3. **Offer next steps** with AskUserQuestion:
+</process>
 
-   **Question:** "All work complete. What next?"
+<handoff>
+All work complete. What next?
 
-   **Options (non-ralph, non-teams):**
-   1. **Run `/beads-review`** on the changes
-   2. **Create a PR** with all changes
-   3. **Continue** with remaining open beads
+**Options (non-ralph, non-teams):**
+1. **Run `/beads-review`** on the changes
+2. **Create a PR** with all changes
+3. **Continue** with remaining open beads
 
-   **Options (ralph or teams):**
-   1. **Run `/beads-review`** on all changes
-   2. **Create a PR** with all changes
-   3. **Retry failed beads** - Re-run with only the failed bead IDs
-   4. **Continue** with remaining open beads
+**Options (ralph or teams):**
+1. **Run `/beads-review`** on all changes
+2. **Create a PR** with all changes
+3. **Retry failed beads** - Re-run with only the failed bead IDs
+4. **Continue** with remaining open beads
+</handoff>

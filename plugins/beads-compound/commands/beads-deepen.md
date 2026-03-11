@@ -4,23 +4,11 @@ description: Enhance a plan with parallel research agents for each section to ad
 argument-hint: "[epic bead ID]"
 ---
 
-# Deepen Plan - Power Enhancement Mode
+<objective>
+Take an existing plan (from `/beads-plan`) and enhance each section with parallel research agents. Each major element gets dedicated research to find best practices, performance optimizations, quality enhancements, edge cases, and real-world implementation examples. The result is a deeply grounded, production-ready plan with concrete implementation details.
+</objective>
 
-## Introduction
-
-**Note: The current year is 2026.** Use this when searching for recent documentation and best practices.
-
-This command takes an existing plan (from `/beads-plan`) and enhances each section with parallel research agents. Each major element gets its own dedicated research sub-agent to find:
-- Best practices and industry patterns
-- Performance optimizations
-- UI/UX improvements (if applicable)
-- Quality enhancements and edge cases
-- Real-world implementation examples
-
-The result is a deeply grounded, production-ready plan with concrete implementation details.
-
-## Epic Bead
-
+<execution_context>
 <epic_bead_id> #$ARGUMENTS </epic_bead_id>
 
 **If the epic bead ID above is empty:**
@@ -28,8 +16,13 @@ The result is a deeply grounded, production-ready plan with concrete implementat
 2. Ask the user: "Which epic would you like to deepen? Please provide the bead ID (e.g., `BD-001`)."
 
 Do not proceed until you have a valid epic bead ID.
+</execution_context>
 
-## Main Tasks
+<context>
+**Note: The current year is 2026.** Use this when searching for recent documentation and best practices.
+</context>
+
+<process>
 
 ### 1. Parse and Analyze Plan Structure
 
@@ -339,9 +332,16 @@ Update the epic bead description with a summary:
 bd comments add {EPIC_ID} "INVESTIGATION: Plan deepened with research from [count] agents, [count] skills, and [count] learnings. Key improvements: [top 3 improvements]"
 ```
 
-## Quality Checks
+</process>
 
-Before finalizing, do a completeness pass:
+<success_criteria>
+- [ ] All original content preserved in child beads
+- [ ] Every agent recommendation either applied or explicitly noted as inapplicable
+- [ ] Research insights clearly marked and attributed
+- [ ] No contradictions between sections
+- [ ] Enhancement summary accurately reflects changes
+
+**Completeness verification:**
 
 **Step 1: Build agent finding inventory**
 
@@ -359,18 +359,14 @@ BEAD {CHILD_ID}: {title}
 
 Re-read each updated child bead description (`bd show {CHILD_ID}`) and confirm each recommendation from the inventory above is reflected. If any are missing, apply them now.
 
-**Step 3: Final checklist**
-
-- [ ] All original content preserved in child beads
-- [ ] Every agent recommendation either applied or explicitly noted as inapplicable
-- [ ] Research insights clearly marked and attributed
-- [ ] No contradictions between sections
-- [ ] Enhancement summary accurately reflects changes
-
 **Do not report completion until the inventory is fully accounted for.**
+</success_criteria>
 
-## Post-Enhancement Options
+<guardrails>
+NEVER CODE! Just research and enhance the plan.
+</guardrails>
 
+<handoff>
 After updating all child beads, use the **AskUserQuestion tool** to present these options:
 
 **Question:** "Plan deepened for epic `{EPIC_ID}`. What would you like to do next?"
@@ -386,5 +382,4 @@ Based on selection:
 - **`/beads-work`** -> Call the /beads-work command with the first ready child bead ID
 - **Deepen further** -> Ask which sections need more research, then re-run those agents
 - **View changes** -> Show before/after for each child bead
-
-NEVER CODE! Just research and enhance the plan.
+</handoff>

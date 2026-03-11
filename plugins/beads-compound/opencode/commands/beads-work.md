@@ -8,19 +8,27 @@ description: Execute work on a bead efficiently while maintaining quality and fi
 argument-hint: "[bead ID or path to specification]"
 ---
 
-# Work Plan Execution Command
+<objective>
+Execute work on a bead efficiently while maintaining quality and finishing features. Takes a bead (or specification) and executes it systematically, focusing on shipping complete features by understanding requirements quickly, following existing patterns, and maintaining quality throughout.
+</objective>
 
-Execute work on a bead efficiently while maintaining quality and finishing features.
-
-## Introduction
-
-This command takes a bead (or specification) and executes it systematically. The focus is on **shipping complete features** by understanding requirements quickly, following existing patterns, and maintaining quality throughout.
-
-## Input
-
+<execution_context>
 <input_document> #$ARGUMENTS </input_document>
+</execution_context>
 
-## Execution Workflow
+<process>
+
+### Phase 0: Permission Check
+
+**Only when running as a subagent** (BEAD_ID was injected into the prompt, or `--ralph`/`--teams` context is detected):
+
+Check whether the current permission mode will block autonomous execution. Subagents that need human approval for Bash/Write/Edit tools will stall silently.
+
+If tool permissions appear restricted:
+- Warn: "Permission mode may block autonomous execution. Subagents need Bash, Write, and Edit tool access without human approval."
+- Suggest: "For autonomous execution, ensure your settings.json allows Bash and Write tools, or run with --dangerously-skip-permissions. See docs/AUTONOMOUS_EXECUTION.md"
+
+This is a warning only -- continue regardless of the result.
 
 ### Phase 1: Quick Start
 
@@ -51,7 +59,7 @@ This command takes a bead (or specification) and executes it systematically. The
    - Get user approval to proceed
    - **Do not skip this** - better to ask questions now than build the wrong thing
 
-2. **Recall Relevant Knowledge** *(required — do not skip)*
+2. **Recall Relevant Knowledge** *(required -- do not skip)*
 
    ```bash
    # Search memory for relevant context
@@ -59,7 +67,7 @@ This command takes a bead (or specification) and executes it systematically. The
    .beads/memory/recall.sh "{tech stack keywords}"
    ```
 
-   **You MUST output the recall results here before continuing.** If recall returns nothing, output: "No relevant knowledge found." Do not proceed to step 3 until this is done. This step exists to prevent repeating solved problems — skipping it defeats the purpose of the memory system.
+   **You MUST output the recall results here before continuing.** If recall returns nothing, output: "No relevant knowledge found." Do not proceed to step 3 until this is done. This step exists to prevent repeating solved problems -- skipping it defeats the purpose of the memory system.
 
 3. **Check Dependencies & Related Beads**
 
@@ -162,9 +170,9 @@ This command takes a bead (or specification) and executes it systematically. The
    git commit -m "feat(scope): description of this unit"
    ```
 
-3. **Log Knowledge as You Work** *(required — inline, not at the end)*
+3. **Log Knowledge as You Work** *(required -- inline, not at the end)*
 
-   **This is mandatory.** Log a comment the moment you encounter any of these triggers. Do not batch them for later — by the time you finish the task, the details are stale and you will skip it.
+   **This is mandatory.** Log a comment the moment you encounter any of these triggers. Do not batch them for later -- by the time you finish the task, the details are stale and you will skip it.
 
    | Trigger | Prefix | Example |
    |---------|--------|---------|
@@ -181,7 +189,7 @@ This command takes a bead (or specification) and executes it systematically. The
    bd comments add {BEAD_ID} "PATTERN: {coding pattern followed}"
    ```
 
-   **You MUST log at least one comment per task completed.** Non-trivial work always produces an insight. If you finish a task with nothing logged, you skipped this step — go back and add it before marking the task complete.
+   **You MUST log at least one comment per task completed.** Non-trivial work always produces an insight. If you finish a task with nothing logged, you skipped this step -- go back and add it before marking the task complete.
 
 4. **Follow Existing Patterns**
 
@@ -270,9 +278,9 @@ This command takes a bead (or specification) and executes it systematically. The
    "
    ```
 
-3. **Verify Knowledge Was Captured** *(required gate — do not skip)*
+3. **Verify Knowledge Was Captured** *(required gate -- do not skip)*
 
-   You must have logged at least one knowledge comment per task during Phase 2. **Do not proceed to the PR until this is true.** Run `bd show {BEAD_ID}` and check the comments. If there are none, add them now — but treat this as a process failure and correct the habit going forward.
+   You must have logged at least one knowledge comment per task during Phase 2. **Do not proceed to the PR until this is true.** Run `bd show {BEAD_ID}` and check the comments. If there are none, add them now -- but treat this as a process failure and correct the habit going forward.
 
    ```bash
    bd comments add {BEAD_ID} "LEARNED: {most important insight from this work}"
@@ -290,7 +298,21 @@ This command takes a bead (or specification) and executes it systematically. The
    3. **Run `/beads-checkpoint`** - Save progress without closing
    4. **Continue working** - Keep implementing
 
-## Key Principles
+</process>
+
+<success_criteria>
+- [ ] All clarifying questions asked and answered
+- [ ] All tasks marked completed (TaskList shows none pending)
+- [ ] Tests pass (run project's test command)
+- [ ] Linting passes
+- [ ] Code follows existing patterns
+- [ ] Bead validation criteria met
+- [ ] Knowledge captured (at least one LEARNED/DECISION comment)
+- [ ] Commit messages follow conventional format
+- [ ] PR description includes bead reference and summary
+</success_criteria>
+
+<guardrails>
 
 ### Start Fast, Execute Faster
 
@@ -323,16 +345,4 @@ This command takes a bead (or specification) and executes it systematically. The
 - Don't leave features 80% done
 - A finished feature that ships beats a perfect feature that doesn't
 
-## Quality Checklist
-
-Before creating PR, verify:
-
-- [ ] All clarifying questions asked and answered
-- [ ] All tasks marked completed (TaskList shows none pending)
-- [ ] Tests pass (run project's test command)
-- [ ] Linting passes
-- [ ] Code follows existing patterns
-- [ ] Bead validation criteria met
-- [ ] Knowledge captured (at least one LEARNED/DECISION comment)
-- [ ] Commit messages follow conventional format
-- [ ] PR description includes bead reference and summary
+</guardrails>

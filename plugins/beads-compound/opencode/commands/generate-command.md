@@ -9,13 +9,17 @@ argument-hint: [command purpose and requirements]
 disable-model-invocation: true
 ---
 
-# Create a Custom Claude Code Command
+<objective>
+Create a new slash command in `.claude/commands/` for the requested task, following Claude Code command conventions and best practices.
+</objective>
 
-Create a new slash command in `.claude/commands/` for the requested task.
-
-## Goal
+<execution_context>
 
 #$ARGUMENTS
+
+</execution_context>
+
+<process>
 
 ## Key Capabilities to Leverage
 
@@ -136,31 +140,11 @@ Implement #$ARGUMENTS following these steps:
 3. **Structure the command** using the template above
 4. **Test the command** by using it with appropriate arguments
 
-## Command File Template
+</process>
 
-```markdown
----
-name: command-name
-description: What this command does
-argument-hint: "[expected arguments]"
----
-
-# Command Title
-
-Brief introduction of what the command does and when to use it.
-
-## Workflow
-
-### Step 1: [First Major Step]
-
-Details about what to do.
-
-### Step 2: [Second Major Step]
-
-Details about what to do.
-
-## Success Criteria
-
-- [ ] Expected outcome 1
-- [ ] Expected outcome 2
-```
+<success_criteria>
+- Command file created at `.claude/commands/[name].md`
+- YAML frontmatter includes name, description, and argument-hint
+- Command has clear step-by-step workflow
+- Success criteria defined in the command itself
+</success_criteria>

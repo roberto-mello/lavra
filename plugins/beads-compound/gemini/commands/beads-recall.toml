@@ -5,31 +5,19 @@ description = "Search knowledge base mid-session and inject relevant context"
 
 prompt = """
 
-# Beads Recall
-
+<objective>
 Search the knowledge base (`.beads/memory/knowledge.jsonl`) mid-session and inject relevant context without restarting Claude Code.
+</objective>
 
-## Usage
-
-```bash
-/beads-recall "oauth authentication"        # Search by keywords
-/beads-recall BD-001                        # Recall knowledge for specific bead
-/beads-recall --recent 10                   # Show 10 most recent entries
-/beads-recall --stats                       # Knowledge base statistics
-/beads-recall --topic BD-005                # All knowledge for epic's children
-/beads-recall "api" --type learned          # Filter by type
-```
-
-## Input Handling
-
+<execution_context>
 <input_document> #{{args}} </input_document>
 
 **Parse the arguments to determine mode:**
 
 1. **Check for flags first:**
-   - `--stats` → Statistics mode
-   - `--recent N` → Recent entries mode
-   - `--topic BEAD_ID` → Topic/epic mode
+   - `--stats` -> Statistics mode
+   - `--recent N` -> Recent entries mode
+   - `--topic BEAD_ID` -> Topic/epic mode
 
 2. **Check if argument matches bead ID pattern:**
    - Pattern: lowercase alphanumeric segments separated by hyphens
@@ -37,8 +25,9 @@ Search the knowledge base (`.beads/memory/knowledge.jsonl`) mid-session and inje
    - Examples: `bd-001`, `oauth-bug`, `beads-feature-123`
 
 3. **Otherwise treat as keyword search**
+</execution_context>
 
-## Workflow
+<process>
 
 ### Mode 1: Statistics (--stats)
 
@@ -228,7 +217,23 @@ Or try:
 - Parse output line count (entries have 2 lines each)
 - Report: "Found {count} entries" or "No matches found"
 
-## Error Handling
+</process>
+
+<success_criteria>
+- Correct mode detected from arguments
+- Knowledge search executed with appropriate parameters
+- Results formatted clearly with entry counts
+- Empty/no-result cases handled with helpful suggestions
+</success_criteria>
+
+<guardrails>
+- Recall uses FTS5 full-text search (if sqlite3 available) with BM25 ranking
+- Falls back to grep search if sqlite3 not installed
+- Search is case-insensitive and supports fuzzy matching
+- Archive can be included with `--all` flag (not exposed in this command for simplicity)
+- Knowledge is git-tracked, so pulling updates automatically rebuilds the search index
+
+**Error handling:**
 
 **If .beads/memory/ doesn't exist:**
 ```
@@ -259,34 +264,18 @@ The memory-capture hook will automatically extract and store these.
 ```
 Beads CLI not found. Install from: https://github.com/steveyegge/beads
 ```
+</guardrails>
 
-## Post-Recall Suggestions
-
-After showing results, suggest next actions:
-
+<handoff>
 **If results found:**
-```
-### Next Steps
-
 - Use this knowledge to inform your current work
 - Add new learnings: `bd comments add <BEAD_ID> "LEARNED: ..."`
 - Document complex solutions: `/beads-compound`
-```
 
 **If implementing related work:**
-```
-Create a bead to track this work:
 ```bash
 bd create --title="..." --type=feature --priority=2
 ```
-```
-
-## Notes
-
-- Recall uses FTS5 full-text search (if sqlite3 available) with BM25 ranking
-- Falls back to grep search if sqlite3 not installed
-- Search is case-insensitive and supports fuzzy matching
-- Archive can be included with `--all` flag (not exposed in this command for simplicity)
-- Knowledge is git-tracked, so pulling updates automatically rebuilds the search index
+</handoff>
 
 """
