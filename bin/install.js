@@ -48,6 +48,11 @@ const FLAG = {
   help: args.includes("--help") || args.includes("-h"),
 };
 
+// Positional argument: optional target directory path
+const TARGET_PATH = args.find((a) => !a.startsWith("-"))
+  ? path.resolve(args.find((a) => !a.startsWith("-")))
+  : null;
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -206,7 +211,7 @@ function buildInstallArgs(runtime, scope) {
   // For global: pass no path — install.sh defaults to ~/.claude and sets GLOBAL_INSTALL=true
   // Passing ~/.claude explicitly would be treated as a local install, breaking bd init skip
   if (scope !== "global") {
-    scriptArgs.push(process.cwd());
+    scriptArgs.push(TARGET_PATH || process.cwd());
   }
 
   return scriptArgs;
@@ -259,6 +264,7 @@ async function main() {
   }
   if (FLAG.global) scope = "global";
   else if (FLAG.local) scope = "local";
+  else if (TARGET_PATH) scope = "local"; // path argument implies local
 
   // Interactive prompts if needed
   if (!runtime || !scope) {
