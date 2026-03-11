@@ -798,7 +798,7 @@ After all waves complete and push is approved:
 1. **Push to remote:**
    ```bash
    git push
-   bd sync
+   bd backup
    ```
 
 2. **Output summary:**

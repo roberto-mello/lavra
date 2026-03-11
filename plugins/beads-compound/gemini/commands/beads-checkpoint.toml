@@ -77,7 +77,7 @@ If there are uncommitted changes:
 ### Step 5: Sync Beads
 
 ```bash
-bd sync --flush-only
+bd backup
 ```
 
 ### Step 6: Optional Simplicity Check
