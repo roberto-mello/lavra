@@ -203,16 +203,9 @@ function buildInstallArgs(runtime, scope) {
   if (FLAG.yes) scriptArgs.push("--yes");
 
   // Target directory
-  if (scope === "global") {
-    const home = process.env.HOME || process.env.USERPROFILE;
-    if (!home) die("Cannot determine home directory.");
-    const claudeDir = path.join(home, ".claude");
-    // Ensure ~/.claude/ exists
-    if (!fs.existsSync(claudeDir)) {
-      fs.mkdirSync(claudeDir, { recursive: true });
-    }
-    scriptArgs.push(claudeDir);
-  } else {
+  // For global: pass no path — install.sh defaults to ~/.claude and sets GLOBAL_INSTALL=true
+  // Passing ~/.claude explicitly would be treated as a local install, breaking bd init skip
+  if (scope !== "global") {
     scriptArgs.push(process.cwd());
   }
 
