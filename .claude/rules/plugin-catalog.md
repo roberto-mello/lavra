@@ -5,15 +5,17 @@ globs: "**/plugins/**,**/agents/**,**/commands/**,**/skills/**"
 
 # Plugin Catalog
 
-## Commands (26)
+## Commands (29)
 
 Commands are in `plugins/beads-compound/commands/`:
 
-**Beads Workflow (8):**
+**Beads Workflow (10):**
 
 | Command | File | Description |
 |---------|------|-------------|
 | `/beads-brainstorm` | beads-brainstorm.md | Explore ideas collaboratively |
+| `/beads-design` | beads-design.md | Orchestrate full planning pipeline per phase: plan → deepen → review |
+| `/beads-quick` | beads-quick.md | Fast-track small tasks with abbreviated plan |
 | `/beads-plan` | beads-plan.md | Research and plan with multiple agents |
 | `/beads-work` | beads-work.md | Work on a single bead with full lifecycle |
 | `/beads-parallel` | beads-parallel.md | Work on multiple beads in parallel (`--ralph` for autonomous retry, `--teams` for persistent worker teammates) |
@@ -22,13 +24,14 @@ Commands are in `plugins/beads-compound/commands/`:
 | `/beads-compound` | beads-compound.md | Document solved problems |
 | `/beads-recall` | beads-recall.md | Search knowledge base mid-session |
 
-**Planning & Triage (3):**
+**Planning & Triage (4):**
 
 | Command | File | Description |
 |---------|------|-------------|
 | `/beads-deepen` | beads-deepen.md | Enhance plan with parallel research |
 | `/beads-plan-review` | beads-plan-review.md | Multi-agent plan review |
 | `/beads-triage` | beads-triage.md | Prioritize and categorize beads |
+| `/beads-import` | beads-import.md | Import markdown plans into beads |
 
 **Utility (15):**
 

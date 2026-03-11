@@ -63,7 +63,7 @@ function bdExecFile(args) {
   try {
     return execFileSync("bd", args, {
       encoding: "utf8",
-      timeout: 10000,
+      timeout: 30000,
       stdio: ["pipe", "pipe", "pipe"],
     }).trim();
   } catch (err) {

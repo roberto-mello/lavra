@@ -56,16 +56,9 @@ jobs:
 
       - name: Run installation tests
         if: steps.check-beads.outputs.available == 'true'
-        continue-on-error: true
         run: |
           export PATH="/usr/local/bin:$PATH"
-          # Run tests with verbose output to diagnose failures
-          bash scripts/test-installation.sh || {
-            echo "Installation tests failed in CI environment"
-            echo "These tests require full beads setup and are best run locally"
-            echo "Test script is available at: scripts/test-installation.sh"
-            exit 0
-          }
+          bash scripts/test-installation.sh
 
       - name: Skip installation tests
         if: steps.check-beads.outputs.available == 'false'
