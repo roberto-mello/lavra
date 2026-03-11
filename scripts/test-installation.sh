@@ -158,29 +158,29 @@ else
   fail "OpenCode install" "Installer failed"
 fi
 
-# Verify directory structure (OpenCode installs to project root)
-if [[ -d "plugins/beads-compound" ]]; then
+# Verify directory structure (project install goes to .opencode/plugins/beads-compound)
+if [[ -d ".opencode/plugins/beads-compound" ]]; then
   pass "OpenCode directory structure created"
 else
   fail "OpenCode structure" "Missing plugin directory"
 fi
 
 # Verify plugin.ts exists
-if [[ -f "plugins/beads-compound/plugin.ts" ]]; then
+if [[ -f ".opencode/plugins/beads-compound/plugin.ts" ]]; then
   pass "OpenCode plugin.ts installed"
 else
   fail "OpenCode plugin" "plugin.ts missing"
 fi
 
 # Verify package.json exists
-if [[ -f "plugins/beads-compound/package.json" ]]; then
+if [[ -f ".opencode/plugins/beads-compound/package.json" ]]; then
   pass "OpenCode package.json installed"
 else
   fail "OpenCode package" "package.json missing"
 fi
 
-# Verify hook files at project root
-if [[ -f "hooks/auto-recall.sh" ]]; then
+# Verify hook files (project install: .opencode/hooks/)
+if [[ -f ".opencode/hooks/auto-recall.sh" ]]; then
   pass "OpenCode hook files installed"
 else
   fail "OpenCode hooks" "Hook files missing"
