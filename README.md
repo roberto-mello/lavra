@@ -111,7 +111,7 @@ For small tasks that don't need the full pipeline:
 ## What's Included
 
 - **28 specialized agents** -- review, research, design, workflow, docs
-- **27 commands** -- brainstorm, plan, design, execute, review, recall
+- **29 commands** -- brainstorm, plan, design, execute, review, recall
 - **15 skills** -- worktrees, Rails style, DSPy, browser automation
 - **Automatic knowledge capture and recall** -- dual SQLite FTS5 + JSONL
 - **Multi-platform** -- Claude Code, OpenCode, Gemini CLI, Cortex Code

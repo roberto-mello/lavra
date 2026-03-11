@@ -24,3 +24,10 @@ Run these slash commands in order. Do not do anything else.
 Start with step 1 now.
 
 </process>
+
+<success_criteria>
+- All 7 steps completed in sequence without being skipped
+- Feature is planned, deepened, implemented, reviewed, TODOs resolved, browser-tested, and video recorded
+- All beads created during planning are closed
+- Code is committed and pushed
+</success_criteria>

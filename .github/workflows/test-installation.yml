@@ -95,18 +95,41 @@ jobs:
       - name: Test --help flag
         run: node bin/install.js --help
 
+      - name: Check if beads installer is available
+        id: check-beads
+        run: |
+          if curl -fsSL --head https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh 2>/dev/null | grep -q "200"; then
+            echo "available=true" >> $GITHUB_OUTPUT
+          else
+            echo "available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install beads CLI
+        if: steps.check-beads.outputs.available == 'true'
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
+
       - name: Test non-interactive Claude Code installation
+        if: steps.check-beads.outputs.available == 'true'
         run: |
           mkdir -p /tmp/test-npx && cd /tmp/test-npx
           git init -q
+          export PATH="/usr/local/bin:$PATH"
           node $GITHUB_WORKSPACE/bin/install.js --claude --yes
 
       - name: Verify installation produced expected files
+        if: steps.check-beads.outputs.available == 'true'
         run: |
           test -d /tmp/test-npx/.claude/hooks || { echo "Missing .claude/hooks"; exit 1; }
           test -d /tmp/test-npx/.claude/commands || { echo "Missing .claude/commands"; exit 1; }
           test -d /tmp/test-npx/.claude/agents || { echo "Missing .claude/agents"; exit 1; }
           echo "All expected directories present"
+
+      - name: Skip npx installation test
+        if: steps.check-beads.outputs.available == 'false'
+        run: |
+          echo "Skipping npx installation test - beads CLI installer not available"
+          exit 0
 
       - name: Clean up
         if: always()
@@ -153,11 +176,11 @@ jobs:
           AGENTS=$(find plugins/beads-compound/agents -name "*.md" | wc -l)
           SKILLS=$(find plugins/beads-compound/skills -name "SKILL.md" | wc -l)
 
-          echo "Commands: $COMMANDS (expected 25+)"
+          echo "Commands: $COMMANDS (expected 29+)"
           echo "Agents: $AGENTS (expected 28+)"
           echo "Skills: $SKILLS (expected 15+)"
 
-          [[ "$COMMANDS" -ge 25 ]] || exit 1
+          [[ "$COMMANDS" -ge 29 ]] || exit 1
           [[ "$AGENTS" -ge 28 ]] || exit 1
           [[ "$SKILLS" -ge 15 ]] || exit 1
 
@@ -175,9 +198,9 @@ jobs:
           [[ -d "plugins/beads-compound/gemini" ]] || { echo "❌ Gemini conversion outputs missing"; exit 1; }
 
           OPENCODE_COMMANDS=$(find plugins/beads-compound/opencode/commands -name "*.md" 2>/dev/null | wc -l)
-          [[ "$OPENCODE_COMMANDS" -ge 25 ]] || { echo "❌ OpenCode .md commands missing"; exit 1; }
+          [[ "$OPENCODE_COMMANDS" -ge 29 ]] || { echo "❌ OpenCode .md commands missing"; exit 1; }
 
           GEMINI_TOML=$(find plugins/beads-compound/gemini/commands -name "*.toml" 2>/dev/null | wc -l)
-          [[ "$GEMINI_TOML" -ge 25 ]] || { echo "❌ Gemini .toml commands missing"; exit 1; }
+          [[ "$GEMINI_TOML" -ge 29 ]] || { echo "❌ Gemini .toml commands missing"; exit 1; }
 
           echo "✅ All source files and conversion outputs verified"

@@ -233,7 +233,7 @@ async function main() {
   // --- Uninstall path ---
   if (FLAG.uninstall) {
     ensureScript(UNINSTALL_SH, "uninstall.sh");
-    const target = process.cwd();
+    const target = TARGET_PATH || process.cwd();
     console.log(`  Uninstalling beads-compound from ${target}...\n`);
     try {
       await runScript(UNINSTALL_SH, [target]);

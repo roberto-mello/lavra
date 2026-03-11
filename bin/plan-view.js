@@ -2,7 +2,16 @@
 
 "use strict";
 
-const { execSync } = require("child_process");
+const { execFileSync } = require("child_process");
+
+const BEAD_ID_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/;
+
+function validateBeadId(id) {
+  if (!BEAD_ID_RE.test(id)) {
+    process.stderr.write(`Error: invalid bead ID: ${JSON.stringify(id)}\n`);
+    process.exit(1);
+  }
+}
 const readline = require("readline");
 
 // ---------------------------------------------------------------------------
@@ -50,9 +59,9 @@ function statusIcon(status) {
 // Data fetching via bd CLI
 // ---------------------------------------------------------------------------
 
-function bdExec(args) {
+function bdExecFile(args) {
   try {
-    return execSync(`bd ${args}`, {
+    return execFileSync("bd", args, {
       encoding: "utf8",
       timeout: 10000,
       stdio: ["pipe", "pipe", "pipe"],
@@ -63,7 +72,8 @@ function bdExec(args) {
 }
 
 function bdShowJson(beadId) {
-  const raw = bdExec(`show ${beadId} --json`);
+  validateBeadId(beadId);
+  const raw = bdExecFile(["show", beadId, "--json"]);
   if (!raw) return null;
   try {
     return JSON.parse(raw);
@@ -73,7 +83,8 @@ function bdShowJson(beadId) {
 }
 
 function bdListChildren(parentId) {
-  const raw = bdExec(`list --parent ${parentId} --json`);
+  validateBeadId(parentId);
+  const raw = bdExecFile(["list", "--parent", parentId, "--json"]);
   if (!raw) return [];
   try {
     const parsed = JSON.parse(raw);
@@ -84,7 +95,8 @@ function bdListChildren(parentId) {
 }
 
 function bdCommentsList(beadId) {
-  const raw = bdExec(`comments list ${beadId}`);
+  validateBeadId(beadId);
+  const raw = bdExecFile(["comments", "list", beadId]);
   if (!raw) return [];
   return raw.split("\n").filter((line) => line.trim());
 }

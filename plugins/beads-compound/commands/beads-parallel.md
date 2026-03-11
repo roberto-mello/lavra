@@ -890,6 +890,15 @@ After all waves complete and push is approved:
 
 </process>
 
+<success_criteria>
+- All resolved beads are closed with `bd close`
+- Each bead has at least one knowledge comment logged (`LEARNED:`, `DECISION:`, `FACT:`, `PATTERN:`, or `INVESTIGATION:`)
+- Code changes are committed and pushed to remote
+- Any failing beads are reported with reasons (not silently dropped)
+- In ralph mode: all beads either closed or exhausted retries with failure summary
+- In teams mode: all teammates have stopped and reported final status
+</success_criteria>
+
 <handoff>
 All work complete. What next?
 

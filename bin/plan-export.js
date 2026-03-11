@@ -2,7 +2,16 @@
 
 "use strict";
 
-const { execSync } = require("child_process");
+const { execFileSync } = require("child_process");
+
+const BEAD_ID_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/;
+
+function validateBeadId(id) {
+  if (!BEAD_ID_RE.test(id)) {
+    console.error(`  Error: invalid bead ID: ${JSON.stringify(id)}`);
+    process.exit(1);
+  }
+}
 const fs = require("fs");
 const path = require("path");
 
@@ -65,19 +74,20 @@ if (!beadId) {
 // Data fetching
 // ---------------------------------------------------------------------------
 
-function exec(cmd) {
+function bdExecFile(args) {
   try {
-    return execSync(cmd, { encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
+    return execFileSync("bd", args, { encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
   } catch (err) {
     const stderr = err.stderr ? err.stderr.trim() : err.message;
-    console.error(`  Error running: ${cmd}`);
+    console.error(`  Error running: bd ${args.join(" ")}`);
     console.error(`  ${stderr}`);
     process.exit(1);
   }
 }
 
 function fetchBead(id) {
-  const raw = exec(`bd show ${id} --json`);
+  validateBeadId(id);
+  const raw = bdExecFile(["show", id, "--json"]);
   try {
     return JSON.parse(raw);
   } catch {
@@ -87,7 +97,8 @@ function fetchBead(id) {
 }
 
 function fetchChildren(parentId) {
-  const raw = exec(`bd list --parent ${parentId} --json`);
+  validateBeadId(parentId);
+  const raw = bdExecFile(["list", "--parent", parentId, "--json"]);
   try {
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -97,7 +108,8 @@ function fetchChildren(parentId) {
 }
 
 function fetchComments(id) {
-  const raw = exec(`bd comments list ${id}`);
+  validateBeadId(id);
+  const raw = bdExecFile(["comments", "list", id]);
   return raw.trim();
 }
 

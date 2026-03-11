@@ -4,20 +4,22 @@ Full listing of all commands, agents, skills, hooks, and MCP servers included in
 
 [Back to README](../README.md)
 
-## Commands (26)
+## Commands (29)
 
 Commands are organized by use case to help you choose the right tool for the job.
 
-### Planning & Discovery (4 commands)
+### Planning & Discovery (6 commands)
 
 Explore ideas and create structured plans before writing code.
 
 | Command | Description | When to Use |
 |---------|-------------|-------------|
-| `/beads-brainstorm` | Explore ideas collaboratively | When requirements are unclear or you need to explore approaches |
+| `/beads-brainstorm` | Explore ideas collaboratively, identify gray areas, file phases as beads | When requirements are unclear or you need to explore approaches |
+| `/beads-design` | Orchestrate full planning pipeline per phase: plan → deepen → review | After brainstorm — runs the entire design pipeline automatically |
 | `/beads-plan` | Research and create epic with child beads | Start every feature - creates structured plan with research |
 | `/beads-deepen` | Enhance plan with parallel research agents | For complex features - adds depth and best practices |
 | `/beads-plan-review` | Multi-agent review of epic plan | Before implementation - catch issues early |
+| `/beads-quick` | Fast-track small tasks with abbreviated plan | Quick fixes and small features that don't need full pipeline |
 
 ### Executing Work (3 commands)
 
