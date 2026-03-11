@@ -4,6 +4,8 @@
 [![Release](https://img.shields.io/github/v/release/roberto-mello/beads-compound-plugin)](https://github.com/roberto-mello/beads-compound-plugin/releases)
 [![Beads CLI](https://img.shields.io/badge/requires-beads%20CLI-blue)](https://github.com/steveyegge/beads)
 
+> This README reflects latest developments. [Download a release](https://github.com/roberto-mello/beads-compound-plugin/releases) for stable versions.
+
 **AI agents that actually learn from their work.**
 
 Agents forget everything between sessions. You fix the same OAuth bug twice. You re-explain architecture patterns every day. This plugin gives agents persistent memory -- they capture lessons during work, recall them automatically in future sessions, and compound knowledge over time.
