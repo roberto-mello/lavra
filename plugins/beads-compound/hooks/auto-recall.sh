@@ -31,7 +31,7 @@ PROJECT_DIR="${CLAUDE_PROJECT_DIR:-${CWD:-.}}"
 
 # If .beads/ doesn't exist, hint to run bd init
 if [[ ! -d "$PROJECT_DIR/.beads" ]]; then
-  cat << 'HINT'
+  cat <<'HINT'
 {"hookSpecificOutput":{"systemMessage":"## Beads Not Initialized\n\nThis project doesn't have beads set up yet. Run `bd init` to enable issue tracking and knowledge management."}}
 HINT
   exit 0
@@ -42,7 +42,7 @@ if [[ ! -d "$PROJECT_DIR/.beads/memory" ]]; then
   source "$SCRIPT_DIR/provision-memory.sh"
   provision_memory_dir "$PROJECT_DIR" "$SCRIPT_DIR"
 
-  cat << 'BOOTSTRAP'
+  cat <<'BOOTSTRAP'
 {"hookSpecificOutput":{"systemMessage":"## Memory System Bootstrapped\n\nAuto-created `.beads/memory/` with knowledge tracking. Your discoveries will be captured automatically via beads comments.\n\nUse `bd comments add <BEAD_ID> \"LEARNED: ...\"` to log knowledge."}}
 BOOTSTRAP
   exit 0
@@ -52,9 +52,9 @@ fi
 # issues, comments, and knowledge are not tracked and will be lost if the
 # local copy is deleted. Emit every session until fixed so it's not missed.
 GITIGNORE="$PROJECT_DIR/.gitignore"
-if [[ -f "$GITIGNORE" ]] && grep -qE '^\s*\.beads/?(\s|$)' "$GITIGNORE" 2>/dev/null \
-  && ! grep -qE '^\s*!\.beads/' "$GITIGNORE" 2>/dev/null; then
-  cat << 'WARN'
+if [[ -f "$GITIGNORE" ]] && grep -qE '^\s*\.beads/?(\s|$)' "$GITIGNORE" 2>/dev/null &&
+  ! grep -qE '^\s*!\.beads/' "$GITIGNORE" 2>/dev/null; then
+  cat <<'WARN'
 {"hookSpecificOutput":{"systemMessage":"## Warning: Beads Data Not Tracked by Git\n\nYour `.gitignore` contains `.beads/`, which means your beads issues, comments, and knowledge are **not committed to git**. If you lose your local copy, this data will be permanently lost.\n\nTo fix: re-run the installer interactively:\n```\nbash /path/to/beads-compound-plugin/install.sh\n```\nOr manually remove `.beads/` from `.gitignore`, then `git add .beads/`.\n\nIf you intentionally want beads invisible to collaborators, use `bd init --stealth` instead (stores the ignore in `.git/info/exclude`, which keeps data safe)."}}
 WARN
   exit 0
@@ -66,7 +66,7 @@ VERSION_FILE="$MEMORY_DIR/.beads-compound-version"
 if [[ -f "$VERSION_FILE" ]]; then
   INSTALLED_VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
   if [[ "$INSTALLED_VERSION" != "$BEADS_COMPOUND_VERSION" ]]; then
-    cat << EOF
+    cat <<EOF
 {"hookSpecificOutput":{"systemMessage":"## beads-compound update available\n\nThis project has beads-compound **$INSTALLED_VERSION** but the plugin is now **$BEADS_COMPOUND_VERSION**. Re-run the installer to get the latest hooks and fixes:\n\n\`\`\`\nbash /path/to/beads-compound-plugin/install.sh $(pwd)\n\`\`\`"}}
 EOF
     exit 0
@@ -78,8 +78,8 @@ KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 
 # First-run detection: if knowledge file is empty or missing, show orientation
 if [ ! -f "$KNOWLEDGE_FILE" ] || [ ! -s "$KNOWLEDGE_FILE" ]; then
-  cat << 'ONBOARD'
-{"hookSpecificOutput":{"systemMessage":"## Beads Compound is ready.\n\n| Goal | Command |\n|------|---------|\n| New feature | `/beads-brainstorm \"describe your feature\"` |\n| Plan from spec | `/beads-plan \"feature description\"` |\n| Existing beads | `/beads-work` |\n| Explore ideas | `/beads-brainstorm \"your idea\"` |\n\nKnowledge you capture will appear here automatically in future sessions."}}
+  cat <<'ONBOARD'
+{"hookSpecificOutput":{"systemMessage":"## Beads Compound is ready.\n\n| Goal | Command |\n|------|---------|\n| New feature | `/beads-brainstorm \"describe your feature\"` |\n| Plan from spec | `/beads-design \"feature description\"` |\n| Existing beads | `/beads-parallel` |\n| Explore ideas | `/beads-brainstorm \"your idea\"` |\n\nKnowledge you capture will appear here automatically in future sessions."}}
 ONBOARD
   exit 0
 fi
@@ -151,7 +151,7 @@ fi
 
 # If we found relevant knowledge, output it
 if [[ -n "$RELEVANT_KNOWLEDGE" ]]; then
-  cat << EOF
+  cat <<EOF
 {"hookSpecificOutput":{"systemMessage":"## Relevant Knowledge from Memory\n\nBased on your current work context:\n\n$RELEVANT_KNOWLEDGE\n\n_Use \`.beads/memory/recall.sh \"keyword\"\` to search for more._"}}
 EOF
 fi
