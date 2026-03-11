@@ -8,7 +8,7 @@ const BEAD_ID_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/;
 
 function validateBeadId(id) {
   if (!BEAD_ID_RE.test(id)) {
-    process.stderr.write(`Error: invalid bead ID: ${JSON.stringify(id)}\n`);
+    console.error(`  Error: invalid bead ID: ${JSON.stringify(id)}`);
     process.exit(1);
   }
 }
@@ -72,7 +72,6 @@ function bdExecFile(args) {
 }
 
 function bdShowJson(beadId) {
-  validateBeadId(beadId);
   const raw = bdExecFile(["show", beadId, "--json"]);
   if (!raw) return null;
   try {
@@ -83,7 +82,6 @@ function bdShowJson(beadId) {
 }
 
 function bdListChildren(parentId) {
-  validateBeadId(parentId);
   const raw = bdExecFile(["list", "--parent", parentId, "--json"]);
   if (!raw) return [];
   try {
@@ -95,7 +93,6 @@ function bdListChildren(parentId) {
 }
 
 function bdCommentsList(beadId) {
-  validateBeadId(beadId);
   const raw = bdExecFile(["comments", "list", beadId]);
   if (!raw) return [];
   return raw.split("\n").filter((line) => line.trim());
@@ -694,4 +691,5 @@ if (args.length === 0) {
 }
 
 const beadId = args[0];
+validateBeadId(beadId);
 run(beadId);

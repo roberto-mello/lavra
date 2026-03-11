@@ -1,11 +1,18 @@
 name: Publish to npm
 
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: ["Test Installation"]
+    types: [completed]
+    branches: [main]
 
 jobs:
   publish:
+    # Only publish when Test Installation (which includes verify-release) succeeded
+    # and the triggering event was a release publish
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'release'
     runs-on: ubuntu-latest
     permissions:
       contents: read

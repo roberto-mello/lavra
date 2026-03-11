@@ -35,37 +35,16 @@ jobs:
 
   test-installation:
     name: Multi-Platform Installation Tests
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs: test-compatibility
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check if beads installer is available
-        id: check-beads
-        run: |
-          if curl -fsSL --head https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh 2>/dev/null | grep -q "200"; then
-            echo "available=true" >> $GITHUB_OUTPUT
-          else
-            echo "available=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Install beads CLI
-        if: steps.check-beads.outputs.available == 'true'
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
+        run: brew install beads
 
       - name: Run installation tests
-        if: steps.check-beads.outputs.available == 'true'
-        run: |
-          export PATH="/usr/local/bin:$PATH"
-          bash scripts/test-installation.sh
-
-      - name: Skip installation tests
-        if: steps.check-beads.outputs.available == 'false'
-        run: |
-          echo "Skipping installation tests - beads CLI installer not available"
-          echo "Installation tests require beads CLI which is not publicly released yet"
-          exit 0
+        run: bash scripts/test-installation.sh
 
       - name: Upload test artifacts
         if: failure()
@@ -76,7 +55,7 @@ jobs:
 
   test-npx-installer:
     name: npx Installer Smoke Tests
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -88,41 +67,21 @@ jobs:
       - name: Test --help flag
         run: node bin/install.js --help
 
-      - name: Check if beads installer is available
-        id: check-beads
-        run: |
-          if curl -fsSL --head https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh 2>/dev/null | grep -q "200"; then
-            echo "available=true" >> $GITHUB_OUTPUT
-          else
-            echo "available=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Install beads CLI
-        if: steps.check-beads.outputs.available == 'true'
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
+        run: brew install beads
 
       - name: Test non-interactive Claude Code installation
-        if: steps.check-beads.outputs.available == 'true'
         run: |
           mkdir -p /tmp/test-npx && cd /tmp/test-npx
           git init -q
-          export PATH="/usr/local/bin:$PATH"
           node "$GITHUB_WORKSPACE/bin/install.js" --claude --yes
 
       - name: Verify installation produced expected files
-        if: steps.check-beads.outputs.available == 'true'
         run: |
           test -d /tmp/test-npx/.claude/hooks || { echo "Missing .claude/hooks"; exit 1; }
           test -d /tmp/test-npx/.claude/commands || { echo "Missing .claude/commands"; exit 1; }
           test -d /tmp/test-npx/.claude/agents || { echo "Missing .claude/agents"; exit 1; }
           echo "All expected directories present"
-
-      - name: Skip npx installation test
-        if: steps.check-beads.outputs.available == 'false'
-        run: |
-          echo "Skipping npx installation test - beads CLI installer not available"
-          exit 0
 
       - name: Clean up
         if: always()
@@ -146,7 +105,7 @@ jobs:
       - name: Generate conversion outputs for verification
         run: |
           cd scripts
-          bun install
+          bun install --frozen-lockfile
           bun run convert-opencode.ts
           bun run convert-gemini.ts
           bun run convert-cortex.ts
@@ -195,5 +154,8 @@ jobs:
 
           GEMINI_TOML=$(find plugins/beads-compound/gemini/commands -name "*.toml" 2>/dev/null | wc -l)
           [[ "$GEMINI_TOML" -ge 29 ]] || { echo "❌ Gemini .toml commands missing"; exit 1; }
+
+          CORTEX_COMMANDS=$(find plugins/beads-compound/cortex/commands -name "*.md" 2>/dev/null | wc -l)
+          [[ "$CORTEX_COMMANDS" -ge 29 ]] || { echo "❌ Cortex .md commands missing"; exit 1; }
 
           echo "✅ All source files and conversion outputs verified"

@@ -3,6 +3,8 @@
 "use strict";
 
 const { execFileSync } = require("child_process");
+const fs = require("fs");
+const path = require("path");
 
 const BEAD_ID_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/;
 
@@ -12,8 +14,6 @@ function validateBeadId(id) {
     process.exit(1);
   }
 }
-const fs = require("fs");
-const path = require("path");
 
 // ---------------------------------------------------------------------------
 // CLI argument parsing
@@ -72,6 +72,7 @@ if (!beadId) {
   console.error("  Error: bead ID is required");
   process.exit(1);
 }
+validateBeadId(beadId);
 
 // ---------------------------------------------------------------------------
 // Data fetching
@@ -89,7 +90,6 @@ function bdExecFile(args) {
 }
 
 function fetchBead(id) {
-  validateBeadId(id);
   const raw = bdExecFile(["show", id, "--json"]);
   try {
     return JSON.parse(raw);
@@ -100,7 +100,6 @@ function fetchBead(id) {
 }
 
 function fetchChildren(parentId) {
-  validateBeadId(parentId);
   const raw = bdExecFile(["list", "--parent", parentId, "--json"]);
   try {
     const parsed = JSON.parse(raw);
@@ -111,7 +110,6 @@ function fetchChildren(parentId) {
 }
 
 function fetchComments(id) {
-  validateBeadId(id);
   const raw = bdExecFile(["comments", "list", id]);
   return raw.trim();
 }
