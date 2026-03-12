@@ -231,8 +231,21 @@ Use **AskUserQuestion tool** to present options:
 
 **Create the epic bead:**
 
+The epic bead description MUST include a Sources section capturing where the plan came from:
+
+```
+## Sources
+- Brainstorm: {BRAINSTORM_BEAD_ID} — {title} (locked decisions: X, Y, Z)
+- File: path/to/file.ext:42 — existing pattern used
+- Knowledge: {knowledge-key} (LEARNED) — key insight
+- Doc: https://example.com/docs — reference documentation
+- Research: best-practices-researcher found X pattern
+```
+
+Include only the source types that apply. If a brainstorm bead was used in Step 0, it MUST appear as a `Brainstorm:` entry.
+
 ```bash
-bd create "{title}" --type epic -d "{overview description with research findings}"
+bd create "{title}" --type epic -d "{overview description with research findings and Sources section}"
 ```
 
 **For each implementation step, create a child bead with thorough descriptions:**
@@ -270,6 +283,12 @@ Each child bead description MUST follow this structure:
 ## Dependencies
 
 [List any child beads that must be completed first]
+
+## References
+
+[Sources relevant to this child bead — freeform bullet list]
+- File: path/to/file.ext:42 — pattern used
+- Knowledge: {key} (LEARNED) — relevant insight
 ```
 
 **File-scope conflict prevention:**
@@ -314,6 +333,33 @@ This creates a bidirectional "see also" link. Related beads will have each other
 - [ ] Include prompts or instructions that worked well during research
 - [ ] Emphasize comprehensive testing given rapid implementation
 
+### 5.5. Cross-Check Validation
+
+After creating all child beads, run a warning-only validation pass before final review.
+
+**Checks to perform:**
+
+1. **Required sections** — Each child bead description includes What/Context/Testing/Validation/Files/Dependencies
+2. **File-scope conflicts** — No two independent (non-dependent) child beads claim overlapping files (e.g., both modifying `src/auth/*`)
+3. **Sources section** — Epic bead has a non-empty Sources section
+4. **Brainstorm reference** — If a brainstorm bead was used in Step 0, the Sources section includes a `Brainstorm:` entry
+
+**Output format:**
+
+```
+Cross-Check Results for {EPIC_ID}
+
+! WARNING: {CHILD_ID} lacks "Files" section
+! WARNING: {CHILD_1} and {CHILD_2} both modify src/auth/* without a dependency
+! WARNING: Sources section missing brainstorm reference (brainstorm {ID} found)
+v PASS: All child beads have Testing and Validation sections
+v PASS: DAG validation passes (bd swarm validate)
+
+-> Proceed to final review, or fix warnings first?
+```
+
+All checks are **warnings only** — they do not block submission. Use **AskUserQuestion tool** to ask whether to proceed or fix warnings first.
+
 ### 6. Final Review & Submission
 
 **Pre-submission Checklist:**
@@ -323,6 +369,7 @@ This creates a bidirectional "see also" link. Related beads will have each other
 - [ ] Dependencies between beads are correctly set
 - [ ] No two independent child beads modify the same files (add dependency or merge if they do)
 - [ ] Research findings are captured as knowledge comments
+- [ ] Epic bead description includes a non-empty Sources section
 - [ ] Add an ERD mermaid diagram if applicable for new model changes
 
 **Validate the epic structure:**

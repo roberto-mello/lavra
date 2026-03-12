@@ -148,6 +148,12 @@ else
     provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
     echo "  - Memory system configured"
   fi
+
+  # Provision config directory for project-setup and other config files.
+  # Separate from .beads/memory/ because memory uses merge=union gitattributes
+  # which would corrupt YAML frontmatter — config needs normal git merge behavior.
+  mkdir -p "$TARGET/.beads/config"
+  echo "  - Config directory provisioned (.beads/config/)"
 fi
 
 # Install hooks (only for project-specific installs)
