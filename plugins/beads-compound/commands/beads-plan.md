@@ -55,35 +55,58 @@ Do not proceed until you have a clear feature description from the user.
 
 **Check for brainstorm output first:**
 
-Before asking questions, search for recent brainstorm-related knowledge entries and bead comments:
+Use this decision tree — stop at the first match and skip idea refinement:
+
+#### Step 0a. Label-Based Detection (fast, deterministic — check FIRST)
+
+If the argument is a bead ID, check whether the bead itself or its parent has a `brainstorm` label:
+
+```bash
+# Check labels on the input bead
+bd show "{BEAD_ID}" --json | jq -r '.[0].labels // [] | .[]'
+
+# If it has a parent, check the parent's labels too
+bd show "{BEAD_ID}" --json | jq -r '.[0].parent // empty'
+# If parent exists:
+bd show "{PARENT_ID}" --json | jq -r '.[0].labels // [] | .[]'
+```
+
+**Label match** = the bead itself, or its parent, has a label containing `brainstorm`.
+
+If label match found: set `BRAINSTORM_ID` to the matching bead ID and jump to [**Brainstorm Detected**](#brainstorm-detected) below.
+
+#### Step 0b. Keyword Match — Recent (<=14 days)
+
+Search for brainstorm-related knowledge and beads using keywords from the feature description:
 
 ```bash
 # Search for brainstorm-related knowledge
 .beads/memory/recall.sh "brainstorm"
 .beads/memory/recall.sh "{keywords from feature description}"
 
-# Check for recent brainstorm beads
-bd list --status=open --json 2>/dev/null | jq -r '.[] | select(.title | test("brainstorm|explore|investigate"; "i")) | "\(.id): \(.title)"'
+# Check for recent brainstorm beads (title-based)
+bd list --status=open --json 2>/dev/null | jq -r '.[] | select(.title | test("brainstorm|explore|investigate"; "i")) | "\(.id): \(.title) (\(.updated_at // .created_at))"'
 ```
 
 **Relevance criteria:** A brainstorm entry is relevant if:
 - The topic semantically matches the feature description
-- Created within the last 14 days
+- Created or updated within the last 14 days
 - If multiple candidates match, use the most recent one
 
-**If a relevant brainstorm bead exists:**
-1. Read the brainstorm bead and its comments: `bd show {BRAINSTORM_ID}`
-2. Announce: "Found brainstorm from [date]: [topic]. Using as context for planning."
-3. Extract key decisions, chosen approach, and open questions
-4. **Skip the idea refinement questions below** - the brainstorm already answered WHAT to build
-5. Use brainstorm decisions as input to the research phase
+If a relevant brainstorm bead found within 14 days: set `BRAINSTORM_ID` and jump to [**Brainstorm Detected**](#brainstorm-detected).
 
-**If multiple brainstorms could match:**
-Use **AskUserQuestion tool** to ask which brainstorm to use, or whether to proceed without one.
+#### Step 0c. Keyword Match — Older (>14 days)
 
-**If no brainstorm found (or not relevant), run idea refinement:**
+If a semantically matching brainstorm bead exists but is older than 14 days, use **AskUserQuestion tool** to ask:
 
-Refine the idea through collaborative dialogue using the **AskUserQuestion tool**:
+"Found brainstorm `{BRAINSTORM_ID}` from [date] that may be relevant: {title}. It's older than 14 days — use it as context for this plan?"
+
+- **Yes** -> set `BRAINSTORM_ID` and proceed to [**Brainstorm Detected**](#brainstorm-detected)
+- **No** -> proceed to idea refinement below
+
+#### Step 0d. No Brainstorm — Run Idea Refinement
+
+If no brainstorm found (or not relevant), refine the idea through collaborative dialogue using the **AskUserQuestion tool**:
 
 - Ask questions one at a time to understand the idea fully
 - Prefer multiple choice questions when natural options exist
@@ -99,6 +122,48 @@ Refine the idea through collaborative dialogue using the **AskUserQuestion tool*
 
 **Skip option:** If the feature description is already detailed, offer:
 "Your description is clear. Should I proceed with research, or would you like to refine it further?"
+
+---
+
+#### Brainstorm Detected
+
+When any of steps 0a–0c identifies a brainstorm bead, execute this block:
+
+1. Read the brainstorm bead and its comments in full:
+   ```bash
+   bd show {BRAINSTORM_ID}
+   bd comments list {BRAINSTORM_ID}
+   ```
+
+2. Extract **locked decisions** — look for:
+   - Comments or description lines explicitly marked "LOCKED", "DECIDED", or "DECISION:"
+   - The chosen approach (what was selected over alternatives)
+   - Key constraints that were agreed upon
+
+3. Announce the handoff with specifics:
+   ```
+   Found brainstorm {BRAINSTORM_ID} from [date]: "{title}"
+   Skipping idea refinement — locked decisions carried forward:
+   - [Decision 1]
+   - [Decision 2]
+   - [Decision N]
+   ```
+
+4. Store for use in later steps:
+   - `BRAINSTORM_ID` = the bead ID
+   - `BRAINSTORM_TITLE` = the bead title
+   - `LOCKED_DECISIONS` = list of extracted locked decisions (short phrases)
+
+5. **Skip the idea refinement dialogue** — the brainstorm already answered WHAT to build.
+
+6. Use locked decisions as direct input to the research phase (Step 1).
+
+**Note:** In Step 5 (Create Epic and Child Beads):
+- The epic's Sources section **MUST** include: `Brainstorm: {BRAINSTORM_ID} — {BRAINSTORM_TITLE} (locked decisions: {comma-separated LOCKED_DECISIONS})`
+- Each child bead's **Context section** MUST include a "Locked decisions from brainstorm:" subsection listing the decisions that apply to that child bead
+
+**If multiple brainstorms could match (step 0b/0c):**
+Use **AskUserQuestion tool** to ask which brainstorm to use, or whether to proceed without one.
 
 ### 1. Local Research (Always Runs - Parallel)
 
