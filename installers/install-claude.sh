@@ -7,8 +7,8 @@
 #   - Knowledge store (.beads/memory/knowledge.jsonl)
 #   - Recall script (.beads/memory/recall.sh)
 #   - Beads-aware workflow commands (25 commands)
-#   - Specialized agents (28 agent definitions)
-#   - Skills (15 skills including git-worktree, brainstorming, etc.)
+#   - Specialized agents (29 agent definitions)
+#   - Skills (16 skills including git-worktree, brainstorming, etc.)
 #   - MCP server configuration (Context7)
 #
 # Usage:

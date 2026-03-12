@@ -7,9 +7,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Claude Code plugin marketplace that provides beads-based persistent memory with compound-engineering's multi-agent workflows. The primary plugin is `beads-compound`, located at `plugins/beads-compound/`.
 
 The plugin provides:
-- 28 specialized agents (14 review, 5 research, 3 design, 5 workflow, 1 docs)
+- 29 specialized agents (15 review, 5 research, 3 design, 5 workflow, 1 docs)
 - 29 commands for brainstorming, planning, design, review, testing, and more
-- 15 skills (git-worktree, brainstorming, create-agent-skills, agent-browser, dhh-rails-style, etc.)
+- 16 skills (git-worktree, brainstorming, create-agent-skills, agent-browser, dhh-rails-style, etc.)
 - 3 hooks for automatic knowledge capture, recall, and subagent wrapup
 - 1 MCP server (Context7 for framework documentation)
 - Automatic knowledge capture from beads comments (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION)
@@ -35,9 +35,9 @@ beads-compound-plugin/              # Marketplace root
 │   └── beads-compound/             # Plugin root
 │       ├── .claude-plugin/
 │       │   └── plugin.json         # Plugin manifest (v0.6.0)
-│       ├── agents/                 # 28 agents (review/, research/, design/, workflow/, docs/)
+│       ├── agents/                 # 29 agents (review/, research/, design/, workflow/, docs/)
 │       ├── commands/               # 29 commands
-│       ├── skills/                 # 15 skills with supporting files
+│       ├── skills/                 # 16 skills with supporting files
 │       ├── hooks/                  # hooks.json, auto-recall.sh, memory-capture.sh, subagent-wrapup.sh, recall.sh
 │       ├── opencode/               # OpenCode TypeScript plugin
 │       ├── gemini/                 # Gemini CLI hook configuration
