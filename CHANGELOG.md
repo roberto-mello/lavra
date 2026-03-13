@@ -2,6 +2,24 @@
 
 All notable changes to the beads-compound plugin are documented here.
 
+## [0.6.9] - 2026-03-13
+
+### Added
+- **`project-setup` skill** - New skill at `skills/project-setup/` for per-project stack detection and review agent configuration. Auto-detects tech stack (Rails, Ruby, TypeScript, JavaScript, Python, General) from project files, lets users toggle specific agents off, and saves config to `.beads/config/project-setup.md` with YAML frontmatter. Review Context notes are length-limited to 500 chars and stripped of prompt-structural characters.
+- **`migration-drift-detector` agent** - New review agent that detects schema/migration drift in PRs across five ORMs: Rails (`db/migrate/` + `db/schema.rb`), Alembic (revision DAG + multiple heads), Prisma (checksum + shadow DB), Drizzle (snapshot/SQL mismatch), and Knex (out-of-sequence timestamps). Auto-detects which ORM is in use. All PR field handling uses `jq --arg` to prevent shell injection.
+- **`beads-review` project config integration** - `/beads-review` now reads `.beads/config/project-setup.md` at start of review. When present, dispatches only the configured `review_agents` (validated against an allowlist of all 29 known agents). Review Context injected into every agent prompt wrapped in `untrusted-config-data` XML. Config-missing = dispatch all agents (fully backward compatible).
+- **`beads-parallel` project config injection** - Section 8 (Recall Knowledge) now reads `.beads/config/project-setup.md` when present and injects Review Context into all subagent prompt templates (standard, ralph, teams worker) under `## Project Conventions`.
+- **`migration-drift-detector` wired into `/beads-review`** - Added as a conditional agent alongside `data-migration-expert` (not instead of it). Triggers on any ORM's migration or schema artifact files. Finding synthesis step notes deduplication between the two agents.
+- **`/beads-compound` surfaced after substantial findings** - `/beads-work` now scans the bead's comments after the knowledge gate and adds `/beads-compound` as an option when `LEARNED:` or `INVESTIGATION:` entries are found. `/beads-parallel` scans all closed beads in step 12, collects matching bead IDs as `COMPOUND_CANDIDATES`, and surfaces `/beads-compound {COMPOUND_CANDIDATES}` in handoff options.
+- **Sources section in `/beads-plan`** - Epic bead descriptions now include a mandatory `## Sources` freeform bullet list (`Brainstorm:`, `File:`, `Knowledge:`, `Doc:`, `Research:` entry types). Child beads get a `## References` subsection. Pre-submission checklist verifies Sources is non-empty.
+- **Cross-check validation in `/beads-plan`** - New Step 5.5 runs warning-only validation after bead creation: checks required sections per child bead, flags file-scope conflicts between independent beads without a dependency, warns on missing brainstorm reference when a brainstorm bead was used. Does not block plan creation.
+- **Improved brainstorm detection in `/beads-plan`** - Step 0 now uses a four-step decision tree: label-based detection first (checks `brainstorm` label on bead and parent), then keyword match ≤14 days, then keyword match >14 days (prompts user), then full idea refinement. When brainstorm detected: locked decisions extracted and carried forward into child bead Context sections, Sources section auto-populated with `Brainstorm:` entry.
+- **`.beads/config/` provisioned by installer** - `install-claude.sh` now runs `mkdir -p "$TARGET/.beads/config"` alongside memory provisioning.
+
+### Changed
+- **`.beads/config/` added to protected artifacts** - All six locations that protect `.beads/memory/` now also protect `.beads/config/`: `beads-review.md`, `beads-parallel.md` (2 locations), `code-simplicity-reviewer.md`, `resolve-todo-parallel.md`, `git-history-analyzer.md`.
+- **Component counts updated** - 28 → 29 agents (migration-drift-detector), 15 → 16 skills (project-setup). Updated in `plugin.json`, `marketplace.json`, `plugin-catalog.md`, `pre-release-check.sh`, `CLAUDE.md`, and `install-claude.sh`.
+
 ## [0.6.8] - 2026-03-05
 
 ### Added
