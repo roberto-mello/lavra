@@ -78,7 +78,7 @@ Check for a project-setup configuration file:
 If the file exists, parse its YAML frontmatter for one field:
 - `review_agents`: list of agent names to dispatch (replaces the default list below)
 
-> **Note:** `reviewer_context_note` is intentionally **not** injected into review agents. Review agents derive project context from the code itself. Context note injection is only done in `/beads-parallel` (pre-work conventions for implementors) where the value is clearer and the injection surface is smaller. See `docs/SECURITY.md`.
+> **Note:** `reviewer_context_note` is intentionally **not** injected into review agents. Review agents derive project context from the code itself. Context note injection is only done in `/beads-parallel` (pre-work conventions for implementors) where the value is clearer and the injection surface is smaller.
 
 **Agent allowlist validation** (when `review_agents` is present):
 
