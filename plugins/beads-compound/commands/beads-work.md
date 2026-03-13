@@ -284,11 +284,23 @@ This is a warning only -- continue regardless of the result.
 
 4. **Offer Next Steps**
 
+   Check whether the bead has any `LEARNED:` or `INVESTIGATION:` comments:
+   ```bash
+   bd show {BEAD_ID} | grep -E "LEARNED:|INVESTIGATION:"
+   ```
+
    Use **AskUserQuestion tool**:
 
    **Question:** "Work complete on {BEAD_ID}. What next?"
 
-   **Options:**
+   **Options (if LEARNED: or INVESTIGATION: comments found):**
+   1. **Run `/beads-review`** - Multi-agent code review before closing
+   2. **Close bead** - Mark as complete: `bd close {BEAD_ID}`
+   3. **Run `/beads-compound`** - Document the non-obvious findings as reusable knowledge
+   4. **Run `/beads-checkpoint`** - Save progress without closing
+   5. **Continue working** - Keep implementing
+
+   **Options (if no LEARNED: or INVESTIGATION: comments):**
    1. **Run `/beads-review`** - Multi-agent code review before closing
    2. **Close bead** - Mark as complete: `bd close {BEAD_ID}`
    3. **Run `/beads-checkpoint`** - Save progress without closing

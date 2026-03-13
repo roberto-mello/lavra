@@ -832,7 +832,15 @@ After all waves complete and push is approved:
    bd backup
    ```
 
-2. **Output summary:**
+2. **Scan for substantial findings:**
+
+   Check all closed beads for `LEARNED:` or `INVESTIGATION:` comments:
+   ```bash
+   for id in {closed-bead-ids}; do bd show $id | grep -E "LEARNED:|INVESTIGATION:" && echo "  bead: $id"; done
+   ```
+   Store the list of beads with matches as `COMPOUND_CANDIDATES` for use in the handoff.
+
+3. **Output summary:**
 
 **When NOT --ralph mode:**
 
@@ -930,11 +938,13 @@ All work complete. What next?
 **Options (non-ralph, non-teams):**
 1. **Run `/beads-review`** on the changes
 2. **Create a PR** with all changes
-3. **Continue** with remaining open beads
+3. **Run `/beads-compound {COMPOUND_CANDIDATES}`** - Document non-obvious findings as reusable knowledge *(only shown if COMPOUND_CANDIDATES is non-empty)*
+4. **Continue** with remaining open beads
 
 **Options (ralph or teams):**
 1. **Run `/beads-review`** on all changes
 2. **Create a PR** with all changes
-3. **Retry failed beads** - Re-run with only the failed bead IDs
-4. **Continue** with remaining open beads
+3. **Run `/beads-compound {COMPOUND_CANDIDATES}`** - Document non-obvious findings as reusable knowledge *(only shown if COMPOUND_CANDIDATES is non-empty)*
+4. **Retry failed beads** - Re-run with only the failed bead IDs
+5. **Continue** with remaining open beads
 </handoff>
