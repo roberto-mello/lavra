@@ -132,15 +132,15 @@ jobs:
 
       - name: Verify component counts
         run: |
-          COMMANDS=$(find plugins/beads-compound/commands -name "*.md" | wc -l)
+          COMMANDS=$(find plugins/beads-compound/commands -maxdepth 1 -name "*.md" | wc -l)
           AGENTS=$(find plugins/beads-compound/agents -name "*.md" | wc -l)
           SKILLS=$(find plugins/beads-compound/skills -name "SKILL.md" | wc -l)
 
-          echo "Commands: $COMMANDS (expected 29+)"
+          echo "Commands: $COMMANDS (expected 24+)"
           echo "Agents: $AGENTS (expected 28+)"
           echo "Skills: $SKILLS (expected 15+)"
 
-          [[ "$COMMANDS" -ge 29 ]] || exit 1
+          [[ "$COMMANDS" -ge 24 ]] || exit 1
           [[ "$AGENTS" -ge 28 ]] || exit 1
           [[ "$SKILLS" -ge 15 ]] || exit 1
 
@@ -158,12 +158,12 @@ jobs:
           [[ -d "plugins/beads-compound/gemini" ]] || { echo "❌ Gemini conversion outputs missing"; exit 1; }
 
           OPENCODE_COMMANDS=$(find plugins/beads-compound/opencode/commands -name "*.md" 2>/dev/null | wc -l)
-          [[ "$OPENCODE_COMMANDS" -ge 29 ]] || { echo "❌ OpenCode .md commands missing"; exit 1; }
+          [[ "$OPENCODE_COMMANDS" -ge 24 ]] || { echo "❌ OpenCode .md commands missing"; exit 1; }
 
           GEMINI_TOML=$(find plugins/beads-compound/gemini/commands -name "*.toml" 2>/dev/null | wc -l)
-          [[ "$GEMINI_TOML" -ge 29 ]] || { echo "❌ Gemini .toml commands missing"; exit 1; }
+          [[ "$GEMINI_TOML" -ge 24 ]] || { echo "❌ Gemini .toml commands missing"; exit 1; }
 
           CORTEX_COMMANDS=$(find plugins/beads-compound/cortex/commands -name "*.md" 2>/dev/null | wc -l)
-          [[ "$CORTEX_COMMANDS" -ge 29 ]] || { echo "❌ Cortex .md commands missing"; exit 1; }
+          [[ "$CORTEX_COMMANDS" -ge 24 ]] || { echo "❌ Cortex .md commands missing"; exit 1; }
 
           echo "✅ All source files and conversion outputs verified"

@@ -124,9 +124,9 @@ After presenting the review, use the **AskUserQuestion tool** to present these o
 
 **Options:**
 1. **Apply feedback** - Update child beads with review suggestions
-2. **Run `/beads-deepen`** - Enhance plan with additional research
+2. **Run `/beads-research`** - Gather additional evidence with domain-matched agents
 3. **Start `/beads-work`** - Begin implementing the first child bead
-4. **Run `/beads-parallel`** - Work on multiple child beads in parallel
+4. **Run `/beads-work {EPIC_ID}`** - Work on multiple child beads in parallel
 5. **Dismiss** - Acknowledge review without changes
 
 ## Applying Feedback (when option 1 is selected)

@@ -362,7 +362,7 @@ When creating child beads, identify the specific files each bead will touch. **I
 1. Merge them into a single bead, OR
 2. Add an explicit dependency between them (`bd dep add {later} {earlier}`) so they execute sequentially
 
-This prevents parallel agents from overwriting each other's changes during `/beads-parallel` execution. Be specific -- list file paths, not just module names.
+This prevents parallel agents from overwriting each other's changes during `/beads-work` multi-bead execution. Be specific -- list file paths, not just module names.
 
 **Create child beads:**
 
@@ -386,7 +386,7 @@ For beads that work in the same domain but don't block each other (e.g., "auth l
 bd dep relate {BEAD_A} {BEAD_B}
 ```
 
-This creates a bidirectional "see also" link. Related beads will have each other's context injected during `/beads-parallel` execution, improving agent awareness without forcing sequential ordering.
+This creates a bidirectional "see also" link. Related beads will have each other's context injected during `/beads-work` multi-bead execution, improving agent awareness without forcing sequential ordering.
 
 **When to use relate vs dep add:**
 - `bd dep add`: Bead B cannot start until Bead A is done (blocking)
@@ -480,21 +480,21 @@ After creating the epic and child beads, use the **AskUserQuestion tool** to pre
 **Question:** "Plan ready as epic `{EPIC_ID}`: {title}. What would you like to do next?"
 
 **Options:**
-1. **Run `/beads-deepen`** - Enhance each child bead with parallel research agents
+1. **Run `/beads-research`** - Gather evidence for each child bead with domain-matched research agents
 2. **Run `/beads-plan-review`** - Get feedback from reviewers on the plan
 3. **Start `/beads-work`** - Begin implementing the first child bead
-4. **Run `/beads-parallel`** - Work on multiple child beads in parallel
+4. **Run `/beads-work {EPIC_ID}`** - Work on multiple child beads in parallel
 5. **Simplify** - Reduce detail level
 
 Based on selection:
-- **`/beads-deepen`** -> Call the /beads-deepen command with the epic bead ID
+- **`/beads-research`** -> Call the /beads-research command with the epic bead ID
 - **`/beads-plan-review`** -> Call the /beads-plan-review command with the epic bead ID
 - **`/beads-work`** -> Call the /beads-work command with the first ready child bead ID
-- **`/beads-parallel`** -> Call the /beads-parallel command with the epic bead ID
+- **`/beads-work {EPIC_ID}`** -> Call the /beads-work command with the epic bead ID
 - **Simplify** -> Ask "What should I simplify?" then regenerate simpler descriptions
 - **Other** (automatically provided) -> Accept free text for rework or specific changes
 
 **Tip:** If this plan originated from `/beads-brainstorm`, the brainstorm's locked decisions are already embedded in child bead descriptions.
 
-Loop back to options after Simplify or Other changes until user selects `/beads-work`, `/beads-parallel`, or `/beads-plan-review`.
+Loop back to options after Simplify or Other changes until user selects `/beads-work` or `/beads-plan-review`.
 </handoff>

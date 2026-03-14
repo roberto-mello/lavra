@@ -10,7 +10,7 @@ The `review_agents` field is lower risk — a bad entry is silently skipped, it 
 
 ## `reviewer_context_note` Injection Defense
 
-### Sanitization (applied on write in `/project-setup`, re-applied on read in `/beads-parallel`)
+### Sanitization (applied on write in `/project-setup`, re-applied on read in `/beads-work`)
 
 Both write-time and read-time sanitization use the same strip list (defense in depth):
 
@@ -22,7 +22,7 @@ Both write-time and read-time sanitization use the same strip list (defense in d
 - Strip Unicode bidirectional override characters (U+202A–U+202E, U+2066–U+2069) — these can make injected text invisible in editors while still being processed by the model
 - Truncate to 500 characters after stripping
 
-### XML wrapping (in `/beads-parallel`)
+### XML wrapping (in `/beads-work`)
 
 When injected into agent prompts, the sanitized value is wrapped in:
 
@@ -46,9 +46,9 @@ A sufficiently crafted injection could still influence agent behavior. The risk 
 
 ## Scope of Injection
 
-`reviewer_context_note` is **only** injected in `/beads-parallel` (pre-work conventions for implementors). It is **intentionally not** injected in `/beads-review`.
+`reviewer_context_note` is **only** injected in `/beads-work` multi-bead path (pre-work conventions for implementors). It is **intentionally not** injected in `/beads-review`.
 
-The reasoning: review agents derive project context from the code they are reviewing. A pre-written context note adds marginal value there while introducing an injection vector into the review pipeline. For implementors in `/beads-parallel`, knowing "all endpoints require auth middleware" before writing code has clear value. The asymmetry justifies the difference in scope.
+The reasoning: review agents derive project context from the code they are reviewing. A pre-written context note adds marginal value there while introducing an injection vector into the review pipeline. For implementors in `/beads-work`, knowing "all endpoints require auth middleware" before writing code has clear value. The asymmetry justifies the difference in scope.
 
 ## Agent Allowlist
 

@@ -70,15 +70,16 @@ echo "  Generating OpenCode and Gemini outputs..."
 echo ""
 echo "=== Component counts ==="
 
-COMMANDS=$(find plugins/beads-compound/commands -name "*.md" | wc -l | tr -d ' ')
+COMMANDS=$(find plugins/beads-compound/commands -maxdepth 1 -name "*.md" | wc -l | tr -d ' ')
+OPTIONAL_COMMANDS=$(find plugins/beads-compound/commands/optional -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 AGENTS=$(find plugins/beads-compound/agents -name "*.md" | wc -l | tr -d ' ')
 SKILLS=$(find plugins/beads-compound/skills -name "SKILL.md" | wc -l | tr -d ' ')
 
-echo "  Commands: $COMMANDS (need 29+)"
+echo "  Commands: $COMMANDS (need 24+) + $OPTIONAL_COMMANDS optional"
 echo "  Agents:   $AGENTS (need 29+)"
 echo "  Skills:   $SKILLS (need 16+)"
 
-[[ "$COMMANDS" -ge 29 ]] && { echo "  PASS  Commands"; ((PASS++)) || true; } || fail "Commands" "$COMMANDS < 29"
+[[ "$COMMANDS" -ge 24 ]] && { echo "  PASS  Commands"; ((PASS++)) || true; } || fail "Commands" "$COMMANDS < 24"
 [[ "$AGENTS"   -ge 29 ]] && { echo "  PASS  Agents";   ((PASS++)) || true; } || fail "Agents"   "$AGENTS < 29"
 [[ "$SKILLS"   -ge 16 ]] && { echo "  PASS  Skills";   ((PASS++)) || true; } || fail "Skills"   "$SKILLS < 16"
 
@@ -99,15 +100,15 @@ check "cortex/ directory"   test -d plugins/beads-compound/cortex
 OPENCODE_COMMANDS=$(find plugins/beads-compound/opencode/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 GEMINI_TOML=$(find plugins/beads-compound/gemini/commands -name "*.toml" 2>/dev/null | wc -l | tr -d ' ')
 
-echo "  OpenCode .md commands: $OPENCODE_COMMANDS (need 29+)"
-echo "  Gemini .toml commands: $GEMINI_TOML (need 29+)"
+echo "  OpenCode .md commands: $OPENCODE_COMMANDS (need 24+)"
+echo "  Gemini .toml commands: $GEMINI_TOML (need 24+)"
 
-[[ "$OPENCODE_COMMANDS" -ge 29 ]] && { echo "  PASS  OpenCode commands"; ((PASS++)) || true; } || fail "OpenCode commands" "$OPENCODE_COMMANDS < 29"
-[[ "$GEMINI_TOML"       -ge 29 ]] && { echo "  PASS  Gemini commands";   ((PASS++)) || true; } || fail "Gemini commands"   "$GEMINI_TOML < 29"
+[[ "$OPENCODE_COMMANDS" -ge 24 ]] && { echo "  PASS  OpenCode commands"; ((PASS++)) || true; } || fail "OpenCode commands" "$OPENCODE_COMMANDS < 24"
+[[ "$GEMINI_TOML"       -ge 24 ]] && { echo "  PASS  Gemini commands";   ((PASS++)) || true; } || fail "Gemini commands"   "$GEMINI_TOML < 24"
 
 CORTEX_COMMANDS=$(find plugins/beads-compound/cortex/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-echo "  Cortex .md commands:   $CORTEX_COMMANDS (need 25+)"
-[[ "$CORTEX_COMMANDS" -ge 25 ]] && { echo "  PASS  Cortex commands"; ((PASS++)) || true; } || fail "Cortex commands" "$CORTEX_COMMANDS < 25"
+echo "  Cortex .md commands:   $CORTEX_COMMANDS (need 20+)"
+[[ "$CORTEX_COMMANDS" -ge 20 ]] && { echo "  PASS  Cortex commands"; ((PASS++)) || true; } || fail "Cortex commands" "$CORTEX_COMMANDS < 20"
 
 echo ""
 echo "=== Compatibility tests ==="

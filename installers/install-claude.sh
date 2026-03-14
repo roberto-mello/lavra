@@ -6,7 +6,7 @@
 #   - Memory capture and auto-recall hooks
 #   - Knowledge store (.beads/memory/knowledge.jsonl)
 #   - Recall script (.beads/memory/recall.sh)
-#   - Beads-aware workflow commands (25 commands)
+#   - Beads-aware workflow commands (24 core commands)
 #   - Specialized agents (29 agent definitions)
 #   - Skills (16 skills including git-worktree, brainstorming, etc.)
 #   - MCP server configuration (Context7)
@@ -446,20 +446,24 @@ echo ""
 echo "Done. Installed:"
 echo ""
 echo "  Commands ($CMD_COUNT):"
-echo "    Workflow: /beads-plan, /beads-brainstorm, /beads-work, /beads-parallel, /beads-review, /beads-compound, /beads-checkpoint"
-echo "    Planning: /beads-deepen, /beads-plan-review, /beads-triage"
-echo "    Utility:  /lfg, /changelog, /create-agent-skill, /generate-command, /heal-skill"
-echo "    Testing:  /test-browser, /xcode-test, /reproduce-bug, /report-bug"
-echo "    Docs:     /deploy-docs, /release-docs, /feature-video, /agent-native-audit"
+echo "    Workflow: /beads-plan, /beads-brainstorm, /beads-work, /beads-work-ralph, /beads-work-teams, /beads-review, /beads-compound, /beads-checkpoint"
+echo "    Planning: /beads-research, /beads-plan-review, /beads-triage"
+echo "    Utility:  /lfg, /changelog, /create-agent-skill, /heal-skill"
+echo "    Testing:  /test-browser, /report-bug"
+echo "    Docs:     /deploy-docs, /release-docs"
 echo "    Parallel: /resolve-pr-parallel, /resolve-todo-parallel"
 echo ""
 echo "  Agents ($AGENT_COUNT):"
 echo "    Review, research, design, workflow, and docs agents"
 echo ""
-echo "  Skills ($SKILL_COUNT):"
+echo "  Core Skills ($SKILL_COUNT):"
 echo "    git-worktree, brainstorming, create-agent-skills, agent-native-architecture, beads-knowledge,"
-echo "    agent-browser, andrew-kane-gem-writer, dhh-rails-style, dspy-ruby, every-style-editor,"
-echo "    file-todos, frontend-design, gemini-imagegen, rclone, skill-creator"
+echo "    agent-browser, file-todos, project-setup, skill-creator"
+echo ""
+echo "  Optional Skills (7, not installed by default):"
+echo "    andrew-kane-gem-writer, dhh-rails-style, dspy-ruby, every-style-editor,"
+echo "    frontend-design, gemini-imagegen, rclone"
+echo "    Install with: cp -r plugins/beads-compound/skills/optional/<name> .claude/skills/"
 echo ""
 
 if [ "$GLOBAL_INSTALL" = false ]; then

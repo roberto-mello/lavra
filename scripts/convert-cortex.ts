@@ -179,7 +179,7 @@ async function convertSkills() {
   await mkdir(outputDir, { recursive: true, mode: 0o755 });
 
   const skillDirs = await readdir(skillsDir, { withFileTypes: true });
-  const skills = skillDirs.filter((d) => d.isDirectory()).map((d) => d.name);
+  const skills = skillDirs.filter((d) => d.isDirectory() && d.name !== "optional").map((d) => d.name);
 
   // Process each skill directory in parallel
   await Promise.all(

@@ -142,7 +142,7 @@ When argument matches bead ID pattern:
    bd comments add {BEAD_ID} "LEARNED: ..."
    ```
 
-   Use `/beads-compound` for deep problem documentation.
+   Use `/beads-learn` to curate findings into structured knowledge.
    ```
 
 ### Mode 5: Keyword Search
@@ -270,7 +270,7 @@ Beads CLI not found. Install from: https://github.com/steveyegge/beads
 **If results found:**
 - Use this knowledge to inform your current work
 - Add new learnings: `bd comments add <BEAD_ID> "LEARNED: ..."`
-- Document complex solutions: `/beads-compound`
+- Curate knowledge entries: `/beads-learn`
 
 **If implementing related work:**
 ```bash

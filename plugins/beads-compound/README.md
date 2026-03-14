@@ -29,15 +29,14 @@ See the [marketplace README](../../README.md) for full details.
 |---------|-------------|
 | `/beads-brainstorm` | Explore ideas collaboratively before planning |
 | `/beads-plan` | Research and plan using multiple agents |
-| `/beads-deepen` | Enhance plan with parallel research agents |
+| `/beads-research` | Gather evidence with domain-matched research agents |
 | `/beads-plan-review` | Multi-agent review of epic plan |
 | `/beads-triage` | Prioritize and categorize child beads |
-| `/beads-work` | Work on a single bead with full lifecycle |
-| `/beads-parallel` | Work on multiple beads in parallel via subagents |
+| `/beads-work` | Work on one or many beads -- auto-routes single vs. multi-bead |
 | `/beads-review` | Multi-agent code review before closing |
 | `/beads-research` | Deep research using 5 specialized agents |
 | `/beads-checkpoint` | Save progress, capture knowledge, commit |
-| `/beads-compound` | Document solved problems as knowledge |
+| `/beads-learn` | Curate knowledge into structured, reusable entries |
 
 
 ## Agents (Model Tier Optimized)
@@ -79,6 +78,8 @@ All 27 agents include model tier assignments for optimal cost/performance balanc
 
 ## Skills
 
+### Core (installed by default)
+
 | Skill | Description |
 |-------|-------------|
 | `git-worktree` | Manage git worktrees for parallel bead work |
@@ -86,6 +87,22 @@ All 27 agents include model tier assignments for optimal cost/performance balanc
 | `create-agent-skills` | Create new agents and skills |
 | `agent-native-architecture` | Design agent-native system architectures |
 | `beads-knowledge` | Document solved problems as knowledge entries |
+| `agent-browser` | Browser automation for testing and screenshots |
+| `file-todos` | Find and manage TODO comments in code |
+| `project-setup` | Project environment setup and onboarding automation |
+| `skill-creator` | Create new skills from templates |
+
+### Optional (in `skills/optional/`, copy to install)
+
+| Skill | Description |
+|-------|-------------|
+| `andrew-kane-gem-writer` | Write Ruby gems following Andrew Kane's style |
+| `dhh-rails-style` | Rails development following DHH's conventions |
+| `dspy-ruby` | DSPy integration for Ruby applications |
+| `every-style-editor` | Every's house style guide for content editing |
+| `frontend-design` | Frontend design patterns and best practices |
+| `gemini-imagegen` | Generate images using Google's Gemini |
+| `rclone` | Cloud storage file management with rclone |
 
 ## Memory System
 

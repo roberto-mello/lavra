@@ -79,7 +79,7 @@ KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 # First-run detection: if knowledge file is empty or missing, show orientation
 if [ ! -f "$KNOWLEDGE_FILE" ] || [ ! -s "$KNOWLEDGE_FILE" ]; then
   cat <<'ONBOARD'
-{"hookSpecificOutput":{"systemMessage":"## Beads Compound is ready.\n\n| Goal | Command |\n|------|---------|\n| New feature | `/beads-brainstorm \"describe your feature\"` |\n| Plan from spec | `/beads-design \"feature description\"` |\n| Existing beads | `/beads-parallel` |\n| Explore ideas | `/beads-brainstorm \"your idea\"` |\n\nKnowledge you capture will appear here automatically in future sessions."}}
+{"hookSpecificOutput":{"systemMessage":"## Beads Compound is ready.\n\n| Goal | Command |\n|------|---------|\n| New feature | `/beads-brainstorm \"describe your feature\"` |\n| Plan from spec | `/beads-design \"feature description\"` |\n| Existing beads | `/beads-work` |\n| Explore ideas | `/beads-brainstorm \"your idea\"` |\n\nKnowledge you capture will appear here automatically in future sessions."}}
 ONBOARD
   exit 0
 fi

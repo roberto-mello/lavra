@@ -5,53 +5,59 @@ globs: "**/plugins/**,**/agents/**,**/commands/**,**/skills/**"
 
 # Plugin Catalog
 
-## Commands (29)
+## Commands (24 core + 5 optional)
 
 Commands are in `plugins/beads-compound/commands/`:
 
-**Beads Workflow (10):**
+**Beads Workflow (11):**
 
 | Command | File | Description |
 |---------|------|-------------|
 | `/beads-brainstorm` | beads-brainstorm.md | Explore ideas collaboratively |
-| `/beads-design` | beads-design.md | Orchestrate full planning pipeline per phase: plan → deepen → review |
+| `/beads-design` | beads-design.md | Orchestrate full planning pipeline per phase: plan -> research -> review |
 | `/beads-quick` | beads-quick.md | Fast-track small tasks with abbreviated plan |
 | `/beads-plan` | beads-plan.md | Research and plan with multiple agents |
-| `/beads-work` | beads-work.md | Work on a single bead with full lifecycle |
-| `/beads-parallel` | beads-parallel.md | Work on multiple beads in parallel (`--ralph` for autonomous retry, `--teams` for persistent worker teammates) |
+| `/beads-work` | beads-work.md | Work on one or many beads -- auto-routes single vs. multi-bead paths |
+| `/beads-work-ralph` | beads-work-ralph.md | Autonomous retry mode with completion promises |
+| `/beads-work-teams` | beads-work-teams.md | Persistent worker teammates with COMPLETED/ACCEPTED protocol |
 | `/beads-review` | beads-review.md | Multi-agent code review |
 | `/beads-checkpoint` | beads-checkpoint.md | Save progress and capture knowledge |
-| `/beads-compound` | beads-compound.md | Document solved problems |
+| `/beads-learn` | beads-learn.md | Curate knowledge into structured entries |
 | `/beads-recall` | beads-recall.md | Search knowledge base mid-session |
 
 **Planning & Triage (4):**
 
 | Command | File | Description |
 |---------|------|-------------|
-| `/beads-deepen` | beads-deepen.md | Enhance plan with parallel research |
+| `/beads-research` | beads-research.md | Gather evidence with domain-matched agents |
 | `/beads-plan-review` | beads-plan-review.md | Multi-agent plan review |
 | `/beads-triage` | beads-triage.md | Prioritize and categorize beads |
 | `/beads-import` | beads-import.md | Import markdown plans into beads |
 
-**Utility (15):**
+**Utility (10):**
 
 | Command | File | Description |
 |---------|------|-------------|
 | `/lfg` | lfg.md | Full autonomous engineering workflow |
 | `/changelog` | changelog.md | Create engaging changelogs |
 | `/create-agent-skill` | create-agent-skill.md | Create or edit skills |
-| `/generate-command` | generate-command.md | Create new slash commands |
 | `/heal-skill` | heal-skill.md | Fix incorrect SKILL.md files |
 | `/deploy-docs` | deploy-docs.md | Validate docs for deployment |
 | `/release-docs` | release-docs.md | Build and update documentation |
-| `/feature-video` | feature-video.md | Record video walkthrough for PR |
-| `/agent-native-audit` | agent-native-audit.md | Agent-native architecture review |
 | `/test-browser` | test-browser.md | Browser tests on affected pages |
-| `/xcode-test` | xcode-test.md | iOS simulator testing |
 | `/report-bug` | report-bug.md | Report a plugin bug |
-| `/reproduce-bug` | reproduce-bug.md | Reproduce and investigate bugs |
 | `/resolve-pr-parallel` | resolve-pr-parallel.md | Resolve PR comments in parallel |
 | `/resolve-todo-parallel` | resolve-todo-parallel.md | Resolve TODOs in parallel |
+
+**Optional (5):** Domain-specific commands in `plugins/beads-compound/commands/optional/`. Not installed by default.
+
+| Command | File | Description |
+|---------|------|-------------|
+| `/feature-video` | optional/feature-video.md | Record video walkthrough for PR |
+| `/agent-native-audit` | optional/agent-native-audit.md | Agent-native architecture review |
+| `/xcode-test` | optional/xcode-test.md | iOS simulator testing |
+| `/reproduce-bug` | optional/reproduce-bug.md | Reproduce and investigate bugs |
+| `/generate-command` | optional/generate-command.md | Create new slash commands |
 
 ## Agents (29)
 

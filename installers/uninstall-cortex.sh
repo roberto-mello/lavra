@@ -90,14 +90,14 @@ fi
 
 if [ -d "$COMMANDS_DIR" ]; then
   PLUGIN_COMMANDS=(
-    beads-plan.md beads-work.md beads-parallel.md beads-review.md beads-checkpoint.md
+    beads-plan.md beads-work.md beads-work-ralph.md beads-work-teams.md beads-parallel.md beads-review.md beads-checkpoint.md
     beads-brainstorm.md beads-compound.md
-    beads-deepen.md beads-plan-review.md beads-triage.md
-    agent-native-audit.md changelog.md create-agent-skill.md deploy-docs.md
-    feature-video.md generate-command.md heal-skill.md lfg.md
-    release-docs.md report-bug.md reproduce-bug.md
+    beads-research.md beads-plan-review.md beads-triage.md
+    changelog.md create-agent-skill.md deploy-docs.md
+    heal-skill.md lfg.md
+    release-docs.md report-bug.md
     resolve-pr-parallel.md resolve-todo-parallel.md
-    test-browser.md xcode-test.md
+    test-browser.md
   )
 
   for cmd in "${PLUGIN_COMMANDS[@]}"; do

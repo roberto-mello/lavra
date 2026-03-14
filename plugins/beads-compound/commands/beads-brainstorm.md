@@ -235,7 +235,52 @@ bd comments add {EPIC_BEAD_ID} "FACT: {constraints discovered}"
 bd comments add {EPIC_BEAD_ID} "PATTERN: {patterns to follow}"
 ```
 
-### Phase 6: Handoff
+### Phase 6: Sharpen
+
+Brainstorming expands possibilities. This phase forces contraction. Of everything discussed, what is the MVP that proves the thesis?
+
+**6.1 Evaluate scope and recommend a mode:**
+
+Review the full conversation -- the vision, requirements, phases, and locked decisions -- and recommend one of three modes:
+
+- **SCOPE EXPANSION**: "The 10-star version of this is..." -- recommend when the initial idea is too small, when there is an obvious larger opportunity the user has not considered, or when the phases feel like a fraction of what is needed.
+- **HOLD SCOPE**: "The scope is right. Here is how to make it bulletproof." -- recommend when the idea is well-sized, when the phases cover the problem space without excess, and when the locked decisions are sound.
+- **SCOPE REDUCTION**: "Strip to essentials. The 80/20 version is..." -- recommend when feature creep is happening, when phases have grown beyond what a first cut needs, or when nice-to-haves have crept into must-haves.
+
+Use **AskUserQuestion tool** to present your recommendation with a brief rationale (2-3 sentences) and let the user confirm or pick a different mode.
+
+**6.2 Force the hard questions:**
+
+Based on the chosen mode, ask these questions using **AskUserQuestion tool** (one at a time):
+
+1. "What is the smallest version that proves this works?"
+2. "What can we defer without losing the core value?"
+3. "Is this solving a real problem or an imagined one?"
+4. "If we could only ship 3 of these {N} items, which 3?"
+
+Skip questions that were already answered during earlier phases. The goal is pressure-testing, not repetition.
+
+**6.3 Apply the sharpening:**
+
+Based on the user's answers:
+
+- If **SCOPE EXPANSION**: add or revise phases to capture the larger vision. Update the epic description.
+- If **HOLD SCOPE**: validate that nothing needs trimming. Tighten phase descriptions if needed.
+- If **SCOPE REDUCTION**: remove or defer phases. Move deferred items to a "Future" section in the epic description. Close any child beads that are no longer in scope.
+
+**6.4 Log scope decisions:**
+
+```bash
+bd comments add {EPIC_BEAD_ID} "DECISION: Scope mode: {EXPANSION|HOLD|REDUCTION} -- {rationale}. Deferred items: {list or 'none'}"
+```
+
+If individual items were cut or deferred, log each:
+
+```bash
+bd comments add {EPIC_BEAD_ID} "DECISION: Deferred {item} -- not needed for MVP. Can revisit after Phase {N} proves the thesis."
+```
+
+### Phase 7: Handoff
 
 Use **AskUserQuestion tool** to present next steps:
 
@@ -255,6 +300,8 @@ Use **AskUserQuestion tool** to present next steps:
 - An epic bead was created with structured description (vision, requirements, non-requirements, locked decisions, phases)
 - Implementation phases were identified, confirmed, and filed as child beads
 - Key decisions captured as DECISION comments immediately when resolved
+- Scope was sharpened: expansion/hold/reduction mode chosen, hard questions answered, phases adjusted if needed
+- Scope decisions logged as DECISION comments
 - Additional knowledge logged as INVESTIGATION/FACT/PATTERN comments
 - User was offered clear next steps (with `/beads-design` as primary option)
 </success_criteria>

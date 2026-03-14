@@ -4,7 +4,7 @@ Full listing of all commands, agents, skills, hooks, and MCP servers included in
 
 [Back to README](../README.md)
 
-## Commands (29)
+## Commands (24 core + 5 optional)
 
 Commands are organized by use case to help you choose the right tool for the job.
 
@@ -15,9 +15,9 @@ Explore ideas and create structured plans before writing code.
 | Command | Description | When to Use |
 |---------|-------------|-------------|
 | `/beads-brainstorm` | Explore ideas collaboratively, identify gray areas, file phases as beads | When requirements are unclear or you need to explore approaches |
-| `/beads-design` | Orchestrate full planning pipeline per phase: plan → deepen → review | After brainstorm — runs the entire design pipeline automatically |
+| `/beads-design` | Orchestrate full planning pipeline per phase: plan → research → review | After brainstorm — runs the entire design pipeline automatically |
 | `/beads-plan` | Research and create epic with child beads | Start every feature - creates structured plan with research |
-| `/beads-deepen` | Enhance plan with parallel research agents | For complex features - adds depth and best practices |
+| `/beads-research` | Gather evidence with domain-matched research agents | For complex features - gathers best practices and prior art |
 | `/beads-plan-review` | Multi-agent review of epic plan | Before implementation - catch issues early |
 | `/beads-quick` | Fast-track small tasks with abbreviated plan | Quick fixes and small features that don't need full pipeline |
 
@@ -27,8 +27,9 @@ Implement features and fix bugs using beads for tracking.
 
 | Command | Description | When to Use |
 |---------|-------------|-------------|
-| `/beads-work` | Work on a single bead with full lifecycle | Standard workflow - one bead at a time |
-| `/beads-parallel` | Work on multiple beads in parallel (`--ralph` for autonomous retry, `--teams` for persistent workers) | Speed up delivery - multiple independent beads |
+| `/beads-work` | Work on one or many beads -- auto-routes single vs. multi-bead | Standard workflow - any number of beads |
+| `/beads-work-ralph` | Autonomous retry mode with completion promises | Hands-off execution with self-correction |
+| `/beads-work-teams` | Persistent worker teammates with COMPLETED/ACCEPTED protocol | Speed up delivery with team parallelism |
 | `/beads-triage` | Prioritize and categorize beads | After planning or review - organize work queue |
 
 ### Reviewing & Quality (2 commands)
@@ -50,25 +51,32 @@ Capture knowledge and save session state.
 | `/beads-checkpoint` | Save progress, create/update beads, commit | Mid-session - checkpoint your work |
 | `/beads-compound` | Deep problem documentation with parallel analysis | After solving hard problems - share learnings |
 
-### Utility Commands (15)
+### Utility Commands (10)
 
 | Command | Description |
 |---------|-------------|
 | `/lfg` | Full autonomous engineering workflow |
 | `/changelog` | Create engaging changelogs for recent merges |
 | `/create-agent-skill` | Create or edit Claude Code skills |
-| `/generate-command` | Create a new custom slash command |
 | `/heal-skill` | Fix incorrect SKILL.md files |
 | `/deploy-docs` | Validate and prepare documentation for deployment |
 | `/release-docs` | Build and update documentation |
-| `/feature-video` | Record a video walkthrough for a PR |
-| `/agent-native-audit` | Comprehensive agent-native architecture review |
 | `/test-browser` | Run browser tests on affected pages |
-| `/xcode-test` | Build and test iOS apps on simulator |
 | `/report-bug` | Report a bug in the plugin |
-| `/reproduce-bug` | Reproduce and investigate a bug |
 | `/resolve-pr-parallel` | Resolve all PR comments in parallel |
 | `/resolve-todo-parallel` | Resolve all pending TODOs in parallel |
+
+### Optional Commands (5)
+
+Domain-specific commands in `commands/optional/`. Not installed by default -- copy manually if needed.
+
+| Command | Description |
+|---------|-------------|
+| `/feature-video` | Record a video walkthrough for a PR |
+| `/agent-native-audit` | Comprehensive agent-native architecture review |
+| `/xcode-test` | Build and test iOS apps on simulator |
+| `/reproduce-bug` | Reproduce and investigate a bug |
+| `/generate-command` | Create a new custom slash command |
 
 ## Agents (28) -- Cost-Optimized by Model Tier
 

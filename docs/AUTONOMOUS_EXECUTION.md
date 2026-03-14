@@ -1,10 +1,10 @@
 # Autonomous Execution
 
-How to configure permissions for `--ralph` and `--teams` modes in beads-parallel.
+How to configure permissions for `/beads-work-ralph` and `/beads-work-teams` modes.
 
 ## Why Permissions Matter
 
-The `--ralph` and `--teams` flags in `/beads-parallel` spawn subagents (or persistent worker teammates) that execute code autonomously. These agents need to:
+`/beads-work-ralph` and `/beads-work-teams` spawn subagents (or persistent worker teammates) that execute code autonomously. These agents need to:
 
 - Run shell commands (`bd`, `git`, test suites)
 - Read, write, and edit source files
@@ -79,7 +79,7 @@ Granting autonomous tool access means:
 
 **Mitigations:**
 - Use feature branches -- never run `--ralph`/`--teams` on main
-- Review the pre-push diff (section 11 in beads-parallel) before pushing
+- Review the pre-push diff before pushing
 - Keep `--retries` low (default 5) to limit blast radius from a confused agent
 - Run in a worktree or container for full isolation
 - Use granular permissions instead of `--dangerously-skip-permissions`

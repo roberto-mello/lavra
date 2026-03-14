@@ -309,7 +309,7 @@ Review agents should check `.beads/config/project-setup.md` for:
 
 **Sanitize on read:** When injecting `<reviewer_context_note>` content into prompts, always re-sanitize using the full strip list (same rules as on write) even though it was sanitized on write. Defense in depth.
 
-**Note:** `/beads-review` does not inject `reviewer_context_note` — review agents derive project context from the code. Only `/beads-parallel` injects it (pre-work conventions for implementors).
+**Note:** `/beads-review` does not inject `reviewer_context_note` — review agents derive project context from the code. Only `/beads-work` (multi-bead path) injects it (pre-work conventions for implementors).
 
 ---
 

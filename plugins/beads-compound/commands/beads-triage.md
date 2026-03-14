@@ -147,13 +147,13 @@ After all items processed:
 <guardrails>
 - DO NOT implement fixes or write code during triage
 - Triage is for decisions only
-- Implementation happens in `/beads-parallel` or `/beads-work`
+- Implementation happens in `/beads-work`
 </guardrails>
 
 <handoff>
 What would you like to do next?
 
-1. Run /beads-parallel to resolve the approved beads
-2. Run /beads-work on a specific bead
+1. Run /beads-work to resolve the approved beads
+2. Run /beads-work {BEAD_ID} on a specific bead
 3. Nothing for now
 </handoff>

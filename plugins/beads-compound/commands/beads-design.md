@@ -1,11 +1,11 @@
 ---
 name: beads-design
-description: Orchestrate the full planning pipeline — brainstorm, plan, deepen, review — for a feature
-argument-hint: "[brainstorm bead ID or phase bead IDs]"
+description: Orchestrate the full design pipeline -- brainstorm, plan, research, revise, review, lock
+argument-hint: "[brainstorm bead ID or feature description]"
 ---
 
 <objective>
-Orchestrate the full planning pipeline as a single invocation: brainstorm (collaborative), plan (auto), deepen (auto), and plan-review (auto). Delegates every step to existing commands with zero code duplication. Produces a fully planned, deepened, and reviewed epic ready for `/beads-work` or `/beads-parallel`.
+Orchestrate the full six-phase design pipeline as a single invocation: brainstorm (interactive), plan (auto), research (domain-matched agents), revise (integrate findings), adversarial review (4 agents), and final plan lock. Delegates every phase to existing commands with zero code duplication. The output must be so detailed that `/beads-work` execution is mechanical -- subagents can implement without asking questions.
 </objective>
 
 <execution_context>
@@ -19,14 +19,14 @@ Orchestrate the full planning pipeline as a single invocation: brainstorm (colla
    ```bash
    bd show "#$ARGUMENTS" --json
    ```
-   - If the bead has a `brainstorm` label or DECISION comments, treat it as a **brainstorm bead** -- skip brainstorming, proceed to Plan.
-   - If the bead is type `epic` with child beads, treat it as an **existing epic** -- skip brainstorm and plan, proceed to Deepen.
-   - If the bead exists but has neither, treat its title/description as the feature description and start from Brainstorm.
+   - If the bead has a `brainstorm` label or DECISION comments, treat it as a **brainstorm bead** -- skip Phase 1, proceed to Phase 2 (Plan).
+   - If the bead is type `epic` with child beads, treat it as an **existing epic** -- skip Phases 1-2, proceed to Phase 3 (Research).
+   - If the bead exists but has neither, treat its title/description as the feature description and start from Phase 1 (Brainstorm).
    - If the bead doesn't exist: report "Bead ID '#$ARGUMENTS' not found" and stop.
 
-3. **If multiple bead IDs are provided** (space-separated): treat each as a phase bead ID. Load each and proceed to Deepen for all of them.
+3. **If multiple bead IDs are provided** (space-separated): treat each as a phase bead ID. Load each and proceed to Phase 3 (Research) for all of them.
 
-4. **If argument is free text:** treat it as a feature description and start from Brainstorm.
+4. **If argument is free text:** treat it as a feature description and start from Phase 1 (Brainstorm).
 
 **Set DETAIL_LEVEL:**
 - Default: **Comprehensive** (this command is the full-thoroughness pipeline)
@@ -36,16 +36,18 @@ Orchestrate the full planning pipeline as a single invocation: brainstorm (colla
 <context>
 **Note: The current year is 2026.**
 
-**Architecture decisions (locked):** This command is a pure orchestrator. It delegates to `/beads-brainstorm`, `/beads-plan`, `/beads-deepen`, and `/beads-plan-review`. No planning logic, research dispatch, or bead creation lives here. When those commands improve, this command automatically inherits the improvements.
+**Architecture decisions (locked):** This command is a pure orchestrator. It delegates to `/beads-brainstorm`, `/beads-plan`, `/beads-research`, and `/beads-plan-review`. No planning logic, research dispatch, or bead creation lives here. When those commands improve, this command automatically inherits the improvements.
+
+**Design principle:** The output of `/beads-design` must be so good that `/beads-work` execution is mechanical. The final plan must be detailed enough that subagents can implement without asking questions.
 
 **Precedent:** Follows the `/lfg` pattern for compound commands that chain multiple steps.
 </context>
 
 <process>
 
-## Step 0: Brainstorm (Interactive -- only if no existing brainstorm context)
+## Phase 1: Brainstorm (Interactive -- explore and sharpen scope)
 
-**Skip condition:** If the input is a brainstorm bead ID (has `brainstorm` label or DECISION comments) or an existing epic, skip to Step 1.
+**Skip condition:** If the input is a brainstorm bead ID (has `brainstorm` label or DECISION comments) or an existing epic, skip to Phase 2.
 
 Run the brainstorm command:
 
@@ -53,20 +55,36 @@ Run the brainstorm command:
 /beads-brainstorm {feature_description_or_bead_id}
 ```
 
-This is fully interactive -- the user will have a collaborative dialogue exploring WHAT to build. The brainstorm produces a bead with DECISION/INVESTIGATION/FACT/PATTERN comments.
+This is fully interactive -- the user will have a collaborative dialogue exploring WHAT to build. The brainstorm includes the CEO/sharpen phase that narrows scope and forces hard prioritization questions. Output: locked decisions, prioritized scope, phases filed as child beads.
 
-After brainstorm completes, capture the brainstorm bead ID for the next step.
+After brainstorm completes, capture the brainstorm bead ID for the next phase.
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Brainstorm complete: {BRAINSTORM_BEAD_ID}
-  Proceeding to planning...
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+----------------------------------------------------
+  Phase 1 complete: Brainstorm
+  Bead: {BRAINSTORM_BEAD_ID}
+  Locked decisions: {count}
+  Scope: {EXPANSION|HOLD|REDUCTION}
+----------------------------------------------------
 ```
 
-## Step 1: Plan (Auto -- Comprehensive detail)
+**GATE: User confirms scope direction.**
 
-**Skip condition:** If the input is an existing epic with child beads, skip to Step 2.
+Use the **AskUserQuestion tool**:
+
+**Question:** "Brainstorm complete. The locked decisions and scope above will drive the implementation plan. Confirm direction before investing compute in planning?"
+
+**Options:**
+1. **Proceed to planning** -- Scope and decisions look right
+2. **Adjust scope** -- Revisit the sharpen phase
+3. **Stop here** -- Keep brainstorm output, design later
+
+If "Adjust scope": re-run the sharpen discussion, then ask again.
+If "Stop here": jump to the Output Summary with only Phase 1 marked complete.
+
+## Phase 2: Plan (Auto -- structured implementation plan)
+
+**Skip condition:** If the input is an existing epic with child beads, skip to Phase 3.
 
 Run the plan command with the brainstorm bead ID. The plan command will auto-detect the brainstorm context and skip its own idea refinement phase:
 
@@ -94,77 +112,179 @@ bd swarm validate {EPIC_ID}
 
 If validation fails, run the **phase gate recovery** (see below).
 
-### Plan Confirmation Pause
+```
+----------------------------------------------------
+  Phase 2 complete: Plan
+  Epic: {EPIC_ID} -- {epic_title}
+  Child beads: {N}
+----------------------------------------------------
+```
 
-Display the plan summary and ask the user to confirm before investing heavy compute:
+**GATE: User confirms plan structure.**
+
+Display the plan summary and ask the user to confirm before investing heavy compute in research:
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Plan created: {EPIC_ID} — {epic_title}
-  Phases: {N} child beads
+----------------------------------------------------
+  Plan created: {EPIC_ID} -- {epic_title}
+  Child beads: {N}
 
-  1. {child_1_id} — {child_1_title}
-  2. {child_2_id} — {child_2_title}
+  1. {child_1_id} -- {child_1_title}
+  2. {child_2_id} -- {child_2_title}
   ...
 
-  Next: Deepen + Review (~20-40 agents)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Next: Research (domain-matched agents) + Review (4 agents)
+----------------------------------------------------
 ```
 
-Use the **AskUserQuestion tool** to confirm:
+Use the **AskUserQuestion tool**:
 
-**Question:** "Plan looks good? This will run deepen (~20-40 agents) and plan-review (4 agents)."
+**Question:** "Plan structure looks good? Next phases: research with domain-matched agents, then adversarial review with 4 agents."
 
 **Options:**
-1. **Proceed** -- Continue with deepen + review
+1. **Proceed** -- Continue with research + review
 2. **Adjust plan first** -- Make changes before heavy compute
-3. **Stop here** -- Keep the plan as-is, skip deepen + review
+3. **Stop here** -- Keep the plan as-is, skip remaining phases
 
 If "Adjust plan first": accept changes, re-validate, then ask again.
 If "Stop here": jump to the Output Summary.
 
-## Step 2: Deepen (Auto -- parallel agents)
+## Phase 3: Research (Auto -- domain-matched evidence gathering)
 
 Display the progress banner:
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Deepening: {EPIC_ID} — {epic_title}
-  [x] Brainstorm
+----------------------------------------------------
+  Researching: {EPIC_ID} -- {epic_title}
+  [x] Brainstorm (locked decisions captured)
   [x] Plan ({N} child beads)
-  [ ] Deepening...
+  [ ] Researching...
+  [ ] Revise pending
   [ ] Review pending
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  [ ] Final plan pending
+----------------------------------------------------
 ```
 
-Run the deepen command:
+Run the research command:
 
 ```
-/beads-deepen {EPIC_ID}
+/beads-research {EPIC_ID}
 ```
 
-When `/beads-deepen` completes, do not present its handoff to the user -- continue the pipeline.
+`/beads-research` selects agents based on the plan's domain indicators (languages, frameworks, concerns). It gathers evidence -- docs, prior art, best practices, edge cases, knowledge recall -- and logs findings as INVESTIGATION/FACT/PATTERN comments on the relevant child beads. It does NOT modify the plan.
 
-**Phase gate:** Verify deepen enriched the child beads. Check that child bead descriptions grew or received new comments:
+When `/beads-research` completes, do not present its handoff to the user -- continue the pipeline.
+
+**Phase gate:** Verify research enriched the child beads. Check that child bead descriptions grew or received new comments:
 
 ```bash
 bd list --parent {EPIC_ID} --json | jq -r '.[] | "\(.id): \(.title)"'
 ```
 
-If deepen fails, run the **phase gate recovery**.
+If research fails, run the **phase gate recovery**.
 
-## Step 3: Plan Review (Auto -- 4 agents)
+**Iteration check:** If research reveals the plan needs significant revision (e.g., a core assumption is wrong, a critical dependency was missed, or a selected technology is unsuitable), flag this for Phase 4. Note which findings require plan changes vs. which are additive context.
+
+## Phase 4: Revise Plan (Auto -- integrate research findings)
 
 Display the progress banner:
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Reviewing: {EPIC_ID} — {epic_title}
+----------------------------------------------------
+  Revising: {EPIC_ID} -- {epic_title}
   [x] Brainstorm
   [x] Plan ({N} child beads)
-  [x] Deepened
+  [x] Researched ({agent_count} agents)
+  [ ] Revising...
+  [ ] Review pending
+  [ ] Final plan pending
+----------------------------------------------------
+```
+
+**4.1 Collect research findings:**
+
+Read all comments added by `/beads-research`:
+
+```bash
+# Read comments on each child bead
+bd comments list {CHILD_ID}
+```
+
+Categorize findings:
+- **Additive context** -- new information that enriches the plan (add to bead descriptions)
+- **Corrections** -- findings that contradict plan assumptions (must update the plan)
+- **New risks** -- risks not anticipated in the original plan (add to risk sections)
+- **Missing scope** -- gaps the research revealed (may need new child beads)
+
+**4.2 Update child bead descriptions:**
+
+For each child bead with research findings:
+
+```bash
+bd show {CHILD_ID} --json | jq -r '.[0].description'
+```
+
+Integrate findings into the existing structure:
+- Add research evidence to the **Context** section
+- Update **Testing** section with edge cases discovered
+- Update **Validation** section with new acceptance criteria
+- Update **Files** section if research revealed additional files to modify
+- Add **Risks** subsection if high-severity findings exist
+
+```bash
+bd update {CHILD_ID} -d "{updated description with research findings integrated}"
+```
+
+**4.3 Resolve conflicts:**
+
+If research findings conflict with plan assumptions or locked decisions from brainstorm:
+- Document the conflict clearly
+- If the conflict is minor (implementation detail), resolve it using the research evidence
+- If the conflict is significant (architectural direction, scope change), log it for the user to address during the Phase 5 review gate
+
+```bash
+bd comments add {EPIC_ID} "DECISION: Research conflict resolved -- {description}. Research showed {finding}, original plan assumed {assumption}. Updated plan to {resolution}."
+```
+
+**4.4 Handle significant revision needs:**
+
+If research reveals the plan needs major changes (new child beads, removed child beads, reordered dependencies):
+
+1. Make the structural changes
+2. Re-validate the epic:
+   ```bash
+   bd swarm validate {EPIC_ID}
+   ```
+3. Log what changed:
+   ```bash
+   bd comments add {EPIC_ID} "DECISION: Plan revised after research. Changes: {summary of structural changes}."
+   ```
+
+**Iteration gate:** If the revision was substantial enough that the new plan content would benefit from additional research (e.g., a new child bead was added covering unfamiliar territory), loop back to Phase 3 for a targeted research pass on just the new/changed beads. Limit to one iteration to avoid infinite loops.
+
+```
+----------------------------------------------------
+  Phase 4 complete: Plan Revised
+  Updated: {count} child beads
+  New beads added: {count or 'none'}
+  Conflicts resolved: {count or 'none'}
+----------------------------------------------------
+```
+
+## Phase 5: Adversarial Review (Auto -- 4 agents)
+
+Display the progress banner:
+
+```
+----------------------------------------------------
+  Reviewing: {EPIC_ID} -- {epic_title}
+  [x] Brainstorm
+  [x] Plan ({N} child beads)
+  [x] Researched
+  [x] Revised
   [ ] Reviewing...
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  [ ] Final plan pending
+----------------------------------------------------
 ```
 
 Run the plan review command:
@@ -173,9 +293,15 @@ Run the plan review command:
 /beads-plan-review {EPIC_ID}
 ```
 
-### Auto-Apply Safe Feedback
+This dispatches 4 agents in parallel:
+1. `architecture-strategist` -- structural soundness, scalability, maintainability
+2. `code-simplicity-reviewer` -- unnecessary complexity, over-engineering
+3. `security-sentinel` -- vulnerabilities, auth gaps, data exposure
+4. `performance-oracle` -- bottlenecks, N+1 queries, caching gaps
 
-After plan-review completes, categorize the review findings:
+**GATE: User reviews findings before final plan.**
+
+After `/beads-plan-review` completes, present its findings summary and categorize them:
 
 **Safe to auto-apply** (do these without asking):
 - Missing test cases -- add to child bead Testing section
@@ -190,7 +316,7 @@ After plan-review completes, categorize the review findings:
 - Performance vs. simplicity trade-offs
 - Security concerns that require design changes
 
-If there are trade-off decisions, present them one at a time using the **AskUserQuestion tool**:
+Use the **AskUserQuestion tool** for each trade-off decision:
 
 **Question:** "Review found a trade-off decision: {description}"
 
@@ -199,10 +325,81 @@ If there are trade-off decisions, present them one at a time using the **AskUser
 2. **Keep current approach** -- Log the alternative as a DECISION comment
 3. **Discuss further** -- Explore the trade-off
 
-After all review feedback is processed, run the **phase gate**:
+After all review feedback is processed, validate:
 
 ```bash
 bd swarm validate {EPIC_ID}
+```
+
+## Phase 6: Final Plan (Auto -- lock and annotate)
+
+Display the progress banner:
+
+```
+----------------------------------------------------
+  Locking: {EPIC_ID} -- {epic_title}
+  [x] Brainstorm
+  [x] Plan ({N} child beads)
+  [x] Researched
+  [x] Revised
+  [x] Reviewed (4 agents)
+  [ ] Locking final plan...
+----------------------------------------------------
+```
+
+**6.1 Apply safe review feedback:**
+
+Auto-apply all safe feedback items identified in Phase 5. For each child bead that needs updates:
+
+```bash
+bd show {CHILD_ID} --json | jq -r '.[0].description'
+# Integrate safe feedback
+bd update {CHILD_ID} -d "{updated description}"
+```
+
+**6.2 Ensure every child bead has the required final sections:**
+
+Read each child bead and verify it contains all of:
+
+- **File-level scope**: Specific files to create or modify (paths, not module names)
+- **Dependencies**: What blocks this bead (other bead IDs)
+- **Decisions already made**: Locked decisions from brainstorm and research that apply to this bead -- implementation must not re-debate these
+- **Known risks with mitigations decided**: Risks from research/review with chosen mitigations
+- **Anti-patterns to avoid**: From knowledge recall and review findings
+- **Testing**: Specific test cases, edge cases, integration tests
+- **Validation**: Acceptance criteria
+
+If any section is missing or thin, fill it from the accumulated context (brainstorm decisions, research findings, review feedback).
+
+```bash
+bd update {CHILD_ID} -d "{final description with all required sections}"
+```
+
+**6.3 Update the epic with the final plan annotation:**
+
+```bash
+bd comments add {EPIC_ID} "DECISION: Plan reviewed and locked. {N} child beads, {review_finding_count} review findings addressed ({auto_applied} auto-applied, {user_decided} user-decided, {skipped} skipped). Dependency ordering validated. Ready for /beads-work."
+```
+
+**6.4 Add the plan label:**
+
+```bash
+bd update {EPIC_ID} --labels plan-reviewed
+```
+
+**6.5 Final validation:**
+
+```bash
+bd swarm validate {EPIC_ID}
+```
+
+```
+----------------------------------------------------
+  Phase 6 complete: Plan Locked
+  Epic: {EPIC_ID} -- {epic_title}
+  Status: Reviewed, concerns addressed
+  Ready for implementation
+----------------------------------------------------
 ```
 
 ## Phase Gate Recovery
@@ -226,21 +423,32 @@ If "Abort": jump directly to the Output Summary, marking incomplete phases.
 After all phases complete (or on abort), display:
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+----------------------------------------------------
   Design complete!
 
-  Epic: {EPIC_ID} — {epic_title}
-  Phases: {N} planned, deepened, reviewed
+  Epic: {EPIC_ID} -- {epic_title}
+  Phases completed: {list of completed phases}
 
-  1. {child_1_id} — {child_1_title} ({child_1_child_count} tasks)
-  2. {child_2_id} — {child_2_title} ({child_2_child_count} tasks)
+  Child beads:
+  1. {child_1_id} -- {child_1_title} ({child_1_child_count} tasks)
+  2. {child_2_id} -- {child_2_title} ({child_2_child_count} tasks)
   ...
 
-  Decisions captured: {decision_count}
-  Knowledge entries: {knowledge_count}
+  File-level scope:
+  - {child_1_id}: {file list summary}
+  - {child_2_id}: {file list summary}
+  ...
 
-  Next: /beads-work {first_ready_child} or /beads-parallel {EPIC_ID}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Dependency ordering:
+  - {child_a_id} blocks {child_b_id}
+  ...
+
+  Decisions locked: {decision_count}
+  Knowledge entries: {knowledge_count}
+  Review findings addressed: {finding_count}
+
+  Next: /beads-work {first_ready_child} or /beads-work {EPIC_ID}
+----------------------------------------------------
 ```
 
 To get the counts:
@@ -259,34 +467,42 @@ wc -l < .beads/memory/knowledge.jsonl
 </process>
 
 <success_criteria>
-- Running `/beads-design` produces identical artifacts to running the 4 commands manually in sequence
-- No functionality is lost from any individual command
-- User interaction is reduced to: brainstorm dialogue + one plan confirmation + trade-off decisions only
+- Running `/beads-design` produces a fully planned, researched, reviewed, and locked epic
+- Each phase delegates to its respective command with zero code duplication
+- Phase 1 (brainstorm) output feeds directly into Phase 2 (plan) as locked decisions
+- Phase 3 (research) gathers evidence without modifying the plan
+- Phase 4 (revise) integrates research findings into bead descriptions
+- Phase 5 (review) catches blind spots with 4 parallel agents
+- Phase 6 (lock) ensures every child bead has file-level scope, dependency ordering, locked decisions, known risks, and anti-patterns
+- User interaction is reduced to: brainstorm dialogue + scope confirmation + plan confirmation + review trade-off decisions only
 - Bead IDs, knowledge comments, and enriched descriptions flow correctly between all phases
 - Phase gate recovery works (retry/skip/abort) at every stage
-- Each delegated command retains its internal parallelism (deepen spawns 20-40+ agents, plan-review runs 4 concurrently)
-- Final summary accurately reports completed work and next steps
+- Each delegated command retains its internal parallelism (research dispatches domain-matched agents, plan-review runs 4 concurrently)
+- The final plan is detailed enough that subagents can implement without asking questions
+- Phases 3-4 can iterate once if research reveals the plan needs significant revision
 </success_criteria>
 
 <guardrails>
-- **Pure orchestration only** -- NEVER duplicate logic from `/beads-brainstorm`, `/beads-plan`, `/beads-deepen`, or `/beads-plan-review`. Delegate to them.
+- **Pure orchestration only** -- NEVER duplicate logic from `/beads-brainstorm`, `/beads-plan`, `/beads-research`, or `/beads-plan-review`. Delegate to them.
 - **NEVER CODE** -- This command produces plans, not implementations
 - **Do not skip steps silently** -- Always display progress banners so the user knows where they are
 - **Do not invent new research or review agents** -- Use only what the delegated commands already provide
-- **Respect the pause contract** -- Interactive brainstorm, auto-plan, pause to confirm plan, then auto-deepen + auto-review. No extra confirmations.
+- **Respect the gate contract** -- Gates after Phase 1, Phase 2, and Phase 5 require user confirmation. Phases 3-4 run without interruption unless iteration is needed.
 - **Do not suppress delegated command output** -- Let each command's output flow through. Only suppress their handoff questions to maintain pipeline continuity.
+- **Use /beads-research, not /beads-deepen** -- The research command was renamed. Always reference `/beads-research`.
 </guardrails>
 
 <handoff>
 After displaying the output summary, use the **AskUserQuestion tool**:
 
-**Question:** "Design pipeline complete for `{EPIC_ID}`. What next?"
+**Question:** "Design pipeline complete for `{EPIC_ID}`. Plan is reviewed and locked. What next?"
 
 **Options:**
-1. **`/beads-work {first_ready_child}`** -- Start implementing the first ready phase
-2. **`/beads-parallel {EPIC_ID}`** -- Work all phases in parallel with multiple agents
+1. **`/beads-work {first_ready_child}`** -- Start implementing the first ready child bead
+2. **`/beads-work {EPIC_ID}`** -- Work all child beads in parallel with multiple agents
 3. **Revise the plan** -- Make adjustments before implementation
 4. **Done for now** -- Come back later
 
 Based on selection, invoke the chosen command or exit.
 </handoff>
+</output>

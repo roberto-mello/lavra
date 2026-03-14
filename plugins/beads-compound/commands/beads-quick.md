@@ -41,7 +41,7 @@ Check if the argument matches a bead ID pattern:
 <context>
 Use `/beads-quick` for small, well-understood tasks: bug fixes, config changes, small refactors, adding a field, writing a utility function.
 
-If you discover the task is larger than expected (touches 5+ files, needs architectural decisions, has unclear requirements), stop and suggest `/beads-plan` or `/beads-design` instead.
+If the task turns out larger than expected, the scope escalation check (step 3) will catch it and offer to switch to `/beads-design`.
 </context>
 
 <process>
@@ -81,7 +81,48 @@ If two tasks touch the same file, add a dependency:
 bd dep add {later_bead} {earlier_bead}
 ```
 
-### 3. Begin Execution
+### 3. Scope Escalation Check
+
+After creating the abbreviated plan but BEFORE starting implementation, evaluate whether the task has outgrown quick-fix territory. Check for these signals:
+
+- **File count**: More than 3 files need changes
+- **Cross-bead dependencies**: Dependencies on other existing beads discovered
+- **Architectural decisions**: The task requires architectural choices, not just implementation choices
+- **Security implications**: Auth, permissions, data exposure, or input validation concerns found
+- **Multi-component impact**: Changes span multiple components, services, or layers
+- **Change volume**: Estimated total changes exceed ~100 lines
+
+**If one or more signals are detected**, pause execution and report:
+
+<scope_escalation>
+"This task has grown beyond quick-fix scope.
+
+Signals detected:
+- {list each signal that fired with a brief explanation}
+
+Switch to /beads-design for proper planning? This preserves all work done so far."
+</scope_escalation>
+
+**If the user accepts escalation:**
+
+1. Save current progress -- update the parent bead description with a note summarizing the abbreviated plan and the escalation signals:
+   ```bash
+   bd comments add {BEAD_ID} "DECISION: Escalated from /beads-quick to /beads-design. Signals: {signals}. Child tasks preserved as starting point."
+   ```
+2. Invoke `/beads-design` with the bead ID so the full planning pipeline picks up where this left off.
+3. Stop the beads-quick workflow. Do not continue to step 4.
+
+**If the user declines escalation:**
+
+1. Log the decision:
+   ```bash
+   bd comments add {BEAD_ID} "DECISION: User chose to proceed with /beads-quick despite scope signals: {signals}. Rationale: user preference."
+   ```
+2. Continue to step 4.
+
+**If no signals are detected**, proceed to step 4 without interruption.
+
+### 4. Begin Execution
 
 Update the parent bead status and transition to execution:
 
@@ -97,7 +138,7 @@ Execute using the `/beads-work` workflow on the first ready child bead. Follow a
 bd comments add {BEAD_ID} "LEARNED: {insight}"
 ```
 
-### 4. Wrap Up
+### 5. Wrap Up
 
 After all child tasks are complete:
 
@@ -117,7 +158,7 @@ After all child tasks are complete:
 
 <guardrails>
 - Do NOT use for complex features, architectural changes, or tasks with unclear requirements
-- If scope creep is detected (5+ files, new patterns needed, design decisions required), stop and suggest: "This task has grown beyond quick scope. Consider `/beads-plan` or `/beads-design` for a thorough approach."
+- If scope creep is detected, the formal escalation check in step 3 handles it -- do not skip that checkpoint
 - Do NOT skip knowledge capture -- the fast path still feeds the memory system
 - Do NOT skip tests -- abbreviated planning does not mean lower quality
 </guardrails>

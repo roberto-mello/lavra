@@ -187,7 +187,7 @@ Details about UI changes...
 <handoff>
 Plan imported as epic `{EPIC_ID}`. What would you like to do next?
 
-1. **Run `/beads-deepen {EPIC_ID}`** - Enhance each child bead with parallel research agents
+1. **Run `/beads-research {EPIC_ID}`** - Gather evidence for each child bead with domain-matched research agents
 2. **Run `/beads-plan-review {EPIC_ID}`** - Get feedback from reviewers on the plan
 3. **Start `/beads-work {EPIC_ID}.1`** - Begin implementing the first child bead
 4. **View epic** - Show the full epic bead details

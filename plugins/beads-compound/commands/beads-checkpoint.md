@@ -86,7 +86,7 @@ If yes:
 
 If problems were solved during this session, suggest documenting them:
 
-"You solved some interesting problems this session. Want to run `/beads-compound` to capture them as reusable knowledge?"
+"You captured knowledge comments this session. Want to run `/beads-learn` to curate them into structured, well-tagged entries?"
 
 ### Step 8: Report
 

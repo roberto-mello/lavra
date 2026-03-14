@@ -78,7 +78,7 @@ Check for a project-setup configuration file:
 If the file exists, parse its YAML frontmatter for one field:
 - `review_agents`: list of agent names to dispatch (replaces the default list below)
 
-> **Note:** `reviewer_context_note` is intentionally **not** injected into review agents. Review agents derive project context from the code itself. Context note injection is only done in `/beads-parallel` (pre-work conventions for implementors) where the value is clearer and the injection surface is smaller.
+> **Note:** `reviewer_context_note` is intentionally **not** injected into review agents. Review agents derive project context from the code itself. Context note injection is only done in `/beads-work` multi-bead path (pre-work conventions for implementors) where the value is clearer and the injection surface is smaller.
 
 **Agent allowlist validation** (when `review_agents` is present):
 
@@ -282,14 +282,26 @@ bd dep relate {FINDING_BEAD_ID} {ORIGINAL_BEAD_ID}
 
 This ensures the original bead cannot be closed until critical issues are resolved.
 
-#### Step 5: Log Knowledge
+#### Step 5: Mandatory Knowledge Capture *(required gate -- do not skip)*
 
-For significant findings, log knowledge:
+Every P1 (CRITICAL) and P2 (IMPORTANT) finding **must** have at least one LEARNED or PATTERN knowledge entry before proceeding to the summary. This captures the *root cause* so future `/beads-design` and `/beads-work` runs benefit from auto-recall.
+
+For each P1/P2 finding, log why it matters:
 
 ```bash
-bd comments add {BEAD_ID} "LEARNED: {key insight from review}"
-bd comments add {BEAD_ID} "PATTERN: {pattern issue discovered}"
+# Format: what was vulnerable/broken + root cause
+bd comments add {BEAD_ID} "LEARNED: [component] was vulnerable to [issue] because [root cause]"
+bd comments add {BEAD_ID} "PATTERN: [anti-pattern name] -- [where it appeared and why it's wrong]"
 ```
+
+**Examples:**
+- `"LEARNED: UserController was vulnerable to XSS because params[:name] was interpolated into HTML without sanitize()"`
+- `"PATTERN: N+1 query in OrdersController#index -- .includes(:line_items) was missing from the scope"`
+- `"LEARNED: migration 20240301 swaps source/target column IDs -- production data uses the reverse mapping"`
+
+**Gate check:** Run `bd show {BEAD_ID}` and verify that the number of LEARNED/PATTERN comments is >= the number of P1 + P2 findings. If not, add the missing entries now. **Do not proceed to the summary report until this gate passes.**
+
+P3 (NICE-TO-HAVE) findings may also have knowledge entries but are not required.
 
 #### Step 6: Summary Report
 
@@ -328,7 +340,7 @@ After creating all beads, present comprehensive summary:
 1. **Address P1 Findings**: CRITICAL - must be fixed before closing
    - `/beads-work {P1_BEAD_ID}` for each critical finding
 2. **Close bead** (if no P1/P2 findings): `bd close {BEAD_ID}`
-3. **Resolve in parallel**: `/beads-parallel {BEAD_ID}`
+3. **Resolve in parallel**: `/beads-work {BEAD_ID}`
 4. **Triage remaining**: `/beads-triage {BEAD_ID}`
 5. **View all findings**: `bd list --tags "review,{BEAD_ID}"`
 ```
@@ -363,7 +375,7 @@ After presenting the Summary Report, offer appropriate testing based on project 
 - Every finding accounted for (applied, deduplicated, or explicitly discarded with reason)
 - All findings stored as child beads with severity, validation criteria, and testing steps
 - P1 findings linked as blocking dependencies
-- Knowledge logged for significant findings
+- Knowledge logged for every P1/P2 finding (at least one LEARNED or PATTERN per critical/important finding)
 - Summary report presented with next-step options
 </success_criteria>
 
