@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>beads-compound Command Map v2 — Pipeline Redesign</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0b0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+.top { display: flex; flex: 1; overflow: hidden; }
+
+/* -- Sidebar -- */
+.sidebar { width: 210px; min-width: 210px; background: #111827; border-right: 1px solid #1f2937; display: flex; flex-direction: column; overflow: hidden; }
+.sb-section { padding: 10px 12px; border-bottom: 1px solid #1f2937; }
+.sb-section h3 { font-size: 9px; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+.preset-btn { display: block; width: 100%; padding: 5px 8px; margin-bottom: 3px; background: #1f2937; border: 1px solid #374151; border-radius: 4px; color: #9ca3af; font-size: 11px; cursor: pointer; text-align: left; transition: all 0.12s; }
+.preset-btn:hover { background: #263040; color: #e2e8f0; }
+.preset-btn.active { background: #1e3a5f; border-color: #3b82f6; color: #93c5fd; }
+.toggle-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; cursor: pointer; user-select: none; }
+.toggle-row input { cursor: pointer; accent-color: #3b82f6; }
+.swatch { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.toggle-row span { font-size: 11px; color: #9ca3af; }
+.comments-list { flex: 1; overflow-y: auto; padding: 8px; }
+.comment-item { background: #1a2235; border: 1px solid #2d3748; border-radius: 4px; padding: 7px 8px; margin-bottom: 5px; }
+.comment-target { font-size: 10px; font-weight: 600; color: #60a5fa; margin-bottom: 3px; }
+.comment-text { font-size: 11px; color: #94a3b8; line-height: 1.4; }
+.comment-del { float: right; cursor: pointer; color: #4b5563; font-size: 10px; }
+.comment-del:hover { color: #f87171; }
+.no-comments { font-size: 11px; color: #374151; padding: 4px; font-style: italic; }
+
+/* -- Canvas -- */
+.canvas-wrap { flex: 1; position: relative; overflow: hidden; background: #0b0f1a; }
+#diagram { width: 100%; height: 100%; cursor: grab; }
+#diagram.grabbing { cursor: grabbing; }
+
+.zoom-controls { position: absolute; bottom: 12px; right: 12px; display: flex; flex-direction: column; gap: 3px; }
+.zoom-btn { width: 26px; height: 26px; background: #1f2937; border: 1px solid #374151; border-radius: 4px; color: #9ca3af; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: background 0.12s; }
+.zoom-btn:hover { background: #374151; color: #e2e8f0; }
+
+.hint { position: absolute; top: 10px; right: 12px; font-size: 10px; color: #374151; pointer-events: none; }
+
+/* -- Prompt bar -- */
+.prompt-bar { border-top: 1px solid #1f2937; padding: 8px 14px; background: #111827; display: flex; align-items: flex-start; gap: 10px; min-height: 56px; max-height: 100px; }
+#prompt-text { flex: 1; font-family: 'SF Mono','Fira Code',monospace; font-size: 10.5px; color: #6b7280; line-height: 1.5; white-space: pre-wrap; overflow-y: auto; }
+.copy-btn { padding: 4px 10px; background: #1f2937; border: 1px solid #374151; border-radius: 4px; color: #9ca3af; font-size: 11px; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.12s; }
+.copy-btn:hover { background: #374151; color: #e2e8f0; }
+.copy-btn.copied { background: #14432a; border-color: #22c55e; color: #4ade80; }
+
+/* -- Modal -- */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+.modal-bg.open { display: flex; }
+.modal { background: #1a2235; border: 1px solid #374151; border-radius: 8px; padding: 18px; width: 340px; }
+.modal h3 { font-size: 13px; color: #e2e8f0; margin-bottom: 3px; }
+.modal-sub { font-size: 11px; color: #6b7280; margin-bottom: 12px; }
+.modal textarea { width: 100%; height: 80px; background: #0b0f1a; border: 1px solid #374151; border-radius: 4px; color: #e2e8f0; font-size: 12px; padding: 8px; resize: none; font-family: inherit; }
+.modal textarea:focus { outline: none; border-color: #3b82f6; }
+.modal-btns { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end; }
+.modal-btns button { padding: 5px 12px; border-radius: 4px; border: 1px solid #374151; font-size: 11px; cursor: pointer; }
+.btn-cancel { background: #1f2937; color: #9ca3af; }
+.btn-save { background: #1e3a5f; border-color: #3b82f6; color: #93c5fd; }
+.btn-save:hover { background: #2550a0; }
+
+/* -- Pipeline highlight -- */
+.pipeline-badge { position: absolute; top: 10px; left: 12px; font-size: 9px; color: #374151; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="sidebar">
+    <div class="sb-section">
+      <h3>Presets</h3>
+      <button class="preset-btn active" data-preset="full" onclick="applyPreset(this,'full')">Full System</button>
+      <button class="preset-btn" data-preset="pipeline" onclick="applyPreset(this,'pipeline')">Primary Pipeline</button>
+      <button class="preset-btn" data-preset="design-deep" onclick="applyPreset(this,'design-deep')">Design Deep Dive</button>
+      <button class="preset-btn" data-preset="review" onclick="applyPreset(this,'review')">Review Pipeline</button>
+      <button class="preset-btn" data-preset="knowledge" onclick="applyPreset(this,'knowledge')">Knowledge Flow</button>
+    </div>
+    <div class="sb-section">
+      <h3>Show Layers</h3>
+      <label class="toggle-row"><input type="checkbox" checked onchange="toggleLayer('commands',this.checked)"><span class="swatch" style="background:#3b82f6"></span><span>Commands</span></label>
+      <label class="toggle-row"><input type="checkbox" checked onchange="toggleLayer('agents',this.checked)"><span class="swatch" style="background:#22c55e"></span><span>Agents</span></label>
+      <label class="toggle-row"><input type="checkbox" checked onchange="toggleLayer('skills',this.checked)"><span class="swatch" style="background:#d946ef"></span><span>Skills</span></label>
+      <label class="toggle-row"><input type="checkbox" checked onchange="toggleLayer('knowledge',this.checked)"><span class="swatch" style="background:#f59e0b"></span><span>Knowledge</span></label>
+    </div>
+    <div class="sb-section">
+      <h3>Connection Types</h3>
+      <label class="toggle-row"><input type="checkbox" checked onchange="toggleConn('orchestrates',this.checked)"><span class="swatch" style="background:#60a5fa;border-radius:0"></span><span>Orchestrates</span></label>
+      <label class="toggle-row"><input type="checkbox" checked onchange="toggleConn('dispatches',this.checked)"><span class="swatch" style="background:#4ade80;border-radius:0"></span><span>Dispatches</span></label>
+      <label class="toggle-row"><input type="checkbox" checked onchange="toggleConn('suggests',this.checked)"><span class="swatch" style="background:#a78bfa;border-radius:0"></span><span>Suggests</span></label>
+      <label class="toggle-row"><input type="checkbox" checked onchange="toggleConn('feeds',this.checked)"><span class="swatch" style="background:#f59e0b;border-radius:0"></span><span>Knowledge Flow</span></label>
+    </div>
+    <div class="sb-section" style="flex-shrink:0">
+      <h3>Comments (<span id="comment-count">0</span>)</h3>
+    </div>
+    <div class="comments-list" id="comments-list">
+      <div class="no-comments">Hover a node to highlight its connections. Click to comment.</div>
+    </div>
+  </div>
+
+  <div class="canvas-wrap">
+    <svg id="diagram" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="pipeline-badge">v2 -- Pipeline Redesign</div>
+    <div class="hint">scroll to zoom -- drag to pan</div>
+    <div class="zoom-controls">
+      <button class="zoom-btn" onclick="doZoom(1.25)">+</button>
+      <button class="zoom-btn" onclick="doZoom(0.8)">-</button>
+      <button class="zoom-btn" onclick="fitView()" style="font-size:9px;width:26px">fit</button>
+    </div>
+  </div>
+</div>
+
+<div class="prompt-bar">
+  <div id="prompt-text">Hover a node to see its connections. Click to add a note.</div>
+  <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copy</button>
+</div>
+
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h3 id="modal-title"></h3>
+    <div class="modal-sub" id="modal-sub"></div>
+    <textarea id="modal-input" placeholder="Note or question about this component..."></textarea>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveComment()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// == Layout constants ==
+const W = { sm:120, md:150, lg:165 };
+const RH = 38;
+
+// Band top-y values
+const BY = {
+  pipeline: 30,
+  design_phases: 120,
+  supporting: 220,
+  specialized: 310,
+  skills: 400,
+  knowledge: 490,
+  review_agents: 580,
+  research_agents: 700,
+};
+
+const NODES = [
+  // == PRIMARY PIPELINE (the 4-command flow) ==
+  { id:'beads-design',  label:'/beads-design',  sub:'Brainstorm+Plan+Research+Review', x:60,  y:BY.pipeline, w:175, h:RH, layer:'commands', group:'pipeline' },
+  { id:'beads-work',    label:'/beads-work',     sub:'Implement+Review+Learn+Fix',     x:260, y:BY.pipeline, w:170, h:RH, layer:'commands', group:'pipeline' },
+  { id:'beads-qa',      label:'/beads-qa',       sub:'Browser-based QA',               x:455, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
+  { id:'beads-ship',    label:'/beads-ship',     sub:'Merge, test, PR, close beads',   x:630, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
+
+  // == DESIGN SUB-PHASES (what design orchestrates) ==
+  { id:'beads-brainstorm', label:'/beads-brainstorm', sub:'Explore + CEO sharpen',       x:60,  y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
+  { id:'beads-plan',       label:'/beads-plan',       sub:'Research & plan epic',        x:230, y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
+  { id:'beads-research',   label:'/beads-research',   sub:'Domain-matched agents',       x:400, y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
+  { id:'beads-plan-review',label:'/beads-plan-review', sub:'Adversarial 4-agent review', x:570, y:BY.design_phases, w:W.lg, h:RH, layer:'commands', group:'design' },
+
+  // == SUPPORTING COMMANDS ==
+  { id:'beads-quick',      label:'/beads-quick',      sub:'Fast path + escalation',     x:60,  y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'beads-learn',      label:'/beads-learn',       sub:'Knowledge curation',         x:200, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'beads-recall',     label:'/beads-recall',      sub:'Mid-session search',         x:340, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'beads-checkpoint', label:'/beads-checkpoint',  sub:'Save progress',              x:480, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'beads-retro',      label:'/beads-retro',       sub:'Weekly analytics',           x:620, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'beads-review',     label:'/beads-review',      sub:'15-agent code review',       x:760, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+
+  // == SPECIALIZED WORK MODES ==
+  { id:'beads-work-ralph', label:'/beads-work-ralph',  sub:'Autonomous retry',           x:60,  y:BY.specialized, w:W.md, h:RH, layer:'commands', group:'specialized' },
+  { id:'beads-work-teams', label:'/beads-work-teams',  sub:'Persistent workers',         x:230, y:BY.specialized, w:W.md, h:RH, layer:'commands', group:'specialized' },
+  { id:'beads-import',     label:'/beads-import',      sub:'Markdown to beads',          x:400, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
+  { id:'beads-triage',     label:'/beads-triage',      sub:'Prioritize beads',           x:540, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
+  { id:'changelog',        label:'/changelog',         sub:'Release changelog',          x:680, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
+
+  // == SKILLS ==
+  { id:'sk-project-setup',  label:'project-setup',   sub:'Stack detect + config',       x:60,  y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
+  { id:'sk-git-worktree',   label:'git-worktree',    sub:'Parallel workspaces',         x:200, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
+  { id:'sk-brainstorming',  label:'brainstorming',   sub:'Structured exploration',      x:340, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
+  { id:'sk-beads-knowledge',label:'beads-knowledge', sub:'Knowledge entries',           x:480, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
+  { id:'sk-agent-browser',  label:'agent-browser',   sub:'Browser automation',          x:620, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
+
+  // == KNOWLEDGE SYSTEM ==
+  { id:'kn-jsonl',     label:'knowledge.jsonl', sub:'Persistent store (git-tracked)',    x:60,  y:BY.knowledge, w:W.lg, h:RH, layer:'knowledge', group:'knowledge' },
+  { id:'kn-recall',    label:'auto-recall',     sub:'Session start injection',           x:250, y:BY.knowledge, w:W.sm, h:RH, layer:'knowledge', group:'knowledge' },
+  { id:'kn-capture',   label:'memory-capture',  sub:'Hook: LEARNED/DECISION/...',       x:390, y:BY.knowledge, w:W.md, h:RH, layer:'knowledge', group:'knowledge' },
+  { id:'kn-fts5',      label:'SQLite FTS5',     sub:'Ranked search index',              x:560, y:BY.knowledge, w:W.sm, h:RH, layer:'knowledge', group:'knowledge' },
+
+  // == REVIEW AGENTS ==
+  { id:'ag-rails',     label:'kieran-rails',      sub:'Rails conventions',    x:30,  y:BY.review_agents,     w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-dhh',       label:'dhh-rails',         sub:'DHH style',            x:150, y:BY.review_agents,     w:100, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-ts',        label:'kieran-typescript', sub:'TS conventions',       x:260, y:BY.review_agents,     w:130, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-python',    label:'kieran-python',     sub:'Python conventions',   x:400, y:BY.review_agents,     w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-security',  label:'security-sentinel', sub:'OWASP/injection',      x:520, y:BY.review_agents,     w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-perf',      label:'performance-oracle',sub:'N+1/complexity',       x:650, y:BY.review_agents,     w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-simplicity',label:'code-simplicity',   sub:'YAGNI/complexity',     x:780, y:BY.review_agents,     w:115, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-arch',      label:'architecture',      sub:'SOLID/boundaries',     x:905, y:BY.review_agents,     w:110, h:RH, layer:'agents', group:'review-ag' },
+
+  { id:'ag-migration', label:'data-migration',    sub:'Migration safety',     x:30,  y:BY.review_agents+54,  w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-drift',     label:'migration-drift',   sub:'Schema sync',          x:160, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-deploy',    label:'deployment-verify', sub:'Deploy checklists',    x:280, y:BY.review_agents+54,  w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-integrity', label:'data-integrity',    sub:'Schema constraints',   x:410, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-pattern',   label:'pattern-recog',     sub:'Anti-patterns',        x:530, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-races',     label:'frontend-races',    sub:'Race conds/Turbo',     x:650, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-git',       label:'git-history',       sub:'Commit history',       x:770, y:BY.review_agents+54,  w:105, h:RH, layer:'agents', group:'review-ag' },
+
+  // == RESEARCH AGENTS ==
+  { id:'ag-best',      label:'best-practices',    sub:'External best practices', x:30,  y:BY.research_agents, w:130, h:RH, layer:'agents', group:'research-ag' },
+  { id:'ag-framework', label:'framework-docs',    sub:'Framework docs/Context7', x:170, y:BY.research_agents, w:125, h:RH, layer:'agents', group:'research-ag' },
+  { id:'ag-learnings', label:'learnings',         sub:'knowledge.jsonl',         x:305, y:BY.research_agents, w:105, h:RH, layer:'agents', group:'research-ag' },
+  { id:'ag-repo',      label:'repo-research',     sub:'Repo structure/docs',     x:420, y:BY.research_agents, w:110, h:RH, layer:'agents', group:'research-ag' },
+  { id:'ag-githistory',label:'git-history-rsch',  sub:'Commit analysis',         x:540, y:BY.research_agents, w:120, h:RH, layer:'agents', group:'research-ag' },
+];
+
+const CONNS = [
+  // == PRIMARY PIPELINE FLOW ==
+  { from:'beads-design', to:'beads-work',  type:'orchestrates', label:'plan approved' },
+  { from:'beads-work',   to:'beads-qa',    type:'suggests',     label:'web apps' },
+  { from:'beads-qa',     to:'beads-ship',  type:'suggests',     label:'QA passed' },
+  { from:'beads-work',   to:'beads-ship',  type:'suggests',     label:'non-web' },
+
+  // == DESIGN ORCHESTRATES SUB-PHASES ==
+  { from:'beads-design', to:'beads-brainstorm',  type:'orchestrates', label:'1' },
+  { from:'beads-design', to:'beads-plan',        type:'orchestrates', label:'2' },
+  { from:'beads-design', to:'beads-research',    type:'orchestrates', label:'3' },
+  { from:'beads-design', to:'beads-plan-review', type:'orchestrates', label:'4' },
+
+  // == DESIGN SUB-PHASE FLOW ==
+  { from:'beads-brainstorm', to:'beads-plan',        type:'orchestrates', label:'scope locked' },
+  { from:'beads-plan',       to:'beads-research',    type:'orchestrates', label:'gaps found' },
+  { from:'beads-research',   to:'beads-plan-review', type:'orchestrates', label:'evidence gathered' },
+
+  // == WORK INTERNAL PHASES ==
+  { from:'beads-work', to:'beads-learn',   type:'orchestrates', label:'auto after review' },
+  { from:'beads-work', to:'beads-review',  type:'orchestrates', label:'auto self-review' },
+
+  // == QUICK ESCALATION ==
+  { from:'beads-quick', to:'beads-design', type:'suggests', label:'scope grew' },
+  { from:'beads-quick', to:'beads-work',   type:'orchestrates', label:'small task' },
+
+  // == SPECIALIZED MODES ==
+  { from:'beads-work-ralph', to:'beads-work', type:'orchestrates', label:'autonomous' },
+  { from:'beads-work-teams', to:'beads-work', type:'orchestrates', label:'persistent' },
+
+  // == SHIP TRIGGERS ==
+  { from:'beads-ship', to:'beads-learn', type:'orchestrates', label:'extract knowledge' },
+
+  // == RESEARCH DISPATCHES ==
+  { from:'beads-research', to:'ag-best',      type:'dispatches' },
+  { from:'beads-research', to:'ag-framework', type:'dispatches' },
+  { from:'beads-research', to:'ag-learnings', type:'dispatches' },
+  { from:'beads-research', to:'ag-repo',      type:'dispatches' },
+  { from:'beads-research', to:'ag-githistory',type:'dispatches' },
+
+  // == PLAN-REVIEW DISPATCHES ==
+  { from:'beads-plan-review', to:'ag-arch',      type:'dispatches' },
+  { from:'beads-plan-review', to:'ag-security',  type:'dispatches' },
+  { from:'beads-plan-review', to:'ag-perf',      type:'dispatches' },
+  { from:'beads-plan-review', to:'ag-simplicity',type:'dispatches' },
+
+  // == FULL REVIEW DISPATCHES ==
+  { from:'beads-review', to:'ag-rails',      type:'dispatches' },
+  { from:'beads-review', to:'ag-dhh',        type:'dispatches' },
+  { from:'beads-review', to:'ag-ts',         type:'dispatches' },
+  { from:'beads-review', to:'ag-python',     type:'dispatches' },
+  { from:'beads-review', to:'ag-security',   type:'dispatches' },
+  { from:'beads-review', to:'ag-perf',       type:'dispatches' },
+  { from:'beads-review', to:'ag-simplicity', type:'dispatches' },
+  { from:'beads-review', to:'ag-arch',       type:'dispatches' },
+  { from:'beads-review', to:'ag-migration',  type:'dispatches' },
+  { from:'beads-review', to:'ag-drift',      type:'dispatches' },
+  { from:'beads-review', to:'ag-deploy',     type:'dispatches' },
+  { from:'beads-review', to:'ag-integrity',  type:'dispatches' },
+  { from:'beads-review', to:'ag-pattern',    type:'dispatches' },
+  { from:'beads-review', to:'ag-races',      type:'dispatches' },
+  { from:'beads-review', to:'ag-git',        type:'dispatches' },
+
+  // == QA USES BROWSER ==
+  { from:'beads-qa', to:'sk-agent-browser', type:'dispatches' },
+
+  // == BRAINSTORM USES SKILL ==
+  { from:'beads-brainstorm', to:'sk-brainstorming', type:'dispatches' },
+
+  // == KNOWLEDGE FLOW ==
+  { from:'beads-work',       to:'kn-capture',  type:'feeds', label:'LEARNED inline' },
+  { from:'beads-review',     to:'kn-capture',  type:'feeds', label:'LEARNED for findings' },
+  { from:'beads-brainstorm', to:'kn-capture',  type:'feeds', label:'DECISION' },
+  { from:'beads-research',   to:'kn-capture',  type:'feeds', label:'FACT/INVESTIGATION' },
+  { from:'beads-learn',      to:'kn-jsonl',    type:'feeds', label:'structured entries' },
+  { from:'kn-capture',       to:'kn-jsonl',    type:'feeds' },
+  { from:'kn-jsonl',         to:'kn-fts5',     type:'feeds' },
+  { from:'kn-fts5',          to:'kn-recall',   type:'feeds' },
+  { from:'kn-recall',        to:'beads-work',  type:'feeds', label:'session start' },
+  { from:'kn-recall',        to:'beads-design',type:'feeds', label:'session start' },
+  { from:'beads-retro',      to:'kn-jsonl',    type:'feeds', label:'PATTERN synthesis' },
+];
+
+// == Presets ==
+const PRESET_NODES = {
+  full: null,
+  pipeline: ['beads-design','beads-work','beads-qa','beads-ship',
+             'beads-brainstorm','beads-plan','beads-research','beads-plan-review'],
+  'design-deep': ['beads-design','beads-brainstorm','beads-plan','beads-research','beads-plan-review',
+                   'ag-best','ag-framework','ag-learnings','ag-repo','ag-githistory',
+                   'ag-arch','ag-security','ag-perf','ag-simplicity',
+                   'sk-brainstorming',
+                   'kn-recall','kn-jsonl'],
+  review: ['beads-review','beads-work',
+           'ag-rails','ag-dhh','ag-ts','ag-python','ag-security','ag-perf','ag-simplicity','ag-arch',
+           'ag-migration','ag-drift','ag-deploy','ag-integrity','ag-pattern','ag-races','ag-git',
+           'kn-capture'],
+  knowledge: ['beads-work','beads-design','beads-brainstorm','beads-research','beads-review',
+              'beads-learn','beads-retro','beads-recall',
+              'kn-jsonl','kn-recall','kn-capture','kn-fts5'],
+};
+
+// == State ==
+const state = {
+  scale:1, tx:0, ty:0,
+  layers:{ commands:true, agents:true, skills:true, knowledge:true },
+  connTypes:{ orchestrates:true, dispatches:true, suggests:true, feeds:true },
+  comments:[], hovered:null, preset:'full',
+};
+let activePreset = null;
+
+// == Styles ==
+const NODE_STYLE = {
+  commands:  { fill:'#0f2040', stroke:'#1d4ed8', textFill:'#93c5fd', subFill:'#334155' },
+  agents:    { fill:'#0a2015', stroke:'#15803d', textFill:'#86efac', subFill:'#334155' },
+  skills:    { fill:'#1e0a2a', stroke:'#9333ea', textFill:'#e879f9', subFill:'#334155' },
+  knowledge: { fill:'#1a1500', stroke:'#d97706', textFill:'#fbbf24', subFill:'#334155' },
+};
+const CONN_STYLE = {
+  orchestrates: { color:'#3b82f6', dash:'',    w:1.8, opacity:0.9 },
+  dispatches:   { color:'#22c55e', dash:'',    w:1.4, opacity:0.9 },
+  suggests:     { color:'#8b5cf6', dash:'5,3', w:1.4, opacity:0.9 },
+  feeds:        { color:'#f59e0b', dash:'3,3', w:1.4, opacity:0.9 },
+};
+const BAND_LABELS = [
+  { label:'PRIMARY PIPELINE', y:BY.pipeline-18, color:'#1e3a5f' },
+  { label:'DESIGN PHASES (orchestrated by /beads-design)', y:BY.design_phases-18, color:'#1a2a4a' },
+  { label:'SUPPORTING COMMANDS', y:BY.supporting-18, color:'#1a1a2a' },
+  { label:'SPECIALIZED / UTILITY', y:BY.specialized-18, color:'#1a1a1a' },
+  { label:'CORE SKILLS', y:BY.skills-18, color:'#200a2a' },
+  { label:'KNOWLEDGE SYSTEM', y:BY.knowledge-18, color:'#1a1500' },
+  { label:'REVIEW AGENTS (15)', y:BY.review_agents-18, color:'#0a200a' },
+  { label:'RESEARCH AGENTS (5)', y:BY.research_agents-18, color:'#0a200a' },
+];
+
+// == SVG helpers ==
+const svg = document.getElementById('diagram');
+let gMain;
+
+function el(tag, attrs={}, text) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k,v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function nById(id) { return NODES.find(n=>n.id===id); }
+
+function visible(n) {
+  if (!state.layers[n.layer]) return false;
+  if (activePreset && !activePreset.includes(n.id)) return false;
+  return true;
+}
+
+// == Elbow path ==
+function elbowPath(a, b) {
+  const ax = a.x + a.w/2, ay = a.y + a.h/2;
+  const bx = b.x + b.w/2, by = b.y + b.h/2;
+  const goingDown = by > ay;
+  const x1 = ax,  y1 = goingDown ? a.y + a.h : a.y;
+  const x2 = bx,  y2 = goingDown ? b.y       : b.y + b.h;
+  const my = (y1 + y2) / 2;
+  return `M ${x1} ${y1} L ${x1} ${my} L ${x2} ${my} L ${x2} ${y2}`;
+}
+
+function sameBandPath(a, b) {
+  const goRight = b.x > a.x;
+  const y = a.y + a.h / 2;
+  const x1 = goRight ? a.x + a.w : a.x;
+  const x2 = goRight ? b.x + 7   : b.x + b.w - 7;
+  return `M ${x1} ${y} L ${x2} ${y}`;
+}
+
+function buildPath(a, b) {
+  if (Math.abs((a.y + a.h/2) - (b.y + b.h/2)) < 20) return sameBandPath(a, b);
+  return elbowPath(a, b);
+}
+
+// == Render ==
+function render() {
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  const defs = el('defs');
+  for (const [type, s] of Object.entries(CONN_STYLE)) {
+    const m = el('marker', { id:`arr-${type}`, markerWidth:'7', markerHeight:'5', refX:'6', refY:'2.5', orient:'auto' });
+    m.appendChild(el('polygon', { points:'0 0,7 2.5,0 5', fill:s.color }));
+    defs.appendChild(m);
+  }
+  svg.appendChild(defs);
+
+  gMain = el('g');
+  gMain.setAttribute('transform', `translate(${state.tx},${state.ty}) scale(${state.scale})`);
+  svg.appendChild(gMain);
+
+  // Swim lane backgrounds
+  const allVis = NODES.filter(visible);
+  if (allVis.length) {
+    const totalW = Math.max(...allVis.map(n=>n.x+n.w)) + 40;
+    BAND_LABELS.forEach(band => {
+      const bandTop = band.y + 18;
+      const nodesInBand = allVis.filter(n => n.y >= bandTop - 10 && n.y < bandTop + 70);
+      if (!nodesInBand.length) return;
+      const maxY = Math.max(...nodesInBand.map(n => n.y + n.h));
+      const bandH = maxY - band.y + 10;
+      const bg = el('rect', { x:0, y:band.y, width:totalW, height:bandH, fill:band.color, opacity:'0.4', rx:'4' });
+      gMain.appendChild(bg);
+      gMain.appendChild(el('text', { x:8, y:band.y+10, fill:'#374151', 'font-size':'8',
+        'font-weight':'700', 'font-family':'-apple-system,sans-serif', 'letter-spacing':'0.08em' }, band.label));
+    });
+  }
+
+  // Determine highlights
+  const hov = state.hovered;
+  const connectedIds = new Set();
+  if (hov) {
+    CONNS.forEach(c => { if (c.from===hov||c.to===hov) { connectedIds.add(c.from); connectedIds.add(c.to); } });
+  }
+
+  // Draw connections
+  CONNS.filter(c => {
+    if (!state.connTypes[c.type]) return false;
+    const a = nById(c.from), b = nById(c.to);
+    return a && b && visible(a) && visible(b);
+  }).forEach(c => {
+    const a = nById(c.from), b = nById(c.to);
+    const s = CONN_STYLE[c.type];
+    const isHi = hov && (c.from===hov || c.to===hov);
+    const isDim = hov && !isHi;
+    const opacity = isDim ? 0.07 : (hov ? 0.95 : 0.25);
+
+    const d = buildPath(a, b);
+    gMain.appendChild(el('path', {
+      d, fill:'none',
+      stroke: s.color,
+      'stroke-width': isHi ? s.w * 1.8 : s.w,
+      'stroke-dasharray': s.dash,
+      'stroke-opacity': opacity,
+      'marker-end': `url(#arr-${c.type})`,
+    }));
+
+    if (c.label && isHi) {
+      const ax=a.x+a.w/2, bx=b.x+b.w/2;
+      const ay = a.y+a.h, by2 = b.y;
+      const my = (ay+by2)/2;
+      const lx = (ax+bx)/2;
+      const tw = c.label.length * 5 + 12;
+      gMain.appendChild(el('rect', { x:lx-tw/2, y:my-8, width:tw, height:13, rx:2, fill:'#0b0f1a', opacity:'0.9' }));
+      gMain.appendChild(el('text', { x:lx, y:my+2, 'text-anchor':'middle', fill:s.color,
+        'font-size':'8', 'font-family':'-apple-system,sans-serif', opacity:'1' }, c.label));
+    }
+  });
+
+  // Draw nodes
+  NODES.filter(visible).forEach(n => drawNode(n, connectedIds, hov));
+}
+
+function drawNode(n, connectedIds, hov) {
+  const s = NODE_STYLE[n.layer];
+  const isHov = hov === n.id;
+  const isConnected = connectedIds.has(n.id);
+  const isDim = hov && !isHov && !isConnected;
+  const hasComment = state.comments.some(c=>c.target===n.id);
+  const isPipeline = n.group === 'pipeline';
+
+  const grp = el('g', { cursor:'pointer', opacity: isDim ? '0.2' : '1' });
+  grp.addEventListener('mouseenter', () => { state.hovered = n.id; render(); });
+  grp.addEventListener('mouseleave', () => { state.hovered = null; render(); });
+  grp.addEventListener('click', () => openModal(n));
+
+  const stroke = isHov ? '#fff' : (hasComment ? '#f97316' : (isPipeline && !hov ? '#60a5fa' : s.stroke));
+  const sw = isHov ? 2 : (isPipeline && !hov ? 1.8 : (hasComment ? 1.5 : 1));
+
+  grp.appendChild(el('rect', { x:n.x, y:n.y, width:n.w, height:n.h, rx:5,
+    fill: isHov ? '#1a2a40' : s.fill,
+    stroke, 'stroke-width':sw }));
+
+  grp.appendChild(el('text', { x:n.x+n.w/2, y:n.y+(n.sub?13:21),
+    'text-anchor':'middle', fill:s.textFill, 'font-size':'10.5', 'font-weight':'600',
+    'font-family':"'SF Mono','Fira Code',monospace" }, n.label));
+
+  if (n.sub) {
+    grp.appendChild(el('text', { x:n.x+n.w/2, y:n.y+25,
+      'text-anchor':'middle', fill:'#4b5563', 'font-size':'8.5',
+      'font-family':'-apple-system,sans-serif' }, n.sub));
+  }
+
+  if (hasComment) {
+    grp.appendChild(el('circle', { cx:n.x+n.w-5, cy:n.y+5, r:3.5, fill:'#f97316' }));
+  }
+
+  gMain.appendChild(grp);
+}
+
+// == Zoom / Pan ==
+function doZoom(f) {
+  state.scale = Math.min(4, Math.max(0.15, state.scale*f));
+  render();
+}
+
+function fitView() {
+  const vis = NODES.filter(visible);
+  if (!vis.length) return;
+  const rect = svg.getBoundingClientRect();
+  const minX = Math.min(...vis.map(n=>n.x)) - 20;
+  const maxX = Math.max(...vis.map(n=>n.x+n.w)) + 20;
+  const minY = Math.min(...vis.map(n=>n.y)) - 30;
+  const maxY = Math.max(...vis.map(n=>n.y+n.h)) + 20;
+  const cw = maxX-minX, ch = maxY-minY;
+  state.scale = Math.min(rect.width/cw, rect.height/ch, 1.2);
+  state.tx = rect.width/2 - (minX+cw/2)*state.scale;
+  state.ty = rect.height/2 - (minY+ch/2)*state.scale;
+  render();
+}
+
+let dragging=false, ds={x:0,y:0}, do_={x:0,y:0};
+svg.addEventListener('mousedown', e => {
+  if (e.target.closest('g[cursor="pointer"]')) return;
+  dragging=true; ds={x:e.clientX,y:e.clientY}; do_={x:state.tx,y:state.ty};
+  svg.classList.add('grabbing');
+});
+window.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  state.tx=do_.x+(e.clientX-ds.x); state.ty=do_.y+(e.clientY-ds.y); render();
+});
+window.addEventListener('mouseup', () => { dragging=false; svg.classList.remove('grabbing'); });
+svg.addEventListener('wheel', e => { e.preventDefault(); doZoom(e.deltaY<0?1.12:0.89); }, {passive:false});
+
+// == Presets ==
+function applyPreset(btn, name) {
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  state.preset = name;
+  activePreset = PRESET_NODES[name];
+  const has = l => !activePreset || activePreset.some(id=>{ const n=nById(id); return n&&n.layer===l; });
+  ['commands','agents','skills','knowledge'].forEach((l,i) => {
+    state.layers[l] = has(l);
+    document.querySelectorAll('.sidebar input[type=checkbox]')[i].checked = state.layers[l];
+  });
+  render(); setTimeout(fitView, 10); updatePrompt();
+}
+
+function toggleLayer(l, v) { state.layers[l]=v; render(); updatePrompt(); }
+function toggleConn(t, v) { state.connTypes[t]=v; render(); updatePrompt(); }
+
+// == Comments ==
+let modalNode=null;
+function openModal(n) {
+  modalNode=n;
+  document.getElementById('modal-title').textContent = n.label;
+  document.getElementById('modal-sub').textContent = n.sub||'';
+  document.getElementById('modal-input').value='';
+  document.getElementById('modal-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('modal-input').focus(),50);
+}
+function closeModal() { document.getElementById('modal-bg').classList.remove('open'); modalNode=null; }
+function saveComment() {
+  const t=document.getElementById('modal-input').value.trim();
+  if (!t) { closeModal(); return; }
+  state.comments.push({id:Date.now(), target:modalNode.id, targetLabel:modalNode.label, text:t});
+  closeModal(); renderComments(); render(); updatePrompt();
+}
+function deleteComment(id) {
+  state.comments=state.comments.filter(c=>c.id!==id);
+  renderComments(); render(); updatePrompt();
+}
+function renderComments() {
+  const list=document.getElementById('comments-list');
+  document.getElementById('comment-count').textContent=state.comments.length;
+  if (!state.comments.length) { list.innerHTML='<div class="no-comments">Hover a node to highlight connections. Click to comment.</div>'; return; }
+  list.innerHTML=state.comments.map(c=>`
+    <div class="comment-item">
+      <div class="comment-target">${c.targetLabel}<span class="comment-del" onclick="deleteComment(${c.id})"> x</span></div>
+      <div class="comment-text">${c.text}</div>
+    </div>`).join('');
+}
+
+// == Prompt ==
+function updatePrompt() {
+  const labels={full:'full system',pipeline:'primary pipeline','design-deep':'design deep dive',review:'review pipeline',knowledge:'knowledge flow'};
+  const parts=[`beads-compound v2 architecture -- ${labels[state.preset]||state.preset} view.`];
+  const hiddenL=Object.entries(state.layers).filter(([,v])=>!v).map(([k])=>k);
+  if (hiddenL.length) parts.push(`Hidden: ${hiddenL.join(', ')}.`);
+  const hiddenC=Object.entries(state.connTypes).filter(([,v])=>!v).map(([k])=>k);
+  if (hiddenC.length) parts.push(`Connection types hidden: ${hiddenC.join(', ')}.`);
+  if (state.comments.length) {
+    parts.push('');
+    state.comments.forEach(c=>parts.push(`[${c.targetLabel}] ${c.text}`));
+  }
+  document.getElementById('prompt-text').textContent=parts.join('\n');
+}
+
+// == Copy ==
+function copyPrompt() {
+  navigator.clipboard.writeText(document.getElementById('prompt-text').textContent);
+  const b=document.getElementById('copy-btn');
+  b.textContent='Copied!'; b.classList.add('copied');
+  setTimeout(()=>{ b.textContent='Copy'; b.classList.remove('copied'); }, 1500);
+}
+
+// == Keyboard ==
+window.addEventListener('keydown', e=>{
+  if (e.key==='Escape') closeModal();
+  if (e.key==='Enter' && !e.shiftKey && document.getElementById('modal-bg').classList.contains('open')) {
+    e.preventDefault(); saveComment();
+  }
+});
+
+// == Init ==
+render();
+setTimeout(fitView, 60);
+updatePrompt();
+</script>
+</body>
+</html>
