@@ -75,12 +75,12 @@ AGENTS=$(find plugins/beads-compound/agents -name "*.md" | wc -l | tr -d ' ')
 SKILLS=$(find plugins/beads-compound/skills -name "SKILL.md" | wc -l | tr -d ' ')
 
 echo "  Commands: $COMMANDS (need 29+)"
-echo "  Agents:   $AGENTS (need 28+)"
-echo "  Skills:   $SKILLS (need 15+)"
+echo "  Agents:   $AGENTS (need 29+)"
+echo "  Skills:   $SKILLS (need 16+)"
 
 [[ "$COMMANDS" -ge 29 ]] && { echo "  PASS  Commands"; ((PASS++)) || true; } || fail "Commands" "$COMMANDS < 29"
-[[ "$AGENTS"   -ge 28 ]] && { echo "  PASS  Agents";   ((PASS++)) || true; } || fail "Agents"   "$AGENTS < 28"
-[[ "$SKILLS"   -ge 15 ]] && { echo "  PASS  Skills";   ((PASS++)) || true; } || fail "Skills"   "$SKILLS < 15"
+[[ "$AGENTS"   -ge 29 ]] && { echo "  PASS  Agents";   ((PASS++)) || true; } || fail "Agents"   "$AGENTS < 29"
+[[ "$SKILLS"   -ge 16 ]] && { echo "  PASS  Skills";   ((PASS++)) || true; } || fail "Skills"   "$SKILLS < 16"
 
 echo ""
 echo "=== Source files ==="

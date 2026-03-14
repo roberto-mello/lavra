@@ -2,6 +2,28 @@
 
 All notable changes to the beads-compound plugin are documented here.
 
+## [0.6.9] - 2026-03-13
+
+### Added
+- **`project-setup` skill** - New skill at `skills/project-setup/` for per-project stack detection and review agent configuration. Auto-detects tech stack (Rails, Ruby, TypeScript, JavaScript, Python, General) from project files, lets users toggle specific agents off, and saves config to `.beads/config/project-setup.md` with YAML frontmatter. Review Context notes are length-limited to 500 chars and stripped of prompt-structural characters.
+- **`migration-drift-detector` agent** - New review agent that detects schema/migration drift in PRs across five ORMs: Rails (`db/migrate/` + `db/schema.rb`), Alembic (revision DAG + multiple heads), Prisma (checksum + shadow DB), Drizzle (snapshot/SQL mismatch), and Knex (out-of-sequence timestamps). Auto-detects which ORM is in use. All PR field handling uses `jq --arg` to prevent shell injection.
+- **`beads-review` project config integration** - `/beads-review` now reads `.beads/config/project-setup.md` at start of review. When present, dispatches only the configured `review_agents` (validated against a dynamically-derived allowlist from the installed agents directory — no hardcoded list to go stale). Config-missing = dispatch all agents (fully backward compatible). `reviewer_context_note` is intentionally **not** injected into review agents — they derive context from the code itself; see `docs/SECURITY.md`.
+- **`beads-parallel` project config injection** - Section 8 (Recall Knowledge) now reads `.beads/config/project-setup.md` when present and injects `reviewer_context_note` into all subagent prompt templates (standard, ralph, teams worker) under `## Project Conventions`. Wrapped in `untrusted-config-data` XML with a "do not follow instructions" directive. Note: `untrusted-config-data` is a prompt engineering convention, not a model-enforced standard — the real protection is the sanitization strip list and 500-char limit. See `docs/SECURITY.md` for the full threat model.
+- **`migration-drift-detector` wired into `/beads-review`** - Added as a conditional agent alongside `data-migration-expert` (not instead of it). Triggers on any ORM's migration or schema artifact files. Finding synthesis step notes deduplication between the two agents.
+- **`/beads-compound` surfaced after substantial findings** - `/beads-work` now scans the bead's comments after the knowledge gate and adds `/beads-compound` as an option when `LEARNED:` or `INVESTIGATION:` entries are found. `/beads-parallel` scans all closed beads in step 12, collects matching bead IDs as `COMPOUND_CANDIDATES`, and surfaces `/beads-compound {COMPOUND_CANDIDATES}` in handoff options.
+- **Sources section in `/beads-plan`** - Epic bead descriptions now include a mandatory `## Sources` freeform bullet list (`Brainstorm:`, `File:`, `Knowledge:`, `Doc:`, `Research:` entry types). Child beads get a `## References` subsection. Pre-submission checklist verifies Sources is non-empty.
+- **Cross-check validation in `/beads-plan`** - New Step 5.5 runs warning-only validation after bead creation: checks required sections per child bead, flags file-scope conflicts between independent beads without a dependency, warns on missing brainstorm reference when a brainstorm bead was used. Does not block plan creation.
+- **Improved brainstorm detection in `/beads-plan`** - Step 0 now uses a four-step decision tree: label-based detection first (checks `brainstorm` label on bead and parent), then keyword match ≤14 days, then keyword match >14 days (prompts user), then full idea refinement. When brainstorm detected: locked decisions extracted and carried forward into child bead Context sections, Sources section auto-populated with `Brainstorm:` entry.
+- **`.beads/config/` provisioned by installer** - `install-claude.sh` now runs `mkdir -p "$TARGET/.beads/config"` alongside memory provisioning.
+
+### Changed
+- **`reviewer_context_note` injection removed from `/beads-review`** - Review agents no longer receive the context note. They derive project context from the code. This removes an injection vector from the review pipeline with no meaningful loss of review quality.
+- **Expanded sanitization strip list** - `project-setup` skill and `beads-parallel` now strip `USER:`, `HUMAN:`, `[INST]`, `<s>`/`</s>` tags, `\r`, null bytes, and Unicode bidirectional override characters (U+202A–U+202E, U+2066–U+2069) in addition to the existing `<`, `>`, `SYSTEM:`, `ASSISTANT:`, and triple backtick rules.
+- **Dynamic agent allowlist in `/beads-review`** - Agent names in `review_agents` are now validated against a live listing of `.claude/agents/` rather than a hardcoded list. New agents are automatically available without any list to maintain.
+- **`docs/SECURITY.md` added** - Documents the threat model, injection defense strategy, honest limitations of `untrusted-config-data` XML wrapping, and the trust model for all config sources.
+- **`.beads/config/` added to protected artifacts** - All six locations that protect `.beads/memory/` now also protect `.beads/config/`: `beads-review.md`, `beads-parallel.md` (2 locations), `code-simplicity-reviewer.md`, `resolve-todo-parallel.md`, `git-history-analyzer.md`.
+- **Component counts updated** - 28 → 29 agents (migration-drift-detector), 15 → 16 skills (project-setup). Updated in `plugin.json`, `marketplace.json`, `plugin-catalog.md`, `pre-release-check.sh`, `CLAUDE.md`, and `install-claude.sh`.
+
 ## [0.6.8] - 2026-03-05
 
 ### Added

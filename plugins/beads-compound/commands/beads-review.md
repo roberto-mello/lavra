@@ -61,12 +61,42 @@ The following paths are beads-compound pipeline artifacts and must never be flag
 - `.beads/memory/knowledge.jsonl` -- Persistent knowledge store
 - `.beads/memory/knowledge.archive.jsonl` -- Archived knowledge
 - `.beads/memory/recall.sh` -- Knowledge search script
+- `.beads/config/project-setup.md` -- Project configuration (read-only input to pipeline)
 
-If a review agent flags any file in `.beads/memory/` for cleanup or removal, discard that finding during synthesis. Do not create a bead for it.
+If a review agent flags any file in `.beads/memory/` or `.beads/config/` for cleanup or removal, discard that finding during synthesis. Do not create a bead for it.
 
-### 3. Dispatch Review Agents in Parallel
+### 3. Read Project Config & Dispatch Review Agents in Parallel
 
-Run ALL or most of these agents at the same time:
+#### 3a. Read Project Config (optional)
+
+Check for a project-setup configuration file:
+
+```bash
+[ -f .beads/config/project-setup.md ] && cat .beads/config/project-setup.md
+```
+
+If the file exists, parse its YAML frontmatter for one field:
+- `review_agents`: list of agent names to dispatch (replaces the default list below)
+
+> **Note:** `reviewer_context_note` is intentionally **not** injected into review agents. Review agents derive project context from the code itself. Context note injection is only done in `/beads-parallel` (pre-work conventions for implementors) where the value is clearer and the injection surface is smaller.
+
+**Agent allowlist validation** (when `review_agents` is present):
+
+Derive the allowlist dynamically from the installed agents directory:
+```bash
+find .claude/agents -name "*.md" 2>/dev/null | xargs -I{} basename {} .md | sort
+```
+Fall back to `plugins/beads-compound/agents/` if `.claude/agents/` is absent (e.g. running from the plugin repo itself).
+
+- Reject any name that does not match `^[a-z][a-z0-9-]*$` or is not in the derived allowlist
+- Silently skip invalid names (do not reveal which agents were disabled or skipped)
+- If `review_agents` is present but all entries are invalid, fall back to dispatching all agents
+
+**Config-missing behavior:** If `.beads/config/project-setup.md` does not exist, dispatch ALL agents below (backward compatible, no prompts, no degradation).
+
+#### 3b. Dispatch Agents in Parallel
+
+Dispatch the validated agent list (from config) or ALL agents below.
 
 1. Task kieran-rails-reviewer(PR content)
 2. Task dhh-rails-reviewer(PR content)
@@ -85,17 +115,29 @@ Run ALL or most of these agents at the same time:
 
 These agents are run ONLY when the PR matches specific criteria. Check the PR files list to determine if they apply:
 
-**If PR contains database migrations or data backfills:**
+**If PR contains migrations or schema changes (any ORM):**
 
-13. Task data-migration-expert(PR content) - Validates ID mappings match production, checks for swapped values, verifies rollback safety
+13. Task data-migration-expert(PR content) - Validates migration code correctness: ID mappings match production, checks for swapped values, verifies rollback safety, SQL verification
 14. Task deployment-verification-agent(PR content) - Creates Go/No-Go deployment checklist with SQL verification queries
+15. Task migration-drift-detector(PR content) - Detects schema/migration drift: verifies schema artifacts are in sync with migration history across Rails, Alembic, Prisma, Drizzle, and Knex
 
 **When to run migration agents:**
-- PR includes migration files
+- PR includes migration files matching any ORM pattern:
+  - `db/migrate/*.rb` (Rails)
+  - `alembic/versions/*.py` (Alembic)
+  - `prisma/migrations/*/migration.sql` (Prisma)
+  - `drizzle/*/migration.sql` (Drizzle)
+  - `migrations/*.js` or `migrations/*.ts` (Knex)
+- PR modifies schema artifacts:
+  - `db/schema.rb`, `prisma/schema.prisma`, `drizzle/meta/*.snapshot.json`
 - PR modifies columns that store IDs, enums, or mappings
 - PR includes data backfill scripts
 - PR changes how data is read/written
 - PR title/body mentions: migration, backfill, data transformation, ID mapping
+
+**Agent roles are complementary, not redundant:**
+- `data-migration-expert`: validates migration **code** correctness (SQL logic, rollback safety, ID mapping values)
+- `migration-drift-detector`: validates migration **consistency** (schema artifacts in sync with migration history)
 
 ### 4. Ultra-Thinking Deep Dive Phases
 
@@ -178,10 +220,10 @@ Remove duplicates, prioritize by severity and impact.
 </thinking>
 
 - [ ] Collect findings from the inventory above
-- [ ] Discard any findings that recommend deleting or gitignoring files in `.beads/memory/` (see Protected Artifacts above)
+- [ ] Discard any findings that recommend deleting or gitignoring files in `.beads/memory/` or `.beads/config/` (see Protected Artifacts above)
 - [ ] Categorize by type: security, performance, architecture, quality, etc.
 - [ ] Assign severity levels: P1 CRITICAL, P2 IMPORTANT, P3 NICE-TO-HAVE
-- [ ] Remove duplicate or overlapping findings
+- [ ] Remove duplicate or overlapping findings — **note:** `data-migration-expert` and `migration-drift-detector` both inspect migration files and may report overlapping findings; deduplicate carefully, keeping the more specific finding (e.g., prefer a drift finding over a generic "migration present" observation)
 - [ ] Estimate effort for each finding (Small/Medium/Large)
 
 #### Step 2a: Completeness Verification

@@ -10,7 +10,7 @@ Resolve all TODO comments using parallel processing, analyzing dependencies to d
 </objective>
 
 <guardrails>
-If any todo recommends deleting, removing, or gitignoring files in `.beads/memory/`, skip it and mark it as `wont_fix`. These are beads-compound pipeline artifacts that are intentional and permanent.
+If any todo recommends deleting, removing, or gitignoring files in `.beads/memory/` or `.beads/config/`, skip it and mark it as `wont_fix`. These are beads-compound pipeline artifacts that are intentional and permanent.
 </guardrails>
 
 <process>

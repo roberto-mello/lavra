@@ -53,11 +53,11 @@ Commands are in `plugins/beads-compound/commands/`:
 | `/resolve-pr-parallel` | resolve-pr-parallel.md | Resolve PR comments in parallel |
 | `/resolve-todo-parallel` | resolve-todo-parallel.md | Resolve TODOs in parallel |
 
-## Agents (28)
+## Agents (29)
 
 Agents are in `plugins/beads-compound/agents/`:
 
-**Review (14)**: agent-native-reviewer, architecture-strategist, code-simplicity-reviewer, data-integrity-guardian, data-migration-expert, deployment-verification-agent, dhh-rails-reviewer, julik-frontend-races-reviewer, kieran-python-reviewer, kieran-rails-reviewer, kieran-typescript-reviewer, pattern-recognition-specialist, performance-oracle, security-sentinel
+**Review (15)**: agent-native-reviewer, architecture-strategist, code-simplicity-reviewer, data-integrity-guardian, data-migration-expert, deployment-verification-agent, dhh-rails-reviewer, julik-frontend-races-reviewer, kieran-python-reviewer, kieran-rails-reviewer, kieran-typescript-reviewer, migration-drift-detector, pattern-recognition-specialist, performance-oracle, security-sentinel
 
 **Research (5)**: best-practices-researcher, framework-docs-researcher, git-history-analyzer, learnings-researcher, repo-research-analyst
 
@@ -67,7 +67,7 @@ Agents are in `plugins/beads-compound/agents/`:
 
 **Docs (1)**: ankane-readme-writer
 
-## Skills (15)
+## Skills (16)
 
 Skills are in `plugins/beads-compound/skills/`:
 
@@ -84,6 +84,7 @@ Skills are in `plugins/beads-compound/skills/`:
 - **file-todos**: Find and manage TODO comments in code
 - **frontend-design**: Frontend design patterns and best practices
 - **gemini-imagegen**: Generate images using Google's Gemini
+- **project-setup**: Project environment setup and onboarding automation
 - **rclone**: Cloud storage file management with rclone
 - **skill-creator**: Create new skills from templates
 
