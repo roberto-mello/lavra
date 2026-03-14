@@ -1,50 +1,65 @@
-# Beads Compound
+# beads-compound
 
-[![License](https://img.shields.io/github/license/roberto-mello/beads-compound-plugin)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/roberto-mello/beads-compound-plugin)](https://github.com/roberto-mello/beads-compound-plugin/releases)
-[![Beads CLI](https://img.shields.io/badge/requires-beads%20CLI-blue)](https://github.com/steveyegge/beads)
+**beads-compound turns your AI coding agent into a development team that gets smarter with every task.**
 
-A development orchestrator that makes each unit of work make the next one easier.
+A plugin for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that orchestrates the full development lifecycle -- from brainstorming to shipping -- while automatically capturing and recalling knowledge so each unit of work makes the next one easier.
 
-## The Pipeline
+### Without beads-compound
+
+- The agent forgets everything between sessions -- you re-explain context every time
+- Planning is shallow: it jumps to code before thinking through the problem
+- Review is inconsistent: sometimes thorough, sometimes a rubber stamp
+- Knowledge stays in your head. When a teammate hits the same bug, they start from zero
+- Shipping is manual: you run tests, create the PR, close tickets, push -- every time
+
+### With beads-compound
+
+- **Automatic memory.** Knowledge is captured inline during work and recalled automatically at the start of every session. Hit the same OAuth bug next month? The agent already knows the fix.
+- **Structured planning.** Brainstorm with scope sharpening, research with domain-matched agents, adversarial plan review -- all before a single line of code is written.
+- **Built-in quality gates.** Every implementation runs through a review-fix-learn loop. Knowledge capture is mandatory, not optional.
+- **Team-shareable knowledge.** Memory lives in `.beads/memory/knowledge.jsonl`, tracked by git. Your team compounds knowledge together.
+
+## The workflow
+
+Most of the time, you type three commands:
 
 ```
-/beads-design  -->  /beads-work  -->  /beads-qa  -->  /beads-ship
+/beads-design "I want users to upload photos for listings"
 ```
 
-**Design** orchestrates the full planning pipeline as a single command: interactive brainstorm, structured plan with phased beads, parallel domain-matched research agents, plan revision, and adversarial review by 4 agents. The output is detailed enough that implementation is mechanical.
-
-**Work** implements the plan with built-in quality gates. Auto-routes between single-bead and multi-bead parallel execution. Includes mandatory knowledge capture inline, self-review with fix loop, and knowledge curation before closing.
-
-**QA** runs browser-based verification against the running app using headless Chromium. Maps changed files to routes, tests interactions and console errors, takes screenshots. Skips gracefully when changes are backend-only.
-
-**Ship** goes from "code is ready" to "PR is open" in one command. Rebases on main, runs tests, scans for secrets and debug leftovers, creates the PR, closes beads, and pushes the backup.
-
-## Knowledge Compounding
-
-Every stage both consumes and produces knowledge. This is what separates beads-compound from a command collection.
+This runs the full planning pipeline as a single command: interactive brainstorm with scope sharpening, structured plan with phased beads, domain-matched research agents, plan revision, and adversarial review. The output is detailed enough that implementation is mechanical.
 
 ```
-brainstorm  --DECISION-->  design
-design      <--LEARNED/PATTERN--  recall from prior work
-research    --FACT/INVESTIGATION-->  revise plan
-work        --LEARNED (inline)-->  mandatory knowledge gate
-review      --LEARNED-->  issues found become future recall
-learn       structures raw entries into searchable knowledge
-retro       synthesizes patterns across time, surfaces gaps
+/beads-work
 ```
 
-Knowledge is stored in `.beads/memory/knowledge.jsonl` (git-tracked, team-shareable) with SQLite FTS5 for ranked search. At session start, relevant entries are recalled automatically based on your current beads and git branch. When you hit the same OAuth bug next month, the agent already knows the fix.
+Picks up the approved plan and implements it. Auto-routes between single and multi-bead parallel execution. Includes mandatory review, fix loop, and knowledge curation -- all automatic.
 
-## Quick Start
+```
+/beads-ship
+```
 
-**Prerequisites:** [beads CLI](https://github.com/steveyegge/beads) (`bd`), `jq`, `sqlite3`
+Rebases on main, runs tests, scans for secrets and debug leftovers, creates the PR, closes beads, and pushes the backup. One command to land the plane.
+
+Add `/beads-qa` between work and ship when building web apps -- it maps changed files to routes and runs browser-based verification with screenshots.
+
+## Who this is for
+
+Anyone using Claude Code who wants consistent, high-quality output instead of hoping the agent gets it right this time.
+
+- **Non-technical users:** `/beads-design "build me X"` handles the brainstorming, planning, and research. `/beads-work` handles the implementation with built-in quality gates. You get working software without needing to know how to code.
+- **Solo developers:** The memory system acts as a second brain. Past decisions, patterns, and gotchas surface automatically when they're relevant.
+- **Teams:** Knowledge compounds across contributors. One person's hard-won insight becomes everyone's starting context.
+
+## Install
+
+**Requires:** [beads CLI](https://github.com/steveyegge/beads), `jq`, `sqlite3`
 
 ```bash
 npx beads-compound@latest
 ```
 
-Or manual install:
+Or manual:
 
 ```bash
 git clone https://github.com/roberto-mello/beads-compound-plugin.git
@@ -55,88 +70,38 @@ cd beads-compound-plugin
 ./install.sh --cortex      # Cortex Code
 ```
 
-Then use the three-command workflow:
-
-```bash
-/beads-design "I want users to upload photos"   # brainstorm + plan + research + review
-/beads-work                                      # implement + review + learn
-/beads-ship                                      # rebase, test, PR, close beads, push
-```
-
 <details>
-<summary><strong>Supporting Commands</strong></summary>
+<summary><strong>All commands</strong></summary>
 
-| Command | Purpose |
-|---------|---------|
-| `/beads-quick` | Fast-track small tasks; escalates to full pipeline if complexity warrants it |
-| `/beads-learn` | Targeted knowledge extraction -- structures raw comments into searchable entries |
-| `/beads-recall` | Mid-session knowledge search when you need prior context |
-| `/beads-checkpoint` | Save progress and sync state without closing beads |
-| `/beads-qa` | Browser-based QA verification (when building web apps) |
-| `/beads-retro` | Weekly analytics, team breakdown, and knowledge synthesis |
-| `/beads-import` | Import markdown plans into beads |
-| `/beads-triage` | Prioritize and categorize beads |
-| `/changelog` | Generate release changelogs |
+**Pipeline (4):** `/beads-design`, `/beads-work`, `/beads-qa`, `/beads-ship`
 
-</details>
+**Supporting (9):** `/beads-quick` (fast path with escalation), `/beads-learn` (knowledge curation), `/beads-recall` (mid-session search), `/beads-checkpoint` (save progress), `/beads-retro` (weekly analytics), `/beads-import`, `/beads-triage`, `/changelog`, `/test-browser`
 
-<details>
-<summary><strong>Power-User Commands</strong></summary>
+**Power-user (6):** `/beads-plan`, `/beads-research`, `/beads-plan-review`, `/beads-review` (15 specialized review agents), `/beads-work-ralph` (autonomous retry), `/beads-work-teams` (persistent workers)
 
-| Command | Purpose |
-|---------|---------|
-| `/beads-plan` | Run the plan phase manually (creates epic with phased child beads) |
-| `/beads-research` | Run domain-matched research agents manually |
-| `/beads-plan-review` | Run adversarial 4-agent plan review manually |
-| `/beads-review` | Full multi-agent code review (15 reviewers across security, performance, architecture, style) |
-| `/beads-work-ralph` | Autonomous retry mode with self-correction |
-| `/beads-work-teams` | Persistent worker teammates with COMPLETED/ACCEPTED protocol |
-
-</details>
-
-## Agents
-
-29 specialized agents across 5 categories make the system smarter than a generic LLM. Each agent runs at the right model tier (Haiku for high-frequency lookups, Opus for deep reasoning) to keep costs 60-70% lower than running everything on the most expensive model.
-
-- **Review (15):** architecture, security, performance, data integrity, deployment, Rails/Python/TypeScript style, frontend races, migration drift, pattern recognition, simplicity
-- **Research (5):** best practices, framework docs (via Context7 MCP), git history, knowledge recall, repo analysis
-- **Design (3):** design implementation, design iteration, Figma sync
-- **Workflow (5):** bug reproduction, style editing, linting, PR comment resolution, spec flow analysis
-- **Docs (1):** Andrew Kane-style README writer
+**29 specialized agents** across review, research, design, workflow, and docs. Each runs at the right model tier to keep costs 60-70% lower than running everything on Opus.
 
 See [docs/CATALOG.md](docs/CATALOG.md) for the full listing.
 
-## Installation
+</details>
 
-The installer copies agents, commands, skills, and hooks into your project's `.claude/` directory. Memory is stored in `.beads/memory/` and tracked by git for team sharing.
+## How knowledge compounds
 
-```bash
-npx beads-compound@latest              # Recommended
-./install.sh                           # Claude Code
-./install.sh --opencode                # OpenCode
-./install.sh --gemini                  # Gemini CLI
-./install.sh --cortex                  # Cortex Code
+```
+brainstorm  --DECISION-->  design
+design      <--LEARNED/PATTERN--  auto-recall from prior work
+research    --FACT/INVESTIGATION-->  plan revision
+work        --LEARNED (inline)-->  mandatory knowledge gate
+review      --LEARNED-->  issues become future recall
+retro       synthesizes patterns, surfaces gaps
 ```
 
-Use `--yes` to skip confirmation prompts. See [docs/PLATFORMS.md](docs/PLATFORMS.md) for platform details.
-
-Uninstall:
-
-```bash
-./uninstall.sh                         # Global
-./uninstall.sh /path/to/project        # Project-specific
-```
-
-Preserves `.beads/` data and accumulated knowledge.
-
-## Multi-Platform
-
-Works with Claude Code (primary), OpenCode, Gemini CLI, and Cortex Code. Every platform gets the memory system. Commands, agents, and skills availability varies by platform. See [docs/PLATFORMS.md](docs/PLATFORMS.md).
+Five knowledge types (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION) are captured inline during work and stored in `.beads/memory/knowledge.jsonl`. At session start, relevant entries are recalled automatically based on your current beads and git branch. The system gets smarter over time -- not just for you, but for your whole team.
 
 ## Acknowledgments
 
-[Every](https://every.to)'s [writing on compound engineering](https://every.to/chain-of-thought/compound-engineering-how-every-codes-with-agents) is well worth reading. Task tracking is powered by Steve Yegge's [Beads](https://github.com/steveyegge/beads). Built by Roberto Mello, extending [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin) by the team at [Every](https://every.to) with persistent memory and multi-agent orchestration.
+Built by [Roberto Mello](https://github.com/roberto-mello), extending [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin) by [Every](https://every.to). Task tracking by [Beads](https://github.com/steveyegge/beads). Inspired by Every's writing on [compound engineering](https://every.to/chain-of-thought/compound-engineering-how-every-codes-with-agents).
 
 ## License
 
-MIT (same as compound-engineering-plugin)
+MIT
