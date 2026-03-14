@@ -12,10 +12,10 @@ git pull --rebase
 
 These four locations must all have the target version:
 
-- `plugins/beads-compound/.claude-plugin/plugin.json`
+- `plugins/lavra/.claude-plugin/plugin.json`
 - `.claude-plugin/marketplace.json` — must match `plugin.json` exactly
-- `BEADS_COMPOUND_VERSION` constant in `plugins/beads-compound/hooks/auto-recall.sh`
-- Version string in `plugins/beads-compound/hooks/provision-memory.sh` (the `echo "X.Y.Z"` line)
+- `LAVRA_VERSION` constant in `plugins/lavra/hooks/auto-recall.sh`
+- Version string in `plugins/lavra/hooks/provision-memory.sh` (the `echo "X.Y.Z"` line)
 
 The pre-release check (step 3) will catch any mismatch, but fix them before running it.
 
@@ -43,7 +43,7 @@ Create a fresh test project, run the installer, and verify the memory system:
 ```bash
 mkdir -p /tmp/test-beads-install && cd /tmp/test-beads-install
 git init -q && bd init --quiet 2>/dev/null
-bash ~/Documents/projects/beads-compound-plugin/install.sh /tmp/test-beads-install
+bash ~/Documents/projects/lavra/install.sh /tmp/test-beads-install
 ```
 
 Verify the memory directory:
@@ -66,7 +66,7 @@ Verify the .beads/ warning prompt fires when .gitignore already has .beads/:
 
 ```bash
 echo ".beads/" >> /tmp/test-beads-install/.gitignore
-bash ~/Documents/projects/beads-compound-plugin/install.sh /tmp/test-beads-install 2>&1 | grep -A5 '\[!\] Warning'
+bash ~/Documents/projects/lavra/install.sh /tmp/test-beads-install 2>&1 | grep -A5 '\[!\] Warning'
 # Must show the data loss warning and [non-interactive] message
 ```
 
@@ -77,7 +77,7 @@ Tests conversion + file installation. Does not require OpenCode to be installed.
 ```bash
 mkdir -p /tmp/test-opencode-install && cd /tmp/test-opencode-install
 git init -q && bd init --quiet 2>/dev/null
-bash ~/Documents/projects/beads-compound-plugin/install.sh -opencode --yes /tmp/test-opencode-install
+bash ~/Documents/projects/lavra/install.sh -opencode --yes /tmp/test-opencode-install
 ```
 
 Verify:
@@ -97,7 +97,7 @@ Tests conversion + file installation. Does not require Gemini CLI to be installe
 ```bash
 mkdir -p /tmp/test-gemini-install && cd /tmp/test-gemini-install
 git init -q && bd init --quiet 2>/dev/null
-bash ~/Documents/projects/beads-compound-plugin/install.sh -gemini --yes /tmp/test-gemini-install
+bash ~/Documents/projects/lavra/install.sh -gemini --yes /tmp/test-gemini-install
 ```
 
 Verify:
@@ -114,7 +114,7 @@ ls /tmp/test-gemini-install/.beads/memory/
 
 ```bash
 rm -rf /tmp/test-beads-install /tmp/test-opencode-install /tmp/test-gemini-install
-cd ~/Documents/projects/beads-compound-plugin
+cd ~/Documents/projects/lavra
 ```
 
 **Do not proceed if any verification fails.**
@@ -153,5 +153,5 @@ Do NOT delete and recreate the tag. Bump to a patch version, fix, and release th
 ## Key facts
 
 - `marketplace.json` uses `"name"` field (not `"id"`) per the Claude Code plugin spec
-- CI query: `.plugins[] | select(.name == "beads-compound") | .version`
+- CI query: `.plugins[] | select(.name == "lavra") | .version`
 - Both `plugin.json` and `marketplace.json` versions must match or CI fails

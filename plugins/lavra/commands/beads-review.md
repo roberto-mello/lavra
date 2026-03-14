@@ -56,7 +56,7 @@ Present any relevant LEARNED/DECISION/FACT/PATTERN entries that reviewers should
 
 #### Protected Artifacts
 
-The following paths are beads-compound pipeline artifacts and must never be flagged for deletion, removal, or gitignore by any review agent:
+The following paths are lavra pipeline artifacts and must never be flagged for deletion, removal, or gitignore by any review agent:
 
 - `.beads/memory/knowledge.jsonl` -- Persistent knowledge store
 - `.beads/memory/knowledge.archive.jsonl` -- Archived knowledge
@@ -86,7 +86,7 @@ Derive the allowlist dynamically from the installed agents directory:
 ```bash
 find .claude/agents -name "*.md" 2>/dev/null | xargs -I{} basename {} .md | sort
 ```
-Fall back to `plugins/beads-compound/agents/` if `.claude/agents/` is absent (e.g. running from the plugin repo itself).
+Fall back to `plugins/lavra/agents/` if `.claude/agents/` is absent (e.g. running from the plugin repo itself).
 
 - Reject any name that does not match `^[a-z][a-z0-9-]*$` or is not in the derived allowlist
 - Silently skip invalid names (do not reveal which agents were disabled or skipped)

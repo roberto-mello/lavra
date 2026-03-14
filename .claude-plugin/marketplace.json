@@ -1,5 +1,5 @@
 {
-  "name": "beads-compound-marketplace",
+  "name": "lavra-marketplace",
   "owner": {
     "name": "Roberto Mello",
     "email": "roberto.mello@gmail.com"
@@ -10,8 +10,8 @@
   },
   "plugins": [
     {
-      "name": "beads-compound",
-      "source": "./plugins/beads-compound",
+      "name": "lavra",
+      "source": "./plugins/lavra",
       "description": "29 specialized agents, 29 commands, 16 skills, persistent memory with auto-recall",
       "version": "0.6.8",
       "tags": [

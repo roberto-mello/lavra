@@ -1,6 +1,6 @@
 # Cost Optimization
 
-How beads-compound assigns agents to model tiers for optimal cost/performance balance.
+How lavra assigns agents to model tiers for optimal cost/performance balance.
 
 [Back to README](../README.md)
 

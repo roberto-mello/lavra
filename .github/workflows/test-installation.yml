@@ -120,8 +120,8 @@ jobs:
 
       - name: Verify version consistency
         run: |
-          PLUGIN_VERSION=$(jq -r '.version' plugins/beads-compound/.claude-plugin/plugin.json)
-          MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name == "beads-compound") | .version' .claude-plugin/marketplace.json)
+          PLUGIN_VERSION=$(jq -r '.version' plugins/lavra/.claude-plugin/plugin.json)
+          MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name == "lavra") | .version' .claude-plugin/marketplace.json)
 
           if [[ "$PLUGIN_VERSION" != "$MARKETPLACE_VERSION" ]]; then
             echo "❌ Version mismatch: plugin.json=$PLUGIN_VERSION, marketplace.json=$MARKETPLACE_VERSION"
@@ -132,9 +132,9 @@ jobs:
 
       - name: Verify component counts
         run: |
-          COMMANDS=$(find plugins/beads-compound/commands -maxdepth 1 -name "*.md" | wc -l)
-          AGENTS=$(find plugins/beads-compound/agents -name "*.md" | wc -l)
-          SKILLS=$(find plugins/beads-compound/skills -name "SKILL.md" | wc -l)
+          COMMANDS=$(find plugins/lavra/commands -maxdepth 1 -name "*.md" | wc -l)
+          AGENTS=$(find plugins/lavra/agents -name "*.md" | wc -l)
+          SKILLS=$(find plugins/lavra/skills -name "SKILL.md" | wc -l)
 
           echo "Commands: $COMMANDS (expected 24+)"
           echo "Agents: $AGENTS (expected 28+)"
@@ -149,21 +149,21 @@ jobs:
       - name: Verify source files and conversion outputs
         run: |
           # Verify source files exist
-          [[ -f "plugins/beads-compound/opencode-src/plugin.ts" ]] || { echo "❌ OpenCode plugin.ts source missing"; exit 1; }
-          [[ -f "plugins/beads-compound/opencode-src/package.json" ]] || { echo "❌ OpenCode package.json source missing"; exit 1; }
-          [[ -f "plugins/beads-compound/gemini-src/settings.json" ]] || { echo "❌ Gemini settings.json source missing"; exit 1; }
+          [[ -f "plugins/lavra/opencode-src/plugin.ts" ]] || { echo "❌ OpenCode plugin.ts source missing"; exit 1; }
+          [[ -f "plugins/lavra/opencode-src/package.json" ]] || { echo "❌ OpenCode package.json source missing"; exit 1; }
+          [[ -f "plugins/lavra/gemini-src/settings.json" ]] || { echo "❌ Gemini settings.json source missing"; exit 1; }
 
           # Verify generated outputs exist (from previous step)
-          [[ -d "plugins/beads-compound/opencode" ]] || { echo "❌ OpenCode conversion outputs missing"; exit 1; }
-          [[ -d "plugins/beads-compound/gemini" ]] || { echo "❌ Gemini conversion outputs missing"; exit 1; }
+          [[ -d "plugins/lavra/opencode" ]] || { echo "❌ OpenCode conversion outputs missing"; exit 1; }
+          [[ -d "plugins/lavra/gemini" ]] || { echo "❌ Gemini conversion outputs missing"; exit 1; }
 
-          OPENCODE_COMMANDS=$(find plugins/beads-compound/opencode/commands -name "*.md" 2>/dev/null | wc -l)
+          OPENCODE_COMMANDS=$(find plugins/lavra/opencode/commands -name "*.md" 2>/dev/null | wc -l)
           [[ "$OPENCODE_COMMANDS" -ge 24 ]] || { echo "❌ OpenCode .md commands missing"; exit 1; }
 
-          GEMINI_TOML=$(find plugins/beads-compound/gemini/commands -name "*.toml" 2>/dev/null | wc -l)
+          GEMINI_TOML=$(find plugins/lavra/gemini/commands -name "*.toml" 2>/dev/null | wc -l)
           [[ "$GEMINI_TOML" -ge 24 ]] || { echo "❌ Gemini .toml commands missing"; exit 1; }
 
-          CORTEX_COMMANDS=$(find plugins/beads-compound/cortex/commands -name "*.md" 2>/dev/null | wc -l)
+          CORTEX_COMMANDS=$(find plugins/lavra/cortex/commands -name "*.md" 2>/dev/null | wc -l)
           [[ "$CORTEX_COMMANDS" -ge 24 ]] || { echo "❌ Cortex .md commands missing"; exit 1; }
 
           echo "✅ All source files and conversion outputs verified"

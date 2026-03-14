@@ -191,7 +191,7 @@ For each contributor in the window (skip this section entirely for solo projects
 
 ### Phase 6: Knowledge Synthesis
 
-This is the beads-compound differentiator. Read and analyze the knowledge base.
+This is the lavra differentiator. Read and analyze the knowledge base.
 
 1. **Load knowledge entries from the window**
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Install beads-compound plugin for OpenCode
+# Install lavra plugin for OpenCode
 #
 # What this installs:
 #   - TypeScript plugin (plugin.ts) for hook integration
@@ -25,7 +25,7 @@ else
   SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
-PLUGIN_DIR="$SCRIPT_DIR/plugins/beads-compound"
+PLUGIN_DIR="$SCRIPT_DIR/plugins/lavra"
 
 # Source shared functions
 # Use BASH_SOURCE to get the correct path when sourced
@@ -55,7 +55,7 @@ fi
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
 
-echo "beads-compound OpenCode Installer"
+echo "lavra OpenCode Installer"
 echo ""
 echo "Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
@@ -126,9 +126,9 @@ echo "[3/6] Installing TypeScript plugin..."
 
 # Determine plugin directory: global uses $TARGET/plugins, project uses $TARGET/.opencode/plugins
 if [ "$GLOBAL_INSTALL" = true ]; then
-  PLUGINS_DIR="$TARGET/plugins/beads-compound"
+  PLUGINS_DIR="$TARGET/plugins/lavra"
 else
-  PLUGINS_DIR="$TARGET/.opencode/plugins/beads-compound"
+  PLUGINS_DIR="$TARGET/.opencode/plugins/lavra"
 fi
 
 create_dir_with_symlink_handling "$PLUGINS_DIR"

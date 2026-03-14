@@ -1,4 +1,4 @@
-# beads-compound
+# lavra
 
 A Claude Code plugin that combines beads-based persistent memory with compound-engineering's multi-agent workflows.
 
@@ -17,7 +17,7 @@ A Claude Code plugin that combines beads-based persistent memory with compound-e
 This plugin is installed via the marketplace root installer:
 
 ```bash
-cd /path/to/beads-compound-plugin
+cd /path/to/lavra
 ./install.sh /path/to/your-project
 ```
 

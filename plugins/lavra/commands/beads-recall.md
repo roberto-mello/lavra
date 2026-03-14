@@ -241,9 +241,9 @@ Or try:
 
 This project doesn't have knowledge capture set up yet.
 
-Run the beads-compound installer to enable memory features:
+Run the lavra installer to enable memory features:
 ```bash
-bash /path/to/beads-compound-plugin/install.sh
+bash /path/to/lavra/install.sh
 ```
 ```
 

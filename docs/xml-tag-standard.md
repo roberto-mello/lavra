@@ -1,4 +1,4 @@
-# XML Tag Standard for beads-compound
+# XML Tag Standard for lavra
 
 Canonical vocabulary for structuring commands and agents. XML tags improve model instruction-following across platforms (Claude, OpenCode, Gemini) by providing explicit semantic boundaries.
 

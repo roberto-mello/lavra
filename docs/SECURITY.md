@@ -1,6 +1,6 @@
 # Security Model
 
-This document covers the threat model and defense-in-depth strategy for user-supplied content in beads-compound.
+This document covers the threat model and defense-in-depth strategy for user-supplied content in lavra.
 
 ## Threat Surface
 

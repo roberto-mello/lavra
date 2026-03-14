@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Install beads-compound plugin for Gemini CLI
+# Install lavra plugin for Gemini CLI
 #
 # What this installs:
 #   - Extension manifest (gemini-extension.json)
@@ -25,7 +25,7 @@ else
   SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
-PLUGIN_DIR="$SCRIPT_DIR/plugins/beads-compound"
+PLUGIN_DIR="$SCRIPT_DIR/plugins/lavra"
 
 # Source shared functions
 # Use BASH_SOURCE to get the correct path when sourced
@@ -55,7 +55,7 @@ fi
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
 
-echo "beads-compound Gemini CLI Installer"
+echo "lavra Gemini CLI Installer"
 echo ""
 echo "Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then

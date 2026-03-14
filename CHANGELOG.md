@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the beads-compound plugin are documented here.
+All notable changes to the lavra plugin are documented here.
 
 ## [0.6.9] - 2026-03-13
 
@@ -27,12 +27,12 @@ All notable changes to the beads-compound plugin are documented here.
 ## [0.6.8] - 2026-03-05
 
 ### Added
-- **Installed version tracking** - `provision-memory.sh` now writes `.beads/memory/.beads-compound-version` on every install. `auto-recall.sh` embeds its own version constant and emits a session warning when the installed hooks are out of date, telling the user exactly which command to run to upgrade.
+- **Installed version tracking** - `provision-memory.sh` now writes `.beads/memory/.lavra-version` on every install. `auto-recall.sh` embeds its own version constant and emits a session warning when the installed hooks are out of date, telling the user exactly which command to run to upgrade.
 - **`.beads/memory/.gitignore`** - The installer now creates a scoped `.gitignore` inside `.beads/memory/` to exclude the SQLite FTS cache (`knowledge.db` and variants). This is our directory — we own its ignore rules rather than relying on beads' `.beads/.gitignore` which can be overwritten by `bd init` or `bd doctor --fix`.
 - **Session warning for gitignored beads data** - `auto-recall.sh` now detects when `.beads/` is listed in the project `.gitignore` without negation rules and emits a prominent session warning explaining the data loss risk and how to fix it. Fires every session until resolved.
 - **Installer prompt for gitignored beads data** - `provision-memory.sh` detects the same condition and interactively offers to remove the `.beads/` line from `.gitignore`. Non-interactive contexts (hooks, `--yes` flag) warn but don't modify.
 - **OpenCode and Gemini installers now use `provision_memory_dir`** - Both platform installers previously duplicated inline memory setup. They now call the shared `provision_memory_dir` function and get all memory fixes automatically.
-- **Hook version check in pre-release checks** - `scripts/pre-release-check.sh` now verifies that the `BEADS_COMPOUND_VERSION` constant in `auto-recall.sh` and the version string in `provision-memory.sh` both match `plugin.json`. Prevents shipping hooks that advertise the wrong version.
+- **Hook version check in pre-release checks** - `scripts/pre-release-check.sh` now verifies that the `LAVRA_VERSION` constant in `auto-recall.sh` and the version string in `provision-memory.sh` both match `plugin.json`. Prevents shipping hooks that advertise the wrong version.
 - **Installer smoke tests in release checklist** - `.claude/rules/github-release.md` now documents required smoke tests for all three platforms (Claude, OpenCode, Gemini) that must pass before tagging a release.
 - **Cortex Code support** -- New `--cortex` flag for install/uninstall. Installs commands, agents, skills, and hooks to native Cortex Code paths (`~/.snowflake/cortex/` global, `.cortex/` project). Hooks configured via `~/.snowflake/cortex/hooks.json`. MCP installation skipped (not needed for Cortex). TeammateIdle hook not installed (unsupported event). Includes `convert-cortex.ts` conversion script, installation tests, and pre-release checks.
 - **Hook cwd fallback** -- `auto-recall.sh` and `memory-capture.sh` now read `cwd` from stdin JSON as fallback when `CLAUDE_PROJECT_DIR` is not set, enabling Cortex Code compatibility while maintaining backward compatibility with Claude Code, OpenCode, and Gemini CLI.
@@ -46,7 +46,7 @@ All notable changes to the beads-compound plugin are documented here.
 
 ### Changed
 - **`.beads/` no longer added to project `.gitignore`** - The installer previously added `.beads/` as "ephemeral task data". This was incorrect: beads JSONL files (issues, comments) should be committed. The installer now leaves `.gitignore` alone. Use `bd init --stealth` if you want `.beads/` invisible to collaborators (it uses `.git/info/exclude` which keeps data safe).
-- **Memory provisioning consolidated** - The four locations that must be kept in sync on a version bump are now documented: `plugin.json`, `marketplace.json`, `auto-recall.sh` (`BEADS_COMPOUND_VERSION`), and `provision-memory.sh` (version string).
+- **Memory provisioning consolidated** - The four locations that must be kept in sync on a version bump are now documented: `plugin.json`, `marketplace.json`, `auto-recall.sh` (`LAVRA_VERSION`), and `provision-memory.sh` (version string).
 - **`bd sync` replaced with `bd backup`** - `bd sync` was removed in beads v0.56.0 (superseded by Dolt-native push/pull). All plugin commands (`beads-checkpoint`, `beads-parallel`) and project CLAUDE.md files now use `bd backup` for local JSONL export. Stale beads workflow sections removed from project CLAUDE.md files since `bd prime` injects this context automatically at session start.
 
 ## [0.6.7] - 2026-03-04
@@ -113,7 +113,7 @@ All notable changes to the beads-compound plugin are documented here.
 ## [0.6.0] - 2026-02-13
 
 ### Added
-- **OpenCode support** via native TypeScript plugin (`plugins/beads-compound/opencode/plugin.ts`)
+- **OpenCode support** via native TypeScript plugin (`plugins/lavra/opencode/plugin.ts`)
   - Auto-recall: inject relevant knowledge at session start
   - Memory capture: extract knowledge from `bd comments add`
   - Subagent wrapup: warn when subagents complete without logging knowledge
@@ -124,7 +124,7 @@ All notable changes to the beads-compound plugin are documented here.
   - AfterTool (bash) → memory-capture.sh
   - AfterAgent → subagent-wrapup.sh
   - Uses same stdin/stdout JSON protocol as Claude Code
-  - Install: `gemini extensions install https://github.com/roberto-mello/beads-compound-plugin`
+  - Install: `gemini extensions install https://github.com/roberto-mello/lavra`
 - **AGENTS.md references** in 10 files (6 commands, 4 agents) where it aids user discovery
   - AGENTS.md is the emerging cross-tool standard (OpenCode, etc.)
   - Recommended: symlink CLAUDE.md → AGENTS.md for dual-tool projects
@@ -223,11 +223,11 @@ Initial public release. Fork of [compound-engineering-plugin](https://github.com
 - Adapted `code-simplicity-reviewer` to protect `.beads/memory/` files
 - Renamed `compound-docs` skill to `beads-knowledge`
 
-[0.6.2]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.6.1...v0.6.2
-[0.6.1]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.6.0...v0.6.1
-[0.6.0]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.5.0...v0.6.0
-[0.5.0]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.4.2...v0.5.0
-[0.4.2]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.4.0...v0.4.2
-[0.4.1]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.4.0...v0.4.2
-[0.4.0]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/roberto-mello/beads-compound-plugin/releases/tag/v0.3.0
+[0.6.2]: https://github.com/roberto-mello/lavra/compare/v0.6.1...v0.6.2
+[0.6.1]: https://github.com/roberto-mello/lavra/compare/v0.6.0...v0.6.1
+[0.6.0]: https://github.com/roberto-mello/lavra/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/roberto-mello/lavra/compare/v0.4.2...v0.5.0
+[0.4.2]: https://github.com/roberto-mello/lavra/compare/v0.4.0...v0.4.2
+[0.4.1]: https://github.com/roberto-mello/lavra/compare/v0.4.0...v0.4.2
+[0.4.0]: https://github.com/roberto-mello/lavra/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/roberto-mello/lavra/releases/tag/v0.3.0

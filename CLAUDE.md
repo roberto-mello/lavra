@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code plugin marketplace that provides beads-based persistent memory with compound-engineering's multi-agent workflows. The primary plugin is `beads-compound`, located at `plugins/beads-compound/`.
+This is a Claude Code plugin marketplace that provides beads-based persistent memory with compound-engineering's multi-agent workflows. The primary plugin is `lavra`, located at `plugins/lavra/`.
 
 The plugin provides:
 - 29 specialized agents (15 review, 5 research, 3 design, 5 workflow, 1 docs)
@@ -17,9 +17,9 @@ The plugin provides:
 
 ## Multi-Platform Support
 
-beads-compound supports OpenCode and Gemini CLI in addition to Claude Code:
+lavra supports OpenCode and Gemini CLI in addition to Claude Code:
 
-**OpenCode:** Core memory system via native TypeScript plugin at `plugins/beads-compound/opencode/plugin.ts`. Commands/agents/skills are Claude Code-specific. OpenCode reads `AGENTS.md`.
+**OpenCode:** Core memory system via native TypeScript plugin at `plugins/lavra/opencode/plugin.ts`. Commands/agents/skills are Claude Code-specific. OpenCode reads `AGENTS.md`.
 
 **Gemini CLI:** Full hook compatibility via `gemini-extension.json` manifest. Uses same stdin/stdout JSON protocol as Claude Code.
 
@@ -28,11 +28,11 @@ See README.md for detailed setup instructions.
 ## Repository Structure
 
 ```
-beads-compound-plugin/              # Marketplace root
+lavra/                              # Marketplace root
 ├── .claude-plugin/
 │   └── marketplace.json            # Marketplace catalog
 ├── plugins/
-│   └── beads-compound/             # Plugin root
+│   └── lavra/                      # Plugin root
 │       ├── .claude-plugin/
 │       │   └── plugin.json         # Plugin manifest (v0.6.0)
 │       ├── agents/                 # 29 agents (review/, research/, design/, workflow/, docs/)
@@ -55,8 +55,8 @@ beads-compound-plugin/              # Marketplace root
 ### Native Plugin System (not done yet)
 
 ```bash
-/plugin marketplace add https://github.com/roberto-mello/beads-compound-plugin
-/plugin install beads-compound
+/plugin marketplace add https://github.com/roberto-mello/lavra
+/plugin install lavra
 ```
 
 ### Manual Install
@@ -66,12 +66,12 @@ beads-compound-plugin/              # Marketplace root
 ./install.sh /path/to/target-project
 
 # Or from target project
-bash /path/to/beads-compound-plugin/install.sh
+bash /path/to/lavra/install.sh
 ```
 
 **IMPORTANT**: The installer will fail if you try to install into the plugin directory itself. Always install into a separate target project.
 
-The installer copies from `plugins/beads-compound/` into the target's `.claude/` directory:
+The installer copies from `plugins/lavra/` into the target's `.claude/` directory:
 - `hooks/` -> `.claude/hooks/`
 - `commands/` -> `.claude/commands/`
 - `agents/` -> `.claude/agents/`
@@ -91,7 +91,7 @@ The installer copies from `plugins/beads-compound/` into the target's `.claude/`
 ```bash
 mkdir -p /tmp/test-project && cd /tmp/test-project
 git init && bd init --no-daemon
-bash ~/Documents/projects/beads-compound-plugin/install.sh
+bash ~/Documents/projects/lavra/install.sh
 
 # Verify
 ls -la .claude/hooks/
@@ -103,7 +103,7 @@ cat .claude/settings.json | jq .
 
 **Test uninstaller:**
 ```bash
-bash ~/Documents/projects/beads-compound-plugin/uninstall.sh /tmp/test-project
+bash ~/Documents/projects/lavra/uninstall.sh /tmp/test-project
 ```
 
 **Test hook format:**

@@ -1,9 +1,9 @@
 {
-  "name": "beads-compound",
+  "name": "lavra",
   "version": "0.6.0",
   "description": "Persistent memory and compound knowledge tracking for Gemini CLI. Auto-recalls relevant knowledge at session start and captures learnings from beads comments.",
   "author": "Roberto Mello",
-  "repository": "https://github.com/roberto-mello/beads-compound-plugin",
+  "repository": "https://github.com/roberto-mello/lavra",
   "hooks": {
     "SessionStart": [
       {

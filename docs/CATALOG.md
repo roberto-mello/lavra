@@ -1,6 +1,6 @@
 # Component Catalog
 
-Full listing of all commands, agents, skills, hooks, and MCP servers included in beads-compound.
+Full listing of all commands, agents, skills, hooks, and MCP servers included in lavra.
 
 [Back to README](../README.md)
 

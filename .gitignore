@@ -10,9 +10,9 @@ tasks/
 plans/
 
 # Build artifacts (generated at install time)
-plugins/beads-compound/opencode/
-plugins/beads-compound/gemini/
-plugins/beads-compound/cortex/
+plugins/lavra/opencode/
+plugins/lavra/gemini/
+plugins/lavra/cortex/
 
 # Dolt database files (added by bd init)
 .dolt/

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Shared memory provisioning for beads-compound
+# Shared memory provisioning for lavra
 #
 # Provides a single function to set up .beads/memory/ with knowledge tracking.
 # Used by auto-recall.sh (native plugin), check-memory.sh (global install),
@@ -45,7 +45,7 @@ provision_memory_dir() {
   fi
 
   # Write installed version for staleness detection by auto-recall.sh
-  echo "0.6.8" > "$MEMORY_DIR/.beads-compound-version"
+  echo "0.6.8" > "$MEMORY_DIR/.lavra-version"
 
   # Create .beads/memory/.gitignore to ignore the SQLite FTS cache
   # (rebuilt from knowledge.jsonl on first use — no need to commit it)
@@ -63,7 +63,7 @@ EOF
   # Check if project .gitignore contains a .beads/ pattern, which would cause
   # all beads issue/comment data to be untracked (data loss risk on new clones).
   # bd init no longer adds .beads/ to project .gitignore — if it's there, it's
-  # from an older version of beads-compound or a manual addition.
+  # from an older version of lavra or a manual addition.
   if git -C "$PROJECT_DIR" rev-parse --git-dir &>/dev/null 2>&1; then
     local GITIGNORE="$PROJECT_DIR/.gitignore"
     if [[ -f "$GITIGNORE" ]] && grep -qE '^\s*\.beads/?(\s|$)' "$GITIGNORE" 2>/dev/null \
@@ -109,7 +109,7 @@ EOF
       .beads/memory/knowledge.jsonl \
       .beads/memory/.gitattributes \
       .beads/memory/.gitignore \
-      .beads/memory/.beads-compound-version \
+      .beads/memory/.lavra-version \
       .beads/memory/recall.sh \
       .beads/memory/knowledge-db.sh \
       2>/dev/null) || true

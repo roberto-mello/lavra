@@ -1,10 +1,10 @@
-# beads-compound
+# lavra
 
-**beads-compound turns your AI coding agent into a development team that gets smarter with every task.**
+**lavra turns your AI coding agent into a development team that gets smarter with every task.**
 
 A plugin for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that orchestrates the full development lifecycle -- from brainstorming to shipping -- while automatically capturing and recalling knowledge so each unit of work makes the next one easier.
 
-### Without beads-compound
+### Without lavra
 
 - The agent forgets everything between sessions -- you re-explain context every time
 - Planning is shallow: it jumps to code before thinking through the problem
@@ -12,7 +12,7 @@ A plugin for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that 
 - Knowledge stays in your head. When a teammate hits the same bug, they start from zero
 - Shipping is manual: you run tests, create the PR, close tickets, push -- every time
 
-### With beads-compound
+### With lavra
 
 - **Automatic memory.** Knowledge is captured inline during work and recalled automatically at the start of every session. Hit the same OAuth bug next month? The agent already knows the fix.
 - **Structured planning.** Brainstorm with scope sharpening, research with domain-matched agents, adversarial plan review -- all before a single line of code is written.
@@ -56,14 +56,14 @@ Anyone using Claude Code who wants consistent, high-quality output instead of ho
 **Requires:** [beads CLI](https://github.com/steveyegge/beads), `jq`, `sqlite3`
 
 ```bash
-npx beads-compound@latest
+npx lavra@latest
 ```
 
 Or manual:
 
 ```bash
-git clone https://github.com/roberto-mello/beads-compound-plugin.git
-cd beads-compound-plugin
+git clone https://github.com/roberto-mello/lavra.git
+cd lavra
 ./install.sh               # Claude Code (default)
 ./install.sh --opencode    # OpenCode
 ./install.sh --gemini      # Gemini CLI

@@ -39,10 +39,10 @@ bash .beads/memory/recall.sh
 ```bash
 # Check if plugin is installed
 # Project-specific:
-ls -la .opencode/plugins/beads-compound/plugin.ts
+ls -la .opencode/plugins/lavra/plugin.ts
 
 # Global:
-ls -la ~/.config/opencode/plugins/beads-compound/plugin.ts
+ls -la ~/.config/opencode/plugins/lavra/plugin.ts
 
 # Check if commands/agents/skills/hooks are installed
 ls -la .opencode/commands/
@@ -51,8 +51,8 @@ ls -la .opencode/skills/
 ls -la .opencode/hooks/
 
 # Check if plugin is loading (look for console.log messages in OpenCode output)
-# Expected: "[beads-compound] Plugin loaded successfully"
-# Expected: "[beads-compound] session.created hook triggered"
+# Expected: "[lavra] Plugin loaded successfully"
+# Expected: "[lavra] session.created hook triggered"
 
 # Check memory directory
 ls -la .beads/memory/
@@ -62,8 +62,8 @@ bd comments add <BEAD_ID> "LEARNED: Testing memory capture"
 tail -1 .beads/memory/knowledge.jsonl
 
 # Check plugin dependencies are installed
-ls -la .opencode/plugins/beads-compound/node_modules/
-# Or for global: ls -la ~/.config/opencode/plugins/beads-compound/node_modules/
+ls -la .opencode/plugins/lavra/node_modules/
+# Or for global: ls -la ~/.config/opencode/plugins/lavra/node_modules/
 ```
 
 ### Gemini CLI
@@ -133,7 +133,7 @@ If you already have a project using the plugin with an existing `knowledge.jsonl
 
 ```bash
 # Re-run the installer (safe to run on existing installs)
-bash /path/to/beads-compound-plugin/install.sh /path/to/your-project
+bash /path/to/lavra/install.sh /path/to/your-project
 ```
 
 On the next Claude Code session start, the system will automatically:

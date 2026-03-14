@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Shared installer functions for beads-compound
+# Shared installer functions for lavra
 #
 # This file is sourced by platform-specific installers to provide
 # common functionality across all platforms.

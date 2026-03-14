@@ -1,9 +1,9 @@
 {
-  "name": "beads-compound",
+  "name": "lavra",
   "version": "0.6.8",
   "description": "Persistent memory and multi-agent workflows for Claude Code, OpenCode, and Gemini CLI",
   "bin": {
-    "beads-compound": "bin/install.js",
+    "lavra": "bin/install.js",
     "bd-plan-view": "bin/plan-view.js",
     "bd-plan-export": "bin/plan-export.js"
   },
@@ -20,7 +20,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/roberto-mello/beads-compound-plugin.git"
+    "url": "https://github.com/roberto-mello/lavra.git"
   },
   "engines": {
     "node": ">=18"

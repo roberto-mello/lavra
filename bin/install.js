@@ -58,7 +58,7 @@ const TARGET_PATH = _positional ? path.resolve(_positional) : null;
 
 function banner() {
   console.log("");
-  console.log(`  beads-compound v${VERSION}`);
+  console.log(`  lavra v${VERSION}`);
   console.log("  Persistent memory + multi-agent workflows");
   console.log("");
 }
@@ -66,17 +66,17 @@ function banner() {
 function usage() {
   banner();
   console.log("  Usage:");
-  console.log("    npx beads-compound@latest                Interactive installer");
-  console.log("    npx beads-compound@latest --claude       Claude Code (local project)");
-  console.log("    npx beads-compound@latest --opencode     OpenCode (local project)");
-  console.log("    npx beads-compound@latest --gemini       Gemini CLI (local project)");
-  console.log("    npx beads-compound@latest --global       Install globally (~/.claude/)");
-  console.log("    npx beads-compound@latest --uninstall    Uninstall from current project");
-  console.log("    npx beads-compound@latest --yes          Skip confirmation prompts");
+  console.log("    npx lavra@latest                Interactive installer");
+  console.log("    npx lavra@latest --claude       Claude Code (local project)");
+  console.log("    npx lavra@latest --opencode     OpenCode (local project)");
+  console.log("    npx lavra@latest --gemini       Gemini CLI (local project)");
+  console.log("    npx lavra@latest --global       Install globally (~/.claude/)");
+  console.log("    npx lavra@latest --uninstall    Uninstall from current project");
+  console.log("    npx lavra@latest --yes          Skip confirmation prompts");
   console.log("");
   console.log("  Flags can be combined:");
-  console.log("    npx beads-compound@latest --opencode --yes");
-  console.log("    npx beads-compound@latest --claude --global");
+  console.log("    npx lavra@latest --opencode --yes");
+  console.log("    npx lavra@latest --claude --global");
   console.log("");
 }
 
@@ -233,7 +233,7 @@ async function main() {
   if (FLAG.uninstall) {
     ensureScript(UNINSTALL_SH, "uninstall.sh");
     const target = TARGET_PATH || process.cwd();
-    console.log(`  Uninstalling beads-compound from ${target}...\n`);
+    console.log(`  Uninstalling lavra from ${target}...\n`);
     try {
       await runScript(UNINSTALL_SH, [target]);
       console.log("\n  Uninstall complete.\n");
@@ -292,7 +292,7 @@ async function main() {
   }[runtime];
   const scopeLabel = scope === "global" ? "globally" : "in current project";
 
-  console.log(`  Installing beads-compound for ${runtimeLabel} ${scopeLabel}...\n`);
+  console.log(`  Installing lavra for ${runtimeLabel} ${scopeLabel}...\n`);
 
   try {
     await runScript(INSTALL_SH, scriptArgs);

@@ -142,7 +142,7 @@ def process_agent(file_path, new_description):
     print(f"  ✓ Description: {len(new_description)} chars")
 
 def main():
-    base = Path("/Users/rbm/Documents/projects/beads-compound-plugin/plugins/beads-compound/agents")
+    base = Path("/Users/rbm/Documents/projects/lavra/plugins/lavra/agents")
 
     processed = 0
     errors = 0

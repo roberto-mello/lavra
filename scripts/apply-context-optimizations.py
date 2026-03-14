@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from typing import Dict, Tuple
 
-BASE = Path("/Users/rbm/Documents/projects/beads-compound-plugin/plugins/beads-compound")
+BASE = Path("/Users/rbm/Documents/projects/lavra/plugins/lavra")
 
 # Phase 1: Agent descriptions (based on compound-engineering patterns)
 AGENT_DESCRIPTIONS = {

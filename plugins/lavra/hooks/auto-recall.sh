@@ -15,8 +15,8 @@
 # Resolve script directory early (works for both native plugin and manual install)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Version of beads-compound that wrote this hook (updated by installer)
-BEADS_COMPOUND_VERSION="0.6.8"
+# Version of lavra that wrote this hook (updated by installer)
+LAVRA_VERSION="0.6.8"
 
 # Exit silently if bd is not installed
 if ! command -v bd &>/dev/null; then
@@ -55,19 +55,19 @@ GITIGNORE="$PROJECT_DIR/.gitignore"
 if [[ -f "$GITIGNORE" ]] && grep -qE '^\s*\.beads/?(\s|$)' "$GITIGNORE" 2>/dev/null &&
   ! grep -qE '^\s*!\.beads/' "$GITIGNORE" 2>/dev/null; then
   cat <<'WARN'
-{"hookSpecificOutput":{"systemMessage":"## Warning: Beads Data Not Tracked by Git\n\nYour `.gitignore` contains `.beads/`, which means your beads issues, comments, and knowledge are **not committed to git**. If you lose your local copy, this data will be permanently lost.\n\nTo fix: re-run the installer interactively:\n```\nbash /path/to/beads-compound-plugin/install.sh\n```\nOr manually remove `.beads/` from `.gitignore`, then `git add .beads/`.\n\nIf you intentionally want beads invisible to collaborators, use `bd init --stealth` instead (stores the ignore in `.git/info/exclude`, which keeps data safe)."}}
+{"hookSpecificOutput":{"systemMessage":"## Warning: Beads Data Not Tracked by Git\n\nYour `.gitignore` contains `.beads/`, which means your beads issues, comments, and knowledge are **not committed to git**. If you lose your local copy, this data will be permanently lost.\n\nTo fix: re-run the installer interactively:\n```\nnpx lavra@latest\n```\nOr manually remove `.beads/` from `.gitignore`, then `git add .beads/`.\n\nIf you intentionally want beads invisible to collaborators, use `bd init --stealth` instead (stores the ignore in `.git/info/exclude`, which keeps data safe)."}}
 WARN
   exit 0
 fi
 
 # Warn if hooks are out of date with the installed plugin version
 MEMORY_DIR="$PROJECT_DIR/.beads/memory"
-VERSION_FILE="$MEMORY_DIR/.beads-compound-version"
+VERSION_FILE="$MEMORY_DIR/.lavra-version"
 if [[ -f "$VERSION_FILE" ]]; then
   INSTALLED_VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
-  if [[ "$INSTALLED_VERSION" != "$BEADS_COMPOUND_VERSION" ]]; then
+  if [[ "$INSTALLED_VERSION" != "$LAVRA_VERSION" ]]; then
     cat <<EOF
-{"hookSpecificOutput":{"systemMessage":"## beads-compound update available\n\nThis project has beads-compound **$INSTALLED_VERSION** but the plugin is now **$BEADS_COMPOUND_VERSION**. Re-run the installer to get the latest hooks and fixes:\n\n\`\`\`\nbash /path/to/beads-compound-plugin/install.sh $(pwd)\n\`\`\`"}}
+{"hookSpecificOutput":{"systemMessage":"## lavra update available\n\nThis project has lavra **$INSTALLED_VERSION** but the plugin is now **$LAVRA_VERSION**. Re-run the installer to get the latest hooks and fixes:\n\n\`\`\`\nnpx lavra@latest\n\`\`\`"}}
 EOF
     exit 0
   fi
@@ -79,7 +79,7 @@ KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 # First-run detection: if knowledge file is empty or missing, show orientation
 if [ ! -f "$KNOWLEDGE_FILE" ] || [ ! -s "$KNOWLEDGE_FILE" ]; then
   cat <<'ONBOARD'
-{"hookSpecificOutput":{"systemMessage":"## Beads Compound is ready.\n\n| Goal | Command |\n|------|---------|\n| New feature | `/beads-brainstorm \"describe your feature\"` |\n| Plan from spec | `/beads-design \"feature description\"` |\n| Existing beads | `/beads-work` |\n| Explore ideas | `/beads-brainstorm \"your idea\"` |\n\nKnowledge you capture will appear here automatically in future sessions."}}
+{"hookSpecificOutput":{"systemMessage":"## Lavra is ready.\n\n| Goal | Command |\n|------|---------|\n| New feature | `/beads-brainstorm \"describe your feature\"` |\n| Plan from spec | `/beads-design \"feature description\"` |\n| Existing beads | `/beads-work` |\n| Explore ideas | `/beads-brainstorm \"your idea\"` |\n\nKnowledge you capture will appear here automatically in future sessions."}}
 ONBOARD
   exit 0
 fi

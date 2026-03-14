@@ -70,4 +70,4 @@ Deliver your findings as:
 
 Your insights should help developers understand not just what the code does, but why it evolved to its current state, informing better decisions for future changes.
 
-Note that files in `.beads/memory/` and `.beads/config/` are beads-compound pipeline artifacts. They are intentional, permanent documents -- do not recommend their removal or characterize them as unnecessary.
+Note that files in `.beads/memory/` and `.beads/config/` are lavra pipeline artifacts. They are intentional, permanent documents -- do not recommend their removal or characterize them as unnecessary.

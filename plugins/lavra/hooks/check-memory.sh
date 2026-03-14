@@ -14,7 +14,7 @@ case "$PLATFORM" in
     PROJECT_HOOKS_DIR=".claude/hooks"
     GLOBAL_HOOKS_DIR="$HOME/.claude/hooks"
     SETTINGS_FILE=".claude/settings.json"
-    SOURCE_SENTINEL="$HOME/.claude/.beads-compound-source"
+    SOURCE_SENTINEL="$HOME/.claude/.lavra-source"
     HOOK_CMD_PREFIX="bash .claude/hooks"
     BASH_TOOL_NAME="Bash"
     PRODUCT_NAME="Claude Code"
@@ -23,7 +23,7 @@ case "$PLATFORM" in
     PROJECT_HOOKS_DIR=".cortex/hooks"
     GLOBAL_HOOKS_DIR="$HOME/.snowflake/cortex/hooks"
     SETTINGS_FILE="$HOME/.snowflake/cortex/hooks.json"
-    SOURCE_SENTINEL="$HOME/.snowflake/cortex/.beads-compound-source"
+    SOURCE_SENTINEL="$HOME/.snowflake/cortex/.lavra-source"
     HOOK_CMD_PREFIX="bash .cortex/hooks"
     BASH_TOOL_NAME="bash"
     PRODUCT_NAME="Cortex Code"
@@ -68,7 +68,7 @@ fi
 # Option 3: Legacy plugin source path (backward compatibility)
 if [ -z "$HOOKS_SOURCE_DIR" ] && [ -f "$SOURCE_SENTINEL" ]; then
   PLUGIN_SOURCE=$(cat "$SOURCE_SENTINEL")
-  PLUGIN_DIR="$PLUGIN_SOURCE/plugins/beads-compound"
+  PLUGIN_DIR="$PLUGIN_SOURCE/plugins/lavra"
   if [ -f "$PLUGIN_DIR/hooks/memory-capture.sh" ]; then
     HOOKS_SOURCE_DIR="$PLUGIN_DIR/hooks"
   fi
@@ -78,7 +78,7 @@ fi
 if [ -z "$HOOKS_SOURCE_DIR" ] || [ ! -f "$HOOKS_SOURCE_DIR/memory-capture.sh" ]; then
   cat <<'NOFIND'
 {
-  "systemMessage": "[beads-compound] Memory hook scripts not found. Install via: /plugin install beads-compound"
+  "systemMessage": "[lavra] Memory hook scripts not found. Install via: npx lavra@latest"
 }
 NOFIND
   exit 0
@@ -159,7 +159,7 @@ fi
 # Report success
 cat <<EOF
 {
-  "systemMessage": "[beads-compound] Auto-installed memory hooks. Restart $PRODUCT_NAME to activate auto-recall and knowledge capture.",
+  "systemMessage": "[lavra] Auto-installed memory hooks. Restart $PRODUCT_NAME to activate auto-recall and knowledge capture.",
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
     "additionalContext": "Memory hooks were just auto-installed for this project (auto-recall, knowledge capture, subagent wrapup). Tell the user to restart $PRODUCT_NAME to activate them."

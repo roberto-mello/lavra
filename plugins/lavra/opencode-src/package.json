@@ -1,7 +1,7 @@
 {
-  "name": "beads-compound-opencode",
+  "name": "lavra-opencode",
   "version": "0.6.0",
-  "description": "beads-compound plugin for OpenCode - persistent memory and knowledge tracking",
+  "description": "lavra plugin for OpenCode - persistent memory and knowledge tracking",
   "type": "module",
   "main": "plugin.ts",
   "dependencies": {

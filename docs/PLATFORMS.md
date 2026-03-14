@@ -19,17 +19,17 @@ Installation and setup instructions for all supported platforms: OpenCode, Gemin
 ./install.sh --opencode /path/to/your-project
 ```
 
-The installer copies the TypeScript plugin to `~/.config/opencode/plugins/beads-compound/` (global) or `.opencode/plugins/beads-compound/` (project-specific) and installs dependencies with Bun.
+The installer copies the TypeScript plugin to `~/.config/opencode/plugins/lavra/` (global) or `.opencode/plugins/lavra/` (project-specific) and installs dependencies with Bun.
 
 ### OpenCode Troubleshooting
 
 ```bash
 # Check if plugin is installed
 # Project-specific:
-ls -la .opencode/plugins/beads-compound/plugin.ts
+ls -la .opencode/plugins/lavra/plugin.ts
 
 # Global:
-ls -la ~/.config/opencode/plugins/beads-compound/plugin.ts
+ls -la ~/.config/opencode/plugins/lavra/plugin.ts
 
 # Check if commands/agents/skills/hooks are installed
 ls -la .opencode/commands/
@@ -38,8 +38,8 @@ ls -la .opencode/skills/
 ls -la .opencode/hooks/
 
 # Check if plugin is loading (look for console.log messages in OpenCode output)
-# Expected: "[beads-compound] Plugin loaded successfully"
-# Expected: "[beads-compound] session.created hook triggered"
+# Expected: "[lavra] Plugin loaded successfully"
+# Expected: "[lavra] session.created hook triggered"
 
 # Check memory directory
 ls -la .beads/memory/
@@ -49,8 +49,8 @@ bd comments add <BEAD_ID> "LEARNED: Testing memory capture"
 tail -1 .beads/memory/knowledge.jsonl
 
 # Check plugin dependencies are installed
-ls -la .opencode/plugins/beads-compound/node_modules/
-# Or for global: ls -la ~/.config/opencode/plugins/beads-compound/node_modules/
+ls -la .opencode/plugins/lavra/node_modules/
+# Or for global: ls -la ~/.config/opencode/plugins/lavra/node_modules/
 ```
 
 ## Gemini CLI

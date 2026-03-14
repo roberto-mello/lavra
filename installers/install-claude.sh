@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Install beads-compound plugin into a project
+# Install lavra plugin into a project
 #
 # What this installs:
 #   - Memory capture and auto-recall hooks
@@ -19,8 +19,8 @@
 #     ./install.sh /path/to/your-project
 #
 #   From anywhere:
-#     bash /path/to/beads-compound-plugin/install.sh
-#     bash /path/to/beads-compound-plugin/install.sh /path/to/your-project
+#     bash /path/to/lavra/install.sh
+#     bash /path/to/lavra/install.sh /path/to/your-project
 #
 
 set -euo pipefail
@@ -32,7 +32,7 @@ else
   SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
-PLUGIN_DIR="$SCRIPT_DIR/plugins/beads-compound"
+PLUGIN_DIR="$SCRIPT_DIR/plugins/lavra"
 
 # Source shared functions
 # Use BASH_SOURCE to get the correct path when sourced
@@ -79,11 +79,11 @@ fi
 # Verify plugin directory exists
 if [ ! -d "$PLUGIN_DIR" ]; then
   echo "[!] Error: Plugin directory not found at $PLUGIN_DIR"
-  echo "    Expected marketplace structure with plugins/beads-compound/"
+  echo "    Expected marketplace structure with plugins/lavra/"
   exit 1
 fi
 
-echo "beads-compound plugin installer"
+echo "lavra plugin installer"
 echo "Plugin: $PLUGIN_DIR"
 if [ "$GLOBAL_INSTALL" = true ]; then
   echo "Target: $TARGET (global)"
@@ -267,7 +267,7 @@ else
           ((SKILL_SKIPPED++))
           continue
         elif [ -d "$SKILLS_DIR/$skill_name" ]; then
-          if [ -f "$SKILLS_DIR/$skill_name/.beads-compound" ]; then
+          if [ -f "$SKILLS_DIR/$skill_name/.lavra" ]; then
             # Our plugin installed this -- safe to overwrite
             rm -rf "$SKILLS_DIR/$skill_name"
           else
@@ -280,7 +280,7 @@ else
 
         # Copy entire skill directory (may contain references/, templates/, etc.)
         cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
-        touch "$SKILLS_DIR/$skill_name/.beads-compound"
+        touch "$SKILLS_DIR/$skill_name/.lavra"
         ((SKILL_COUNT++))
       fi
     done
@@ -463,7 +463,7 @@ echo ""
 echo "  Optional Skills (7, not installed by default):"
 echo "    andrew-kane-gem-writer, dhh-rails-style, dspy-ruby, every-style-editor,"
 echo "    frontend-design, gemini-imagegen, rclone"
-echo "    Install with: cp -r plugins/beads-compound/skills/optional/<name> .claude/skills/"
+echo "    Install with: cp -r plugins/lavra/skills/optional/<name> .claude/skills/"
 echo ""
 
 if [ "$GLOBAL_INSTALL" = false ]; then
@@ -488,7 +488,7 @@ if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  bash $SCRIPT_DIR/install.sh /path/to/your-project"
   echo ""
   echo "[!] IMPORTANT: If you have existing projects with a previous version of"
-  echo "    beads-compound installed, re-run the installer on each to update hooks:"
+  echo "    lavra installed, re-run the installer on each to update hooks:"
   echo "    bash $SCRIPT_DIR/install.sh /path/to/your-project"
   echo "    (Auto-provisioning only installs hooks for the first time, not updates.)"
   echo ""

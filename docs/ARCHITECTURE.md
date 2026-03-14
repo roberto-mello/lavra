@@ -36,11 +36,11 @@ Both are written to simultaneously. If `sqlite3` is unavailable, only JSONL is w
 ## Plugin Structure
 
 ```
-beads-compound-plugin/              # Marketplace root
+lavra/                              # Marketplace root
 ├── .claude-plugin/
 │   └── marketplace.json
 ├── plugins/
-│   └── beads-compound/             # Plugin root
+│   └── lavra/                      # Plugin root
 │       ├── .claude-plugin/
 │       │   └── plugin.json
 │       ├── agents/
@@ -73,7 +73,7 @@ This plugin is a fork of [compound-engineering-plugin](https://github.com/EveryI
 - Subagent knowledge enforcement via `SubagentStop` hook
 - All workflows create and update beads instead of markdown files
 - Automatic one-time backfill from existing JSONL and beads.db comments on first FTS5 run
-- First session (like cloning a beads-compound enabled repo) triggers rebuilding the FTS5 index from the JSONL in git. Everything self-heals on first session.
+- First session (like cloning a lavra enabled repo) triggers rebuilding the FTS5 index from the JSONL in git. Everything self-heals on first session.
 
 ### Performance Optimizations
 

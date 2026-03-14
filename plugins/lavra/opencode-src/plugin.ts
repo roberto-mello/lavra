@@ -1,5 +1,5 @@
 /**
- * beads-compound plugin for OpenCode
+ * lavra plugin for OpenCode
  *
  * Ports auto-recall.sh and memory-capture.sh hooks to OpenCode's event system.
  * Subagent wrapup is handled separately via tool.execute.after with tool=task filter.
@@ -8,12 +8,12 @@
 import type { Plugin } from "@opencode-ai/plugin";
 import { resolve } from "node:path";
 
-console.log("[beads-compound] Plugin loaded successfully");
+console.log("[lavra] Plugin loaded successfully");
 
 export default {
   // Set CLAUDE_PROJECT_DIR globally for all bd commands
   "shell.env": async ({ directory }) => {
-    console.log("[beads-compound] shell.env hook triggered");
+    console.log("[lavra] shell.env hook triggered");
 
     // Validate that directory is an absolute path (security)
     if (!directory || !resolve(directory).startsWith("/")) {
@@ -27,7 +27,7 @@ export default {
 
   // Auto-recall: inject relevant knowledge at session start
   "session.created": async ({ directory }) => {
-    console.log("[beads-compound] session.created hook triggered");
+    console.log("[lavra] session.created hook triggered");
     // Validate absolute path (security)
     if (!directory || !resolve(directory).startsWith("/")) {
       return;
@@ -51,7 +51,7 @@ export default {
     const stderr = await new Response(proc.stderr).text();
 
     if (stderr) {
-      console.error("[beads-compound] auto-recall error:", stderr);
+      console.error("[lavra] auto-recall error:", stderr);
     }
 
     // Parse JSON output
@@ -168,7 +168,7 @@ Use one of: LEARNED, DECISION, FACT, PATTERN, INVESTIGATION`,
 
     const stderr = await new Response(proc.stderr).text();
     if (stderr) {
-      console.error("[beads-compound] memory-capture error:", stderr);
+      console.error("[lavra] memory-capture error:", stderr);
     }
 
     return;

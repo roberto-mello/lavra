@@ -7,7 +7,7 @@ globs: "**/plugins/**,**/agents/**,**/commands/**,**/skills/**"
 
 ## Commands (24 core + 5 optional)
 
-Commands are in `plugins/beads-compound/commands/`:
+Commands are in `plugins/lavra/commands/`:
 
 **Beads Workflow (11):**
 
@@ -49,7 +49,7 @@ Commands are in `plugins/beads-compound/commands/`:
 | `/resolve-pr-parallel` | resolve-pr-parallel.md | Resolve PR comments in parallel |
 | `/resolve-todo-parallel` | resolve-todo-parallel.md | Resolve TODOs in parallel |
 
-**Optional (5):** Domain-specific commands in `plugins/beads-compound/commands/optional/`. Not installed by default.
+**Optional (5):** Domain-specific commands in `plugins/lavra/commands/optional/`. Not installed by default.
 
 | Command | File | Description |
 |---------|------|-------------|
@@ -61,7 +61,7 @@ Commands are in `plugins/beads-compound/commands/`:
 
 ## Agents (29)
 
-Agents are in `plugins/beads-compound/agents/`:
+Agents are in `plugins/lavra/agents/`:
 
 **Review (15)**: agent-native-reviewer, architecture-strategist, code-simplicity-reviewer, data-integrity-guardian, data-migration-expert, deployment-verification-agent, dhh-rails-reviewer, julik-frontend-races-reviewer, kieran-python-reviewer, kieran-rails-reviewer, kieran-typescript-reviewer, migration-drift-detector, pattern-recognition-specialist, performance-oracle, security-sentinel
 
@@ -75,7 +75,7 @@ Agents are in `plugins/beads-compound/agents/`:
 
 ## Skills (16)
 
-Skills are in `plugins/beads-compound/skills/`:
+Skills are in `plugins/lavra/skills/`:
 
 - **git-worktree**: Manage git worktrees for parallel bead work
 - **brainstorming**: Structured brainstorming with bead output

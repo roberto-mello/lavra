@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Install beads-compound plugin for Cortex Code
+# Install lavra plugin for Cortex Code
 #
 # What this installs:
 #   - Memory capture and auto-recall hooks
@@ -23,7 +23,7 @@ else
   SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
-PLUGIN_DIR="$SCRIPT_DIR/plugins/beads-compound"
+PLUGIN_DIR="$SCRIPT_DIR/plugins/lavra"
 
 # Source shared functions
 # Use BASH_SOURCE to get the correct path when sourced
@@ -70,11 +70,11 @@ fi
 # Verify plugin directory exists
 if [ ! -d "$PLUGIN_DIR" ]; then
   echo "[!] Error: Plugin directory not found at $PLUGIN_DIR"
-  echo "    Expected marketplace structure with plugins/beads-compound/"
+  echo "    Expected marketplace structure with plugins/lavra/"
   exit 1
 fi
 
-echo "beads-compound Cortex Code Installer"
+echo "lavra Cortex Code Installer"
 echo ""
 echo "Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
@@ -295,7 +295,7 @@ else
           ((SKILL_SKIPPED++))
           continue
         elif [ -d "$SKILLS_DIR/$skill_name" ]; then
-          if [ -f "$SKILLS_DIR/$skill_name/.beads-compound" ]; then
+          if [ -f "$SKILLS_DIR/$skill_name/.lavra" ]; then
             # Our plugin installed this -- safe to overwrite
             rm -rf "$SKILLS_DIR/$skill_name"
           else
@@ -308,7 +308,7 @@ else
 
         # Copy entire skill directory
         cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
-        touch "$SKILLS_DIR/$skill_name/.beads-compound"
+        touch "$SKILLS_DIR/$skill_name/.lavra"
         ((SKILL_COUNT++))
       fi
     done
@@ -449,7 +449,7 @@ if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  bash $SCRIPT_DIR/install.sh -cortex /path/to/your-project"
   echo ""
   echo "[!] IMPORTANT: If you have existing projects with a previous version of"
-  echo "    beads-compound installed, re-run the installer on each to update hooks:"
+  echo "    lavra installed, re-run the installer on each to update hooks:"
   echo "    bash $SCRIPT_DIR/install.sh -cortex /path/to/your-project"
   echo "    (Auto-provisioning only installs hooks for the first time, not updates.)"
   echo ""

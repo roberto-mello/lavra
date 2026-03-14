@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Uninstall beads-compound plugin from Cortex Code
+# Uninstall lavra plugin from Cortex Code
 #
 # What this removes:
 #   - Hooks from .cortex/hooks/ (or ~/.snowflake/cortex/hooks/)
@@ -22,8 +22,8 @@
 #     ./uninstall-cortex.sh /path/to/your-project
 #
 #   From anywhere:
-#     bash /path/to/beads-compound-plugin/installers/uninstall-cortex.sh
-#     bash /path/to/beads-compound-plugin/installers/uninstall-cortex.sh /path/to/your-project
+#     bash /path/to/lavra/installers/uninstall-cortex.sh
+#     bash /path/to/lavra/installers/uninstall-cortex.sh /path/to/your-project
 #
 
 set -euo pipefail
@@ -41,7 +41,7 @@ fi
 
 TARGET="$(cd "$TARGET" && pwd)"
 
-echo "beads-compound plugin uninstaller (Cortex Code)"
+echo "lavra plugin uninstaller (Cortex Code)"
 if [ "$GLOBAL_UNINSTALL" = true ]; then
   echo "Target: $TARGET (global)"
 else
@@ -73,8 +73,8 @@ else
 fi
 
 # Remove global source path sentinel
-if [ "$GLOBAL_UNINSTALL" = true ] && [ -f "$TARGET/.beads-compound-source" ]; then
-  rm "$TARGET/.beads-compound-source"
+if [ "$GLOBAL_UNINSTALL" = true ] && [ -f "$TARGET/.lavra-source" ]; then
+  rm "$TARGET/.lavra-source"
   echo "  - Removed plugin source path"
   ((REMOVED_COUNT++))
 fi
@@ -157,7 +157,7 @@ if [ -d "$SKILLS_DIR" ]; then
     if [ -L "$SKILLS_DIR/$skill" ]; then
       echo "  - Kept $skill (symlink, not ours)"
     elif [ -d "$SKILLS_DIR/$skill" ]; then
-      if [ -f "$SKILLS_DIR/$skill/.beads-compound" ]; then
+      if [ -f "$SKILLS_DIR/$skill/.lavra" ]; then
         rm -rf "$SKILLS_DIR/$skill"
         echo "  - Removed $skill skill"
         ((REMOVED_COUNT++))
@@ -226,5 +226,5 @@ if [ $REMOVED_COUNT -gt 0 ]; then
   echo ""
   echo "Restart Cortex Code to complete uninstallation."
 else
-  echo "Nothing to uninstall. beads-compound may not be installed here."
+  echo "Nothing to uninstall. lavra may not be installed here."
 fi

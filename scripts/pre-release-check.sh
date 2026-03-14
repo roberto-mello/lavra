@@ -35,8 +35,8 @@ fail() {
 echo ""
 echo "=== Version consistency ==="
 
-PLUGIN_VERSION=$(jq -r '.version' plugins/beads-compound/.claude-plugin/plugin.json)
-MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name == "beads-compound") | .version' .claude-plugin/marketplace.json)
+PLUGIN_VERSION=$(jq -r '.version' plugins/lavra/.claude-plugin/plugin.json)
+MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name == "lavra") | .version' .claude-plugin/marketplace.json)
 
 echo "  plugin.json:      $PLUGIN_VERSION"
 echo "  marketplace.json: $MARKETPLACE_VERSION"
@@ -51,8 +51,8 @@ fi
 echo ""
 echo "=== Hook version constants ==="
 
-HOOK_VERSION=$(grep 'BEADS_COMPOUND_VERSION=' plugins/beads-compound/hooks/auto-recall.sh | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-PROVISION_VERSION=$(grep 'echo "' plugins/beads-compound/hooks/provision-memory.sh | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+HOOK_VERSION=$(grep 'LAVRA_VERSION=' plugins/lavra/hooks/auto-recall.sh | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+PROVISION_VERSION=$(grep 'echo "' plugins/lavra/hooks/provision-memory.sh | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
 
 echo "  auto-recall.sh:       $HOOK_VERSION"
 echo "  provision-memory.sh:  $PROVISION_VERSION"
@@ -70,10 +70,10 @@ echo "  Generating OpenCode and Gemini outputs..."
 echo ""
 echo "=== Component counts ==="
 
-COMMANDS=$(find plugins/beads-compound/commands -maxdepth 1 -name "*.md" | wc -l | tr -d ' ')
-OPTIONAL_COMMANDS=$(find plugins/beads-compound/commands/optional -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-AGENTS=$(find plugins/beads-compound/agents -name "*.md" | wc -l | tr -d ' ')
-SKILLS=$(find plugins/beads-compound/skills -name "SKILL.md" | wc -l | tr -d ' ')
+COMMANDS=$(find plugins/lavra/commands -maxdepth 1 -name "*.md" | wc -l | tr -d ' ')
+OPTIONAL_COMMANDS=$(find plugins/lavra/commands/optional -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+AGENTS=$(find plugins/lavra/agents -name "*.md" | wc -l | tr -d ' ')
+SKILLS=$(find plugins/lavra/skills -name "SKILL.md" | wc -l | tr -d ' ')
 
 echo "  Commands: $COMMANDS (need 24+) + $OPTIONAL_COMMANDS optional"
 echo "  Agents:   $AGENTS (need 29+)"
@@ -86,19 +86,19 @@ echo "  Skills:   $SKILLS (need 16+)"
 echo ""
 echo "=== Source files ==="
 
-check "opencode-src/plugin.ts"    test -f plugins/beads-compound/opencode-src/plugin.ts
-check "opencode-src/package.json" test -f plugins/beads-compound/opencode-src/package.json
-check "gemini-src/settings.json"  test -f plugins/beads-compound/gemini-src/settings.json
+check "opencode-src/plugin.ts"    test -f plugins/lavra/opencode-src/plugin.ts
+check "opencode-src/package.json" test -f plugins/lavra/opencode-src/package.json
+check "gemini-src/settings.json"  test -f plugins/lavra/gemini-src/settings.json
 
 echo ""
 echo "=== Conversion output files ==="
 
-check "opencode/ directory" test -d plugins/beads-compound/opencode
-check "gemini/ directory"   test -d plugins/beads-compound/gemini
-check "cortex/ directory"   test -d plugins/beads-compound/cortex
+check "opencode/ directory" test -d plugins/lavra/opencode
+check "gemini/ directory"   test -d plugins/lavra/gemini
+check "cortex/ directory"   test -d plugins/lavra/cortex
 
-OPENCODE_COMMANDS=$(find plugins/beads-compound/opencode/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-GEMINI_TOML=$(find plugins/beads-compound/gemini/commands -name "*.toml" 2>/dev/null | wc -l | tr -d ' ')
+OPENCODE_COMMANDS=$(find plugins/lavra/opencode/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+GEMINI_TOML=$(find plugins/lavra/gemini/commands -name "*.toml" 2>/dev/null | wc -l | tr -d ' ')
 
 echo "  OpenCode .md commands: $OPENCODE_COMMANDS (need 24+)"
 echo "  Gemini .toml commands: $GEMINI_TOML (need 24+)"
@@ -106,7 +106,7 @@ echo "  Gemini .toml commands: $GEMINI_TOML (need 24+)"
 [[ "$OPENCODE_COMMANDS" -ge 24 ]] && { echo "  PASS  OpenCode commands"; ((PASS++)) || true; } || fail "OpenCode commands" "$OPENCODE_COMMANDS < 24"
 [[ "$GEMINI_TOML"       -ge 24 ]] && { echo "  PASS  Gemini commands";   ((PASS++)) || true; } || fail "Gemini commands"   "$GEMINI_TOML < 24"
 
-CORTEX_COMMANDS=$(find plugins/beads-compound/cortex/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+CORTEX_COMMANDS=$(find plugins/lavra/cortex/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 echo "  Cortex .md commands:   $CORTEX_COMMANDS (need 20+)"
 [[ "$CORTEX_COMMANDS" -ge 20 ]] && { echo "  PASS  Cortex commands"; ((PASS++)) || true; } || fail "Cortex commands" "$CORTEX_COMMANDS < 20"
 

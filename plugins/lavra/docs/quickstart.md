@@ -4,7 +4,7 @@
 
 ```bash
 # From the plugin directory
-cd ~/Documents/projects/beads-compound-plugin
+cd ~/Documents/projects/lavra
 ./install.sh /path/to/your-project
 
 # Restart Claude Code
@@ -224,7 +224,7 @@ The plugin references compound-engineering agents but doesn't install them. If y
 ## Uninstall
 
 ```bash
-cd ~/Documents/projects/beads-compound-plugin
+cd ~/Documents/projects/lavra
 ./uninstall.sh /path/to/your-project
 ```
 
