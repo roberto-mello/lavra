@@ -5,11 +5,11 @@ globs: "**/plugins/**,**/agents/**,**/commands/**,**/skills/**"
 
 # Plugin Catalog
 
-## Commands (24 core + 5 optional)
+## Commands (22 core + 5 optional)
 
 Commands are in `plugins/lavra/commands/`:
 
-**Beads Workflow (11):**
+**Beads Workflow (14):**
 
 | Command | File | Description |
 |---------|------|-------------|
@@ -21,7 +21,10 @@ Commands are in `plugins/lavra/commands/`:
 | `/beads-work-ralph` | beads-work-ralph.md | Autonomous retry mode with completion promises |
 | `/beads-work-teams` | beads-work-teams.md | Persistent worker teammates with COMPLETED/ACCEPTED protocol |
 | `/beads-review` | beads-review.md | Multi-agent code review |
+| `/beads-qa` | beads-qa.md | Browser-based QA verification from the user's perspective |
+| `/beads-ship` | beads-ship.md | Automated ship sequence from code-ready to PR-open |
 | `/beads-checkpoint` | beads-checkpoint.md | Save progress and capture knowledge |
+| `/beads-retro` | beads-retro.md | Weekly retrospective with shipping analytics and knowledge synthesis |
 | `/beads-learn` | beads-learn.md | Curate knowledge into structured entries |
 | `/beads-recall` | beads-recall.md | Search knowledge base mid-session |
 
@@ -34,20 +37,14 @@ Commands are in `plugins/lavra/commands/`:
 | `/beads-triage` | beads-triage.md | Prioritize and categorize beads |
 | `/beads-import` | beads-import.md | Import markdown plans into beads |
 
-**Utility (10):**
+**Utility (4):**
 
 | Command | File | Description |
 |---------|------|-------------|
-| `/lfg` | lfg.md | Full autonomous engineering workflow |
 | `/changelog` | changelog.md | Create engaging changelogs |
-| `/create-agent-skill` | create-agent-skill.md | Create or edit skills |
 | `/heal-skill` | heal-skill.md | Fix incorrect SKILL.md files |
-| `/deploy-docs` | deploy-docs.md | Validate docs for deployment |
-| `/release-docs` | release-docs.md | Build and update documentation |
 | `/test-browser` | test-browser.md | Browser tests on affected pages |
 | `/report-bug` | report-bug.md | Report a plugin bug |
-| `/resolve-pr-parallel` | resolve-pr-parallel.md | Resolve PR comments in parallel |
-| `/resolve-todo-parallel` | resolve-todo-parallel.md | Resolve TODOs in parallel |
 
 **Optional (5):** Domain-specific commands in `plugins/lavra/commands/optional/`. Not installed by default.
 

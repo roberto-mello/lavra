@@ -8,7 +8,7 @@ This is a Claude Code plugin marketplace that provides beads-based persistent me
 
 The plugin provides:
 - 29 specialized agents (15 review, 5 research, 3 design, 5 workflow, 1 docs)
-- 24 core commands + 5 optional domain-specific commands (in commands/optional/)
+- 22 core commands + 5 optional domain-specific commands (in commands/optional/)
 - 16 skills (git-worktree, brainstorming, create-agent-skills, agent-browser, dhh-rails-style, etc.)
 - 3 hooks for automatic knowledge capture, recall, and subagent wrapup
 - 1 MCP server (Context7 for framework documentation)
@@ -36,7 +36,7 @@ lavra/                              # Marketplace root
 │       ├── .claude-plugin/
 │       │   └── plugin.json         # Plugin manifest (v0.6.0)
 │       ├── agents/                 # 29 agents (review/, research/, design/, workflow/, docs/)
-│       ├── commands/               # 24 core commands + optional/
+│       ├── commands/               # 22 core commands + optional/
 │       ├── skills/                 # 16 skills with supporting files
 │       ├── hooks/                  # hooks.json, auto-recall.sh, memory-capture.sh, subagent-wrapup.sh, recall.sh
 │       ├── opencode/               # OpenCode TypeScript plugin
