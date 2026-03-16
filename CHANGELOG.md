@@ -28,6 +28,9 @@ All notable changes to the lavra plugin are documented here.
 - **README rewrite** - WHY-first pitch with pain/solution framing instead of feature-list-first.
 - **Project renamed from beads-compound to lavra** - Plugin directory, package name, marketplace entry, sentinels, and all internal references updated. GitHub repo redirect handles old URLs.
 
+### Fixed
+- **OpenCode installer hangs in non-interactive mode** - `install-opencode.sh` model selection prompt now checks `[[ -t 0 ]]` (stdin is a terminal) in addition to `--yes` flag. Prevents hang when called from test scripts or CI. Installation tests now pass `--yes` to OpenCode installer. All 35 installation tests pass (was 30/35).
+
 ## [0.6.9] - 2026-03-13
 
 ### Added
