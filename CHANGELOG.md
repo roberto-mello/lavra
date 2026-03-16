@@ -4,54 +4,33 @@ All notable changes to the lavra plugin are documented here.
 
 ## [0.7.0] - 2026-03-15
 
+See [docs/releases/v0.7.0.md](docs/releases/v0.7.0.md) for the full release notes with context on why each change matters.
+
 ### Breaking Changes
-- **All `/beads-*` commands renamed to `/lavra-*`** - Every command, skill reference, agent reference, installer, and documentation file has been updated. `/beads-brainstorm` is now `/lavra-brainstorm`, `/beads-work` is now `/lavra-work`, etc. The `beads-knowledge` skill directory is now `lavra-knowledge`. This affects 46 command files across Claude Code, OpenCode, and Cortex platforms, plus ~80 files with internal references. The `bd` CLI and `.beads/` directory are unchanged -- only the slash-command prefix moved.
+- All `/beads-*` commands renamed to `/lavra-*`. The `bd` CLI and `.beads/` directory are unchanged.
 
 ### Added
-- **Goal-backward verification (F1)** - New `goal-verifier` agent checks implementation against bead success criteria at three levels: Exists (code artifact present), Substantive (not a stub/placeholder), Wired (imported/called/routed). Runs in `/lavra-work` Phase 3 (single-bead) and Phase M7 (multi-bead agent prompt), plus `/lavra-ship` Phase 4 as pre-landing gate. Exists/Substantive failures are CRITICAL (halt), Wired failures are WARNING (proceed). Skippable via `lavra.json` `workflow.goal_verification: false`.
-- **Deviation rules for execution (F2)** - `DEVIATION:` prefix added to memory-capture.sh and all knowledge type documentation. Four-rule framework: auto-fix blocking bugs (Rule 1), auto-add critical missing functionality (Rule 2), auto-fix blocking infrastructure (Rule 3), STOP for architectural changes (Rule 4). 3-attempt limit per issue. Deviations surfaced in `/lavra-ship` PR body with count and summaries. Light version in `/lavra-quick`.
-- **Session state digest (F3)** - New ephemeral file `.beads/memory/session-state.md` (gitignored) preserves "where was I?" context across context compaction. Written by `/lavra-work`, `/lavra-design`, and `/lavra-checkpoint` at milestones. `auto-recall.sh` injects it once at next session start then deletes. Stale files (>24h) auto-cleaned.
-- **Decision categorization (F4)** - Brainstorm epic descriptions now include three decision sections: `## Locked Decisions` (must honor), `## Agent Discretion` (agent can choose), `## Deferred` (out of scope). `/lavra-plan` child beads inherit Locked/Discretion in a `## Decisions` section. `/lavra-design` Phase 6 verifies inheritance and creates backlog beads (priority 4) from Deferred items.
-- **Brownfield codebase analysis (F5)** - `/project-setup` skill Step 1.5 dispatches 3 parallel agents (stack/architecture/conventions) and writes `.beads/config/codebase-profile.md` (200 lines max). Read by `/lavra-design` and `/lavra-work` with full injection safety (XML wrapping, sanitization, size cap).
-- **Workflow config file (F6)** - New `.beads/config/lavra.json` (committed, project-scoped) with toggles for research, plan_review, goal_verification, max_parallel_agents, commit_granularity, and model_profile. Provisioned by `provision-memory.sh` on install. Read by `/lavra-design` (skip phases) and `/lavra-work` (parallelism, commits).
-- **Context size budgets (F7)** - Epic max 80 lines (brainstorm), child bead max 150 lines (plan). `/lavra-design` Phase 6 enforces budgets and auto-splits oversized beads into 2-3 smaller ones. Cross-check warning in `/lavra-plan` Step 5.5.
-- **Atomic commits per task (F8)** - `/lavra-work` single-bead commits per task with `{type}({BEAD_ID}): {description}` format (enables `git log --grep`). Multi-bead commits per bead instead of per wave. Configurable via `commit_granularity: "task"|"wave"` in `lavra.json`.
+- Goal-backward verification -- new `goal-verifier` agent (Exists/Substantive/Wired checks)
+- Deviation rules -- `DEVIATION:` knowledge type, 4-rule auto-fix framework, PR summaries
+- Session state digest -- `.beads/memory/session-state.md` survives context compaction
+- Decision categorization -- Locked Decisions / Agent Discretion / Deferred sections in brainstorm and plan
+- Brownfield codebase analysis -- `/project-setup` Step 1.5 with 3 parallel agents
+- Workflow config -- `.beads/config/lavra.json` toggles for research, review, verification, parallelism
+- Context size budgets -- epic 80 lines, child bead 150 lines, auto-split on overflow
+- Atomic commits per task -- `{type}({BEAD_ID}): {description}` format, per-bead in multi-bead
+- `project-setup` skill, `migration-drift-detector` agent
+- Sources/References sections in `/lavra-plan`, cross-check validation (Step 5.5)
+- `docs/SECURITY.md` -- threat model and injection defense documentation
 
 ### Changed
-- **4-command pipeline redesign** - Restructured from 29 scattered commands into a focused development pipeline: `/lavra-design` -> `/lavra-work` -> `/lavra-qa` -> `/lavra-ship`. Merged `/lavra-parallel` into `/lavra-work` with auto-routing (single vs multi-bead). Extracted ralph and teams modes into `/lavra-work-ralph` and `/lavra-work-teams`. Killed 6 thin stubs, moved 5 domain-specific commands to `commands/optional/`, split skills into 9 core + 7 optional. Down from 29 to 22 core commands + 5 optional.
-- **Command renames within pipeline** - `/lavra-compound` -> `/lavra-learn` (targeted knowledge extraction), `/lavra-deepen` -> `/lavra-research` (scoped agent selection). New commands: `/lavra-ship`, `/lavra-qa`, `/lavra-retro`, `/lavra-work-ralph`, `/lavra-work-teams`.
-- **Agent count 29 -> 30** - Added `goal-verifier` to review agents (16 review total).
-- **Version self-heal for existing projects** - `auto-recall.sh` now calls `provision_memory_dir` on version mismatch, auto-provisioning `lavra.json` and `session-state.md` gitignore for existing projects without requiring a full re-install.
-- **Feature test suite** - New `scripts/test-features.sh` with 27 tests covering all 8 new features: DEVIATION capture, lavra.json provisioning + idempotency, session-state gitignore, goal-verifier structure, agent counts, documentation consistency, and command file integration.
-- **Installation test updates** - Agent count thresholds bumped from 28 to 30 across all 4 platform tests. New Test 5 verifies lavra.json provisioning, session-state gitignore, goal-verifier installation, and idempotency.
-- **Documentation updates** - Updated ARCHITECTURE.md (new artifacts section), SECURITY.md (codebase-profile injection defense), CATALOG.md (agent counts, goal-verifier, decision categories), quickstart.md (configuration section, DEVIATION prefix, fixed stale beads-* references), README.md (agent count, knowledge types, configuration details block).
-- **README rewrite** - WHY-first pitch with pain/solution framing instead of feature-list-first.
-- **Project renamed from beads-compound to lavra** - Plugin directory, package name, marketplace entry, sentinels, and all internal references updated. GitHub repo redirect handles old URLs.
+- Pipeline redesign: `/lavra-design` -> `/lavra-work` -> `/lavra-qa` -> `/lavra-ship`
+- `/lavra-compound` -> `/lavra-learn`, `/lavra-deepen` -> `/lavra-research`
+- Version self-heal provisions new config files on upgrade without full re-install
+- 30 agents (was 29), 16 skills (was 15), 22 core commands + 5 optional
+- Dynamic agent allowlist in `/lavra-review`, expanded sanitization strip list
 
 ### Fixed
-- **OpenCode installer hangs in non-interactive mode** - `install-opencode.sh` model selection prompt now checks `[[ -t 0 ]]` (stdin is a terminal) in addition to `--yes` flag. Prevents hang when called from test scripts or CI. Installation tests now pass `--yes` to OpenCode installer. All 35 installation tests pass (was 30/35).
-
-### Also included (from unreleased 0.6.9)
-
-#### Added
-- **`project-setup` skill** - Per-project stack detection and review agent configuration. Auto-detects tech stack, lets users toggle specific agents off, saves config to `.beads/config/project-setup.md`.
-- **`migration-drift-detector` agent** - Detects schema/migration drift across five ORMs (Rails, Alembic, Prisma, Drizzle, Knex). All PR field handling uses `jq --arg` to prevent shell injection.
-- **`lavra-review` project config integration** - Reads `.beads/config/project-setup.md` and dispatches only configured agents (dynamic allowlist). `reviewer_context_note` intentionally not injected into review agents.
-- **`/lavra-work` multi-bead config injection** - Reads `reviewer_context_note` and injects into subagent prompts wrapped in `untrusted-config-data` XML.
-- **`migration-drift-detector` wired into `/lavra-review`** - Conditional agent alongside `data-migration-expert`, triggers on migration/schema files.
-- **`/lavra-learn` surfaced after substantial findings** - `/lavra-work` surfaces `/lavra-learn` when `LEARNED:` or `INVESTIGATION:` comments found.
-- **Sources section in `/lavra-plan`** - Epic descriptions include mandatory `## Sources` list. Child beads get `## References`.
-- **Cross-check validation in `/lavra-plan`** - Step 5.5 warning-only validation: required sections, file-scope conflicts, brainstorm reference.
-- **Improved brainstorm detection in `/lavra-plan`** - Four-step decision tree: label-based, keyword <=14d, keyword >14d (prompt), full refinement.
-- **`.beads/config/` provisioned by installer**.
-
-#### Changed
-- **`reviewer_context_note` injection removed from `/lavra-review`** - Review agents derive context from code, removing injection vector.
-- **Expanded sanitization strip list** - Added `USER:`, `HUMAN:`, `[INST]`, `<s>`/`</s>`, `\r`, null bytes, Unicode bidirectional overrides.
-- **Dynamic agent allowlist in `/lavra-review`** - Validated against live `.claude/agents/` listing.
-- **`docs/SECURITY.md` added** - Full threat model, injection defense strategy, trust model.
-- **`.beads/config/` added to protected artifacts** across all six protection locations.
-- **Component counts** - 28 → 30 agents (migration-drift-detector + goal-verifier), 15 → 16 skills (project-setup).
+- OpenCode installer hangs in non-interactive mode (added `[[ -t 0 ]]` check)
 
 ## [0.6.8] - 2026-03-05
 
