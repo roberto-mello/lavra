@@ -56,11 +56,11 @@ AGENT_DESCRIPTIONS = {
 # (Manual commands with side effects that shouldn't be auto-suggested)
 DISABLE_COMMANDS = [
     "lfg",
-    "beads-checkpoint",
+    "lavra-checkpoint",
     "deploy-docs",
     "release-docs",
     "changelog",
-    "beads-triage",
+    "lavra-triage",
     "test-browser",
     "xcode-test",
     "report-bug",
@@ -82,7 +82,7 @@ DISABLE_COMMANDS = [
 
 # Phase 3: Skills that should have disable-model-invocation: true
 DISABLE_SKILLS = [
-    "beads-knowledge",      # compound-docs equivalent
+    "lavra-knowledge",      # compound-docs equivalent
     "create-agent-skills",  # matches their pattern
     "file-todos",           # matches their pattern
     "skill-creator",        # matches their pattern

@@ -1,11 +1,11 @@
 ---
-name: beads-research
+name: lavra-research
 description: Gather evidence and best practices for a plan using domain-matched research agents
 argument-hint: "[epic bead ID]"
 ---
 
 <objective>
-Take an existing plan (from `/beads-plan` or `/beads-design`) and GATHER evidence for each section using domain-matched research agents. Each agent is selected because its expertise matches the plan's technologies and concerns. Research GATHERS findings (docs, prior art, best practices, edge cases, knowledge recall) -- it does NOT revise the plan or apply changes. That is `/beads-design`'s job. The output is organized research findings ready for `/beads-design` to integrate.
+Take an existing plan (from `/lavra-plan` or `/lavra-design`) and GATHER evidence for each section using domain-matched research agents. Each agent is selected because its expertise matches the plan's technologies and concerns. Research GATHERS findings (docs, prior art, best practices, edge cases, knowledge recall) -- it does NOT revise the plan or apply changes. That is `/lavra-design`'s job. The output is organized research findings ready for `/lavra-design` to integrate.
 </objective>
 
 <execution_context>
@@ -214,7 +214,7 @@ BEAD {CHILD_ID}: {title}
 ### 7. Log Research Findings as Knowledge Comments
 
 <thinking>
-Capture key findings as knowledge comments on the relevant beads. This is the primary output -- structured evidence for /beads-design to consume.
+Capture key findings as knowledge comments on the relevant beads. This is the primary output -- structured evidence for /lavra-design to consume.
 </thinking>
 
 **For each child bead with findings:**
@@ -228,7 +228,7 @@ bd comments add {CHILD_ID} "PATTERN: [recommended pattern with rationale]"
 **Add a research summary to the epic:**
 
 ```bash
-bd comments add {EPIC_ID} "INVESTIGATION: Research completed with [count] domain-matched agents ([agent names]). Key findings: [top 3 findings]. Ready for /beads-design to integrate."
+bd comments add {EPIC_ID} "INVESTIGATION: Research completed with [count] domain-matched agents ([agent names]). Key findings: [top 3 findings]. Ready for /lavra-design to integrate."
 ```
 
 </process>
@@ -243,7 +243,7 @@ bd comments add {EPIC_ID} "INVESTIGATION: Research completed with [count] domain
 </success_criteria>
 
 <guardrails>
-- NEVER modify child bead descriptions. Research GATHERS evidence. `/beads-design` APPLIES it.
+- NEVER modify child bead descriptions. Research GATHERS evidence. `/lavra-design` APPLIES it.
 - NEVER write code. Just research and report findings.
 - NEVER dispatch agents that have no domain match. Each agent must have a stated reason for inclusion.
 </guardrails>
@@ -254,14 +254,14 @@ After logging all findings, use the **AskUserQuestion tool** to present these op
 **Question:** "Research complete for epic `{EPIC_ID}`. [count] agents gathered findings across [count] child beads. What would you like to do next?"
 
 **Options:**
-1. **Run `/beads-design`** - Integrate research findings into the plan
-2. **Run `/beads-plan-review`** - Get feedback from reviewers on the plan
+1. **Run `/lavra-design`** - Integrate research findings into the plan
+2. **Run `/lavra-plan-review`** - Get feedback from reviewers on the plan
 3. **Research deeper** - Run another round on specific sections with additional agents
 4. **View findings** - Show all research findings organized by child bead
 
 Based on selection:
-- **`/beads-design`** -> Call the /beads-design command with the epic bead ID
-- **`/beads-plan-review`** -> Call the /beads-plan-review command with the epic bead ID
+- **`/lavra-design`** -> Call the /lavra-design command with the epic bead ID
+- **`/lavra-plan-review`** -> Call the /lavra-plan-review command with the epic bead ID
 - **Research deeper** -> Ask which sections need more research, add targeted agents
 - **View findings** -> Show findings grouped by child bead with agent attribution
 </handoff>

@@ -1,11 +1,11 @@
 ---
-name: beads-qa
+name: lavra-qa
 description: Browser-based QA verification of the running app -- systematic testing from the user's perspective
 argument-hint: "[bead ID or --quick for smoke test]"
 ---
 
 <objective>
-Verify that implemented changes work correctly from the user's perspective by running systematic browser-based tests against the running application. Sits between /beads-work (implementation) and shipping, catching visual regressions, broken interactions, console errors, and workflow breakages that unit tests miss.
+Verify that implemented changes work correctly from the user's perspective by running systematic browser-based tests against the running application. Sits between /lavra-work (implementation) and shipping, catching visual regressions, broken interactions, console errors, and workflow breakages that unit tests miss.
 </objective>
 
 <execution_context>
@@ -324,13 +324,13 @@ Use **AskUserQuestion tool**:
 **Question:** "QA complete. Result: {PASS/WARN/FAIL}. What next?"
 
 **Options (if PASS):**
-1. **Run `/beads-review`** - Code review before shipping
+1. **Run `/lavra-review`** - Code review before shipping
 2. **Close bead** - Mark as complete: `bd close {BEAD_ID}`
 3. **Ship it** - Push and create PR
 
 **Options (if WARN or FAIL):**
 1. **Fix issues** - Address failures before shipping
-2. **Run `/beads-review`** - Code review (issues noted but accepted)
+2. **Run `/lavra-review`** - Code review (issues noted but accepted)
 3. **Create beads for failures** - Track issues separately and ship
 4. **Re-run QA** - Test again after fixes
 
@@ -351,7 +351,7 @@ Use **AskUserQuestion tool**:
 
 <handoff>
 After QA completes:
-1. **Run `/beads-review`** - Multi-agent code review
+1. **Run `/lavra-review`** - Multi-agent code review
 2. **Fix failures** - Address any FAIL results
 3. **Ship** - Push changes and create PR
 </handoff>

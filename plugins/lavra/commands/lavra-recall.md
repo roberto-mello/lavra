@@ -1,5 +1,5 @@
 ---
-name: beads-recall
+name: lavra-recall
 description: Search knowledge base mid-session and inject relevant context
 argument-hint: "[keywords, bead ID, or --flag]"
 disable-model-invocation: true
@@ -142,7 +142,7 @@ When argument matches bead ID pattern:
    bd comments add {BEAD_ID} "LEARNED: ..."
    ```
 
-   Use `/beads-learn` to curate findings into structured knowledge.
+   Use `/lavra-learn` to curate findings into structured knowledge.
    ```
 
 ### Mode 5: Keyword Search
@@ -177,8 +177,8 @@ When argument is plain text (not a flag or bead ID):
    Try:
    - Different keywords (e.g., "auth" instead of "authentication")
    - Broader search terms
-   - `/beads-recall --recent 20` to see latest entries
-   - `/beads-recall --stats` to see all topics and tags
+   - `/lavra-recall --recent 20` to see latest entries
+   - `/lavra-recall --stats` to see all topics and tags
    ```
 
 ### Mode 6: Empty Arguments
@@ -190,16 +190,16 @@ If `#$ARGUMENTS` is empty:
 
 Usage:
 ```bash
-/beads-recall "keywords"           # Search by keywords
-/beads-recall BD-001               # Recall for specific bead
-/beads-recall --recent 10          # Show recent entries
-/beads-recall --stats              # Database statistics
-/beads-recall --topic BD-005       # Epic's knowledge
+/lavra-recall "keywords"           # Search by keywords
+/lavra-recall BD-001               # Recall for specific bead
+/lavra-recall --recent 10          # Show recent entries
+/lavra-recall --stats              # Database statistics
+/lavra-recall --topic BD-005       # Epic's knowledge
 ```
 
 Or try:
 ```bash
-/beads-recall --recent 10          # See what's been captured lately
+/lavra-recall --recent 10          # See what's been captured lately
 ```
 ```
 
@@ -270,7 +270,7 @@ Beads CLI not found. Install from: https://github.com/steveyegge/beads
 **If results found:**
 - Use this knowledge to inform your current work
 - Add new learnings: `bd comments add <BEAD_ID> "LEARNED: ..."`
-- Curate knowledge entries: `/beads-learn`
+- Curate knowledge entries: `/lavra-learn`
 
 **If implementing related work:**
 ```bash

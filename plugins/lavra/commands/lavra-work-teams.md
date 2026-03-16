@@ -1,5 +1,5 @@
 ---
-name: beads-work-teams
+name: lavra-work-teams
 description: Work on multiple beads with persistent worker teammates that self-organize through a ready queue
 argument-hint: "[epic bead ID, list of bead IDs, or empty for all ready beads] [--workers N] [--retries N] [--max-turns N] [--yes]"
 ---
@@ -13,15 +13,15 @@ Spawn persistent worker teammates that self-organize to pull beads from a ready 
 </execution_context>
 
 <shared_behavior>
-This command shares foundational behavior with `/beads-work`. Specifically:
+This command shares foundational behavior with `/lavra-work`. Specifically:
 
-- **Knowledge gates**: Every bead requires at least one knowledge comment (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION) before it can be accepted. See `/beads-work` Phase 2 step 3 for the full trigger table.
-- **File-scope conflict detection**: Before spawning workers, analyze which files each bead will modify and force sequential ordering where independent beads overlap. See `/beads-work` Phase M3 for the full algorithm (path validation, overlap detection, ordering heuristic).
-- **Wave ordering / dependency analysis**: Beads are organized into execution waves based on dependencies. For epic input, use `bd swarm validate`; otherwise use `bd graph`. See `/beads-work` Phase M4.
-- **Bead gathering**: Epic ID, comma-separated IDs, or `bd ready`. Validate IDs with `^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$`. Skip beads that recommend deleting `.beads/memory/` or `.beads/config/` files. See `/beads-work` Phase M1.
-- **Knowledge recall**: Run `.beads/memory/recall.sh` with combined bead keywords before building worker prompts. See `/beads-work` Phase M6.
-- **Project config / reviewer_context_note**: Read `.beads/config/project-setup.md`, sanitize, and inject as `{review_context}`. See `/beads-work` Phase M6.
-- **Pre-push diff review**: Always show diff and require confirmation before pushing, even with `--yes`. See `/beads-work` Phase M9.
+- **Knowledge gates**: Every bead requires at least one knowledge comment (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION) before it can be accepted. See `/lavra-work` Phase 2 step 3 for the full trigger table.
+- **File-scope conflict detection**: Before spawning workers, analyze which files each bead will modify and force sequential ordering where independent beads overlap. See `/lavra-work` Phase M3 for the full algorithm (path validation, overlap detection, ordering heuristic).
+- **Wave ordering / dependency analysis**: Beads are organized into execution waves based on dependencies. For epic input, use `bd swarm validate`; otherwise use `bd graph`. See `/lavra-work` Phase M4.
+- **Bead gathering**: Epic ID, comma-separated IDs, or `bd ready`. Validate IDs with `^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$`. Skip beads that recommend deleting `.beads/memory/` or `.beads/config/` files. See `/lavra-work` Phase M1.
+- **Knowledge recall**: Run `.beads/memory/recall.sh` with combined bead keywords before building worker prompts. See `/lavra-work` Phase M6.
+- **Project config / reviewer_context_note**: Read `.beads/config/project-setup.md`, sanitize, and inject as `{review_context}`. See `/lavra-work` Phase M6.
+- **Pre-push diff review**: Always show diff and require confirmation before pushing, even with `--yes`. See `/lavra-work` Phase M9.
 </shared_behavior>
 
 <process>
@@ -79,7 +79,7 @@ If yes: `bd update {BEAD_ID} --status open` for each.
 ### 3d. Determine completion promise per bead
 
 For each bead, derive completion criteria from (in priority order):
-1. **`## Validation` section** in the bead description (from `/beads-plan`) -- use directly
+1. **`## Validation` section** in the bead description (from `/lavra-plan`) -- use directly
 2. **`## Testing` section** in the bead description -- "all specified tests pass"
 3. **`TEST_COMMAND` exists** -- "all tests pass"
 4. **None of the above** -- "implementation matches the bead description and no errors on manual review"
@@ -88,7 +88,7 @@ Store as `COMPLETION_CRITERIA` per bead for injection into worker prompts.
 
 ## 4. Gather Beads, Detect Conflicts, Build Waves
 
-Follow the shared behavior for bead gathering (Phase M1 of `/beads-work`), file-scope conflict detection (Phase M3), and dependency analysis / wave building (Phase M4).
+Follow the shared behavior for bead gathering (Phase M1 of `/lavra-work`), file-scope conflict detection (Phase M3), and dependency analysis / wave building (Phase M4).
 
 **Register swarm (epic input only):**
 When the input was an epic bead ID, register the orchestration:
@@ -152,7 +152,7 @@ If `--yes` is set, skip this approval and proceed automatically.
 
 ## 7. Recall Knowledge & Read Project Config *(required -- do not skip)*
 
-Follow the shared behavior for knowledge recall and project config reading (Phase M6 of `/beads-work`).
+Follow the shared behavior for knowledge recall and project config reading (Phase M6 of `/lavra-work`).
 
 ```bash
 .beads/memory/recall.sh "{combined keywords from all bead titles}"
@@ -496,9 +496,9 @@ After push is approved:
 <handoff>
 All work complete. What next?
 
-1. **Run `/beads-review`** on all changes
+1. **Run `/lavra-review`** on all changes
 2. **Create a PR** with all changes
-3. **Run `/beads-compound {COMPOUND_CANDIDATES}`** - Document non-obvious findings as reusable knowledge *(only shown if COMPOUND_CANDIDATES is non-empty)*
+3. **Run `/lavra-compound {COMPOUND_CANDIDATES}`** - Document non-obvious findings as reusable knowledge *(only shown if COMPOUND_CANDIDATES is non-empty)*
 4. **Retry failed beads** - Re-run with only the failed bead IDs
 5. **Continue** with remaining open beads
 </handoff>

@@ -188,7 +188,7 @@ fi
 # Detect if commands/agents/skills are already installed globally
 GLOBALLY_INSTALLED=false
 
-if [ "$GLOBAL_INSTALL" = false ] && [ -f "$HOME/.snowflake/cortex/commands/beads-plan.md" ]; then
+if [ "$GLOBAL_INSTALL" = false ] && [ -f "$HOME/.snowflake/cortex/commands/lavra-plan.md" ]; then
   GLOBALLY_INSTALLED=true
 fi
 
@@ -412,8 +412,8 @@ echo ""
 echo "Done. Installed:"
 echo ""
 echo "  Commands ($CMD_COUNT):"
-echo "    Workflow: /beads-plan, /beads-brainstorm, /beads-work, /beads-work-ralph, /beads-work-teams, /beads-review, /beads-compound, /beads-checkpoint"
-echo "    Planning: /beads-research, /beads-plan-review, /beads-triage"
+echo "    Workflow: /lavra-plan, /lavra-brainstorm, /lavra-work, /lavra-work-ralph, /lavra-work-teams, /lavra-review, /lavra-compound, /lavra-checkpoint"
+echo "    Planning: /lavra-research, /lavra-plan-review, /lavra-triage"
 echo "    Utility:  /lfg, /changelog, /create-agent-skill, /heal-skill"
 echo "    Testing:  /test-browser, /report-bug"
 echo "    Docs:     /deploy-docs, /release-docs"
@@ -423,7 +423,7 @@ echo "  Agents ($AGENT_COUNT):"
 echo "    Review, research, design, workflow, and docs agents"
 echo ""
 echo "  Core Skills ($SKILL_COUNT):"
-echo "    git-worktree, brainstorming, create-agent-skills, agent-native-architecture, beads-knowledge,"
+echo "    git-worktree, brainstorming, create-agent-skills, agent-native-architecture, lavra-knowledge,"
 echo "    agent-browser, file-todos, project-setup, skill-creator"
 echo ""
 echo "  Optional Skills (7, not installed by default):"
@@ -456,9 +456,9 @@ if [ "$GLOBAL_INSTALL" = true ]; then
 else
   echo "Usage:"
   echo "  1. Create or work on beads normally with bd commands"
-  echo "  2. Use /beads-plan for complex features requiring research"
-  echo "  3. Use /beads-brainstorm to explore ideas before planning"
-  echo "  4. Use /beads-review before closing beads to catch issues"
+  echo "  2. Use /lavra-plan for complex features requiring research"
+  echo "  3. Use /lavra-brainstorm to explore ideas before planning"
+  echo "  4. Use /lavra-review before closing beads to catch issues"
   echo "  5. Log learnings with: bd comment add ID \"LEARNED: ...\""
   echo "  6. Knowledge will be recalled automatically next session"
   echo ""

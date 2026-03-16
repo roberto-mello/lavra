@@ -111,7 +111,7 @@ if [ -d "$BASE_DIR/skills" ]; then
   # List of known plugin skills
   PLUGIN_SKILLS=(
     git-worktree brainstorming create-agent-skills agent-native-architecture
-    beads-knowledge agent-browser andrew-kane-gem-writer dhh-rails-style
+    lavra-knowledge agent-browser andrew-kane-gem-writer dhh-rails-style
     dspy-ruby every-style-editor file-todos frontend-design gemini-imagegen
     rclone skill-creator
   )

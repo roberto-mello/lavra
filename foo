@@ -1,0 +1,54 @@
+we were working on this discussion before compaction:
+---
+lfg is imported from compound-engineering. I wonder if there's a point for us having it in our workflow. My intention is to turn
+lavra-compound into a full development orchestrator that embeds real software skills into coding agent workflows so users (technical
+or otherwise) can get work done with its philosophy of "each unit of work makes the next one easier"
+
+⏺ That's a sharp framing. Let me read /lfg to understand what it actually does.
+
+⏺ /lfg is basically a thin shell — 7 sequential slash commands with zero logic of its own. It's also missing the brainstorm step, uses
+  /lavra-work (single bead) instead of /lavra-parallel, and skips /lavra-compound. It was clearly inherited from compound-engineering
+  where the workflow was different.
+
+  Against your vision it has a deeper problem: it treats the workflow as a fixed 7-step pipeline rather than something that adapts to
+  the work. "Each unit of work makes the next one easier" implies the pipeline should carry context forward — locked decisions, prior
+  learnings, knowledge recall — not just chain commands.
+
+  The real question is whether /lfg should be replaced or evolved. A few ways to think about it:
+
+  1. Drop it — /lavra-design already orchestrates the planning half. You could just make /lavra-design able to continue into execution
+  (work/parallel → review → compound). That would be one coherent command embodying the full philosophy.
+  2. Replace it with a proper orchestrator — /beads-go (or keep the name /lfg) that does what you described: plan with brainstorm
+  context, execute with parallel, review, surface compound candidates, push. The key difference from the current /lfg is it threads
+  context through each stage rather than just calling commands in a list.
+  3. Keep /lfg as the "no-questions" fast path — for users who just want to throw a description at it and get code back. Minimal
+  interaction. Useful for non-technical users.
+
+  Option 2 and 3 aren't mutually exclusive — option 2 becomes /lavra-design extended into execution, option 3 becomes a one-liner entry
+   point to it.
+
+  What's your instinct — extend /lavra-design to cover the full lifecycle, or keep the planning and execution orchestrators separate
+  and have /lfg (or a new name) chain them?
+---
+
+I think that means:
+
+- Getting rid of commands that don't make sense
+- Making sure that commands that we keep are comprehensive and work with the philosophy of
+  helping people come up with actual projects from design to implementation and deployment
+  with comprehensive help from agents and a workflow that helps give agents the proper
+  context and memory when needed
+- Easy installation and updating (we have an installer that I need to test)
+- 
+
+In that vein, let's evaluate:
+
+- Everything we have
+- What we can learn/reuse from gstack (~/Documents/projects/github/gstack/)
+  - I think we're missing the "CEO" view of gstack
+  - but what else?
+
+
+
+
+

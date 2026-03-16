@@ -1,6 +1,6 @@
 # MCP Server Configuration for OpenCode
 
-The beads-compound plugin uses the Context7 MCP server for framework documentation.
+The lavra-compound plugin uses the Context7 MCP server for framework documentation.
 
 ## Manual Configuration Required
 

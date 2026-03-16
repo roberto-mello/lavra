@@ -269,7 +269,7 @@ echo ""
 echo "2. The TypeScript plugin will automatically load on next OpenCode session"
 echo ""
 echo "3. Commands are available via Ctrl+K:"
-echo "   - beads-plan, beads-work, beads-review, etc."
+echo "   - lavra-plan, lavra-work, lavra-review, etc."
 echo ""
 
 if [ "$GLOBAL_INSTALL" = true ]; then

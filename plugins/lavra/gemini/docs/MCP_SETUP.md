@@ -1,6 +1,6 @@
 # MCP Server Configuration for Gemini CLI
 
-The beads-compound plugin uses the Context7 MCP server for framework documentation.
+The lavra plugin uses the Context7 MCP server for framework documentation.
 
 ## Manual Configuration Required
 

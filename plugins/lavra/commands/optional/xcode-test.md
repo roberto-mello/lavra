@@ -18,9 +18,9 @@ Build, install, and test iOS apps on the simulator using XcodeBuildMCP. Captures
 - Valid Xcode project or workspace
 - At least one iOS Simulator available
 
-### Integration with /beads-review
+### Integration with /lavra-review
 
-When reviewing PRs that touch iOS code, the `/beads-review` command can spawn this as a subagent:
+When reviewing PRs that touch iOS code, the `/lavra-review` command can spawn this as a subagent:
 
 ```
 Task general-purpose("Run /xcode-test for scheme [name]. Build, install on simulator, test key screens, check for crashes.")
@@ -281,7 +281,7 @@ mcp__xcodebuildmcp__shutdown_simulator({ simulator_id: "[uuid]" })
 </success_criteria>
 
 <handoff>
-1. **Run `/beads-review`** - Full code review of the changes
+1. **Run `/lavra-review`** - Full code review of the changes
 2. **Fix failures** - Address test failures now
 3. **Done** - Accept results
 </handoff>

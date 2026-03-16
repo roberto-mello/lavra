@@ -1,5 +1,5 @@
 ---
-name: beads-retro
+name: lavra-retro
 description: Weekly retrospective with shipping analytics, team performance, and knowledge synthesis
 argument-hint: "[--window 14d] [--since 2026-03-01]"
 ---
@@ -238,7 +238,7 @@ This is the lavra differentiator. Read and analyze the knowledge base.
 
    Cross-reference: for each hotspot file (Phase 2) and each closed bead (Phase 3), check whether any knowledge entries reference them. Files or beads with significant activity but zero knowledge entries represent gaps.
 
-   Report these gaps with a recommendation: "Consider running /beads-compound on {bead} to capture what was learned."
+   Report these gaps with a recommendation: "Consider running /lavra-compound on {bead} to capture what was learned."
 
 6. **Trend comparison**
 

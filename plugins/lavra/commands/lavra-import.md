@@ -1,5 +1,5 @@
 ---
-name: beads-import
+name: lavra-import
 description: Import a markdown plan into beads as an epic with child tasks
 argument-hint: "[path/to/plan.md] [optional epic title]"
 ---
@@ -23,7 +23,7 @@ Import a markdown plan document into beads as an epic with child task beads. Aut
    - Epic title (optional)
 
    If no arguments provided:
-   - Ask: "Please provide the path to the markdown plan file, e.g.: /beads-import plan.md"
+   - Ask: "Please provide the path to the markdown plan file, e.g.: /lavra-import plan.md"
    - Stop execution
 
    If only file path provided, the title will be auto-extracted from the first `#` header in the markdown file.
@@ -57,7 +57,7 @@ Import a markdown plan document into beads as an epic with child task beads. Aut
    ```
 
    If no `#` header found and no title argument provided:
-   - Ask: "No title found in markdown file. Please provide a title: /beads-import {file_path} \"Your Epic Title\""
+   - Ask: "No title found in markdown file. Please provide a title: /lavra-import {file_path} \"Your Epic Title\""
    - Stop execution
 
 ### Phase 2: Run Import Script
@@ -187,8 +187,8 @@ Details about UI changes...
 <handoff>
 Plan imported as epic `{EPIC_ID}`. What would you like to do next?
 
-1. **Run `/beads-research {EPIC_ID}`** - Gather evidence for each child bead with domain-matched research agents
-2. **Run `/beads-plan-review {EPIC_ID}`** - Get feedback from reviewers on the plan
-3. **Start `/beads-work {EPIC_ID}.1`** - Begin implementing the first child bead
+1. **Run `/lavra-research {EPIC_ID}`** - Gather evidence for each child bead with domain-matched research agents
+2. **Run `/lavra-plan-review {EPIC_ID}`** - Get feedback from reviewers on the plan
+3. **Start `/lavra-work {EPIC_ID}.1`** - Begin implementing the first child bead
 4. **View epic** - Show the full epic bead details
 </handoff>

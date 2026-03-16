@@ -206,7 +206,7 @@ echo ""
 echo "2. Context7 MCP server configured (framework documentation lookup)"
 echo ""
 echo "3. Commands are available as slash commands:"
-echo "   - /beads-plan, /beads-work, /beads-review, etc."
+echo "   - /lavra-plan, /lavra-work, /lavra-review, etc."
 echo ""
 
 if [ "$GLOBAL_INSTALL" = true ]; then

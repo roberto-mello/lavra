@@ -17,7 +17,7 @@ The plugin's 28 agents are assigned to three model tiers based on reasoning comp
 ## Key Optimizations
 
 - Most frequently invoked agents (`learnings-researcher`, `repo-research-analyst`) use Haiku
-- Review workflows like `/beads-review` fire 13+ agents, mostly Sonnet tier
+- Review workflows like `/lavra-review` fire 13+ agents, mostly Sonnet tier
 - Opus reserved for architectural/security decisions requiring deep reasoning
 - Commands automatically dispatch agents at their assigned tier via frontmatter `model:` field
 

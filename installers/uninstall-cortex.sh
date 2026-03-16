@@ -90,9 +90,9 @@ fi
 
 if [ -d "$COMMANDS_DIR" ]; then
   PLUGIN_COMMANDS=(
-    beads-plan.md beads-work.md beads-work-ralph.md beads-work-teams.md beads-parallel.md beads-review.md beads-checkpoint.md
-    beads-brainstorm.md beads-compound.md
-    beads-research.md beads-plan-review.md beads-triage.md
+    lavra-plan.md lavra-work.md lavra-work-ralph.md lavra-work-teams.md lavra-parallel.md lavra-review.md lavra-checkpoint.md
+    lavra-brainstorm.md lavra-compound.md
+    lavra-research.md lavra-plan-review.md lavra-triage.md
     changelog.md create-agent-skill.md deploy-docs.md
     heal-skill.md lfg.md
     release-docs.md report-bug.md
@@ -151,7 +151,7 @@ else
 fi
 
 if [ -d "$SKILLS_DIR" ]; then
-  PLUGIN_SKILLS=(git-worktree brainstorming create-agent-skills agent-native-architecture beads-knowledge agent-browser andrew-kane-gem-writer dhh-rails-style dspy-ruby every-style-editor file-todos frontend-design gemini-imagegen rclone skill-creator)
+  PLUGIN_SKILLS=(git-worktree brainstorming create-agent-skills agent-native-architecture lavra-knowledge agent-browser andrew-kane-gem-writer dhh-rails-style dspy-ruby every-style-editor file-todos frontend-design gemini-imagegen rclone skill-creator)
 
   for skill in "${PLUGIN_SKILLS[@]}"; do
     if [ -L "$SKILLS_DIR/$skill" ]; then

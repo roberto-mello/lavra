@@ -1,11 +1,11 @@
 ---
-name: beads-work-ralph
+name: lavra-work-ralph
 description: Autonomous retry mode for bead work -- iterates until completion criteria are met or retry budget is exhausted
 argument-hint: "[bead ID or epic ID or comma-separated IDs] [--retries N] [--max-turns N] [--yes]"
 ---
 
 <objective>
-Work on beads autonomously with iterative retry. Each subagent loops until its completion criteria pass or retries are exhausted, using the ralph-wiggum promise pattern. Combines the full beads-work quality standard with self-healing execution.
+Work on beads autonomously with iterative retry. Each subagent loops until its completion criteria pass or retries are exhausted, using the ralph-wiggum promise pattern. Combines the full lavra-work quality standard with self-healing execution.
 </objective>
 
 <execution_context>
@@ -53,7 +53,7 @@ Determine what "done" means for each agent and extract the test command.
 The **completion promise** is how the subagent signals it is done -- following the ralph-wiggum pattern. Each subagent must output `<promise>DONE</promise>` when its completion criteria are met.
 
 For each bead, derive the completion criteria from (in priority order):
-1. **`## Validation` section** in the bead description (from `/beads-plan`) -- use these criteria directly
+1. **`## Validation` section** in the bead description (from `/lavra-plan`) -- use these criteria directly
 2. **`## Testing` section** in the bead description -- "all specified tests pass"
 3. **`TEST_COMMAND` exists** -- "all tests pass"
 4. **None of the above** -- "implementation matches the bead description and no errors on manual review"
@@ -62,7 +62,7 @@ Store as `COMPLETION_CRITERIA` per bead for injection into the subagent prompt.
 
 ## 4. Gather Beads
 
-Follows the same bead gathering logic as `/beads-work` (multi-bead path):
+Follows the same bead gathering logic as `/lavra-work` (multi-bead path):
 
 **If input is an epic bead ID:**
 ```bash
@@ -133,10 +133,10 @@ PRE_BRANCH_SHA=$(git rev-parse HEAD)
 
 ## 6. File-Scope Conflict Detection
 
-Follows the same logic as `/beads-work` Phase M3. Prevents parallel agents from overwriting each other.
+Follows the same logic as `/lavra-work` Phase M3. Prevents parallel agents from overwriting each other.
 
 For each bead:
-1. Check the bead description for a `## Files` section (added by `/beads-plan`)
+1. Check the bead description for a `## Files` section (added by `/lavra-plan`)
 2. If no `## Files` section, scan the description for:
    - Explicit file paths (e.g., `src/auth/login.ts`)
    - Directory/module references (e.g., "the auth module")
@@ -167,7 +167,7 @@ For each overlap where no dependency exists between the beads:
 
 ## 7. Dependency Analysis & Wave Building
 
-Follows the same logic as `/beads-work` Phase M4.
+Follows the same logic as `/lavra-work` Phase M4.
 
 **When input is an epic ID:**
 
@@ -272,7 +272,7 @@ Each agent gets a detailed prompt containing:
 - The full bead description (from `bd show`)
 - Related bead context (from `relates_to` links)
 - Relevant knowledge entries from the recall step
-- Clear instructions to follow the beads-work methodology
+- Clear instructions to follow the lavra-work methodology
 - Completion criteria and retry budget
 
 **Resolve related beads:** For each bead in the wave, check for `relates_to` links:
@@ -511,9 +511,9 @@ After all waves complete and push is approved:
 <handoff>
 All work complete. What next?
 
-1. **Run `/beads-review`** on all changes
+1. **Run `/lavra-review`** on all changes
 2. **Create a PR** with all changes
-3. **Run `/beads-compound {COMPOUND_CANDIDATES}`** - Document non-obvious findings as reusable knowledge *(only shown if COMPOUND_CANDIDATES is non-empty)*
+3. **Run `/lavra-compound {COMPOUND_CANDIDATES}`** - Document non-obvious findings as reusable knowledge *(only shown if COMPOUND_CANDIDATES is non-empty)*
 4. **Retry failed beads** - Re-run with only the failed bead IDs
 5. **Continue** with remaining open beads
 </handoff>

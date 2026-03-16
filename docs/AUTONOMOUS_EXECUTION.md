@@ -1,10 +1,10 @@
 # Autonomous Execution
 
-How to configure permissions for `/beads-work-ralph` and `/beads-work-teams` modes.
+How to configure permissions for `/lavra-work-ralph` and `/lavra-work-teams` modes.
 
 ## Why Permissions Matter
 
-`/beads-work-ralph` and `/beads-work-teams` spawn subagents (or persistent worker teammates) that execute code autonomously. These agents need to:
+`/lavra-work-ralph` and `/lavra-work-teams` spawn subagents (or persistent worker teammates) that execute code autonomously. These agents need to:
 
 - Run shell commands (`bd`, `git`, test suites)
 - Read, write, and edit source files

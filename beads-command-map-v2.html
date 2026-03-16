@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>beads-compound Command Map v2 — Pipeline Redesign</title>
+<title>lavra-compound Command Map v2 — Pipeline Redesign</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #0b0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -144,37 +144,37 @@ const BY = {
 
 const NODES = [
   // == PRIMARY PIPELINE (the 4-command flow) ==
-  { id:'beads-design',  label:'/beads-design',  sub:'Brainstorm+Plan+Research+Review', x:60,  y:BY.pipeline, w:175, h:RH, layer:'commands', group:'pipeline' },
-  { id:'beads-work',    label:'/beads-work',     sub:'Implement+Review+Learn+Fix',     x:260, y:BY.pipeline, w:170, h:RH, layer:'commands', group:'pipeline' },
-  { id:'beads-qa',      label:'/beads-qa',       sub:'Browser-based QA',               x:455, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
-  { id:'beads-ship',    label:'/beads-ship',     sub:'Merge, test, PR, close beads',   x:630, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
+  { id:'lavra-design',  label:'/lavra-design',  sub:'Brainstorm+Plan+Research+Review', x:60,  y:BY.pipeline, w:175, h:RH, layer:'commands', group:'pipeline' },
+  { id:'lavra-work',    label:'/lavra-work',     sub:'Implement+Review+Learn+Fix',     x:260, y:BY.pipeline, w:170, h:RH, layer:'commands', group:'pipeline' },
+  { id:'lavra-qa',      label:'/lavra-qa',       sub:'Browser-based QA',               x:455, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
+  { id:'lavra-ship',    label:'/lavra-ship',     sub:'Merge, test, PR, close beads',   x:630, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
 
   // == DESIGN SUB-PHASES (what design orchestrates) ==
-  { id:'beads-brainstorm', label:'/beads-brainstorm', sub:'Explore + CEO sharpen',       x:60,  y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
-  { id:'beads-plan',       label:'/beads-plan',       sub:'Research & plan epic',        x:230, y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
-  { id:'beads-research',   label:'/beads-research',   sub:'Domain-matched agents',       x:400, y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
-  { id:'beads-plan-review',label:'/beads-plan-review', sub:'Adversarial 4-agent review', x:570, y:BY.design_phases, w:W.lg, h:RH, layer:'commands', group:'design' },
+  { id:'lavra-brainstorm', label:'/lavra-brainstorm', sub:'Explore + CEO sharpen',       x:60,  y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
+  { id:'lavra-plan',       label:'/lavra-plan',       sub:'Research & plan epic',        x:230, y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
+  { id:'lavra-research',   label:'/lavra-research',   sub:'Domain-matched agents',       x:400, y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
+  { id:'lavra-plan-review',label:'/lavra-plan-review', sub:'Adversarial 4-agent review', x:570, y:BY.design_phases, w:W.lg, h:RH, layer:'commands', group:'design' },
 
   // == SUPPORTING COMMANDS ==
-  { id:'beads-quick',      label:'/beads-quick',      sub:'Fast path + escalation',     x:60,  y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
-  { id:'beads-learn',      label:'/beads-learn',       sub:'Knowledge curation',         x:200, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
-  { id:'beads-recall',     label:'/beads-recall',      sub:'Mid-session search',         x:340, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
-  { id:'beads-checkpoint', label:'/beads-checkpoint',  sub:'Save progress',              x:480, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
-  { id:'beads-retro',      label:'/beads-retro',       sub:'Weekly analytics',           x:620, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
-  { id:'beads-review',     label:'/beads-review',      sub:'15-agent code review',       x:760, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'lavra-quick',      label:'/lavra-quick',      sub:'Fast path + escalation',     x:60,  y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'lavra-learn',      label:'/lavra-learn',       sub:'Knowledge curation',         x:200, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'lavra-recall',     label:'/lavra-recall',      sub:'Mid-session search',         x:340, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'lavra-checkpoint', label:'/lavra-checkpoint',  sub:'Save progress',              x:480, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'lavra-retro',      label:'/lavra-retro',       sub:'Weekly analytics',           x:620, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'lavra-review',     label:'/lavra-review',      sub:'15-agent code review',       x:760, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
 
   // == SPECIALIZED WORK MODES ==
-  { id:'beads-work-ralph', label:'/beads-work-ralph',  sub:'Autonomous retry',           x:60,  y:BY.specialized, w:W.md, h:RH, layer:'commands', group:'specialized' },
-  { id:'beads-work-teams', label:'/beads-work-teams',  sub:'Persistent workers',         x:230, y:BY.specialized, w:W.md, h:RH, layer:'commands', group:'specialized' },
-  { id:'beads-import',     label:'/beads-import',      sub:'Markdown to beads',          x:400, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
-  { id:'beads-triage',     label:'/beads-triage',      sub:'Prioritize beads',           x:540, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
+  { id:'lavra-work-ralph', label:'/lavra-work-ralph',  sub:'Autonomous retry',           x:60,  y:BY.specialized, w:W.md, h:RH, layer:'commands', group:'specialized' },
+  { id:'lavra-work-teams', label:'/lavra-work-teams',  sub:'Persistent workers',         x:230, y:BY.specialized, w:W.md, h:RH, layer:'commands', group:'specialized' },
+  { id:'lavra-import',     label:'/lavra-import',      sub:'Markdown to beads',          x:400, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
+  { id:'lavra-triage',     label:'/lavra-triage',      sub:'Prioritize beads',           x:540, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
   { id:'changelog',        label:'/changelog',         sub:'Release changelog',          x:680, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
 
   // == SKILLS ==
   { id:'sk-project-setup',  label:'project-setup',   sub:'Stack detect + config',       x:60,  y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
   { id:'sk-git-worktree',   label:'git-worktree',    sub:'Parallel workspaces',         x:200, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
   { id:'sk-brainstorming',  label:'brainstorming',   sub:'Structured exploration',      x:340, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
-  { id:'sk-beads-knowledge',label:'beads-knowledge', sub:'Knowledge entries',           x:480, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
+  { id:'sk-lavra-knowledge',label:'lavra-knowledge', sub:'Knowledge entries',           x:480, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
   { id:'sk-agent-browser',  label:'agent-browser',   sub:'Browser automation',          x:620, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
 
   // == KNOWLEDGE SYSTEM ==
@@ -211,103 +211,103 @@ const NODES = [
 
 const CONNS = [
   // == PRIMARY PIPELINE FLOW ==
-  { from:'beads-design', to:'beads-work',  type:'orchestrates', label:'plan approved' },
-  { from:'beads-work',   to:'beads-qa',    type:'suggests',     label:'web apps' },
-  { from:'beads-qa',     to:'beads-ship',  type:'suggests',     label:'QA passed' },
-  { from:'beads-work',   to:'beads-ship',  type:'suggests',     label:'non-web' },
+  { from:'lavra-design', to:'lavra-work',  type:'orchestrates', label:'plan approved' },
+  { from:'lavra-work',   to:'lavra-qa',    type:'suggests',     label:'web apps' },
+  { from:'lavra-qa',     to:'lavra-ship',  type:'suggests',     label:'QA passed' },
+  { from:'lavra-work',   to:'lavra-ship',  type:'suggests',     label:'non-web' },
 
   // == DESIGN ORCHESTRATES SUB-PHASES ==
-  { from:'beads-design', to:'beads-brainstorm',  type:'orchestrates', label:'1' },
-  { from:'beads-design', to:'beads-plan',        type:'orchestrates', label:'2' },
-  { from:'beads-design', to:'beads-research',    type:'orchestrates', label:'3' },
-  { from:'beads-design', to:'beads-plan-review', type:'orchestrates', label:'4' },
+  { from:'lavra-design', to:'lavra-brainstorm',  type:'orchestrates', label:'1' },
+  { from:'lavra-design', to:'lavra-plan',        type:'orchestrates', label:'2' },
+  { from:'lavra-design', to:'lavra-research',    type:'orchestrates', label:'3' },
+  { from:'lavra-design', to:'lavra-plan-review', type:'orchestrates', label:'4' },
 
   // == DESIGN SUB-PHASE FLOW ==
-  { from:'beads-brainstorm', to:'beads-plan',        type:'orchestrates', label:'scope locked' },
-  { from:'beads-plan',       to:'beads-research',    type:'orchestrates', label:'gaps found' },
-  { from:'beads-research',   to:'beads-plan-review', type:'orchestrates', label:'evidence gathered' },
+  { from:'lavra-brainstorm', to:'lavra-plan',        type:'orchestrates', label:'scope locked' },
+  { from:'lavra-plan',       to:'lavra-research',    type:'orchestrates', label:'gaps found' },
+  { from:'lavra-research',   to:'lavra-plan-review', type:'orchestrates', label:'evidence gathered' },
 
   // == WORK INTERNAL PHASES ==
-  { from:'beads-work', to:'beads-learn',   type:'orchestrates', label:'auto after review' },
-  { from:'beads-work', to:'beads-review',  type:'orchestrates', label:'auto self-review' },
+  { from:'lavra-work', to:'lavra-learn',   type:'orchestrates', label:'auto after review' },
+  { from:'lavra-work', to:'lavra-review',  type:'orchestrates', label:'auto self-review' },
 
   // == QUICK ESCALATION ==
-  { from:'beads-quick', to:'beads-design', type:'suggests', label:'scope grew' },
-  { from:'beads-quick', to:'beads-work',   type:'orchestrates', label:'small task' },
+  { from:'lavra-quick', to:'lavra-design', type:'suggests', label:'scope grew' },
+  { from:'lavra-quick', to:'lavra-work',   type:'orchestrates', label:'small task' },
 
   // == SPECIALIZED MODES ==
-  { from:'beads-work-ralph', to:'beads-work', type:'orchestrates', label:'autonomous' },
-  { from:'beads-work-teams', to:'beads-work', type:'orchestrates', label:'persistent' },
+  { from:'lavra-work-ralph', to:'lavra-work', type:'orchestrates', label:'autonomous' },
+  { from:'lavra-work-teams', to:'lavra-work', type:'orchestrates', label:'persistent' },
 
   // == SHIP TRIGGERS ==
-  { from:'beads-ship', to:'beads-learn', type:'orchestrates', label:'extract knowledge' },
+  { from:'lavra-ship', to:'lavra-learn', type:'orchestrates', label:'extract knowledge' },
 
   // == RESEARCH DISPATCHES ==
-  { from:'beads-research', to:'ag-best',      type:'dispatches' },
-  { from:'beads-research', to:'ag-framework', type:'dispatches' },
-  { from:'beads-research', to:'ag-learnings', type:'dispatches' },
-  { from:'beads-research', to:'ag-repo',      type:'dispatches' },
-  { from:'beads-research', to:'ag-githistory',type:'dispatches' },
+  { from:'lavra-research', to:'ag-best',      type:'dispatches' },
+  { from:'lavra-research', to:'ag-framework', type:'dispatches' },
+  { from:'lavra-research', to:'ag-learnings', type:'dispatches' },
+  { from:'lavra-research', to:'ag-repo',      type:'dispatches' },
+  { from:'lavra-research', to:'ag-githistory',type:'dispatches' },
 
   // == PLAN-REVIEW DISPATCHES ==
-  { from:'beads-plan-review', to:'ag-arch',      type:'dispatches' },
-  { from:'beads-plan-review', to:'ag-security',  type:'dispatches' },
-  { from:'beads-plan-review', to:'ag-perf',      type:'dispatches' },
-  { from:'beads-plan-review', to:'ag-simplicity',type:'dispatches' },
+  { from:'lavra-plan-review', to:'ag-arch',      type:'dispatches' },
+  { from:'lavra-plan-review', to:'ag-security',  type:'dispatches' },
+  { from:'lavra-plan-review', to:'ag-perf',      type:'dispatches' },
+  { from:'lavra-plan-review', to:'ag-simplicity',type:'dispatches' },
 
   // == FULL REVIEW DISPATCHES ==
-  { from:'beads-review', to:'ag-rails',      type:'dispatches' },
-  { from:'beads-review', to:'ag-dhh',        type:'dispatches' },
-  { from:'beads-review', to:'ag-ts',         type:'dispatches' },
-  { from:'beads-review', to:'ag-python',     type:'dispatches' },
-  { from:'beads-review', to:'ag-security',   type:'dispatches' },
-  { from:'beads-review', to:'ag-perf',       type:'dispatches' },
-  { from:'beads-review', to:'ag-simplicity', type:'dispatches' },
-  { from:'beads-review', to:'ag-arch',       type:'dispatches' },
-  { from:'beads-review', to:'ag-migration',  type:'dispatches' },
-  { from:'beads-review', to:'ag-drift',      type:'dispatches' },
-  { from:'beads-review', to:'ag-deploy',     type:'dispatches' },
-  { from:'beads-review', to:'ag-integrity',  type:'dispatches' },
-  { from:'beads-review', to:'ag-pattern',    type:'dispatches' },
-  { from:'beads-review', to:'ag-races',      type:'dispatches' },
-  { from:'beads-review', to:'ag-git',        type:'dispatches' },
+  { from:'lavra-review', to:'ag-rails',      type:'dispatches' },
+  { from:'lavra-review', to:'ag-dhh',        type:'dispatches' },
+  { from:'lavra-review', to:'ag-ts',         type:'dispatches' },
+  { from:'lavra-review', to:'ag-python',     type:'dispatches' },
+  { from:'lavra-review', to:'ag-security',   type:'dispatches' },
+  { from:'lavra-review', to:'ag-perf',       type:'dispatches' },
+  { from:'lavra-review', to:'ag-simplicity', type:'dispatches' },
+  { from:'lavra-review', to:'ag-arch',       type:'dispatches' },
+  { from:'lavra-review', to:'ag-migration',  type:'dispatches' },
+  { from:'lavra-review', to:'ag-drift',      type:'dispatches' },
+  { from:'lavra-review', to:'ag-deploy',     type:'dispatches' },
+  { from:'lavra-review', to:'ag-integrity',  type:'dispatches' },
+  { from:'lavra-review', to:'ag-pattern',    type:'dispatches' },
+  { from:'lavra-review', to:'ag-races',      type:'dispatches' },
+  { from:'lavra-review', to:'ag-git',        type:'dispatches' },
 
   // == QA USES BROWSER ==
-  { from:'beads-qa', to:'sk-agent-browser', type:'dispatches' },
+  { from:'lavra-qa', to:'sk-agent-browser', type:'dispatches' },
 
   // == BRAINSTORM USES SKILL ==
-  { from:'beads-brainstorm', to:'sk-brainstorming', type:'dispatches' },
+  { from:'lavra-brainstorm', to:'sk-brainstorming', type:'dispatches' },
 
   // == KNOWLEDGE FLOW ==
-  { from:'beads-work',       to:'kn-capture',  type:'feeds', label:'LEARNED inline' },
-  { from:'beads-review',     to:'kn-capture',  type:'feeds', label:'LEARNED for findings' },
-  { from:'beads-brainstorm', to:'kn-capture',  type:'feeds', label:'DECISION' },
-  { from:'beads-research',   to:'kn-capture',  type:'feeds', label:'FACT/INVESTIGATION' },
-  { from:'beads-learn',      to:'kn-jsonl',    type:'feeds', label:'structured entries' },
+  { from:'lavra-work',       to:'kn-capture',  type:'feeds', label:'LEARNED inline' },
+  { from:'lavra-review',     to:'kn-capture',  type:'feeds', label:'LEARNED for findings' },
+  { from:'lavra-brainstorm', to:'kn-capture',  type:'feeds', label:'DECISION' },
+  { from:'lavra-research',   to:'kn-capture',  type:'feeds', label:'FACT/INVESTIGATION' },
+  { from:'lavra-learn',      to:'kn-jsonl',    type:'feeds', label:'structured entries' },
   { from:'kn-capture',       to:'kn-jsonl',    type:'feeds' },
   { from:'kn-jsonl',         to:'kn-fts5',     type:'feeds' },
   { from:'kn-fts5',          to:'kn-recall',   type:'feeds' },
-  { from:'kn-recall',        to:'beads-work',  type:'feeds', label:'session start' },
-  { from:'kn-recall',        to:'beads-design',type:'feeds', label:'session start' },
-  { from:'beads-retro',      to:'kn-jsonl',    type:'feeds', label:'PATTERN synthesis' },
+  { from:'kn-recall',        to:'lavra-work',  type:'feeds', label:'session start' },
+  { from:'kn-recall',        to:'lavra-design',type:'feeds', label:'session start' },
+  { from:'lavra-retro',      to:'kn-jsonl',    type:'feeds', label:'PATTERN synthesis' },
 ];
 
 // == Presets ==
 const PRESET_NODES = {
   full: null,
-  pipeline: ['beads-design','beads-work','beads-qa','beads-ship',
-             'beads-brainstorm','beads-plan','beads-research','beads-plan-review'],
-  'design-deep': ['beads-design','beads-brainstorm','beads-plan','beads-research','beads-plan-review',
+  pipeline: ['lavra-design','lavra-work','lavra-qa','lavra-ship',
+             'lavra-brainstorm','lavra-plan','lavra-research','lavra-plan-review'],
+  'design-deep': ['lavra-design','lavra-brainstorm','lavra-plan','lavra-research','lavra-plan-review',
                    'ag-best','ag-framework','ag-learnings','ag-repo','ag-githistory',
                    'ag-arch','ag-security','ag-perf','ag-simplicity',
                    'sk-brainstorming',
                    'kn-recall','kn-jsonl'],
-  review: ['beads-review','beads-work',
+  review: ['lavra-review','lavra-work',
            'ag-rails','ag-dhh','ag-ts','ag-python','ag-security','ag-perf','ag-simplicity','ag-arch',
            'ag-migration','ag-drift','ag-deploy','ag-integrity','ag-pattern','ag-races','ag-git',
            'kn-capture'],
-  knowledge: ['beads-work','beads-design','beads-brainstorm','beads-research','beads-review',
-              'beads-learn','beads-retro','beads-recall',
+  knowledge: ['lavra-work','lavra-design','lavra-brainstorm','lavra-research','lavra-review',
+              'lavra-learn','lavra-retro','lavra-recall',
               'kn-jsonl','kn-recall','kn-capture','kn-fts5'],
 };
 
@@ -335,7 +335,7 @@ const CONN_STYLE = {
 };
 const BAND_LABELS = [
   { label:'PRIMARY PIPELINE', y:BY.pipeline-18, color:'#1e3a5f' },
-  { label:'DESIGN PHASES (orchestrated by /beads-design)', y:BY.design_phases-18, color:'#1a2a4a' },
+  { label:'DESIGN PHASES (orchestrated by /lavra-design)', y:BY.design_phases-18, color:'#1a2a4a' },
   { label:'SUPPORTING COMMANDS', y:BY.supporting-18, color:'#1a1a2a' },
   { label:'SPECIALIZED / UTILITY', y:BY.specialized-18, color:'#1a1a1a' },
   { label:'CORE SKILLS', y:BY.skills-18, color:'#200a2a' },
@@ -588,7 +588,7 @@ function renderComments() {
 // == Prompt ==
 function updatePrompt() {
   const labels={full:'full system',pipeline:'primary pipeline','design-deep':'design deep dive',review:'review pipeline',knowledge:'knowledge flow'};
-  const parts=[`beads-compound v2 architecture -- ${labels[state.preset]||state.preset} view.`];
+  const parts=[`lavra-compound v2 architecture -- ${labels[state.preset]||state.preset} view.`];
   const hiddenL=Object.entries(state.layers).filter(([,v])=>!v).map(([k])=>k);
   if (hiddenL.length) parts.push(`Hidden: ${hiddenL.join(', ')}.`);
   const hiddenC=Object.entries(state.connTypes).filter(([,v])=>!v).map(([k])=>k);

@@ -27,16 +27,16 @@ See the [marketplace README](../../README.md) for full details.
 
 | Command | Description |
 |---------|-------------|
-| `/beads-brainstorm` | Explore ideas collaboratively before planning |
-| `/beads-plan` | Research and plan using multiple agents |
-| `/beads-research` | Gather evidence with domain-matched research agents |
-| `/beads-plan-review` | Multi-agent review of epic plan |
-| `/beads-triage` | Prioritize and categorize child beads |
-| `/beads-work` | Work on one or many beads -- auto-routes single vs. multi-bead |
-| `/beads-review` | Multi-agent code review before closing |
-| `/beads-research` | Deep research using 5 specialized agents |
-| `/beads-checkpoint` | Save progress, capture knowledge, commit |
-| `/beads-learn` | Curate knowledge into structured, reusable entries |
+| `/lavra-brainstorm` | Explore ideas collaboratively before planning |
+| `/lavra-plan` | Research and plan using multiple agents |
+| `/lavra-research` | Gather evidence with domain-matched research agents |
+| `/lavra-plan-review` | Multi-agent review of epic plan |
+| `/lavra-triage` | Prioritize and categorize child beads |
+| `/lavra-work` | Work on one or many beads -- auto-routes single vs. multi-bead |
+| `/lavra-review` | Multi-agent code review before closing |
+| `/lavra-research` | Deep research using 5 specialized agents |
+| `/lavra-checkpoint` | Save progress, capture knowledge, commit |
+| `/lavra-learn` | Curate knowledge into structured, reusable entries |
 
 
 ## Agents (Model Tier Optimized)
@@ -86,7 +86,7 @@ All 27 agents include model tier assignments for optimal cost/performance balanc
 | `brainstorming` | Structured brainstorming with bead output |
 | `create-agent-skills` | Create new agents and skills |
 | `agent-native-architecture` | Design agent-native system architectures |
-| `beads-knowledge` | Document solved problems as knowledge entries |
+| `lavra-knowledge` | Document solved problems as knowledge entries |
 | `agent-browser` | Browser automation for testing and screenshots |
 | `file-todos` | Find and manage TODO comments in code |
 | `project-setup` | Project environment setup and onboarding automation |
