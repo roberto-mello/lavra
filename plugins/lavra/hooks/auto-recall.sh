@@ -66,8 +66,13 @@ VERSION_FILE="$MEMORY_DIR/.lavra-version"
 if [[ -f "$VERSION_FILE" ]]; then
   INSTALLED_VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
   if [[ "$INSTALLED_VERSION" != "$LAVRA_VERSION" ]]; then
+    # Self-heal: provision new artifacts (lavra.json, session-state gitignore, etc.)
+    # provision_memory_dir is idempotent -- only creates files that don't exist yet
+    source "$SCRIPT_DIR/provision-memory.sh"
+    provision_memory_dir "$PROJECT_DIR" "$SCRIPT_DIR"
+
     cat <<EOF
-{"hookSpecificOutput":{"systemMessage":"## lavra update available\n\nThis project has lavra **$INSTALLED_VERSION** but the plugin is now **$LAVRA_VERSION**. Re-run the installer to get the latest hooks and fixes:\n\n\`\`\`\nnpx lavra@latest\n\`\`\`"}}
+{"hookSpecificOutput":{"systemMessage":"## lavra updated ($INSTALLED_VERSION -> $LAVRA_VERSION)\n\nAuto-provisioned new config files. Changes:\n- \`.beads/config/lavra.json\` -- workflow configuration (toggle research, review, goal verification)\n- \`.beads/memory/.gitignore\` -- updated for session state\n\nFor a full upgrade (hooks, commands, agents), re-run the installer:\n\`\`\`\nnpx lavra@latest\n\`\`\`"}}
 EOF
     exit 0
   fi
@@ -79,7 +84,7 @@ KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 # First-run detection: if knowledge file is empty or missing, show orientation
 if [ ! -f "$KNOWLEDGE_FILE" ] || [ ! -s "$KNOWLEDGE_FILE" ]; then
   cat <<'ONBOARD'
-{"hookSpecificOutput":{"systemMessage":"## Lavra is ready.\n\n| Goal | Command |\n|------|---------|\n| New feature | `/beads-brainstorm \"describe your feature\"` |\n| Plan from spec | `/beads-design \"feature description\"` |\n| Existing beads | `/beads-work` |\n| Explore ideas | `/beads-brainstorm \"your idea\"` |\n\nKnowledge you capture will appear here automatically in future sessions."}}
+{"hookSpecificOutput":{"systemMessage":"## Lavra is ready.\n\n| Goal | Command |\n|------|---------|\n| New feature | `/lavra-brainstorm \"describe your feature\"` |\n| Plan from spec | `/lavra-design \"feature description\"` |\n| Existing beads | `/lavra-work` |\n| Explore ideas | `/lavra-brainstorm \"your idea\"` |\n\nKnowledge you capture will appear here automatically in future sessions."}}
 ONBOARD
   exit 0
 fi
@@ -149,10 +154,46 @@ $MATCHES"
   fi
 fi
 
-# If we found relevant knowledge, output it
+# Check for session state (survives context compaction)
+SESSION_STATE=""
+SESSION_STATE_FILE="$MEMORY_DIR/session-state.md"
+
+if [[ -f "$SESSION_STATE_FILE" ]] && [[ -s "$SESSION_STATE_FILE" ]]; then
+  # Delete if stale (>24 hours old)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    FILE_AGE=$(( $(date +%s) - $(stat -f %m "$SESSION_STATE_FILE") ))
+  else
+    FILE_AGE=$(( $(date +%s) - $(stat -c %Y "$SESSION_STATE_FILE") ))
+  fi
+
+  if [[ "$FILE_AGE" -gt 86400 ]]; then
+    # Stale session state from previous day -- delete
+    rm -f "$SESSION_STATE_FILE"
+  else
+    # Read session state for injection
+    SESSION_STATE=$(cat "$SESSION_STATE_FILE")
+    # Delete after reading -- it's a one-shot recall
+    rm -f "$SESSION_STATE_FILE"
+  fi
+fi
+
+# Build the output message
+OUTPUT_MSG=""
+
+if [[ -n "$SESSION_STATE" ]]; then
+  # Escape for JSON
+  ESCAPED_STATE=$(echo "$SESSION_STATE" | sed 's/\\/\\\\/g; s/"/\\"/g' | tr '\n' ' ' | sed 's/  */ /g')
+  OUTPUT_MSG="## Session State (recovered after compaction)\n\n$ESCAPED_STATE\n\n"
+fi
+
 if [[ -n "$RELEVANT_KNOWLEDGE" ]]; then
+  OUTPUT_MSG="${OUTPUT_MSG}## Relevant Knowledge from Memory\n\nBased on your current work context:\n\n$RELEVANT_KNOWLEDGE\n\n_Use \`.beads/memory/recall.sh \"keyword\"\` to search for more._"
+fi
+
+# Output combined message
+if [[ -n "$OUTPUT_MSG" ]]; then
   cat <<EOF
-{"hookSpecificOutput":{"systemMessage":"## Relevant Knowledge from Memory\n\nBased on your current work context:\n\n$RELEVANT_KNOWLEDGE\n\n_Use \`.beads/memory/recall.sh \"keyword\"\` to search for more._"}}
+{"hookSpecificOutput":{"systemMessage":"$OUTPUT_MSG"}}
 EOF
 fi
 
