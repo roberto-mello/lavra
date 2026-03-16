@@ -26,6 +26,15 @@ body { background: #0b0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMac
 .comment-del { float: right; cursor: pointer; color: #4b5563; font-size: 10px; }
 .comment-del:hover { color: #f87171; }
 .no-comments { font-size: 11px; color: #374151; padding: 4px; font-style: italic; }
+.doc-card { background: #1a2235; border: 1px solid #2d3748; border-radius: 6px; padding: 10px; }
+.doc-name { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+.doc-name a { color: #60a5fa; text-decoration: none; font-family: 'SF Mono','Fira Code',monospace; }
+.doc-name a:hover { text-decoration: underline; color: #93c5fd; }
+.doc-type { font-size: 9px; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.doc-desc { font-size: 11px; color: #94a3b8; line-height: 1.5; }
+.doc-source { font-size: 9px; color: #374151; margin-top: 8px; word-break: break-all; }
+.doc-source a { color: #4b5563; text-decoration: none; }
+.doc-source a:hover { color: #60a5fa; }
 
 /* -- Canvas -- */
 .canvas-wrap { flex: 1; position: relative; overflow: hidden; background: #0b0f1a; }
@@ -45,19 +54,6 @@ body { background: #0b0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMac
 .copy-btn:hover { background: #374151; color: #e2e8f0; }
 .copy-btn.copied { background: #14432a; border-color: #22c55e; color: #4ade80; }
 
-/* -- Modal -- */
-.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
-.modal-bg.open { display: flex; }
-.modal { background: #1a2235; border: 1px solid #374151; border-radius: 8px; padding: 18px; width: 340px; }
-.modal h3 { font-size: 13px; color: #e2e8f0; margin-bottom: 3px; }
-.modal-sub { font-size: 11px; color: #6b7280; margin-bottom: 12px; }
-.modal textarea { width: 100%; height: 80px; background: #0b0f1a; border: 1px solid #374151; border-radius: 4px; color: #e2e8f0; font-size: 12px; padding: 8px; resize: none; font-family: inherit; }
-.modal textarea:focus { outline: none; border-color: #3b82f6; }
-.modal-btns { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end; }
-.modal-btns button { padding: 5px 12px; border-radius: 4px; border: 1px solid #374151; font-size: 11px; cursor: pointer; }
-.btn-cancel { background: #1f2937; color: #9ca3af; }
-.btn-save { background: #1e3a5f; border-color: #3b82f6; color: #93c5fd; }
-.btn-save:hover { background: #2550a0; }
 
 /* -- Pipeline highlight -- */
 .pipeline-badge { position: absolute; top: 10px; left: 12px; font-size: 9px; color: #374151; pointer-events: none; }
@@ -93,17 +89,17 @@ body { background: #0b0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMac
       <label class="toggle-row"><input type="checkbox" checked onchange="toggleConn('feeds',this.checked)"><span class="swatch" style="background:#f59e0b;border-radius:0"></span><span>Knowledge Flow</span></label>
     </div>
     <div class="sb-section" style="flex-shrink:0">
-      <h3>Comments (<span id="comment-count">0</span>)</h3>
+      <h3>Documentation</h3>
     </div>
-    <div class="comments-list" id="comments-list">
-      <div class="no-comments">Click a node to pin its connections. Double-click to view source. Hover to preview.</div>
+    <div class="comments-list" id="doc-panel">
+      <div class="no-comments">Click a node to see its documentation and pin its connections.</div>
     </div>
   </div>
 
   <div class="canvas-wrap">
     <svg id="diagram" xmlns="http://www.w3.org/2000/svg"></svg>
     <div class="pipeline-badge">lavra -- Architecture Overview</div>
-    <div class="hint">scroll to zoom -- drag to pan -- click to pin -- double-click for source</div>
+    <div class="hint">scroll to zoom -- drag to pan -- click to pin + view docs</div>
     <div class="pin-indicator" id="pin-indicator">Pinned -- click another node or background to unpin</div>
     <div class="zoom-controls">
       <button class="zoom-btn" onclick="doZoom(1.25)">+</button>
@@ -114,21 +110,10 @@ body { background: #0b0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMac
 </div>
 
 <div class="prompt-bar">
-  <div id="prompt-text">Click a node to pin its connections. Double-click to view source.</div>
+  <div id="prompt-text">Click a node to pin its connections and view documentation.</div>
   <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copy</button>
 </div>
 
-<div class="modal-bg" id="modal-bg">
-  <div class="modal">
-    <h3 id="modal-title"></h3>
-    <div class="modal-sub" id="modal-sub"></div>
-    <textarea id="modal-input" placeholder="Note or question about this component..."></textarea>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-save" onclick="saveComment()">Save</button>
-    </div>
-  </div>
-</div>
 
 <script>
 // == Layout constants ==
@@ -213,12 +198,75 @@ const SOURCE_MAP = {
   'cfg-setup':   'skills/project-setup/SKILL.md',
 };
 
+// == Documentation descriptions ==
+const DOCS_MAP = {
+  // Commands
+  'lavra-design':     'Orchestrate the full design pipeline (brainstorm, plan, research, revise, review, lock) as a single invocation.',
+  'lavra-work':       'Execute work on one or many beads with auto-routing between single-bead and multi-bead paths.',
+  'lavra-qa':         'Browser-based QA verification -- systematic testing from the user\'s perspective using agent-browser.',
+  'lavra-ship':       'Automated ship sequence from code-ready to PR-open with beads closed and knowledge captured.',
+  'lavra-brainstorm': 'Explore requirements and approaches through collaborative dialogue before planning. Answers WHAT to build.',
+  'lavra-plan':       'Transform feature descriptions into well-structured beads with research and multi-phase planning.',
+  'lavra-research':   'Gather evidence for a plan using domain-matched research agents organized by technology.',
+  'lavra-plan-review':'Have multiple specialized agents review a plan in parallel to catch issues before implementation.',
+  'lavra-quick':      'Fast-track small tasks with abbreviated plan and immediate execution, skipping brainstorm and deepen.',
+  'lavra-learn':      'Curate raw knowledge comments into structured, deduplicated, well-tagged entries in knowledge.jsonl.',
+  'lavra-recall':     'Search the knowledge base mid-session and inject relevant context without restarting.',
+  'lavra-checkpoint': 'Save session progress by filing beads for work done and capturing knowledge without ending the session.',
+  'lavra-retro':      'Weekly retrospective with shipping analytics, team performance, and knowledge synthesis.',
+  'lavra-review':     'Exhaustive code review using multi-agent analysis, ultra-thinking, and Git worktrees for deep inspection.',
+  'lavra-work-ralph': 'Autonomous retry mode that iterates with self-healing until completion criteria are met.',
+  'lavra-work-teams': 'Work on multiple beads with persistent worker teammates that self-organize through a ready queue.',
+  'lavra-import':     'Import a markdown plan document into beads as an epic with child task beads.',
+  'lavra-triage':     'Present findings one by one for categorization -- keep, modify, dismiss, or defer each item.',
+  'changelog':        'Create fun, engaging changelogs summarizing recent merges with features, fixes, and developer credit.',
+  // Review agents
+  'ag-rails':      'Reviews Rails code with high quality bar for conventions, clarity, and maintainability.',
+  'ag-dhh':        'Brutally honest Rails review identifying anti-patterns and convention violations from DHH\'s perspective.',
+  'ag-ts':         'TypeScript review enforcing no-any policy, type safety, modern TS 5+ patterns, and import organization.',
+  'ag-python':     'Python review enforcing mandatory type hints (3.10+ syntax), Pythonic patterns, and proper module organization.',
+  'ag-security':   'Security audit covering input validation, SQL injection, XSS, authentication, and OWASP Top 10.',
+  'ag-perf':       'Analyzes bottlenecks, algorithmic complexity, N+1 queries, caching, and scalability at 10x/100x/1000x.',
+  'ag-simplicity': 'Final review ensuring code is as simple as possible. Identifies unnecessary complexity and premature abstractions.',
+  'ag-arch':       'Architectural analysis -- system design, component boundaries, SOLID compliance, and dependency review.',
+  'ag-goal':       'Verify implementation delivers bead success criteria with three-level check: Exists, Substantive, Wired.',
+  'ag-migration':  'Reviews PRs touching database migrations -- validating ID mappings and checking for swapped values.',
+  'ag-drift':      'Detects out-of-sync schema/migration changes across Rails, Alembic, Prisma, Drizzle, and Knex.',
+  'ag-deploy':     'Produces pre/post-deploy checklists with SQL verification queries, rollback procedures, and monitoring plans.',
+  'ag-integrity':  'Reviews database models for constraint safety, referential integrity, and privacy compliance.',
+  'ag-pattern':    'Analyzes code for design patterns, anti-patterns, naming conventions, duplication, and boundary violations.',
+  'ag-races':      'Reviews JavaScript/Stimulus for race conditions, timing issues, and Hotwire/Turbo compatibility.',
+  'ag-native':     'Reviews for agent-native compliance -- user actions must have agent equivalents, agents see what users see.',
+  // Research agents
+  'ag-best':       'Researches external best practices and documentation for any technology -- checks skills first, then official docs.',
+  'ag-framework':  'Gathers framework/library documentation and best practices via Context7, exploring source code.',
+  'ag-learnings':  'Searches knowledge.jsonl for past solutions and patterns to prevent repeated mistakes.',
+  'ag-repo':       'Research on repository structure, documentation, architecture patterns, and contribution guidelines.',
+  'ag-githistory': 'Analyzes git history to understand code evolution, trace patterns, and identify contributor expertise.',
+  // Skills
+  'sk-project-setup':   'Configure project tech stack and review agents -- auto-detects stack, toggles agents, saves config.',
+  'sk-git-worktree':    'Manage Git worktrees for isolated parallel development with unified create/list/switch/cleanup.',
+  'sk-brainstorming':   'Guide exploring user intent, approaches, and design decisions before planning.',
+  'sk-lavra-knowledge': 'Capture solved problems as structured JSONL entries for fast recall and auto-injection.',
+  'sk-agent-browser':   'Browser automation using agent-browser CLI for web interaction, form filling, and screenshots.',
+  // Knowledge system
+  'kn-jsonl':    'Append-only JSONL file storing structured knowledge entries (LEARNED/DECISION/FACT/PATTERN) for auto-recall.',
+  'kn-recall':   'SessionStart hook that searches knowledge based on open beads and git branch, injecting top 10 entries.',
+  'kn-capture':  'PostToolUse hook that detects knowledge-prefixed comments and stores them in knowledge.jsonl with auto-tags.',
+  'kn-fts5':     'Full-text search index over knowledge entries enabling semantic and keyword search with deduplication.',
+  'kn-session':  'Ephemeral file (gitignored) written at milestones -- survives context compaction, recalled once then deleted.',
+  // Config
+  'cfg-lavra':   'Workflow config in .beads/config/ that toggles research, review, goal verification, and parallelism.',
+  'cfg-profile': 'Auto-detected project stack analysis (200 lines) shared with planning and review agents for context.',
+  'cfg-setup':   'Committed config with detected tech stack, enabled agents, and optional reviewer context notes.',
+};
+
 const NODES = [
   // == PRIMARY PIPELINE (the 4-command flow) ==
-  { id:'lavra-design',  label:'/lavra-design',  sub:'Brainstorm+Plan+Research+Review', x:60,  y:BY.pipeline, w:185, h:RH, layer:'commands', group:'pipeline' },
-  { id:'lavra-work',    label:'/lavra-work',     sub:'Implement+Review+Learn+Fix',     x:280, y:BY.pipeline, w:180, h:RH, layer:'commands', group:'pipeline' },
-  { id:'lavra-qa',      label:'/lavra-qa',       sub:'Browser-based QA',               x:500, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
-  { id:'lavra-ship',    label:'/lavra-ship',     sub:'Merge, test, PR, close beads',   x:700, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
+  { id:'lavra-design',  label:'/lavra-design',  sub:'Brainstorm+Plan+Research+Review', x:60,  y:BY.pipeline, w:200, h:RH, layer:'commands', group:'pipeline' },
+  { id:'lavra-work',    label:'/lavra-work',     sub:'Implement+Review+Learn+Fix',     x:300, y:BY.pipeline, w:195, h:RH, layer:'commands', group:'pipeline' },
+  { id:'lavra-qa',      label:'/lavra-qa',       sub:'Browser-based QA',               x:535, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
+  { id:'lavra-ship',    label:'/lavra-ship',     sub:'Merge+test+PR+close beads',      x:740, y:BY.pipeline, w:195, h:RH, layer:'commands', group:'pipeline' },
 
   // == DESIGN SUB-PHASES (what design orchestrates) ==
   { id:'lavra-brainstorm', label:'/lavra-brainstorm', sub:'Explore + CEO sharpen',       x:60,  y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
@@ -416,7 +464,7 @@ const state = {
   scale:1, tx:0, ty:0,
   layers:{ commands:true, agents:true, skills:true, knowledge:true },
   connTypes:{ orchestrates:true, dispatches:true, suggests:true, feeds:true },
-  comments:[], hovered:null, pinned:null, preset:'full',
+  hovered:null, pinned:null, preset:'full',
 };
 let activePreset = null;
 
@@ -467,11 +515,28 @@ function visible(n) {
 // Active highlight = pinned if set, else hovered
 function activeHighlight() { return state.pinned || state.hovered; }
 
+// == Path offset tracking -- separate different-colored lines in same corridor ==
+// Tracks which connection types use each vertical x-corridor (source side and target side)
+let corridorTypes = {};
+
+function resetPathOffsets() { corridorTypes = {}; }
+
+function getCorridorOffset(x, connType) {
+  const bucket = Math.round(x / 20) * 20;
+  const key = `v-${bucket}`;
+  if (!corridorTypes[key]) corridorTypes[key] = {};
+  const types = corridorTypes[key];
+  if (types[connType] !== undefined) return types[connType];
+  const idx = Object.keys(types).length;
+  types[connType] = idx * 14;
+  return types[connType];
+}
+
 // == Elbow path ==
-function elbowPath(a, b) {
-  const ax = a.x + a.w/2, ay = a.y + a.h/2;
-  const bx = b.x + b.w/2, by = b.y + b.h/2;
-  const goingDown = by > ay;
+function elbowPath(a, b, srcOff, tgtOff) {
+  const ax = a.x + a.w/2 + (srcOff || 0);
+  const bx = b.x + b.w/2 + (tgtOff || 0);
+  const goingDown = (b.y + b.h/2) > (a.y + a.h/2);
   const x1 = ax,  y1 = goingDown ? a.y + a.h : a.y;
   const x2 = bx,  y2 = goingDown ? b.y       : b.y + b.h;
   const my = (y1 + y2) / 2;
@@ -486,22 +551,39 @@ function sameBandPath(a, b) {
   return `M ${x1} ${y} L ${x2} ${y}`;
 }
 
-function buildPath(a, b) {
+function buildPath(a, b, connType) {
   if (Math.abs((a.y + a.h/2) - (b.y + b.h/2)) < 20) return sameBandPath(a, b);
-  return elbowPath(a, b);
+  const srcOff = getCorridorOffset(a.x + a.w/2, connType);
+  const tgtOff = getCorridorOffset(b.x + b.w/2, connType);
+  return elbowPath(a, b, srcOff, tgtOff);
 }
 
-// == Label position: offset from midpoint of path, not on the line ==
-function getLabelPos(a, b) {
-  const ax = a.x + a.w/2, bx = b.x + b.w/2;
+// == Label position ==
+function getLabelPos(a, b, placement) {
+  const bx = b.x + b.w/2;
   const sameBand = Math.abs((a.y + a.h/2) - (b.y + b.h/2)) < 20;
+
+  if (placement === 'near-target') {
+    // Place on the vertical segment just before the arrowhead enters the target
+    if (sameBand) {
+      const goRight = b.x > a.x;
+      const tx = goRight ? b.x - 5 : b.x + b.w + 5;
+      return { x: tx, y: b.y + b.h/2 - 8 };
+    }
+    // Vertical drop into target: label sits on the vertical line, offset to the right
+    const goingDown = (b.y + b.h/2) > (a.y + a.h/2);
+    const targetEdge = goingDown ? b.y : b.y + b.h;
+    return { x: bx + 12, y: targetEdge + (goingDown ? -12 : 12) };
+  }
+
   if (sameBand) {
-    // Horizontal line -- place label above
-    const lx = (Math.max(a.x + a.w, b.x + b.w) + Math.min(a.x, b.x)) / 2;
+    const ax = a.x + a.w/2;
+    const lx = (ax + bx) / 2;
     const ly = a.y + a.h / 2 - 8;
     return { x: lx, y: ly };
   }
   // Elbow path -- place at midpoint of horizontal segment, offset above
+  const ax = a.x + a.w/2;
   const goingDown = (b.y + b.h/2) > (a.y + a.h/2);
   const y1 = goingDown ? a.y + a.h : a.y;
   const y2 = goingDown ? b.y       : b.y + b.h;
@@ -522,10 +604,14 @@ function render() {
 
   const defs = el('defs');
   for (const [type, s] of Object.entries(CONN_STYLE)) {
-    // Smaller arrowheads: 5x4 instead of 7x5
+    // Normal arrowhead
     const m = el('marker', { id:`arr-${type}`, markerWidth:'5', markerHeight:'4', refX:'4.5', refY:'2', orient:'auto' });
     m.appendChild(el('polygon', { points:'0 0,5 2,0 4', fill:s.color }));
     defs.appendChild(m);
+    // Dimmed arrowhead -- nearly invisible to match dimmed paths
+    const md = el('marker', { id:`arr-${type}-dim`, markerWidth:'5', markerHeight:'4', refX:'4.5', refY:'2', orient:'auto' });
+    md.appendChild(el('polygon', { points:'0 0,5 2,0 4', fill:s.color, opacity:'0.04' }));
+    defs.appendChild(md);
   }
   svg.appendChild(defs);
 
@@ -557,6 +643,9 @@ function render() {
     CONNS.forEach(c => { if (c.from===hov||c.to===hov) { connectedIds.add(c.from); connectedIds.add(c.to); } });
   }
 
+  // Reset path offset tracking for this render pass
+  resetPathOffsets();
+
   // Draw connections
   CONNS.filter(c => {
     if (!state.connTypes[c.type]) return false;
@@ -567,21 +656,23 @@ function render() {
     const s = CONN_STYLE[c.type];
     const isHi = hov && (c.from===hov || c.to===hov);
     const isDim = hov && !isHi;
-    const opacity = isDim ? 0.07 : (hov ? 0.95 : 0.25);
+    const opacity = isDim ? 0.03 : (hov ? 0.95 : 0.25);
 
-    const d = buildPath(a, b);
+    const d = buildPath(a, b, c.type);
     gMain.appendChild(el('path', {
       d, fill:'none',
       stroke: s.color,
       'stroke-width': isHi ? s.w * 1.8 : s.w,
       'stroke-dasharray': s.dash,
       'stroke-opacity': opacity,
-      'marker-end': `url(#arr-${c.type})`,
+      'marker-end': isDim ? `url(#arr-${c.type}-dim)` : `url(#arr-${c.type})`,
     }));
 
-    // Label: placed above/beside the path, not on top of it
+    // Label placement
     if (c.label && isHi) {
-      const pos = getLabelPos(a, b);
+      // Short labels (1-2 chars like "1","2","3","4") go near the arrowhead
+      const placement = c.label.length <= 2 ? 'near-target' : 'midpoint';
+      const pos = getLabelPos(a, b, placement);
       const tw = c.label.length * 5 + 12;
       gMain.appendChild(el('rect', { x:pos.x-tw/2, y:pos.y-9, width:tw, height:14, rx:2, fill:'#0b0f1a', opacity:'0.92' }));
       gMain.appendChild(el('text', { x:pos.x, y:pos.y+2, 'text-anchor':'middle', fill:s.color,
@@ -600,11 +691,10 @@ function drawNode(n, connectedIds, hov) {
   const isHov = hov === n.id;
   const isConnected = connectedIds.has(n.id);
   const isDim = hov && !isHov && !isConnected;
-  const hasComment = state.comments.some(c=>c.target===n.id);
   const isPipeline = n.group === 'pipeline';
   const isPinned = state.pinned === n.id;
 
-  const grp = el('g', { cursor:'pointer', opacity: isDim ? '0.2' : '1' });
+  const grp = el('g', { cursor:'pointer', opacity: isDim ? '0.06' : '1' });
 
   // Hover: only preview if nothing is pinned
   grp.addEventListener('mouseenter', () => {
@@ -614,34 +704,23 @@ function drawNode(n, connectedIds, hov) {
     if (!state.pinned) { state.hovered = null; render(); }
   });
 
-  // Single click: pin/unpin
+  // Single click: pin + show docs
   grp.addEventListener('click', (e) => {
     e.stopPropagation();
     if (state.pinned === n.id) {
-      // Same node: unpin
       state.pinned = null;
-      state.hovered = n.id; // keep hover active
+      state.hovered = null;
+      showDocPanel(null);
     } else {
       state.pinned = n.id;
+      state.hovered = null;
+      showDocPanel(n);
     }
     render();
   });
 
-  // Double click: open source file
-  grp.addEventListener('dblclick', (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const src = SOURCE_MAP[n.id];
-    if (src) {
-      // Show path in prompt bar as feedback
-      document.getElementById('prompt-text').textContent = `Source: plugins/lavra/${src}`;
-      // Copy to clipboard for easy opening
-      navigator.clipboard.writeText(`plugins/lavra/${src}`).catch(()=>{});
-    }
-  });
-
-  const stroke = isPinned ? '#fbbf24' : (isHov ? '#fff' : (hasComment ? '#f97316' : (isPipeline && !hov ? '#60a5fa' : s.stroke)));
-  const sw = isPinned ? 2.5 : (isHov ? 2 : (isPipeline && !hov ? 1.8 : (hasComment ? 1.5 : 1)));
+  const stroke = isPinned ? '#fbbf24' : (isHov ? '#fff' : (isPipeline && !hov ? '#60a5fa' : s.stroke));
+  const sw = isPinned ? 2.5 : (isHov ? 2 : (isPipeline && !hov ? 1.8 : 1));
 
   grp.appendChild(el('rect', { x:n.x, y:n.y, width:n.w, height:n.h, rx:5,
     fill: isHov || isPinned ? '#1a2a40' : s.fill,
@@ -657,10 +736,6 @@ function drawNode(n, connectedIds, hov) {
       'font-family':'-apple-system,sans-serif' }, n.sub));
   }
 
-  if (hasComment) {
-    grp.appendChild(el('circle', { cx:n.x+n.w-5, cy:n.y+5, r:3.5, fill:'#f97316' }));
-  }
-
   // Pin indicator on node
   if (isPinned) {
     grp.appendChild(el('circle', { cx:n.x+n.w-5, cy:n.y+5, r:3, fill:'#fbbf24' }));
@@ -669,13 +744,13 @@ function drawNode(n, connectedIds, hov) {
   gMain.appendChild(grp);
 }
 
-// == Click on background to unpin ==
+// == Click on background to unpin/reset ==
 svg.addEventListener('click', (e) => {
-  // Only if clicking the SVG background (not a node)
   if (!e.target.closest('g[cursor="pointer"]')) {
-    if (state.pinned) {
+    if (state.pinned || state.hovered) {
       state.pinned = null;
       state.hovered = null;
+      showDocPanel(null);
       render();
     }
   }
@@ -733,36 +808,24 @@ function applyPreset(btn, name) {
 function toggleLayer(l, v) { state.layers[l]=v; render(); updatePrompt(); }
 function toggleConn(t, v) { state.connTypes[t]=v; render(); updatePrompt(); }
 
-// == Comments ==
-let modalNode=null;
-function openModal(n) {
-  modalNode=n;
-  document.getElementById('modal-title').textContent = n.label;
-  document.getElementById('modal-sub').textContent = n.sub||'';
-  document.getElementById('modal-input').value='';
-  document.getElementById('modal-bg').classList.add('open');
-  setTimeout(()=>document.getElementById('modal-input').focus(),50);
-}
-function closeModal() { document.getElementById('modal-bg').classList.remove('open'); modalNode=null; }
-function saveComment() {
-  const t=document.getElementById('modal-input').value.trim();
-  if (!t) { closeModal(); return; }
-  state.comments.push({id:Date.now(), target:modalNode.id, targetLabel:modalNode.label, text:t});
-  closeModal(); renderComments(); render(); updatePrompt();
-}
-function deleteComment(id) {
-  state.comments=state.comments.filter(c=>c.id!==id);
-  renderComments(); render(); updatePrompt();
-}
-function renderComments() {
-  const list=document.getElementById('comments-list');
-  document.getElementById('comment-count').textContent=state.comments.length;
-  if (!state.comments.length) { list.innerHTML='<div class="no-comments">Click a node to pin its connections. Double-click to view source.</div>'; return; }
-  list.innerHTML=state.comments.map(c=>`
-    <div class="comment-item">
-      <div class="comment-target">${c.targetLabel}<span class="comment-del" onclick="deleteComment(${c.id})"> x</span></div>
-      <div class="comment-text">${c.text}</div>
-    </div>`).join('');
+// == Documentation panel ==
+function showDocPanel(n) {
+  const panel = document.getElementById('doc-panel');
+  if (!n) {
+    panel.innerHTML = '<div class="no-comments">Click a node to see its documentation and pin its connections.</div>';
+    return;
+  }
+  const desc = DOCS_MAP[n.id] || n.sub || '';
+  const src = SOURCE_MAP[n.id];
+  const typeLabel = n.layer === 'commands' ? 'Command' : n.layer === 'agents' ? 'Agent' : n.layer === 'skills' ? 'Skill' : n.group === 'config' ? 'Config' : 'Knowledge';
+  const srcLink = src ? `<div class="doc-source"><a href="https://github.com/roberto-mello/lavra/blob/main/plugins/lavra/${src}" target="_blank">plugins/lavra/${src}</a></div>` : '';
+  panel.innerHTML = `
+    <div class="doc-card">
+      <div class="doc-type">${typeLabel}</div>
+      <div class="doc-name"><a href="${src ? 'https://github.com/roberto-mello/lavra/blob/main/plugins/lavra/' + src : '#'}" target="_blank">${n.label}</a></div>
+      <div class="doc-desc">${desc}</div>
+      ${srcLink}
+    </div>`;
 }
 
 // == Prompt ==
@@ -773,10 +836,6 @@ function updatePrompt() {
   if (hiddenL.length) parts.push(`Hidden: ${hiddenL.join(', ')}.`);
   const hiddenC=Object.entries(state.connTypes).filter(([,v])=>!v).map(([k])=>k);
   if (hiddenC.length) parts.push(`Connection types hidden: ${hiddenC.join(', ')}.`);
-  if (state.comments.length) {
-    parts.push('');
-    state.comments.forEach(c=>parts.push(`[${c.targetLabel}] ${c.text}`));
-  }
   document.getElementById('prompt-text').textContent=parts.join('\n');
 }
 
@@ -790,17 +849,11 @@ function copyPrompt() {
 
 // == Keyboard ==
 window.addEventListener('keydown', e=>{
-  if (e.key==='Escape') {
-    if (document.getElementById('modal-bg').classList.contains('open')) {
-      closeModal();
-    } else if (state.pinned) {
-      state.pinned = null;
-      state.hovered = null;
-      render();
-    }
-  }
-  if (e.key==='Enter' && !e.shiftKey && document.getElementById('modal-bg').classList.contains('open')) {
-    e.preventDefault(); saveComment();
+  if (e.key==='Escape' && state.pinned) {
+    state.pinned = null;
+    state.hovered = null;
+    showDocPanel(null);
+    render();
   }
 });
 
