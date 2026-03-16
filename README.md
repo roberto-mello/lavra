@@ -24,30 +24,30 @@ A plugin for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that 
 Most of the time, you type three commands:
 
 ```
-/beads-design "I want users to upload photos for listings"
+/lavra-design "I want users to upload photos for listings"
 ```
 
 This runs the full planning pipeline as a single command: interactive brainstorm with scope sharpening, structured plan with phased beads, domain-matched research agents, plan revision, and adversarial review. The output is detailed enough that implementation is mechanical.
 
 ```
-/beads-work
+/lavra-work
 ```
 
 Picks up the approved plan and implements it. Auto-routes between single and multi-bead parallel execution. Includes mandatory review, fix loop, and knowledge curation -- all automatic.
 
 ```
-/beads-ship
+/lavra-ship
 ```
 
 Rebases on main, runs tests, scans for secrets and debug leftovers, creates the PR, closes beads, and pushes the backup. One command to land the plane.
 
-Add `/beads-qa` between work and ship when building web apps -- it maps changed files to routes and runs browser-based verification with screenshots.
+Add `/lavra-qa` between work and ship when building web apps -- it maps changed files to routes and runs browser-based verification with screenshots.
 
 ## Who this is for
 
 Anyone using Claude Code who wants consistent, high-quality output instead of hoping the agent gets it right this time.
 
-- **Non-technical users:** `/beads-design "build me X"` handles the brainstorming, planning, and research. `/beads-work` handles the implementation with built-in quality gates. You get working software without needing to know how to code.
+- **Non-technical users:** `/lavra-design "build me X"` handles the brainstorming, planning, and research. `/lavra-work` handles the implementation with built-in quality gates. You get working software without needing to know how to code.
 - **Solo developers:** The memory system acts as a second brain. Past decisions, patterns, and gotchas surface automatically when they're relevant.
 - **Teams:** Knowledge compounds across contributors. One person's hard-won insight becomes everyone's starting context.
 
@@ -73,13 +73,13 @@ cd lavra
 <details>
 <summary><strong>All commands</strong></summary>
 
-**Pipeline (4):** `/beads-design`, `/beads-work`, `/beads-qa`, `/beads-ship`
+**Pipeline (4):** `/lavra-design`, `/lavra-work`, `/lavra-qa`, `/lavra-ship`
 
-**Supporting (9):** `/beads-quick` (fast path with escalation), `/beads-learn` (knowledge curation), `/beads-recall` (mid-session search), `/beads-checkpoint` (save progress), `/beads-retro` (weekly analytics), `/beads-import`, `/beads-triage`, `/changelog`, `/test-browser`
+**Supporting (9):** `/lavra-quick` (fast path with escalation), `/lavra-learn` (knowledge curation), `/lavra-recall` (mid-session search), `/lavra-checkpoint` (save progress), `/lavra-retro` (weekly analytics), `/lavra-import`, `/lavra-triage`, `/changelog`, `/test-browser`
 
-**Power-user (6):** `/beads-plan`, `/beads-research`, `/beads-plan-review`, `/beads-review` (15 specialized review agents), `/beads-work-ralph` (autonomous retry), `/beads-work-teams` (persistent workers)
+**Power-user (6):** `/lavra-plan`, `/lavra-research`, `/lavra-plan-review`, `/lavra-review` (15 specialized review agents), `/lavra-work-ralph` (autonomous retry), `/lavra-work-teams` (persistent workers)
 
-**29 specialized agents** across review, research, design, workflow, and docs. Each runs at the right model tier to keep costs 60-70% lower than running everything on Opus.
+**30 specialized agents** across review, research, design, workflow, and docs. Each runs at the right model tier to keep costs 60-70% lower than running everything on Opus.
 
 See [docs/CATALOG.md](docs/CATALOG.md) for the full listing.
 
@@ -96,11 +96,29 @@ review      --LEARNED-->  issues become future recall
 retro       synthesizes patterns, surfaces gaps
 ```
 
-Five knowledge types (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION) are captured inline during work and stored in `.beads/memory/knowledge.jsonl`. At session start, relevant entries are recalled automatically based on your current beads and git branch. The system gets smarter over time -- not just for you, but for your whole team.
+Six knowledge types (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION, DEVIATION) are captured inline during work and stored in `.beads/memory/knowledge.jsonl`. At session start, relevant entries are recalled automatically based on your current beads and git branch. The system gets smarter over time -- not just for you, but for your whole team.
+
+<details>
+<summary><strong>Configuration</strong></summary>
+
+**`.beads/config/lavra.json`** (created automatically) -- toggle workflow phases and execution behavior:
+
+```json
+{
+  "workflow": { "research": true, "plan_review": true, "goal_verification": true },
+  "execution": { "max_parallel_agents": 3, "commit_granularity": "task" }
+}
+```
+
+**`/project-setup`** -- for brownfield projects, run this to generate a codebase profile (stack, architecture, conventions) that informs planning.
+
+</details>
 
 ## Acknowledgments
 
-Built by [Roberto Mello](https://github.com/roberto-mello), extending [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin) by [Every](https://every.to). Task tracking by [Beads](https://github.com/steveyegge/beads). Inspired by Every's writing on [compound engineering](https://every.to/chain-of-thought/compound-engineering-how-every-codes-with-agents).
+Built by [Roberto Mello](https://github.com/roberto-mello), extending [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin) by [Every](https://every.to). Task tracking by [Beads](https://github.com/steveyegge/beads).
+
+Inspired by Every's writing on [compound engineering](https://every.to/chain-of-thought/compound-engineering-how-every-codes-with-agents), [gstack](https://github.com/garrytan/gstack) by Garry Tan (role-based skills for autonomous workflows), and [Get Shit Done](https://github.com/gsd-build/get-shit-done) (spec-driven development with context engineering).
 
 ## License
 

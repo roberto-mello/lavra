@@ -7,13 +7,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Claude Code plugin marketplace that provides beads-based persistent memory with compound-engineering's multi-agent workflows. The primary plugin is `lavra`, located at `plugins/lavra/`.
 
 The plugin provides:
-- 29 specialized agents (15 review, 5 research, 3 design, 5 workflow, 1 docs)
+- 30 specialized agents (16 review, 5 research, 3 design, 5 workflow, 1 docs)
 - 22 core commands + 5 optional domain-specific commands (in commands/optional/)
 - 16 skills (git-worktree, brainstorming, create-agent-skills, agent-browser, dhh-rails-style, etc.)
 - 3 hooks for automatic knowledge capture, recall, and subagent wrapup
 - 1 MCP server (Context7 for framework documentation)
-- Automatic knowledge capture from beads comments (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION)
+- Automatic knowledge capture from beads comments (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION/DEVIATION)
 - Automatic knowledge recall at session start based on current beads
+- Workflow configuration via `.beads/config/lavra.json` (toggle research, review, goal verification, parallelism)
 
 ## Multi-Platform Support
 
@@ -35,7 +36,7 @@ lavra/                              # Marketplace root
 │   └── lavra/                      # Plugin root
 │       ├── .claude-plugin/
 │       │   └── plugin.json         # Plugin manifest (v0.6.0)
-│       ├── agents/                 # 29 agents (review/, research/, design/, workflow/, docs/)
+│       ├── agents/                 # 30 agents (review/, research/, design/, workflow/, docs/)
 │       ├── commands/               # 22 core commands + optional/
 │       ├── skills/                 # 16 skills with supporting files
 │       ├── hooks/                  # hooks.json, auto-recall.sh, memory-capture.sh, subagent-wrapup.sh, recall.sh

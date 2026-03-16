@@ -13,29 +13,29 @@ Commands are in `plugins/lavra/commands/`:
 
 | Command | File | Description |
 |---------|------|-------------|
-| `/beads-brainstorm` | beads-brainstorm.md | Explore ideas collaboratively |
-| `/beads-design` | beads-design.md | Orchestrate full planning pipeline per phase: plan -> research -> review |
-| `/beads-quick` | beads-quick.md | Fast-track small tasks with abbreviated plan |
-| `/beads-plan` | beads-plan.md | Research and plan with multiple agents |
-| `/beads-work` | beads-work.md | Work on one or many beads -- auto-routes single vs. multi-bead paths |
-| `/beads-work-ralph` | beads-work-ralph.md | Autonomous retry mode with completion promises |
-| `/beads-work-teams` | beads-work-teams.md | Persistent worker teammates with COMPLETED/ACCEPTED protocol |
-| `/beads-review` | beads-review.md | Multi-agent code review |
-| `/beads-qa` | beads-qa.md | Browser-based QA verification from the user's perspective |
-| `/beads-ship` | beads-ship.md | Automated ship sequence from code-ready to PR-open |
-| `/beads-checkpoint` | beads-checkpoint.md | Save progress and capture knowledge |
-| `/beads-retro` | beads-retro.md | Weekly retrospective with shipping analytics and knowledge synthesis |
-| `/beads-learn` | beads-learn.md | Curate knowledge into structured entries |
-| `/beads-recall` | beads-recall.md | Search knowledge base mid-session |
+| `/lavra-brainstorm` | lavra-brainstorm.md | Explore ideas collaboratively |
+| `/lavra-design` | lavra-design.md | Orchestrate full planning pipeline per phase: plan -> research -> review |
+| `/lavra-quick` | lavra-quick.md | Fast-track small tasks with abbreviated plan |
+| `/lavra-plan` | lavra-plan.md | Research and plan with multiple agents |
+| `/lavra-work` | lavra-work.md | Work on one or many beads -- auto-routes single vs. multi-bead paths |
+| `/lavra-work-ralph` | lavra-work-ralph.md | Autonomous retry mode with completion promises |
+| `/lavra-work-teams` | lavra-work-teams.md | Persistent worker teammates with COMPLETED/ACCEPTED protocol |
+| `/lavra-review` | lavra-review.md | Multi-agent code review |
+| `/lavra-qa` | lavra-qa.md | Browser-based QA verification from the user's perspective |
+| `/lavra-ship` | lavra-ship.md | Automated ship sequence from code-ready to PR-open |
+| `/lavra-checkpoint` | lavra-checkpoint.md | Save progress and capture knowledge |
+| `/lavra-retro` | lavra-retro.md | Weekly retrospective with shipping analytics and knowledge synthesis |
+| `/lavra-learn` | lavra-learn.md | Curate knowledge into structured entries |
+| `/lavra-recall` | lavra-recall.md | Search knowledge base mid-session |
 
 **Planning & Triage (4):**
 
 | Command | File | Description |
 |---------|------|-------------|
-| `/beads-research` | beads-research.md | Gather evidence with domain-matched agents |
-| `/beads-plan-review` | beads-plan-review.md | Multi-agent plan review |
-| `/beads-triage` | beads-triage.md | Prioritize and categorize beads |
-| `/beads-import` | beads-import.md | Import markdown plans into beads |
+| `/lavra-research` | lavra-research.md | Gather evidence with domain-matched agents |
+| `/lavra-plan-review` | lavra-plan-review.md | Multi-agent plan review |
+| `/lavra-triage` | lavra-triage.md | Prioritize and categorize beads |
+| `/lavra-import` | lavra-import.md | Import markdown plans into beads |
 
 **Utility (4):**
 
@@ -56,11 +56,11 @@ Commands are in `plugins/lavra/commands/`:
 | `/reproduce-bug` | optional/reproduce-bug.md | Reproduce and investigate bugs |
 | `/generate-command` | optional/generate-command.md | Create new slash commands |
 
-## Agents (29)
+## Agents (30)
 
 Agents are in `plugins/lavra/agents/`:
 
-**Review (15)**: agent-native-reviewer, architecture-strategist, code-simplicity-reviewer, data-integrity-guardian, data-migration-expert, deployment-verification-agent, dhh-rails-reviewer, julik-frontend-races-reviewer, kieran-python-reviewer, kieran-rails-reviewer, kieran-typescript-reviewer, migration-drift-detector, pattern-recognition-specialist, performance-oracle, security-sentinel
+**Review (16)**: agent-native-reviewer, architecture-strategist, code-simplicity-reviewer, data-integrity-guardian, data-migration-expert, deployment-verification-agent, dhh-rails-reviewer, goal-verifier, julik-frontend-races-reviewer, kieran-python-reviewer, kieran-rails-reviewer, kieran-typescript-reviewer, migration-drift-detector, pattern-recognition-specialist, performance-oracle, security-sentinel
 
 **Research (5)**: best-practices-researcher, framework-docs-researcher, git-history-analyzer, learnings-researcher, repo-research-analyst
 
@@ -78,7 +78,7 @@ Skills are in `plugins/lavra/skills/`:
 - **brainstorming**: Structured brainstorming with bead output
 - **create-agent-skills**: Create new agents and skills
 - **agent-native-architecture**: Design agent-native system architectures
-- **beads-knowledge**: Document solved problems as knowledge entries
+- **lavra-knowledge**: Document solved problems as knowledge entries
 - **agent-browser**: Browser automation for testing and screenshots
 - **andrew-kane-gem-writer**: Write Ruby gems following Andrew Kane's style
 - **dhh-rails-style**: Rails development following DHH's conventions
@@ -87,7 +87,7 @@ Skills are in `plugins/lavra/skills/`:
 - **file-todos**: Find and manage TODO comments in code
 - **frontend-design**: Frontend design patterns and best practices
 - **gemini-imagegen**: Generate images using Google's Gemini
-- **project-setup**: Project environment setup and onboarding automation
+- **project-setup**: Project stack detection, review agent config, and optional brownfield codebase analysis
 - **rclone**: Cloud storage file management with rclone
 - **skill-creator**: Create new skills from templates
 
@@ -103,4 +103,4 @@ Task(subagent_type="general-purpose",
 The `subagent-wrapup.sh` hook will:
 1. Extract BEAD_ID from the subagent transcript
 2. Block completion until subagent logs knowledge
-3. Prompt with the five knowledge prefixes (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION)
+3. Prompt with the six knowledge prefixes (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION/DEVIATION)

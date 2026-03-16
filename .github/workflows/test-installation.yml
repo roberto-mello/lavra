@@ -137,11 +137,11 @@ jobs:
           SKILLS=$(find plugins/lavra/skills -name "SKILL.md" | wc -l)
 
           echo "Commands: $COMMANDS (expected 24+)"
-          echo "Agents: $AGENTS (expected 28+)"
+          echo "Agents: $AGENTS (expected 30+)"
           echo "Skills: $SKILLS (expected 15+)"
 
           [[ "$COMMANDS" -ge 24 ]] || exit 1
-          [[ "$AGENTS" -ge 28 ]] || exit 1
+          [[ "$AGENTS" -ge 30 ]] || exit 1
           [[ "$SKILLS" -ge 15 ]] || exit 1
 
           echo "✅ Component counts verified"

@@ -17,9 +17,32 @@ cd /path/to/your-project
 
 # Check that files were created
 ls -la .claude/hooks/        # Should see auto-recall.sh, memory-capture.sh
-ls -la .claude/commands/     # Should see beads-*.md files
+ls -la .claude/commands/     # Should see lavra-*.md files
 ls -la .beads/memory/        # Should see knowledge.jsonl, recall.sh
 ```
+
+## Configuration
+
+### Workflow config (automatic)
+
+The installer creates `.beads/config/lavra.json` with default settings. Edit to toggle:
+- `workflow.research` -- skip research phase in `/lavra-design`
+- `workflow.plan_review` -- skip plan review phase in `/lavra-design`
+- `workflow.goal_verification` -- skip goal verification in `/lavra-work` and `/lavra-ship`
+- `execution.max_parallel_agents` -- limit parallel subagents (default: 3)
+- `execution.commit_granularity` -- `"task"` (default, atomic) or `"wave"` (legacy)
+
+Existing projects get this file automatically on next session start (version self-heal).
+
+### Codebase analysis (optional, for brownfield projects)
+
+If you're installing lavra into an existing project, run `/project-setup` to generate a codebase profile:
+
+```
+/project-setup
+```
+
+When prompted "Run codebase analysis?", choose Y. This dispatches 3 parallel agents to analyze your stack, architecture, and conventions, saving the results to `.beads/config/codebase-profile.md`. This file is used by `/lavra-design` and `/lavra-work` as planning context.
 
 ## Your First Workflow
 
@@ -33,7 +56,7 @@ bd create "Add user profile page" -d "Display user info with edit capability"
 ### 2. Plan it (optional but recommended)
 
 ```
-/beads-plan BD-001
+/lavra-plan BD-001
 ```
 
 This dispatches research agents to gather:
@@ -46,7 +69,7 @@ Creates child beads for each step.
 ### 3. Work on it
 
 ```
-/beads-work BD-001.1
+/lavra-work BD-001.1
 ```
 
 This:
@@ -75,7 +98,7 @@ These get auto-captured to `.beads/memory/knowledge.jsonl`.
 ### 6. Review
 
 ```
-/beads-review BD-001.1
+/lavra-review BD-001.1
 ```
 
 This dispatches multiple reviewers:
@@ -107,11 +130,11 @@ You get relevant learnings without manually searching!
 
 | Command | Use When |
 |---------|----------|
-| `/beads-plan {id or desc}` | Starting a complex feature, need research |
-| `/beads-work {id}` | Starting work on a bead |
-| `/beads-review {id}` | Before closing a bead, want multi-agent review |
-| `/beads-research {id or question}` | Need deep understanding before implementing |
-| `/beads-checkpoint` | Want to save progress during long session |
+| `/lavra-plan {id or desc}` | Starting a complex feature, need research |
+| `/lavra-work {id}` | Starting work on a bead |
+| `/lavra-review {id}` | Before closing a bead, want multi-agent review |
+| `/lavra-research {id or question}` | Need deep understanding before implementing |
+| `/lavra-checkpoint` | Want to save progress during long session |
 
 ## Manual Knowledge Search
 
@@ -136,7 +159,7 @@ You get relevant learnings without manually searching!
 bd create "Add two-factor authentication" -d "TOTP-based 2FA with QR codes"
 # => BD-050
 
-/beads-plan BD-050
+/lavra-plan BD-050
 # Researches best practices, security considerations, framework options
 # Creates child beads:
 #   BD-050.1: Database schema for OTP secrets
@@ -145,7 +168,7 @@ bd create "Add two-factor authentication" -d "TOTP-based 2FA with QR codes"
 #   BD-050.4: Settings UI
 
 # Day 2: Implement first step
-/beads-work BD-050.1
+/lavra-work BD-050.1
 # Auto-recalls security knowledge from yesterday's research
 
 # Edit files, create migration
@@ -156,7 +179,7 @@ bd comments add BD-050.1 "LEARNED: OTP secrets MUST be encrypted at rest"
 bd comments add BD-050.1 "DECISION: Using rotp gem for TOTP generation"
 bd comments add BD-050.1 "FACT: Backup codes needed for account recovery"
 
-/beads-review BD-050.1
+/lavra-review BD-050.1
 # Security review catches missing index on user_id
 # Creates BD-051: Add index to otp_secrets.user_id
 
@@ -180,12 +203,13 @@ bd close BD-050.1
    - `FACT:` - Constraints, requirements, environment details
    - `PATTERN:` - Coding patterns, conventions, idioms
    - `INVESTIGATION:` - Root cause analysis, how things work
+   - `DEVIATION:` - Auto-fixes applied outside bead scope
 
-3. **Review before closing**: `/beads-review` catches issues early
+3. **Review before closing**: `/lavra-review` catches issues early
 
-4. **Plan complex features**: `/beads-plan` prevents rework by researching upfront
+4. **Plan complex features**: `/lavra-plan` prevents rework by researching upfront
 
-5. **Checkpoint long sessions**: `/beads-checkpoint` saves progress without losing context
+5. **Checkpoint long sessions**: `/lavra-checkpoint` saves progress without losing context
 
 6. **Trust auto-recall**: Knowledge will be injected when relevant, no need to search manually
 
@@ -208,7 +232,7 @@ cat .claude/settings.json | jq '.hooks.SessionStart'
 
 ```bash
 # Check if commands are installed
-ls -la .claude/commands/beads-*.md
+ls -la .claude/commands/lavra-*.md
 
 # Restart Claude Code (required after installation)
 ```
