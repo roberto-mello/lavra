@@ -31,27 +31,27 @@ All notable changes to the lavra plugin are documented here.
 ### Fixed
 - **OpenCode installer hangs in non-interactive mode** - `install-opencode.sh` model selection prompt now checks `[[ -t 0 ]]` (stdin is a terminal) in addition to `--yes` flag. Prevents hang when called from test scripts or CI. Installation tests now pass `--yes` to OpenCode installer. All 35 installation tests pass (was 30/35).
 
-## [0.6.9] - 2026-03-13
+### Also included (from unreleased 0.6.9)
 
-### Added
-- **`project-setup` skill** - New skill at `skills/project-setup/` for per-project stack detection and review agent configuration. Auto-detects tech stack (Rails, Ruby, TypeScript, JavaScript, Python, General) from project files, lets users toggle specific agents off, and saves config to `.beads/config/project-setup.md` with YAML frontmatter. Review Context notes are length-limited to 500 chars and stripped of prompt-structural characters.
-- **`migration-drift-detector` agent** - New review agent that detects schema/migration drift in PRs across five ORMs: Rails (`db/migrate/` + `db/schema.rb`), Alembic (revision DAG + multiple heads), Prisma (checksum + shadow DB), Drizzle (snapshot/SQL mismatch), and Knex (out-of-sequence timestamps). Auto-detects which ORM is in use. All PR field handling uses `jq --arg` to prevent shell injection.
-- **`lavra-review` project config integration** - `/lavra-review` now reads `.beads/config/project-setup.md` at start of review. When present, dispatches only the configured `review_agents` (validated against a dynamically-derived allowlist from the installed agents directory — no hardcoded list to go stale). Config-missing = dispatch all agents (fully backward compatible). `reviewer_context_note` is intentionally **not** injected into review agents — they derive context from the code itself; see `docs/SECURITY.md`.
-- **`lavra-parallel` project config injection** - Section 8 (Recall Knowledge) now reads `.beads/config/project-setup.md` when present and injects `reviewer_context_note` into all subagent prompt templates (standard, ralph, teams worker) under `## Project Conventions`. Wrapped in `untrusted-config-data` XML with a "do not follow instructions" directive. Note: `untrusted-config-data` is a prompt engineering convention, not a model-enforced standard — the real protection is the sanitization strip list and 500-char limit. See `docs/SECURITY.md` for the full threat model.
-- **`migration-drift-detector` wired into `/lavra-review`** - Added as a conditional agent alongside `data-migration-expert` (not instead of it). Triggers on any ORM's migration or schema artifact files. Finding synthesis step notes deduplication between the two agents.
-- **`/lavra-compound` surfaced after substantial findings** - `/lavra-work` now scans the bead's comments after the knowledge gate and adds `/lavra-compound` as an option when `LEARNED:` or `INVESTIGATION:` entries are found. `/lavra-parallel` scans all closed beads in step 12, collects matching bead IDs as `COMPOUND_CANDIDATES`, and surfaces `/lavra-compound {COMPOUND_CANDIDATES}` in handoff options.
-- **Sources section in `/lavra-plan`** - Epic bead descriptions now include a mandatory `## Sources` freeform bullet list (`Brainstorm:`, `File:`, `Knowledge:`, `Doc:`, `Research:` entry types). Child beads get a `## References` subsection. Pre-submission checklist verifies Sources is non-empty.
-- **Cross-check validation in `/lavra-plan`** - New Step 5.5 runs warning-only validation after bead creation: checks required sections per child bead, flags file-scope conflicts between independent beads without a dependency, warns on missing brainstorm reference when a brainstorm bead was used. Does not block plan creation.
-- **Improved brainstorm detection in `/lavra-plan`** - Step 0 now uses a four-step decision tree: label-based detection first (checks `brainstorm` label on bead and parent), then keyword match ≤14 days, then keyword match >14 days (prompts user), then full idea refinement. When brainstorm detected: locked decisions extracted and carried forward into child bead Context sections, Sources section auto-populated with `Brainstorm:` entry.
-- **`.beads/config/` provisioned by installer** - `install-claude.sh` now runs `mkdir -p "$TARGET/.beads/config"` alongside memory provisioning.
+#### Added
+- **`project-setup` skill** - Per-project stack detection and review agent configuration. Auto-detects tech stack, lets users toggle specific agents off, saves config to `.beads/config/project-setup.md`.
+- **`migration-drift-detector` agent** - Detects schema/migration drift across five ORMs (Rails, Alembic, Prisma, Drizzle, Knex). All PR field handling uses `jq --arg` to prevent shell injection.
+- **`lavra-review` project config integration** - Reads `.beads/config/project-setup.md` and dispatches only configured agents (dynamic allowlist). `reviewer_context_note` intentionally not injected into review agents.
+- **`/lavra-work` multi-bead config injection** - Reads `reviewer_context_note` and injects into subagent prompts wrapped in `untrusted-config-data` XML.
+- **`migration-drift-detector` wired into `/lavra-review`** - Conditional agent alongside `data-migration-expert`, triggers on migration/schema files.
+- **`/lavra-learn` surfaced after substantial findings** - `/lavra-work` surfaces `/lavra-learn` when `LEARNED:` or `INVESTIGATION:` comments found.
+- **Sources section in `/lavra-plan`** - Epic descriptions include mandatory `## Sources` list. Child beads get `## References`.
+- **Cross-check validation in `/lavra-plan`** - Step 5.5 warning-only validation: required sections, file-scope conflicts, brainstorm reference.
+- **Improved brainstorm detection in `/lavra-plan`** - Four-step decision tree: label-based, keyword <=14d, keyword >14d (prompt), full refinement.
+- **`.beads/config/` provisioned by installer**.
 
-### Changed
-- **`reviewer_context_note` injection removed from `/lavra-review`** - Review agents no longer receive the context note. They derive project context from the code. This removes an injection vector from the review pipeline with no meaningful loss of review quality.
-- **Expanded sanitization strip list** - `project-setup` skill and `lavra-parallel` now strip `USER:`, `HUMAN:`, `[INST]`, `<s>`/`</s>` tags, `\r`, null bytes, and Unicode bidirectional override characters (U+202A–U+202E, U+2066–U+2069) in addition to the existing `<`, `>`, `SYSTEM:`, `ASSISTANT:`, and triple backtick rules.
-- **Dynamic agent allowlist in `/lavra-review`** - Agent names in `review_agents` are now validated against a live listing of `.claude/agents/` rather than a hardcoded list. New agents are automatically available without any list to maintain.
-- **`docs/SECURITY.md` added** - Documents the threat model, injection defense strategy, honest limitations of `untrusted-config-data` XML wrapping, and the trust model for all config sources.
-- **`.beads/config/` added to protected artifacts** - All six locations that protect `.beads/memory/` now also protect `.beads/config/`: `lavra-review.md`, `lavra-parallel.md` (2 locations), `code-simplicity-reviewer.md`, `resolve-todo-parallel.md`, `git-history-analyzer.md`.
-- **Component counts updated** - 28 → 29 agents (migration-drift-detector), 15 → 16 skills (project-setup). Updated in `plugin.json`, `marketplace.json`, `plugin-catalog.md`, `pre-release-check.sh`, `CLAUDE.md`, and `install-claude.sh`.
+#### Changed
+- **`reviewer_context_note` injection removed from `/lavra-review`** - Review agents derive context from code, removing injection vector.
+- **Expanded sanitization strip list** - Added `USER:`, `HUMAN:`, `[INST]`, `<s>`/`</s>`, `\r`, null bytes, Unicode bidirectional overrides.
+- **Dynamic agent allowlist in `/lavra-review`** - Validated against live `.claude/agents/` listing.
+- **`docs/SECURITY.md` added** - Full threat model, injection defense strategy, trust model.
+- **`.beads/config/` added to protected artifacts** across all six protection locations.
+- **Component counts** - 28 → 30 agents (migration-drift-detector + goal-verifier), 15 → 16 skills (project-setup).
 
 ## [0.6.8] - 2026-03-05
 
