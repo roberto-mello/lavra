@@ -47,7 +47,7 @@ provision_memory_dir() {
   # Write installed version for staleness detection by auto-recall.sh
   echo "0.6.8" > "$MEMORY_DIR/.lavra-version"
 
-  # Create .beads/memory/.gitignore to ignore the SQLite FTS cache
+  # Create .beads/memory/.gitignore to ignore the SQLite FTS cache and ephemeral state
   # (rebuilt from knowledge.jsonl on first use — no need to commit it)
   local MEMORY_GITIGNORE="$MEMORY_DIR/.gitignore"
   if [[ ! -f "$MEMORY_GITIGNORE" ]]; then
@@ -57,6 +57,34 @@ knowledge.db
 knowledge.db-journal
 knowledge.db-wal
 knowledge.db-shm
+
+# Ephemeral session state (survives compaction, recalled once, then deleted)
+session-state.md
+EOF
+  elif ! grep -q 'session-state.md' "$MEMORY_GITIGNORE" 2>/dev/null; then
+    # Append session-state.md to existing gitignore if missing
+    echo "" >> "$MEMORY_GITIGNORE"
+    echo "# Ephemeral session state (survives compaction, recalled once, then deleted)" >> "$MEMORY_GITIGNORE"
+    echo "session-state.md" >> "$MEMORY_GITIGNORE"
+  fi
+
+  # Create default lavra.json config if missing
+  local CONFIG_DIR="$PROJECT_DIR/.beads/config"
+  mkdir -p "$CONFIG_DIR"
+  if [[ ! -f "$CONFIG_DIR/lavra.json" ]]; then
+    cat > "$CONFIG_DIR/lavra.json" << 'EOF'
+{
+  "workflow": {
+    "research": true,
+    "plan_review": true,
+    "goal_verification": true
+  },
+  "execution": {
+    "max_parallel_agents": 3,
+    "commit_granularity": "task"
+  },
+  "model_profile": "balanced"
+}
 EOF
   fi
 
