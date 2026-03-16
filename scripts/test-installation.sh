@@ -100,12 +100,12 @@ fi
 AGENT_COUNT=$(find .claude/agents -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 GLOBAL_AGENT_COUNT=$(find -L "$HOME/.claude/agents" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 
-if [[ "$AGENT_COUNT" -ge 28 ]]; then
+if [[ "$AGENT_COUNT" -ge 30 ]]; then
   pass "Claude Code agents installed locally ($AGENT_COUNT files)"
 elif [[ "$GLOBAL_AGENT_COUNT" -ge 28 ]]; then
   pass "Claude Code agents installed globally ($GLOBAL_AGENT_COUNT files)"
 else
-  fail "Claude Code agents" "Expected 28+, found $AGENT_COUNT local, $GLOBAL_AGENT_COUNT global"
+  fail "Claude Code agents" "Expected 30+, found $AGENT_COUNT local, $GLOBAL_AGENT_COUNT global"
 fi
 
 # Verify skills (should be 15+ in project OR global)
@@ -242,10 +242,10 @@ fi
 
 # Verify agents (should be .md for Gemini)
 GEMINI_AGENT_COUNT=$(find agents -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-if [[ "$GEMINI_AGENT_COUNT" -ge 28 ]]; then
+if [[ "$GEMINI_AGENT_COUNT" -ge 30 ]]; then
   pass "Gemini agents installed ($GEMINI_AGENT_COUNT files)"
 else
-  fail "Gemini agents" "Expected 28+, found $GEMINI_AGENT_COUNT"
+  fail "Gemini agents" "Expected 30+, found $GEMINI_AGENT_COUNT"
 fi
 
 # Verify skills
@@ -326,10 +326,10 @@ fi
 
 # Verify agents (should be 28+)
 AGENT_COUNT=$(find .cortex/agents -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-if [[ "$AGENT_COUNT" -ge 28 ]]; then
+if [[ "$AGENT_COUNT" -ge 30 ]]; then
   pass "Cortex Code agents installed ($AGENT_COUNT files)"
 else
-  fail "Cortex Code agents" "Expected 28+, found $AGENT_COUNT"
+  fail "Cortex Code agents" "Expected 30+, found $AGENT_COUNT"
 fi
 
 # Verify skills (should be 15+)
@@ -358,10 +358,67 @@ fi
 export HOME="$REAL_HOME"
 
 # ==============================================================================
-# Test 5: Uninstallation (Optional - requires user confirmation)
+# Test 5: New Feature Provisioning (v0.7.0)
 # ==============================================================================
 echo
-echo "  Test 5: Uninstallation (skipped - requires interactive confirmation)"
+echo " Test 5: New Feature Provisioning"
+
+# Use the Claude test directory which already has a full install
+cd "$CLAUDE_TEST"
+
+# F6: lavra.json provisioned by installer
+if [[ -f ".beads/config/lavra.json" ]]; then
+  if grep -q '"goal_verification"' ".beads/config/lavra.json" && \
+     grep -q '"max_parallel_agents"' ".beads/config/lavra.json" && \
+     grep -q '"commit_granularity"' ".beads/config/lavra.json"; then
+    pass "lavra.json provisioned with all expected keys"
+  else
+    fail "lavra.json content" "Missing expected configuration keys"
+  fi
+else
+  fail "lavra.json" "Not created by installer"
+fi
+
+# F3: session-state.md in .gitignore
+if [[ -f ".beads/memory/.gitignore" ]]; then
+  if grep -q "session-state.md" ".beads/memory/.gitignore"; then
+    pass "session-state.md in .beads/memory/.gitignore"
+  else
+    fail "session-state gitignore" "session-state.md not in .beads/memory/.gitignore"
+  fi
+else
+  fail "memory .gitignore" ".beads/memory/.gitignore not found"
+fi
+
+# F1: goal-verifier agent exists
+if [[ -f ".claude/agents/review/goal-verifier.md" ]]; then
+  pass "goal-verifier agent installed"
+else
+  fail "goal-verifier" "Agent file not installed"
+fi
+
+# F6: lavra.json is valid JSON
+if jq . ".beads/config/lavra.json" >/dev/null 2>&1; then
+  pass "lavra.json is valid JSON"
+else
+  fail "lavra.json validation" "File is not valid JSON"
+fi
+
+# F6: lavra.json idempotent (re-run installer, should not overwrite)
+ORIGINAL_CONTENT=$(cat ".beads/config/lavra.json")
+bash "$PROJECT_ROOT/install.sh" "$CLAUDE_TEST" >/dev/null 2>&1
+AFTER_CONTENT=$(cat ".beads/config/lavra.json")
+if [[ "$ORIGINAL_CONTENT" == "$AFTER_CONTENT" ]]; then
+  pass "lavra.json idempotent on re-install"
+else
+  fail "lavra.json idempotency" "File was overwritten on re-install"
+fi
+
+# ==============================================================================
+# Test 6: Uninstallation (Optional - requires user confirmation)
+# ==============================================================================
+echo
+echo "  Test 6: Uninstallation (skipped - requires interactive confirmation)"
 echo "  [WARN]  Uninstallers require confirmation prompt - test manually if needed"
 
 # ==============================================================================
