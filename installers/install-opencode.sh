@@ -81,8 +81,8 @@ if [[ "$TARGET_OWNER" != "$USER" ]]; then
   exit 1
 fi
 
-# Step 1: Model selection (interactive unless --yes)
-if [ "$AUTO_YES" = false ] && command -v opencode &>/dev/null; then
+# Step 1: Model selection (interactive unless --yes or non-interactive)
+if [ "$AUTO_YES" = false ] && [[ -t 0 ]] && command -v opencode &>/dev/null; then
   echo "[1/6] Model selection..."
   echo ""
   echo "Would you like to customize model selections for each tier?"

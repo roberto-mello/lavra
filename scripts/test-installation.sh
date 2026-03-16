@@ -151,8 +151,8 @@ cd "$OPENCODE_TEST"
 git init -q
 bd init -q 2>/dev/null || true
 
-# Run installer with --opencode flag
-if bash "$PROJECT_ROOT/install.sh" --opencode "$OPENCODE_TEST" >/dev/null 2>&1; then
+# Run installer with --opencode flag (--yes skips interactive model selection)
+if bash "$PROJECT_ROOT/install.sh" --opencode --yes "$OPENCODE_TEST" >/dev/null 2>&1; then
   pass "Installer completed for OpenCode"
 else
   fail "OpenCode install" "Installer failed"
