@@ -3,7 +3,7 @@
 # PostToolUse:Bash (async) - Capture knowledge from bd comments add commands
 #
 # Detects: bd comments add {BEAD_ID} "INVESTIGATION: ..." / "LEARNED: ..." /
-#          "DECISION: ..." / "FACT: ..." / "PATTERN: ..."
+#          "DECISION: ..." / "FACT: ..." / "PATTERN: ..." / "DEVIATION: ..."
 # Extracts knowledge entries into .beads/memory/knowledge.jsonl
 #
 
@@ -16,7 +16,7 @@ COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 [[ -z "$COMMAND" ]] && exit 0
 
 echo "$COMMAND" | grep -qE 'bd\s+comments?\s+add\s+' || exit 0
-echo "$COMMAND" | grep -qE '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:)' || exit 0
+echo "$COMMAND" | grep -qE '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:)' || exit 0
 
 # Extract BEAD_ID
 BEAD_ID=$(echo "$COMMAND" | sed -E 's/.*bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+([A-Za-z0-9._-]+)[[:space:]]+.*/\1/')
@@ -30,7 +30,7 @@ COMMENT_BODY=$(echo "$COMMAND" | sed -E 's/.*bd[[:space:]]+comments?[[:space:]]+
 TYPE=""
 CONTENT=""
 
-for PREFIX in INVESTIGATION LEARNED DECISION FACT PATTERN; do
+for PREFIX in INVESTIGATION LEARNED DECISION FACT PATTERN DEVIATION; do
   if echo "$COMMENT_BODY" | grep -q "${PREFIX}:"; then
     TYPE=$(echo "$PREFIX" | tr '[:upper:]' '[:lower:]')
     CONTENT=$(echo "$COMMENT_BODY" | sed "s/.*${PREFIX}:[[:space:]]*//" | head -c 2048)
