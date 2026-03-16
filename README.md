@@ -1,8 +1,19 @@
 # lavra
 
+[![License](https://img.shields.io/github/license/roberto-mello/lavra)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/roberto-mello/lavra)](https://github.com/roberto-mello/lavra/releases)
+[![Beads CLI](https://img.shields.io/badge/requires-beads%20CLI-blue)](https://github.com/steveyegge/beads)
+
 **lavra turns your AI coding agent into a development team that gets smarter with every task.**
 
-A plugin for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that orchestrates the full development lifecycle -- from brainstorming to shipping -- while automatically capturing and recalling knowledge so each unit of work makes the next one easier.
+A plugin for coding agents that orchestrates the full development lifecycle -- from brainstorming to shipping -- while automatically capturing and recalling knowledge so each unit of work makes the next one easier.
+
+[![Claude Code](https://img.shields.io/badge/Claude_Code-cc785c?logo=anthropic&logoColor=white)](https://docs.anthropic.com/en/docs/claude-code)
+[![OpenCode](https://img.shields.io/badge/OpenCode-000000?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwb2x5bGluZSBwb2ludHM9IjE2IDE4IDIyIDEyIDE2IDYiLz48cG9seWxpbmUgcG9pbnRzPSI4IDYgMiAxMiA4IDE4Ii8+PC9zdmc+&logoColor=white)](https://opencode.ai/)
+[![Gemini CLI](https://img.shields.io/badge/Gemini_CLI-4285F4?logo=google&logoColor=white)](https://github.com/google-gemini/gemini-cli)
+[![Cortex Code](https://img.shields.io/badge/Cortex_Code-29B5E8?logo=snowflake&logoColor=white)](https://www.snowflake.com/en/product/features/cortex-code/)
+
+**[Quick Start](plugins/lavra/docs/quickstart.md)** | **[Full Catalog](docs/CATALOG.md)** | **[Architecture](docs/ARCHITECTURE.md)** | **[Security](docs/SECURITY.md)** | **[v0.7.0 Release Notes](docs/releases/v0.7.0.md)**
 
 ### Without lavra
 
@@ -16,6 +27,7 @@ A plugin for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) that 
 
 - **Automatic memory.** Knowledge is captured inline during work and recalled automatically at the start of every session. Hit the same OAuth bug next month? The agent already knows the fix.
 - **Structured planning.** Brainstorm with scope sharpening, research with domain-matched agents, adversarial plan review -- all before a single line of code is written.
+- **Disciplined execution.** Agents follow deviation rules (what to auto-fix vs. escalate), commit per task with traceable bead IDs, and verify every success criterion before marking work done.
 - **Built-in quality gates.** Every implementation runs through a review-fix-learn loop. Knowledge capture is mandatory, not optional.
 - **Team-shareable knowledge.** Memory lives in `.beads/memory/knowledge.jsonl`, tracked by git. Your team compounds knowledge together.
 
@@ -45,7 +57,7 @@ Add `/lavra-qa` between work and ship when building web apps -- it maps changed 
 
 ## Who this is for
 
-Anyone using Claude Code who wants consistent, high-quality output instead of hoping the agent gets it right this time.
+Anyone using coding agents who wants consistent, high-quality output instead of hoping the agent gets it right this time.
 
 - **Non-technical users:** `/lavra-design "build me X"` handles the brainstorming, planning, and research. `/lavra-work` handles the implementation with built-in quality gates. You get working software without needing to know how to code.
 - **Solo developers:** The memory system acts as a second brain. Past decisions, patterns, and gotchas surface automatically when they're relevant.
