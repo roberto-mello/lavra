@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>lavra Command Map v2 — Pipeline Redesign</title>
+<title>lavra Command Map -- Architecture Overview</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #0b0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -61,6 +61,10 @@ body { background: #0b0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMac
 
 /* -- Pipeline highlight -- */
 .pipeline-badge { position: absolute; top: 10px; left: 12px; font-size: 9px; color: #374151; pointer-events: none; }
+
+/* -- Pinned indicator -- */
+.pin-indicator { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #fbbf24; pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+.pin-indicator.visible { opacity: 1; }
 </style>
 </head>
 <body>
@@ -92,14 +96,15 @@ body { background: #0b0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMac
       <h3>Comments (<span id="comment-count">0</span>)</h3>
     </div>
     <div class="comments-list" id="comments-list">
-      <div class="no-comments">Hover a node to highlight its connections. Click to comment.</div>
+      <div class="no-comments">Click a node to pin its connections. Double-click to view source. Hover to preview.</div>
     </div>
   </div>
 
   <div class="canvas-wrap">
     <svg id="diagram" xmlns="http://www.w3.org/2000/svg"></svg>
-    <div class="pipeline-badge">v2 -- Pipeline Redesign</div>
-    <div class="hint">scroll to zoom -- drag to pan</div>
+    <div class="pipeline-badge">lavra -- Architecture Overview</div>
+    <div class="hint">scroll to zoom -- drag to pan -- click to pin -- double-click for source</div>
+    <div class="pin-indicator" id="pin-indicator">Pinned -- click another node or background to unpin</div>
     <div class="zoom-controls">
       <button class="zoom-btn" onclick="doZoom(1.25)">+</button>
       <button class="zoom-btn" onclick="doZoom(0.8)">-</button>
@@ -109,7 +114,7 @@ body { background: #0b0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMac
 </div>
 
 <div class="prompt-bar">
-  <div id="prompt-text">Hover a node to see its connections. Click to add a note.</div>
+  <div id="prompt-text">Click a node to pin its connections. Double-click to view source.</div>
   <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copy</button>
 </div>
 
@@ -127,94 +132,159 @@ body { background: #0b0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMac
 
 <script>
 // == Layout constants ==
-const W = { sm:120, md:150, lg:165 };
-const RH = 38;
+// Increased spacing: wider boxes, more vertical gap between bands
+const W = { sm:130, md:160, lg:180 };
+const RH = 40;
+const HGAP = 20; // horizontal gap between boxes in same band
 
-// Band top-y values
+// Band top-y values -- increased vertical spacing between bands
 const BY = {
   pipeline: 30,
-  design_phases: 120,
-  supporting: 220,
-  specialized: 310,
-  skills: 400,
-  knowledge: 490,
-  config: 580,
-  review_agents: 660,
-  research_agents: 780,
+  design_phases: 140,
+  supporting: 260,
+  specialized: 380,
+  skills: 500,
+  knowledge: 620,
+  config: 740,
+  review_agents: 860,
+  research_agents: 1000,
+};
+
+// == Source file mapping (relative to plugins/lavra/) ==
+const SOURCE_MAP = {
+  // Commands
+  'lavra-design':     'commands/lavra-design.md',
+  'lavra-work':       'commands/lavra-work.md',
+  'lavra-qa':         'commands/lavra-qa.md',
+  'lavra-ship':       'commands/lavra-ship.md',
+  'lavra-brainstorm': 'commands/lavra-brainstorm.md',
+  'lavra-plan':       'commands/lavra-plan.md',
+  'lavra-research':   'commands/lavra-research.md',
+  'lavra-plan-review':'commands/lavra-plan-review.md',
+  'lavra-quick':      'commands/lavra-quick.md',
+  'lavra-learn':      'commands/lavra-learn.md',
+  'lavra-recall':     'commands/lavra-recall.md',
+  'lavra-checkpoint': 'commands/lavra-checkpoint.md',
+  'lavra-retro':      'commands/lavra-retro.md',
+  'lavra-review':     'commands/lavra-review.md',
+  'lavra-work-ralph': 'commands/lavra-work-ralph.md',
+  'lavra-work-teams': 'commands/lavra-work-teams.md',
+  'lavra-import':     'commands/lavra-import.md',
+  'lavra-triage':     'commands/lavra-triage.md',
+  'changelog':        'commands/changelog.md',
+  // Review agents
+  'ag-rails':      'agents/review/kieran-rails-reviewer.md',
+  'ag-dhh':        'agents/review/dhh-rails-reviewer.md',
+  'ag-ts':         'agents/review/kieran-typescript-reviewer.md',
+  'ag-python':     'agents/review/kieran-python-reviewer.md',
+  'ag-security':   'agents/review/security-sentinel.md',
+  'ag-perf':       'agents/review/performance-oracle.md',
+  'ag-simplicity': 'agents/review/code-simplicity-reviewer.md',
+  'ag-arch':       'agents/review/architecture-strategist.md',
+  'ag-goal':       'agents/review/goal-verifier.md',
+  'ag-migration':  'agents/review/data-migration-expert.md',
+  'ag-drift':      'agents/review/migration-drift-detector.md',
+  'ag-deploy':     'agents/review/deployment-verification-agent.md',
+  'ag-integrity':  'agents/review/data-integrity-guardian.md',
+  'ag-pattern':    'agents/review/pattern-recognition-specialist.md',
+  'ag-races':      'agents/review/julik-frontend-races-reviewer.md',
+  'ag-native':     'agents/review/agent-native-reviewer.md',
+  // Research agents
+  'ag-best':       'agents/research/best-practices-researcher.md',
+  'ag-framework':  'agents/research/framework-docs-researcher.md',
+  'ag-learnings':  'agents/research/learnings-researcher.md',
+  'ag-repo':       'agents/research/repo-research-analyst.md',
+  'ag-githistory': 'agents/research/git-history-analyzer.md',
+  // Skills
+  'sk-project-setup':   'skills/project-setup/SKILL.md',
+  'sk-git-worktree':    'skills/git-worktree/SKILL.md',
+  'sk-brainstorming':   'skills/brainstorming/SKILL.md',
+  'sk-lavra-knowledge': 'skills/lavra-knowledge/SKILL.md',
+  'sk-agent-browser':   'skills/agent-browser/SKILL.md',
+  // Knowledge (hooks)
+  'kn-jsonl':    'hooks/memory-capture.sh',
+  'kn-recall':   'hooks/auto-recall.sh',
+  'kn-capture':  'hooks/memory-capture.sh',
+  'kn-fts5':     'hooks/knowledge-db.sh',
+  'kn-session':  'hooks/auto-recall.sh',
+  // Config
+  'cfg-lavra':   'hooks/auto-recall.sh',
+  'cfg-profile': 'skills/project-setup/SKILL.md',
+  'cfg-setup':   'skills/project-setup/SKILL.md',
 };
 
 const NODES = [
   // == PRIMARY PIPELINE (the 4-command flow) ==
-  { id:'lavra-design',  label:'/lavra-design',  sub:'Brainstorm+Plan+Research+Review', x:60,  y:BY.pipeline, w:175, h:RH, layer:'commands', group:'pipeline' },
-  { id:'lavra-work',    label:'/lavra-work',     sub:'Implement+Review+Learn+Fix',     x:260, y:BY.pipeline, w:170, h:RH, layer:'commands', group:'pipeline' },
-  { id:'lavra-qa',      label:'/lavra-qa',       sub:'Browser-based QA',               x:455, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
-  { id:'lavra-ship',    label:'/lavra-ship',     sub:'Merge, test, PR, close beads',   x:630, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
+  { id:'lavra-design',  label:'/lavra-design',  sub:'Brainstorm+Plan+Research+Review', x:60,  y:BY.pipeline, w:185, h:RH, layer:'commands', group:'pipeline' },
+  { id:'lavra-work',    label:'/lavra-work',     sub:'Implement+Review+Learn+Fix',     x:280, y:BY.pipeline, w:180, h:RH, layer:'commands', group:'pipeline' },
+  { id:'lavra-qa',      label:'/lavra-qa',       sub:'Browser-based QA',               x:500, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
+  { id:'lavra-ship',    label:'/lavra-ship',     sub:'Merge, test, PR, close beads',   x:700, y:BY.pipeline, w:W.md, h:RH, layer:'commands', group:'pipeline' },
 
   // == DESIGN SUB-PHASES (what design orchestrates) ==
   { id:'lavra-brainstorm', label:'/lavra-brainstorm', sub:'Explore + CEO sharpen',       x:60,  y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
-  { id:'lavra-plan',       label:'/lavra-plan',       sub:'Research & plan epic',        x:230, y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
-  { id:'lavra-research',   label:'/lavra-research',   sub:'Domain-matched agents',       x:400, y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
-  { id:'lavra-plan-review',label:'/lavra-plan-review', sub:'Adversarial 4-agent review', x:570, y:BY.design_phases, w:W.lg, h:RH, layer:'commands', group:'design' },
+  { id:'lavra-plan',       label:'/lavra-plan',       sub:'Research & plan epic',        x:250, y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
+  { id:'lavra-research',   label:'/lavra-research',   sub:'Domain-matched agents',       x:440, y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
+  { id:'lavra-plan-review',label:'/lavra-plan-review', sub:'Adversarial 4-agent review', x:630, y:BY.design_phases, w:W.lg, h:RH, layer:'commands', group:'design' },
 
   // == SUPPORTING COMMANDS ==
   { id:'lavra-quick',      label:'/lavra-quick',      sub:'Fast path + escalation',     x:60,  y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
-  { id:'lavra-learn',      label:'/lavra-learn',       sub:'Knowledge curation',         x:200, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
-  { id:'lavra-recall',     label:'/lavra-recall',      sub:'Mid-session search',         x:340, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
-  { id:'lavra-checkpoint', label:'/lavra-checkpoint',  sub:'Save progress',              x:480, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
-  { id:'lavra-retro',      label:'/lavra-retro',       sub:'Weekly analytics',           x:620, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
-  { id:'lavra-review',     label:'/lavra-review',      sub:'15-agent code review',       x:760, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'lavra-learn',      label:'/lavra-learn',       sub:'Knowledge curation',         x:220, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'lavra-recall',     label:'/lavra-recall',      sub:'Mid-session search',         x:380, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'lavra-checkpoint', label:'/lavra-checkpoint',  sub:'Save progress',              x:540, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'lavra-retro',      label:'/lavra-retro',       sub:'Weekly analytics',           x:700, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
+  { id:'lavra-review',     label:'/lavra-review',      sub:'16-agent code review',       x:860, y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
 
   // == SPECIALIZED WORK MODES ==
   { id:'lavra-work-ralph', label:'/lavra-work-ralph',  sub:'Autonomous retry',           x:60,  y:BY.specialized, w:W.md, h:RH, layer:'commands', group:'specialized' },
-  { id:'lavra-work-teams', label:'/lavra-work-teams',  sub:'Persistent workers',         x:230, y:BY.specialized, w:W.md, h:RH, layer:'commands', group:'specialized' },
-  { id:'lavra-import',     label:'/lavra-import',      sub:'Markdown to beads',          x:400, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
-  { id:'lavra-triage',     label:'/lavra-triage',      sub:'Prioritize beads',           x:540, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
-  { id:'changelog',        label:'/changelog',         sub:'Release changelog',          x:680, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
+  { id:'lavra-work-teams', label:'/lavra-work-teams',  sub:'Persistent workers',         x:250, y:BY.specialized, w:W.md, h:RH, layer:'commands', group:'specialized' },
+  { id:'lavra-import',     label:'/lavra-import',      sub:'Markdown to beads',          x:440, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
+  { id:'lavra-triage',     label:'/lavra-triage',      sub:'Prioritize beads',           x:600, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
+  { id:'changelog',        label:'/changelog',         sub:'Release changelog',          x:760, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
 
   // == SKILLS ==
   { id:'sk-project-setup',  label:'project-setup',   sub:'Stack detect + config',       x:60,  y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
-  { id:'sk-git-worktree',   label:'git-worktree',    sub:'Parallel workspaces',         x:200, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
-  { id:'sk-brainstorming',  label:'brainstorming',   sub:'Structured exploration',      x:340, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
-  { id:'sk-lavra-knowledge',label:'lavra-knowledge', sub:'Knowledge entries',           x:480, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
-  { id:'sk-agent-browser',  label:'agent-browser',   sub:'Browser automation',          x:620, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
+  { id:'sk-git-worktree',   label:'git-worktree',    sub:'Parallel workspaces',         x:220, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
+  { id:'sk-brainstorming',  label:'brainstorming',   sub:'Structured exploration',      x:380, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
+  { id:'sk-lavra-knowledge',label:'lavra-knowledge', sub:'Knowledge entries',           x:540, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
+  { id:'sk-agent-browser',  label:'agent-browser',   sub:'Browser automation',          x:700, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
 
   // == KNOWLEDGE SYSTEM ==
   { id:'kn-jsonl',     label:'knowledge.jsonl', sub:'Persistent store (git-tracked)',    x:60,  y:BY.knowledge, w:W.lg, h:RH, layer:'knowledge', group:'knowledge' },
-  { id:'kn-recall',    label:'auto-recall',     sub:'Session start + state digest',      x:250, y:BY.knowledge, w:W.md, h:RH, layer:'knowledge', group:'knowledge' },
-  { id:'kn-capture',   label:'memory-capture',  sub:'Hook: LEARNED/.../DEVIATION',      x:420, y:BY.knowledge, w:W.md, h:RH, layer:'knowledge', group:'knowledge' },
-  { id:'kn-fts5',      label:'SQLite FTS5',     sub:'Ranked search index',              x:590, y:BY.knowledge, w:W.sm, h:RH, layer:'knowledge', group:'knowledge' },
-  { id:'kn-session',   label:'session-state.md',sub:'Ephemeral position (gitignored)',   x:730, y:BY.knowledge, w:W.lg, h:RH, layer:'knowledge', group:'knowledge' },
+  { id:'kn-recall',    label:'auto-recall',     sub:'Session start + state digest',      x:280, y:BY.knowledge, w:W.md, h:RH, layer:'knowledge', group:'knowledge' },
+  { id:'kn-capture',   label:'memory-capture',  sub:'Hook: LEARNED/.../DEVIATION',      x:480, y:BY.knowledge, w:W.md, h:RH, layer:'knowledge', group:'knowledge' },
+  { id:'kn-fts5',      label:'SQLite FTS5',     sub:'Ranked search index',              x:680, y:BY.knowledge, w:W.sm, h:RH, layer:'knowledge', group:'knowledge' },
+  { id:'kn-session',   label:'session-state.md',sub:'Ephemeral position (gitignored)',   x:850, y:BY.knowledge, w:W.lg, h:RH, layer:'knowledge', group:'knowledge' },
 
   // == CONFIG ARTIFACTS ==
   { id:'cfg-lavra',    label:'lavra.json',      sub:'Workflow toggles + execution',      x:60,  y:BY.config, w:W.md, h:RH, layer:'knowledge', group:'config' },
-  { id:'cfg-profile',  label:'codebase-profile', sub:'Brownfield analysis (200 lines)',  x:230, y:BY.config, w:W.lg, h:RH, layer:'knowledge', group:'config' },
-  { id:'cfg-setup',    label:'project-setup.md', sub:'Stack + review agent config',      x:420, y:BY.config, w:W.md, h:RH, layer:'knowledge', group:'config' },
+  { id:'cfg-profile',  label:'codebase-profile', sub:'Brownfield analysis (200 lines)',  x:260, y:BY.config, w:W.lg, h:RH, layer:'knowledge', group:'config' },
+  { id:'cfg-setup',    label:'project-setup.md', sub:'Stack + review agent config',      x:480, y:BY.config, w:W.md, h:RH, layer:'knowledge', group:'config' },
 
   // == REVIEW AGENTS ==
-  { id:'ag-rails',     label:'kieran-rails',      sub:'Rails conventions',    x:30,  y:BY.review_agents,     w:110, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-dhh',       label:'dhh-rails',         sub:'DHH style',            x:150, y:BY.review_agents,     w:100, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-ts',        label:'kieran-typescript', sub:'TS conventions',       x:260, y:BY.review_agents,     w:130, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-python',    label:'kieran-python',     sub:'Python conventions',   x:400, y:BY.review_agents,     w:110, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-security',  label:'security-sentinel', sub:'OWASP/injection',      x:520, y:BY.review_agents,     w:120, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-perf',      label:'performance-oracle',sub:'N+1/complexity',       x:650, y:BY.review_agents,     w:120, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-simplicity',label:'code-simplicity',   sub:'YAGNI/complexity',     x:780, y:BY.review_agents,     w:115, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-arch',      label:'architecture',      sub:'SOLID/boundaries',     x:905, y:BY.review_agents,     w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-rails',     label:'kieran-rails',      sub:'Rails conventions',    x:30,  y:BY.review_agents,     w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-dhh',       label:'dhh-rails',         sub:'DHH style',            x:170, y:BY.review_agents,     w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-ts',        label:'kieran-typescript', sub:'TS conventions',       x:300, y:BY.review_agents,     w:140, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-python',    label:'kieran-python',     sub:'Python conventions',   x:460, y:BY.review_agents,     w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-security',  label:'security-sentinel', sub:'OWASP/injection',      x:600, y:BY.review_agents,     w:130, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-perf',      label:'performance-oracle',sub:'N+1/complexity',       x:750, y:BY.review_agents,     w:130, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-simplicity',label:'code-simplicity',   sub:'YAGNI/complexity',     x:900, y:BY.review_agents,     w:125, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-arch',      label:'architecture',      sub:'SOLID/boundaries',     x:1045,y:BY.review_agents,     w:120, h:RH, layer:'agents', group:'review-ag' },
 
-  { id:'ag-goal',      label:'goal-verifier',     sub:'Exists/Substantive/Wired', x:30,  y:BY.review_agents+54,  w:120, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-migration', label:'data-migration',    sub:'Migration safety',     x:160, y:BY.review_agents+54,  w:120, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-drift',     label:'migration-drift',   sub:'Schema sync',          x:290, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-deploy',    label:'deployment-verify', sub:'Deploy checklists',    x:410, y:BY.review_agents+54,  w:120, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-integrity', label:'data-integrity',    sub:'Schema constraints',   x:540, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-pattern',   label:'pattern-recog',     sub:'Anti-patterns',        x:660, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-races',     label:'frontend-races',    sub:'Race conds/Turbo',     x:780, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-native',    label:'agent-native',      sub:'Agent parity/context', x:900, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-goal',      label:'goal-verifier',     sub:'Exists/Substantive/Wired', x:30,  y:BY.review_agents+60,  w:130, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-migration', label:'data-migration',    sub:'Migration safety',     x:180, y:BY.review_agents+60,  w:130, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-drift',     label:'migration-drift',   sub:'Schema sync',          x:330, y:BY.review_agents+60,  w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-deploy',    label:'deployment-verify', sub:'Deploy checklists',    x:470, y:BY.review_agents+60,  w:130, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-integrity', label:'data-integrity',    sub:'Schema constraints',   x:620, y:BY.review_agents+60,  w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-pattern',   label:'pattern-recog',     sub:'Anti-patterns',        x:760, y:BY.review_agents+60,  w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-races',     label:'frontend-races',    sub:'Race conds/Turbo',     x:900, y:BY.review_agents+60,  w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-native',    label:'agent-native',      sub:'Agent parity/context', x:1040,y:BY.review_agents+60,  w:120, h:RH, layer:'agents', group:'review-ag' },
 
   // == RESEARCH AGENTS ==
-  { id:'ag-best',      label:'best-practices',    sub:'External best practices', x:30,  y:BY.research_agents, w:130, h:RH, layer:'agents', group:'research-ag' },
-  { id:'ag-framework', label:'framework-docs',    sub:'Framework docs/Context7', x:170, y:BY.research_agents, w:125, h:RH, layer:'agents', group:'research-ag' },
-  { id:'ag-learnings', label:'learnings',         sub:'knowledge.jsonl',         x:305, y:BY.research_agents, w:105, h:RH, layer:'agents', group:'research-ag' },
-  { id:'ag-repo',      label:'repo-research',     sub:'Repo structure/docs',     x:420, y:BY.research_agents, w:110, h:RH, layer:'agents', group:'research-ag' },
-  { id:'ag-githistory',label:'git-history-rsch',  sub:'Commit analysis',         x:540, y:BY.research_agents, w:120, h:RH, layer:'agents', group:'research-ag' },
+  { id:'ag-best',      label:'best-practices',    sub:'External best practices', x:30,  y:BY.research_agents, w:140, h:RH, layer:'agents', group:'research-ag' },
+  { id:'ag-framework', label:'framework-docs',    sub:'Framework docs/Context7', x:190, y:BY.research_agents, w:140, h:RH, layer:'agents', group:'research-ag' },
+  { id:'ag-learnings', label:'learnings',         sub:'knowledge.jsonl',         x:350, y:BY.research_agents, w:115, h:RH, layer:'agents', group:'research-ag' },
+  { id:'ag-repo',      label:'repo-research',     sub:'Repo structure/docs',     x:485, y:BY.research_agents, w:120, h:RH, layer:'agents', group:'research-ag' },
+  { id:'ag-githistory',label:'git-history-rsch',  sub:'Commit analysis',         x:625, y:BY.research_agents, w:130, h:RH, layer:'agents', group:'research-ag' },
 ];
 
 const CONNS = [
@@ -290,9 +360,6 @@ const CONNS = [
   { from:'lavra-work',   to:'ag-goal',     type:'dispatches', label:'after self-review' },
   { from:'lavra-ship',   to:'ag-goal',     type:'dispatches', label:'pre-landing gate' },
 
-  // == REVIEW ALSO DISPATCHES ==
-  { from:'lavra-review', to:'ag-native',   type:'dispatches' },
-
   // == KNOWLEDGE FLOW ==
   { from:'lavra-work',       to:'kn-capture',  type:'feeds', label:'LEARNED/DEVIATION' },
   { from:'lavra-review',     to:'kn-capture',  type:'feeds', label:'LEARNED for findings' },
@@ -349,7 +416,7 @@ const state = {
   scale:1, tx:0, ty:0,
   layers:{ commands:true, agents:true, skills:true, knowledge:true },
   connTypes:{ orchestrates:true, dispatches:true, suggests:true, feeds:true },
-  comments:[], hovered:null, preset:'full',
+  comments:[], hovered:null, pinned:null, preset:'full',
 };
 let activePreset = null;
 
@@ -397,6 +464,9 @@ function visible(n) {
   return true;
 }
 
+// Active highlight = pinned if set, else hovered
+function activeHighlight() { return state.pinned || state.hovered; }
+
 // == Elbow path ==
 function elbowPath(a, b) {
   const ax = a.x + a.w/2, ay = a.y + a.h/2;
@@ -421,14 +491,40 @@ function buildPath(a, b) {
   return elbowPath(a, b);
 }
 
+// == Label position: offset from midpoint of path, not on the line ==
+function getLabelPos(a, b) {
+  const ax = a.x + a.w/2, bx = b.x + b.w/2;
+  const sameBand = Math.abs((a.y + a.h/2) - (b.y + b.h/2)) < 20;
+  if (sameBand) {
+    // Horizontal line -- place label above
+    const lx = (Math.max(a.x + a.w, b.x + b.w) + Math.min(a.x, b.x)) / 2;
+    const ly = a.y + a.h / 2 - 8;
+    return { x: lx, y: ly };
+  }
+  // Elbow path -- place at midpoint of horizontal segment, offset above
+  const goingDown = (b.y + b.h/2) > (a.y + a.h/2);
+  const y1 = goingDown ? a.y + a.h : a.y;
+  const y2 = goingDown ? b.y       : b.y + b.h;
+  const my = (y1 + y2) / 2;
+  const lx = (ax + bx) / 2;
+  return { x: lx, y: my - 6 };
+}
+
+// == Pin indicator ==
+function updatePinIndicator() {
+  const ind = document.getElementById('pin-indicator');
+  ind.classList.toggle('visible', !!state.pinned);
+}
+
 // == Render ==
 function render() {
   while (svg.firstChild) svg.removeChild(svg.firstChild);
 
   const defs = el('defs');
   for (const [type, s] of Object.entries(CONN_STYLE)) {
-    const m = el('marker', { id:`arr-${type}`, markerWidth:'7', markerHeight:'5', refX:'6', refY:'2.5', orient:'auto' });
-    m.appendChild(el('polygon', { points:'0 0,7 2.5,0 5', fill:s.color }));
+    // Smaller arrowheads: 5x4 instead of 7x5
+    const m = el('marker', { id:`arr-${type}`, markerWidth:'5', markerHeight:'4', refX:'4.5', refY:'2', orient:'auto' });
+    m.appendChild(el('polygon', { points:'0 0,5 2,0 4', fill:s.color }));
     defs.appendChild(m);
   }
   svg.appendChild(defs);
@@ -443,7 +539,7 @@ function render() {
     const totalW = Math.max(...allVis.map(n=>n.x+n.w)) + 40;
     BAND_LABELS.forEach(band => {
       const bandTop = band.y + 18;
-      const nodesInBand = allVis.filter(n => n.y >= bandTop - 10 && n.y < bandTop + 70);
+      const nodesInBand = allVis.filter(n => n.y >= bandTop - 10 && n.y < bandTop + 80);
       if (!nodesInBand.length) return;
       const maxY = Math.max(...nodesInBand.map(n => n.y + n.h));
       const bandH = maxY - band.y + 10;
@@ -455,7 +551,7 @@ function render() {
   }
 
   // Determine highlights
-  const hov = state.hovered;
+  const hov = activeHighlight();
   const connectedIds = new Set();
   if (hov) {
     CONNS.forEach(c => { if (c.from===hov||c.to===hov) { connectedIds.add(c.from); connectedIds.add(c.to); } });
@@ -483,20 +579,20 @@ function render() {
       'marker-end': `url(#arr-${c.type})`,
     }));
 
+    // Label: placed above/beside the path, not on top of it
     if (c.label && isHi) {
-      const ax=a.x+a.w/2, bx=b.x+b.w/2;
-      const ay = a.y+a.h, by2 = b.y;
-      const my = (ay+by2)/2;
-      const lx = (ax+bx)/2;
+      const pos = getLabelPos(a, b);
       const tw = c.label.length * 5 + 12;
-      gMain.appendChild(el('rect', { x:lx-tw/2, y:my-8, width:tw, height:13, rx:2, fill:'#0b0f1a', opacity:'0.9' }));
-      gMain.appendChild(el('text', { x:lx, y:my+2, 'text-anchor':'middle', fill:s.color,
-        'font-size':'8', 'font-family':'-apple-system,sans-serif', opacity:'1' }, c.label));
+      gMain.appendChild(el('rect', { x:pos.x-tw/2, y:pos.y-9, width:tw, height:14, rx:2, fill:'#0b0f1a', opacity:'0.92' }));
+      gMain.appendChild(el('text', { x:pos.x, y:pos.y+2, 'text-anchor':'middle', fill:s.color,
+        'font-size':'8.5', 'font-weight':'500', 'font-family':'-apple-system,sans-serif', opacity:'1' }, c.label));
     }
   });
 
   // Draw nodes
   NODES.filter(visible).forEach(n => drawNode(n, connectedIds, hov));
+
+  updatePinIndicator();
 }
 
 function drawNode(n, connectedIds, hov) {
@@ -506,25 +602,57 @@ function drawNode(n, connectedIds, hov) {
   const isDim = hov && !isHov && !isConnected;
   const hasComment = state.comments.some(c=>c.target===n.id);
   const isPipeline = n.group === 'pipeline';
+  const isPinned = state.pinned === n.id;
 
   const grp = el('g', { cursor:'pointer', opacity: isDim ? '0.2' : '1' });
-  grp.addEventListener('mouseenter', () => { state.hovered = n.id; render(); });
-  grp.addEventListener('mouseleave', () => { state.hovered = null; render(); });
-  grp.addEventListener('click', () => openModal(n));
 
-  const stroke = isHov ? '#fff' : (hasComment ? '#f97316' : (isPipeline && !hov ? '#60a5fa' : s.stroke));
-  const sw = isHov ? 2 : (isPipeline && !hov ? 1.8 : (hasComment ? 1.5 : 1));
+  // Hover: only preview if nothing is pinned
+  grp.addEventListener('mouseenter', () => {
+    if (!state.pinned) { state.hovered = n.id; render(); }
+  });
+  grp.addEventListener('mouseleave', () => {
+    if (!state.pinned) { state.hovered = null; render(); }
+  });
+
+  // Single click: pin/unpin
+  grp.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (state.pinned === n.id) {
+      // Same node: unpin
+      state.pinned = null;
+      state.hovered = n.id; // keep hover active
+    } else {
+      state.pinned = n.id;
+    }
+    render();
+  });
+
+  // Double click: open source file
+  grp.addEventListener('dblclick', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const src = SOURCE_MAP[n.id];
+    if (src) {
+      // Show path in prompt bar as feedback
+      document.getElementById('prompt-text').textContent = `Source: plugins/lavra/${src}`;
+      // Copy to clipboard for easy opening
+      navigator.clipboard.writeText(`plugins/lavra/${src}`).catch(()=>{});
+    }
+  });
+
+  const stroke = isPinned ? '#fbbf24' : (isHov ? '#fff' : (hasComment ? '#f97316' : (isPipeline && !hov ? '#60a5fa' : s.stroke)));
+  const sw = isPinned ? 2.5 : (isHov ? 2 : (isPipeline && !hov ? 1.8 : (hasComment ? 1.5 : 1)));
 
   grp.appendChild(el('rect', { x:n.x, y:n.y, width:n.w, height:n.h, rx:5,
-    fill: isHov ? '#1a2a40' : s.fill,
+    fill: isHov || isPinned ? '#1a2a40' : s.fill,
     stroke, 'stroke-width':sw }));
 
-  grp.appendChild(el('text', { x:n.x+n.w/2, y:n.y+(n.sub?13:21),
+  grp.appendChild(el('text', { x:n.x+n.w/2, y:n.y+(n.sub?14:22),
     'text-anchor':'middle', fill:s.textFill, 'font-size':'10.5', 'font-weight':'600',
     'font-family':"'SF Mono','Fira Code',monospace" }, n.label));
 
   if (n.sub) {
-    grp.appendChild(el('text', { x:n.x+n.w/2, y:n.y+25,
+    grp.appendChild(el('text', { x:n.x+n.w/2, y:n.y+27,
       'text-anchor':'middle', fill:'#4b5563', 'font-size':'8.5',
       'font-family':'-apple-system,sans-serif' }, n.sub));
   }
@@ -533,8 +661,25 @@ function drawNode(n, connectedIds, hov) {
     grp.appendChild(el('circle', { cx:n.x+n.w-5, cy:n.y+5, r:3.5, fill:'#f97316' }));
   }
 
+  // Pin indicator on node
+  if (isPinned) {
+    grp.appendChild(el('circle', { cx:n.x+n.w-5, cy:n.y+5, r:3, fill:'#fbbf24' }));
+  }
+
   gMain.appendChild(grp);
 }
+
+// == Click on background to unpin ==
+svg.addEventListener('click', (e) => {
+  // Only if clicking the SVG background (not a node)
+  if (!e.target.closest('g[cursor="pointer"]')) {
+    if (state.pinned) {
+      state.pinned = null;
+      state.hovered = null;
+      render();
+    }
+  }
+});
 
 // == Zoom / Pan ==
 function doZoom(f) {
@@ -575,6 +720,7 @@ function applyPreset(btn, name) {
   document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   state.preset = name;
+  state.pinned = null;
   activePreset = PRESET_NODES[name];
   const has = l => !activePreset || activePreset.some(id=>{ const n=nById(id); return n&&n.layer===l; });
   ['commands','agents','skills','knowledge'].forEach((l,i) => {
@@ -611,7 +757,7 @@ function deleteComment(id) {
 function renderComments() {
   const list=document.getElementById('comments-list');
   document.getElementById('comment-count').textContent=state.comments.length;
-  if (!state.comments.length) { list.innerHTML='<div class="no-comments">Hover a node to highlight connections. Click to comment.</div>'; return; }
+  if (!state.comments.length) { list.innerHTML='<div class="no-comments">Click a node to pin its connections. Double-click to view source.</div>'; return; }
   list.innerHTML=state.comments.map(c=>`
     <div class="comment-item">
       <div class="comment-target">${c.targetLabel}<span class="comment-del" onclick="deleteComment(${c.id})"> x</span></div>
@@ -622,7 +768,7 @@ function renderComments() {
 // == Prompt ==
 function updatePrompt() {
   const labels={full:'full system',pipeline:'primary pipeline','design-deep':'design deep dive',review:'review pipeline',knowledge:'knowledge flow'};
-  const parts=[`lavra v0.7.0 architecture -- ${labels[state.preset]||state.preset} view.`];
+  const parts=[`lavra architecture -- ${labels[state.preset]||state.preset} view.`];
   const hiddenL=Object.entries(state.layers).filter(([,v])=>!v).map(([k])=>k);
   if (hiddenL.length) parts.push(`Hidden: ${hiddenL.join(', ')}.`);
   const hiddenC=Object.entries(state.connTypes).filter(([,v])=>!v).map(([k])=>k);
@@ -644,7 +790,15 @@ function copyPrompt() {
 
 // == Keyboard ==
 window.addEventListener('keydown', e=>{
-  if (e.key==='Escape') closeModal();
+  if (e.key==='Escape') {
+    if (document.getElementById('modal-bg').classList.contains('open')) {
+      closeModal();
+    } else if (state.pinned) {
+      state.pinned = null;
+      state.hovered = null;
+      render();
+    }
+  }
   if (e.key==='Enter' && !e.shiftKey && document.getElementById('modal-bg').classList.contains('open')) {
     e.preventDefault(); saveComment();
   }
