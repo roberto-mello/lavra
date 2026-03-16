@@ -15,6 +15,10 @@ A plugin for coding agents that orchestrates the full development lifecycle -- f
 
 **[Quick Start](plugins/lavra/docs/quickstart.md)** | **[Full Catalog](docs/CATALOG.md)** | **[Architecture](docs/ARCHITECTURE.md)** | **[Security](docs/SECURITY.md)** | **[v0.7.0 Release Notes](docs/releases/v0.7.0.md)**
 
+<table>
+<tr>
+<td width="65%">
+
 ### Without lavra
 
 - The agent forgets everything between sessions -- you re-explain context every time
@@ -23,6 +27,17 @@ A plugin for coding agents that orchestrates the full development lifecycle -- f
 - Knowledge stays in your head. When a teammate hits the same bug, they start from zero
 - Shipping is manual: you run tests, create the PR, close tickets, push -- every time
 
+</td>
+<td width="35%" align="center">
+<img src="images/forgeftul-agent.jpg" alt="Forgetful agent surrounded by scattered documents" width="280">
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="65%">
+
 ### With lavra
 
 - **Automatic memory.** Knowledge is captured inline during work and recalled automatically at the start of every session. Hit the same OAuth bug next month? The agent already knows the fix.
@@ -30,6 +45,13 @@ A plugin for coding agents that orchestrates the full development lifecycle -- f
 - **Disciplined execution.** Agents follow deviation rules (what to auto-fix vs. escalate), commit per task with traceable bead IDs, and verify every success criterion before marking work done.
 - **Built-in quality gates.** Every implementation runs through a review-fix-learn loop. Knowledge capture is mandatory, not optional.
 - **Team-shareable knowledge.** Memory lives in `.beads/memory/knowledge.jsonl`, tracked by git. Your team compounds knowledge together.
+
+</td>
+<td width="35%" align="center">
+<img src="images/agent-with-memory.jpg" alt="Agent with memory climbing stairs of compounding knowledge" width="280">
+</td>
+</tr>
+</table>
 
 ## The workflow
 
