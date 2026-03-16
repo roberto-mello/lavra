@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>lavra-compound Command Map v2 — Pipeline Redesign</title>
+<title>lavra Command Map v2 — Pipeline Redesign</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #0b0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -138,8 +138,9 @@ const BY = {
   specialized: 310,
   skills: 400,
   knowledge: 490,
-  review_agents: 580,
-  research_agents: 700,
+  config: 580,
+  review_agents: 660,
+  research_agents: 780,
 };
 
 const NODES = [
@@ -179,9 +180,15 @@ const NODES = [
 
   // == KNOWLEDGE SYSTEM ==
   { id:'kn-jsonl',     label:'knowledge.jsonl', sub:'Persistent store (git-tracked)',    x:60,  y:BY.knowledge, w:W.lg, h:RH, layer:'knowledge', group:'knowledge' },
-  { id:'kn-recall',    label:'auto-recall',     sub:'Session start injection',           x:250, y:BY.knowledge, w:W.sm, h:RH, layer:'knowledge', group:'knowledge' },
-  { id:'kn-capture',   label:'memory-capture',  sub:'Hook: LEARNED/DECISION/...',       x:390, y:BY.knowledge, w:W.md, h:RH, layer:'knowledge', group:'knowledge' },
-  { id:'kn-fts5',      label:'SQLite FTS5',     sub:'Ranked search index',              x:560, y:BY.knowledge, w:W.sm, h:RH, layer:'knowledge', group:'knowledge' },
+  { id:'kn-recall',    label:'auto-recall',     sub:'Session start + state digest',      x:250, y:BY.knowledge, w:W.md, h:RH, layer:'knowledge', group:'knowledge' },
+  { id:'kn-capture',   label:'memory-capture',  sub:'Hook: LEARNED/.../DEVIATION',      x:420, y:BY.knowledge, w:W.md, h:RH, layer:'knowledge', group:'knowledge' },
+  { id:'kn-fts5',      label:'SQLite FTS5',     sub:'Ranked search index',              x:590, y:BY.knowledge, w:W.sm, h:RH, layer:'knowledge', group:'knowledge' },
+  { id:'kn-session',   label:'session-state.md',sub:'Ephemeral position (gitignored)',   x:730, y:BY.knowledge, w:W.lg, h:RH, layer:'knowledge', group:'knowledge' },
+
+  // == CONFIG ARTIFACTS ==
+  { id:'cfg-lavra',    label:'lavra.json',      sub:'Workflow toggles + execution',      x:60,  y:BY.config, w:W.md, h:RH, layer:'knowledge', group:'config' },
+  { id:'cfg-profile',  label:'codebase-profile', sub:'Brownfield analysis (200 lines)',  x:230, y:BY.config, w:W.lg, h:RH, layer:'knowledge', group:'config' },
+  { id:'cfg-setup',    label:'project-setup.md', sub:'Stack + review agent config',      x:420, y:BY.config, w:W.md, h:RH, layer:'knowledge', group:'config' },
 
   // == REVIEW AGENTS ==
   { id:'ag-rails',     label:'kieran-rails',      sub:'Rails conventions',    x:30,  y:BY.review_agents,     w:110, h:RH, layer:'agents', group:'review-ag' },
@@ -193,13 +200,14 @@ const NODES = [
   { id:'ag-simplicity',label:'code-simplicity',   sub:'YAGNI/complexity',     x:780, y:BY.review_agents,     w:115, h:RH, layer:'agents', group:'review-ag' },
   { id:'ag-arch',      label:'architecture',      sub:'SOLID/boundaries',     x:905, y:BY.review_agents,     w:110, h:RH, layer:'agents', group:'review-ag' },
 
-  { id:'ag-migration', label:'data-migration',    sub:'Migration safety',     x:30,  y:BY.review_agents+54,  w:120, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-drift',     label:'migration-drift',   sub:'Schema sync',          x:160, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-deploy',    label:'deployment-verify', sub:'Deploy checklists',    x:280, y:BY.review_agents+54,  w:120, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-integrity', label:'data-integrity',    sub:'Schema constraints',   x:410, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-pattern',   label:'pattern-recog',     sub:'Anti-patterns',        x:530, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-races',     label:'frontend-races',    sub:'Race conds/Turbo',     x:650, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
-  { id:'ag-git',       label:'git-history',       sub:'Commit history',       x:770, y:BY.review_agents+54,  w:105, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-goal',      label:'goal-verifier',     sub:'Exists/Substantive/Wired', x:30,  y:BY.review_agents+54,  w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-migration', label:'data-migration',    sub:'Migration safety',     x:160, y:BY.review_agents+54,  w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-drift',     label:'migration-drift',   sub:'Schema sync',          x:290, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-deploy',    label:'deployment-verify', sub:'Deploy checklists',    x:410, y:BY.review_agents+54,  w:120, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-integrity', label:'data-integrity',    sub:'Schema constraints',   x:540, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-pattern',   label:'pattern-recog',     sub:'Anti-patterns',        x:660, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-races',     label:'frontend-races',    sub:'Race conds/Turbo',     x:780, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
+  { id:'ag-native',    label:'agent-native',      sub:'Agent parity/context', x:900, y:BY.review_agents+54,  w:110, h:RH, layer:'agents', group:'review-ag' },
 
   // == RESEARCH AGENTS ==
   { id:'ag-best',      label:'best-practices',    sub:'External best practices', x:30,  y:BY.research_agents, w:130, h:RH, layer:'agents', group:'research-ag' },
@@ -270,7 +278,7 @@ const CONNS = [
   { from:'lavra-review', to:'ag-integrity',  type:'dispatches' },
   { from:'lavra-review', to:'ag-pattern',    type:'dispatches' },
   { from:'lavra-review', to:'ag-races',      type:'dispatches' },
-  { from:'lavra-review', to:'ag-git',        type:'dispatches' },
+  { from:'lavra-review', to:'ag-native',     type:'dispatches' },
 
   // == QA USES BROWSER ==
   { from:'lavra-qa', to:'sk-agent-browser', type:'dispatches' },
@@ -278,8 +286,15 @@ const CONNS = [
   // == BRAINSTORM USES SKILL ==
   { from:'lavra-brainstorm', to:'sk-brainstorming', type:'dispatches' },
 
+  // == GOAL VERIFICATION ==
+  { from:'lavra-work',   to:'ag-goal',     type:'dispatches', label:'after self-review' },
+  { from:'lavra-ship',   to:'ag-goal',     type:'dispatches', label:'pre-landing gate' },
+
+  // == REVIEW ALSO DISPATCHES ==
+  { from:'lavra-review', to:'ag-native',   type:'dispatches' },
+
   // == KNOWLEDGE FLOW ==
-  { from:'lavra-work',       to:'kn-capture',  type:'feeds', label:'LEARNED inline' },
+  { from:'lavra-work',       to:'kn-capture',  type:'feeds', label:'LEARNED/DEVIATION' },
   { from:'lavra-review',     to:'kn-capture',  type:'feeds', label:'LEARNED for findings' },
   { from:'lavra-brainstorm', to:'kn-capture',  type:'feeds', label:'DECISION' },
   { from:'lavra-research',   to:'kn-capture',  type:'feeds', label:'FACT/INVESTIGATION' },
@@ -290,25 +305,43 @@ const CONNS = [
   { from:'kn-recall',        to:'lavra-work',  type:'feeds', label:'session start' },
   { from:'kn-recall',        to:'lavra-design',type:'feeds', label:'session start' },
   { from:'lavra-retro',      to:'kn-jsonl',    type:'feeds', label:'PATTERN synthesis' },
+
+  // == SESSION STATE ==
+  { from:'lavra-work',       to:'kn-session',  type:'feeds', label:'write at milestones' },
+  { from:'lavra-design',     to:'kn-session',  type:'feeds', label:'write at phase end' },
+  { from:'lavra-checkpoint', to:'kn-session',  type:'feeds', label:'write on checkpoint' },
+  { from:'kn-session',       to:'kn-recall',   type:'feeds', label:'inject once then delete' },
+
+  // == CONFIG ARTIFACTS ==
+  { from:'cfg-lavra',        to:'lavra-design', type:'feeds', label:'skip phases' },
+  { from:'cfg-lavra',        to:'lavra-work',   type:'feeds', label:'parallelism/commits' },
+  { from:'cfg-profile',      to:'lavra-design', type:'feeds', label:'planning context' },
+  { from:'cfg-profile',      to:'lavra-work',   type:'feeds', label:'agent context' },
+  { from:'sk-project-setup', to:'cfg-profile',  type:'feeds', label:'generates' },
+  { from:'sk-project-setup', to:'cfg-setup',    type:'feeds', label:'generates' },
+  { from:'cfg-setup',        to:'lavra-review', type:'feeds', label:'agent selection' },
 ];
 
 // == Presets ==
 const PRESET_NODES = {
   full: null,
   pipeline: ['lavra-design','lavra-work','lavra-qa','lavra-ship',
-             'lavra-brainstorm','lavra-plan','lavra-research','lavra-plan-review'],
+             'lavra-brainstorm','lavra-plan','lavra-research','lavra-plan-review',
+             'ag-goal','cfg-lavra'],
   'design-deep': ['lavra-design','lavra-brainstorm','lavra-plan','lavra-research','lavra-plan-review',
                    'ag-best','ag-framework','ag-learnings','ag-repo','ag-githistory',
                    'ag-arch','ag-security','ag-perf','ag-simplicity',
                    'sk-brainstorming',
-                   'kn-recall','kn-jsonl'],
-  review: ['lavra-review','lavra-work',
+                   'kn-recall','kn-jsonl',
+                   'cfg-lavra','cfg-profile'],
+  review: ['lavra-review','lavra-work','lavra-ship',
            'ag-rails','ag-dhh','ag-ts','ag-python','ag-security','ag-perf','ag-simplicity','ag-arch',
-           'ag-migration','ag-drift','ag-deploy','ag-integrity','ag-pattern','ag-races','ag-git',
-           'kn-capture'],
+           'ag-migration','ag-drift','ag-deploy','ag-integrity','ag-pattern','ag-races','ag-native','ag-goal',
+           'kn-capture','cfg-setup'],
   knowledge: ['lavra-work','lavra-design','lavra-brainstorm','lavra-research','lavra-review',
-              'lavra-learn','lavra-retro','lavra-recall',
-              'kn-jsonl','kn-recall','kn-capture','kn-fts5'],
+              'lavra-learn','lavra-retro','lavra-recall','lavra-checkpoint',
+              'kn-jsonl','kn-recall','kn-capture','kn-fts5','kn-session',
+              'cfg-lavra','cfg-profile','cfg-setup'],
 };
 
 // == State ==
@@ -340,7 +373,8 @@ const BAND_LABELS = [
   { label:'SPECIALIZED / UTILITY', y:BY.specialized-18, color:'#1a1a1a' },
   { label:'CORE SKILLS', y:BY.skills-18, color:'#200a2a' },
   { label:'KNOWLEDGE SYSTEM', y:BY.knowledge-18, color:'#1a1500' },
-  { label:'REVIEW AGENTS (15)', y:BY.review_agents-18, color:'#0a200a' },
+  { label:'CONFIG ARTIFACTS (.beads/config/)', y:BY.config-18, color:'#1a1a00' },
+  { label:'REVIEW AGENTS (16)', y:BY.review_agents-18, color:'#0a200a' },
   { label:'RESEARCH AGENTS (5)', y:BY.research_agents-18, color:'#0a200a' },
 ];
 
@@ -588,7 +622,7 @@ function renderComments() {
 // == Prompt ==
 function updatePrompt() {
   const labels={full:'full system',pipeline:'primary pipeline','design-deep':'design deep dive',review:'review pipeline',knowledge:'knowledge flow'};
-  const parts=[`lavra-compound v2 architecture -- ${labels[state.preset]||state.preset} view.`];
+  const parts=[`lavra v0.7.0 architecture -- ${labels[state.preset]||state.preset} view.`];
   const hiddenL=Object.entries(state.layers).filter(([,v])=>!v).map(([k])=>k);
   if (hiddenL.length) parts.push(`Hidden: ${hiddenL.join(', ')}.`);
   const hiddenC=Object.entries(state.connTypes).filter(([,v])=>!v).map(([k])=>k);
