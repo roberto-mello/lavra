@@ -1,10 +1,30 @@
 ---
+import '@fontsource/geist-sans/400.css';
+import '@fontsource/geist-sans/700.css';
+import '@fontsource/geist-sans/900.css';
+import '@fontsource/geist-mono/400.css';
+import '@fontsource/geist-mono/700.css';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+
 interface Props {
   title: string;
   description?: string;
 }
 
-const { title, description = 'Multi-agent workflow engine for Claude Code, OpenCode, and Gemini CLI' } = Astro.props;
+const { title, description = 'Multi-agent workflow engine for Claude Code, OpenCode, Gemini CLI, and Cortex Code' } = Astro.props;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'lavra',
+  description,
+  url: 'https://lavra.dev',
+  applicationCategory: 'DeveloperApplication',
+  applicationSubCategory: 'CommandLineApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  offers: { '@type': 'Offer', price: '0' },
+};
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -13,48 +33,60 @@ const { title, description = 'Multi-agent workflow engine for Claude Code, OpenC
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title} | lavra</title>
   <meta name="description" content={description}>
+  <link rel="canonical" href="https://lavra.dev">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <style is:global>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0b0f1a;
-      color: #e2e8f0;
-      -webkit-font-smoothing: antialiased;
-    }
-    a { color: #60a5fa; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-  </style>
+
+  <!-- Security headers (GitHub Pages cannot set response headers) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-src 'self'; object-src 'none'; base-uri 'self';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- Preload critical fonts -->
+  <link rel="preload" href="/_astro/geist-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/_astro/geist-sans-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={`${title} | lavra`}>
+  <meta property="og:description" content={description}>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://lavra.dev">
+  <meta property="og:site_name" content="lavra">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content={`${title} | lavra`}>
+  <meta name="twitter:description" content={description}>
+
+  <!-- Structured data -->
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+  <noscript>
+    <style>
+      [data-reveal] { opacity: 1 !important; transform: none !important; }
+    </style>
+  </noscript>
 </head>
-<body>
-  <nav class="nav">
-    <a href="/" class="nav-brand">lavra</a>
-    <div class="nav-links">
-      <a href="/command-map">Command Map</a>
-      <a href="https://github.com/roberto-mello/lavra" target="_blank">GitHub</a>
-    </div>
-  </nav>
+<body class="bg-bg text-text font-sans antialiased">
+  <Nav />
   <slot />
-  <style>
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 24px;
-      border-bottom: 1px solid #1f2937;
-      background: #111827;
+
+  <script>
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('revealed');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0, rootMargin: '0px 0px -80px 0px' }
+      );
+      document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el));
+    } else {
+      document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('revealed'));
     }
-    .nav-brand {
-      font-size: 16px;
-      font-weight: 700;
-      color: #e2e8f0;
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      letter-spacing: -0.02em;
-    }
-    .nav-brand:hover { text-decoration: none; color: #93c5fd; }
-    .nav-links { display: flex; gap: 20px; }
-    .nav-links a { font-size: 13px; color: #9ca3af; }
-    .nav-links a:hover { color: #e2e8f0; text-decoration: none; }
-  </style>
+  </script>
 </body>
 </html>
