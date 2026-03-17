@@ -141,20 +141,31 @@ You get relevant learnings without manually searching!
 | `/lavra-quick` | Fast-track small tasks. Abbreviated plan then straight to execution |
 | `/lavra-checkpoint` | When you've been working outside the pipeline (ad-hoc sessions). Save session progress by filing beads, capturing knowledge, and syncing state |
 
+See the full [Command Reference](/docs/commands) or the [Command Map](/command-map) for a visual overview of all commands and how they connect.
+
 ## Manual Knowledge Search
+
+Mid-session, use the slash command:
+
+```
+/lavra-recall authentication
+/lavra-recall BD-050
+```
+
+Or search directly from the shell:
 
 ```bash
 # Search by keyword
 .beads/memory/recall.sh "authentication"
 
-# Show recent
+# Filter by type
+.beads/memory/recall.sh "jwt" --type learned
+
+# Show recent entries
 .beads/memory/recall.sh --recent 10
 
 # Show stats
 .beads/memory/recall.sh --stats
-
-# Filter by type
-.beads/memory/recall.sh "jwt" --type learned
 ```
 
 ## Example: Full Feature Flow
