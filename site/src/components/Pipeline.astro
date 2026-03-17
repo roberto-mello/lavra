@@ -1,0 +1,61 @@
+---
+// Pipeline.astro -- Four-command workflow + stats row
+const cards = [
+  { command: '/lavra-design', subtitle: 'Plan with domain-matched research agents' },
+  { command: '/lavra-work', subtitle: 'Execute with parallel subagents and knowledge recall' },
+  { command: '/lavra-review', subtitle: 'Adversarial review with 4+ specialized agents' },
+  { command: '/lavra-qa', subtitle: 'Browser-based testing from the user\'s perspective', optional: true },
+];
+
+const stats = [
+  { value: '30', label: 'Agents' },
+  { value: '27', label: 'Commands' },
+  { value: '16', label: 'Skills' },
+  { value: '4', label: 'Platforms' },
+];
+---
+
+<section class="py-32 bg-bg">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 data-reveal class="text-4xl lg:text-5xl font-bold text-accent tracking-tight text-left">
+      Four commands. Full pipeline.
+    </h2>
+    <p data-reveal class="text-lg text-text-muted mt-4 mb-12">
+      From idea to shipped code. Each command compounds what came before.
+    </p>
+
+    <div class="ml-auto max-w-[720px]">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {cards.map((card, i) => (
+          <div
+            data-reveal
+            style={`--index: ${i}`}
+            class:list={[
+              'bg-surface rounded-2xl p-8',
+              card.optional ? 'border border-dashed border-border' : 'border border-border',
+            ]}
+          >
+            <div class="flex items-center">
+              <span class="font-mono text-accent text-lg font-bold">{card.command}</span>
+              {card.optional && (
+                <span class="inline-block text-xs font-mono text-text-dim bg-bg px-2 py-0.5 rounded-full border border-border-light ml-2">
+                  optional
+                </span>
+              )}
+            </div>
+            <p class="text-text-muted text-sm mt-2">{card.subtitle}</p>
+          </div>
+        ))}
+      </div>
+
+      <div data-reveal class="mt-16 flex flex-wrap justify-end gap-8 lg:gap-12">
+        {stats.map((stat) => (
+          <div class="text-right">
+            <div class="font-mono text-3xl lg:text-4xl font-bold text-accent">{stat.value}</div>
+            <div class="text-sm text-text-muted mt-1">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
