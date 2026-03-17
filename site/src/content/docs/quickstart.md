@@ -145,7 +145,9 @@ See the full [Command Reference](/docs/commands) or the [Command Map](/command-m
 
 ## Manual Knowledge Search
 
-Mid-session, use the slash command:
+See the [Knowledge System docs](/docs/knowledge) for how capture, storage, and auto-recall work.
+
+Mid-session, use the slash command in your agent to inject learnings into the agent's context:
 
 ```
 /lavra-recall authentication
