@@ -19,13 +19,22 @@ These four locations must all have the target version:
 
 Also verify that `site/public/command-map.html` reflects current nodes/connections (new commands, agents, or skills should be added).
 
-Verify that `site/src/content/docs/commands.md` descriptions match the current command frontmatter. For each command, the `description:` field in its `.md` file should match the table entry in `commands.md`. Quick check:
+Verify that the three reference docs match current plugin contents:
 
-```bash
-grep '^description:' plugins/lavra/commands/*.md plugins/lavra/commands/optional/*.md
-```
+- `site/src/content/docs/commands.md` — check against command frontmatter descriptions:
+  ```bash
+  grep '^description:' plugins/lavra/commands/*.md plugins/lavra/commands/optional/*.md
+  ```
+- `site/src/content/docs/agents.md` — check against agent frontmatter descriptions:
+  ```bash
+  grep '^description:' plugins/lavra/agents/**/*.md
+  ```
+- `site/src/content/docs/skills.md` — check against skill SKILL.md descriptions:
+  ```bash
+  grep '^description:' plugins/lavra/skills/*/SKILL.md
+  ```
 
-If any command was added, renamed, or had its description changed since the last release, update `commands.md` before proceeding.
+If any command, agent, or skill was added, renamed, or had its description changed since the last release, update the corresponding doc before proceeding.
 
 The pre-release check (step 3) will catch any mismatch, but fix them before running it.
 
