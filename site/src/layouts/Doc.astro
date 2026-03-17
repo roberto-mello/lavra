@@ -85,7 +85,8 @@ function label(slug: string) {
         prose-a:text-accent prose-a:no-underline hover:prose-a:underline
         prose-strong:text-text prose-strong:font-semibold
         prose-code:text-accent prose-code:bg-surface prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
-        prose-pre:bg-surface prose-pre:border prose-pre:border-border prose-pre:rounded-xl prose-pre:text-sm
+        prose-pre:!bg-transparent prose-pre:border prose-pre:border-border prose-pre:rounded-xl prose-pre:text-sm prose-pre:p-0
+        [&_pre]:overflow-x-auto [&_pre>code]:bg-transparent [&_pre>code]:text-inherit [&_pre>code]:p-5 [&_pre>code]:block
         prose-blockquote:border-l-accent prose-blockquote:text-text-muted
         prose-ul:text-text-muted prose-ol:text-text-muted
         prose-li:marker:text-text-dim

@@ -7,6 +7,12 @@ import icon from 'astro-icon';
 export default defineConfig({
   site: 'https://lavra.dev',
   output: 'static',
+  markdown: {
+    shikiConfig: {
+      theme: 'one-dark-pro',
+      wrap: false,
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },

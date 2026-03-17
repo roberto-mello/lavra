@@ -18,6 +18,38 @@
   --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Doc prose code blocks — Shiki sets background via inline style, so we wrap
+   with a border/radius shell and use the Shiki background as-is. */
+.prose pre.astro-code {
+  border: 1px solid var(--color-border-light);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  padding: 0 !important;
+  margin: 1.5rem 0;
+}
+
+.prose pre.astro-code code {
+  display: block;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  background: transparent !important;
+}
+
+/* Language badge */
+.prose pre.astro-code[data-language]::before {
+  content: attr(data-language);
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-dim);
+  background: rgb(255 255 255 / 0.04);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.4rem 1.5rem;
+}
+
 .hero-gradient {
   background: linear-gradient(135deg, #09090b 0%, #0c1a14 50%, #09090b 100%);
 }
