@@ -1,0 +1,58 @@
+---
+import TerminalMockup from './TerminalMockup.astro';
+---
+
+<section class="hero-gradient min-h-[100dvh] flex items-center">
+  <div class="max-w-7xl mx-auto px-6 py-16 w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
+
+      <!-- Left Column -->
+      <div>
+        <p class="font-mono text-accent text-sm uppercase tracking-wider mb-4">MULTI-AGENT WORKFLOW ENGINE</p>
+        <h1 class="text-4xl lg:text-6xl font-black tracking-tight text-text leading-[1.1]">Your AI agents,<br>with memory</h1>
+        <p class="text-lg lg:text-xl text-text-muted mt-6 max-w-lg">lavra gives your coding agents persistent memory, multi-agent workflows, and knowledge that compounds across sessions.</p>
+
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href="#install" class="inline-flex items-center px-6 py-3 rounded-lg border-2 border-accent text-accent font-semibold text-sm hover:bg-accent hover:text-bg transition-colors duration-200">Get Started</a>
+          <a href="https://github.com/roberto-mello/lavra" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-6 py-3 rounded-lg bg-surface border border-border text-text-muted font-semibold text-sm hover:text-text hover:border-border-light transition-colors duration-200">View on GitHub</a>
+        </div>
+
+        <div class="mt-8 flex flex-wrap gap-6 items-center">
+          <span class="text-xs text-text-dim opacity-50">Claude Code</span>
+          <span class="text-xs text-text-dim opacity-50">OpenCode</span>
+          <span class="text-xs text-text-dim opacity-50">Gemini CLI</span>
+          <span class="text-xs text-text-dim opacity-50">Cortex Code</span>
+        </div>
+      </div>
+
+      <!-- Right Column (terminal with tilt) -->
+      <div class="hidden lg:block" style="transform: perspective(1200px) rotateY(-6deg) rotateX(2deg);">
+        <TerminalMockup title="lavra-design">
+          <span class="text-accent">$</span> <span class="text-accent">/lavra-design "add persistent memory"</span><br>
+          <br>
+          <span class="text-border-light">----------------------------------------------------</span><br>
+          <span class="text-text">&nbsp;&nbsp;Phase 1 complete: Brainstorm</span><br>
+          <span class="text-text">&nbsp;&nbsp;Locked decisions: 6</span><br>
+          <span class="text-text">&nbsp;&nbsp;Scope: HOLD</span><br>
+          <span class="text-border-light">----------------------------------------------------</span><br>
+          <br>
+          <span class="text-text">&nbsp;&nbsp;Researching with 4 domain-matched agents...</span><br>
+          <span class="text-text-muted">&nbsp;&nbsp;</span><span class="text-accent">[x]</span> <span class="text-text-muted">framework-docs-researcher</span><br>
+          <span class="text-text-muted">&nbsp;&nbsp;</span><span class="text-accent">[x]</span> <span class="text-text-muted">security-sentinel</span><br>
+          <span class="text-text-muted">&nbsp;&nbsp;</span><span class="text-accent">[x]</span> <span class="text-text-muted">best-practices-researcher</span><br>
+          <span class="text-text-muted">&nbsp;&nbsp;</span><span class="text-accent">[x]</span> <span class="text-text-muted">learnings-researcher</span><br>
+          <br>
+          <span class="text-border-light">----------------------------------------------------</span><br>
+          <span class="text-text">&nbsp;&nbsp;Phase 5 complete: Review (4 agents)</span><br>
+          <span class="text-text">&nbsp;&nbsp;Auto-applied: 8 findings</span><br>
+          <span class="text-text">&nbsp;&nbsp;User-decided: 2 trade-offs</span><br>
+          <span class="text-border-light">----------------------------------------------------</span><br>
+          <br>
+          <span class="text-text">&nbsp;&nbsp;Plan locked. 7 child beads.</span><br>
+          <span class="text-accent">&nbsp;&nbsp;Ready for /lavra-work.</span>
+        </TerminalMockup>
+      </div>
+
+    </div>
+  </div>
+</section>
