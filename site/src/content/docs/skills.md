@@ -1,6 +1,6 @@
 ---
 title: Skills Reference
-description: The 9 skills lavra installs — reusable instruction sets that extend your agent's capabilities.
+description: The 9 skills Lavra installs — reusable instruction sets that extend your agent's capabilities.
 order: 10
 ---
 

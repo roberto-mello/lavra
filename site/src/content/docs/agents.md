@@ -1,12 +1,12 @@
 ---
 title: Agent Reference
-description: All 30 specialized agents lavra dispatches for research, review, design, and workflow tasks.
+description: All 30 specialized agents Lavra dispatches for research, review, design, and workflow tasks.
 order: 9
 ---
 
 # Agent Reference
 
-Agents are dispatched automatically by lavra's workflow commands — you don't invoke them directly. They run as subagents with specialized instructions for a specific domain.
+Agents are dispatched automatically by Lavra's workflow commands — you don't invoke them directly. They run as subagents with specialized instructions for a specific domain.
 
 ## Review (16)
 

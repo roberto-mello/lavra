@@ -1,6 +1,6 @@
 ---
 title: Command Reference
-description: All lavra slash commands — what they do and when to use them.
+description: All Lavra slash commands — what they do and when to use them.
 order: 5
 ---
 
@@ -49,7 +49,7 @@ These commands cover the end-to-end development loop from idea to shipped PR.
 | `/changelog` | Create engaging changelogs for recent merges to main branch |
 | `/heal-skill` | Fix incorrect SKILL.md files when a skill has wrong instructions or outdated API references |
 | `/test-browser` | Run browser tests on pages affected by current PR or branch |
-| `/report-bug` | Report a bug in the lavra plugin |
+| `/report-bug` | Report a bug in the Lavra plugin |
 
 ## Optional Commands
 

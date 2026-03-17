@@ -1,16 +1,16 @@
 ---
 title: Knowledge System
-description: How lavra captures, stores, and automatically recalls technical knowledge across sessions.
+description: How Lavra captures, stores, and automatically recalls technical knowledge across sessions.
 order: 7
 ---
 
 # Knowledge System
 
-lavra's knowledge system solves a fundamental problem with AI coding assistants: they forget everything between sessions. The knowledge system gives your agent persistent memory that compounds over time.
+Lavra's knowledge system solves a fundamental problem with AI coding assistants: they usually have no consistent memory, and forget everything between sessions. Lavra's knowledge system gives your agent persistent memory that compounds over time.
 
 ## How it works
 
-When using Lavra's workflow commands, agents are instructed to log things worth remembering - a gotcha, an architectural decision, a root cause. They log it as a typed knowledge comment on a bead:
+When using Lavra's workflow commands, agents are instructed to log things worth remembering - a gotcha, an architectural decision, a pattern, a root cause. They log it as a typed knowledge comment on a bead:
 
 ```bash
 bd comments add beads-abc "LEARNED: OAuth redirect URI must match exactly, including trailing slash"
@@ -18,7 +18,7 @@ bd comments add beads-abc "LEARNED: OAuth redirect URI must match exactly, inclu
 
 The `memory-capture` hook detects this, parses it, and stores it in `.beads/memory/knowledge.jsonl`. At the start of every future session, the `auto-recall` hook searches that file based on your current work and injects the most relevant entries into Claude's context automatically.
 
-You are free to add your own knowledge entries manually using `bd comments add` and they will be retrieved by agents via a hook at session start, or by using the Lavra workflow commands. See also [Searching manually](#searching-manually) and [Curating knowledge](#curating-knowledge).
+You can add your own knowledge entries manually using `bd comments add` and they will be retrieved by agents via a hook at session start, or by using the Lavra workflow commands. See also [Searching manually](#searching-manually) and [Curating knowledge](#curating-knowledge).
 
 ## Knowledge types
 

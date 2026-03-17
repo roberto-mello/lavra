@@ -1,12 +1,12 @@
 ---
 title: Hooks
-description: How lavra's three automatic hooks work — session recall, knowledge capture, and subagent wrapup.
+description: How Lavra's three automatic hooks work — session recall, knowledge capture, and subagent wrapup.
 order: 6
 ---
 
 # Hooks
 
-lavra ships three hooks that run automatically during your Claude Code session. You don't invoke them directly — they fire in the background based on what you do.
+Lavra ships three hooks that run automatically during your Claude Code session. You don't invoke them directly — they fire in the background based on what you do.
 
 ## auto-recall (SessionStart)
 

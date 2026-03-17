@@ -1,6 +1,6 @@
 ---
 title: Quick Start
-description: Install lavra and run your first workflow in minutes
+description: Install Lavra and run your first workflow in minutes
 order: 1
 ---
 
@@ -14,9 +14,10 @@ Install into the current project for your AI coding agent:
 npx lavra@latest --claude      # Claude Code
 npx lavra@latest --opencode    # OpenCode
 npx lavra@latest --gemini      # Gemini CLI
+npx lavra@latest --cortex      # Cortex Code
 ```
 
-Or install globally so lavra is available in every project:
+Or install globally so Lavra is available in every project:
 
 ```bash
 npx lavra@latest --global
@@ -45,7 +46,7 @@ ls -la .beads/memory/        # Should see knowledge.jsonl, recall.sh
 
 ### Workflow config (automatic)
 
-The installer creates `.beads/config/lavra.json` automatically. Edit to tune the workflow:
+The installer creates `.beads/config/Lavra.json` automatically. Edit to tune the workflow:
 
 ```json
 {
@@ -66,7 +67,7 @@ Existing projects get this file automatically on next session start.
 
 ### Codebase analysis (optional, for brownfield projects)
 
-If you're installing lavra into an existing project, run `/project-setup` to generate a codebase profile:
+If you're installing Lavra into an existing project, run `/project-setup` to generate a codebase profile:
 
 ```
 /project-setup
@@ -78,7 +79,7 @@ When prompted "Run codebase analysis?", choose Y. This dispatches 3 parallel age
 
 ### 1. Design
 
-Describe the feature — lavra runs the full six-phase design pipeline:
+Describe the feature — Lavra runs the full six-phase design pipeline:
 
 ```
 /lavra-design "add two-factor authentication with TOTP and QR codes"
@@ -95,7 +96,7 @@ The output is detailed enough that implementation is mechanical — subagents do
 
 ### 2. Work
 
-Pick up the epic and lavra works through the child beads automatically:
+Pick up the epic and Lavra works through the child beads automatically:
 
 ```
 /lavra-work BD-001
