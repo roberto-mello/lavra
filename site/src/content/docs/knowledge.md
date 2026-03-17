@@ -47,21 +47,27 @@ The SQLite DB is rebuilt automatically from the JSONL on first use and kept in s
 
 ## Searching manually
 
-Mid-session, use the slash command to search and inject relevant entries into your agent's context:
+Knowledge entries are indexed by domain terms — framework names, error codes, API names, gotcha keywords. Search with whatever you'd naturally reach for when debugging:
+
+Mid-session, use the slash command to inject relevant entries into your agent's context:
 
 ```
-/lavra-recall authentication
-/lavra-recall BD-050
+/lavra-recall oauth redirect
+/lavra-recall rls context postgres
+/lavra-recall nfse E0014
 ```
 
 Or search directly from the shell:
 
 ```bash
-# Search by keyword (uses SQLite FTS + BM25 ranking)
+# Keyword search (SQLite FTS5 + BM25 ranking, Porter stemming)
 .beads/memory/recall.sh "authentication"
 
-# Filter by type
-.beads/memory/recall.sh "jwt" --type learned
+# Filter by knowledge type
+.beads/memory/recall.sh "postgres" --type investigation
+
+# Include archived entries (older than 5000 lines)
+.beads/memory/recall.sh "pydantic" --all
 
 # Show recent entries
 .beads/memory/recall.sh --recent 10

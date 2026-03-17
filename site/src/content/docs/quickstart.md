@@ -150,8 +150,8 @@ See the [Knowledge System docs](/docs/knowledge) for how capture, storage, and a
 Mid-session, use the slash command in your agent to inject learnings into the agent's context:
 
 ```
-/lavra-recall authentication
-/lavra-recall BD-050
+/lavra-recall oauth redirect
+/lavra-recall rls postgres
 ```
 
 Or search directly from the shell:
