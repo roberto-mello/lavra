@@ -51,7 +51,7 @@ git log --oneline -20
 
 If prior commits suggest a previous review cycle on this branch (e.g., "address review feedback", reverted changes, refactor-after-review commits), note which areas were previously problematic. Pass this context to agents so they review those areas more aggressively. Recurring problem areas are architectural smells.
 
-### Step 2: Recall Relevant Knowledge
+### Step 2: Recall Relevant Knowledge + Read Workflow Config
 
 ```bash
 # Search for knowledge related to the plan's topic
@@ -61,6 +61,14 @@ If prior commits suggest a previous review cycle on this branch (e.g., "address 
 
 Include any relevant LEARNED/DECISION/FACT/PATTERN entries as context for reviewers.
 
+Read workflow config for model profile:
+
+```bash
+[ -f .beads/config/lavra.json ] && cat .beads/config/lavra.json
+```
+
+Parse `model_profile` (default: `"balanced"`). When `model_profile` is `"quality"`, dispatch `architecture-strategist`, `security-sentinel`, and `performance-oracle` with `model: opus`.
+
 ### Step 3: Dispatch Review Agents in Parallel
 
 **In `--small` mode:** instruct each agent to return only its single most important finding.
@@ -69,10 +77,10 @@ Include any relevant LEARNED/DECISION/FACT/PATTERN entries as context for review
 
 Run these 4 agents simultaneously, passing the full plan content + retrospective context to each. Also request: (a) one realistic production failure scenario per new codepath (timeout, nil, race condition, etc.) and (b) any work that could be deferred without blocking the core objective:
 
-1. Task architecture-strategist("Review this plan for architectural soundness, scalability, and maintainability. For each new codepath, identify one realistic production failure. Flag any work deferrable without blocking the core objective. Plan: [full plan content]. Prior review context: [retrospective findings]")
+1. Task architecture-strategist("Review this plan for architectural soundness, scalability, and maintainability. For each new codepath, identify one realistic production failure. Flag any work deferrable without blocking the core objective. Plan: [full plan content]. Prior review context: [retrospective findings]") -- add `model: opus` if profile=quality
 2. Task code-simplicity-reviewer("Review this plan for unnecessary complexity, over-engineering, and opportunities to simplify. For each new codepath, identify one realistic production failure. Flag any work deferrable without blocking the core objective. Plan: [full plan content]. Prior review context: [retrospective findings]")
-3. Task security-sentinel("Review this plan for security vulnerabilities, missing auth checks, data exposure risks. For each new codepath, identify one realistic production failure. Plan: [full plan content]. Prior review context: [retrospective findings]")
-4. Task performance-oracle("Review this plan for performance bottlenecks, N+1 queries, missing caching, scalability issues. For each new codepath, identify one realistic production failure. Plan: [full plan content]. Prior review context: [retrospective findings]")
+3. Task security-sentinel("Review this plan for security vulnerabilities, missing auth checks, data exposure risks. For each new codepath, identify one realistic production failure. Plan: [full plan content]. Prior review context: [retrospective findings]") -- add `model: opus` if profile=quality
+4. Task performance-oracle("Review this plan for performance bottlenecks, N+1 queries, missing caching, scalability issues. For each new codepath, identify one realistic production failure. Plan: [full plan content]. Prior review context: [retrospective findings]") -- add `model: opus` if profile=quality
 
 ### Step 4: Synthesize Findings
 

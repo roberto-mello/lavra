@@ -71,14 +71,24 @@ If a review agent flags any file in `.beads/memory/` or `.beads/config/` for cle
 
 #### 3a. Read Project Config (optional)
 
-Check for a project-setup configuration file:
+Check for a project-setup configuration file and workflow config:
 
 ```bash
 [ -f .beads/config/project-setup.md ] && cat .beads/config/project-setup.md
+[ -f .beads/config/lavra.json ] && cat .beads/config/lavra.json
 ```
 
-If the file exists, parse its YAML frontmatter for one field:
+From `project-setup.md`, parse its YAML frontmatter for one field:
 - `review_agents`: list of agent names to dispatch (replaces the default list below)
+
+From `lavra.json`, parse `model_profile` (default: `"balanced"`).
+
+**Model override rule:** When `model_profile` is `"quality"`, dispatch these critical agents with `model: opus`:
+- `security-sentinel`
+- `architecture-strategist`
+- `performance-oracle`
+
+All other agents run at their default tier regardless of profile.
 
 > **Note:** `reviewer_context_note` is intentionally **not** injected into review agents. Review agents derive project context from the code itself. Context note injection is only done in `/lavra-work` multi-bead path (pre-work conventions for implementors) where the value is clearer and the injection surface is smaller.
 
@@ -106,9 +116,9 @@ Dispatch the validated agent list (from config) or ALL agents below.
 4. Task kieran-python-reviewer(PR content)
 5. Task git-history-analyzer(PR content)
 6. Task pattern-recognition-specialist(PR content)
-7. Task architecture-strategist(PR content)
-8. Task security-sentinel(PR content)
-9. Task performance-oracle(PR content)
+7. Task architecture-strategist(PR content) -- add `model: opus` if profile=quality
+8. Task security-sentinel(PR content) -- add `model: opus` if profile=quality
+9. Task performance-oracle(PR content) -- add `model: opus` if profile=quality
 10. Task data-integrity-guardian(PR content)
 11. Task agent-native-reviewer(PR content)
 12. Task julik-frontend-races-reviewer(PR content)

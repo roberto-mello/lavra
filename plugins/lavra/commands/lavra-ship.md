@@ -120,10 +120,11 @@ Read workflow config:
 [ -f .beads/config/lavra.json ] && cat .beads/config/lavra.json
 ```
 
-For each bead being shipped that has a `## Validation` section, dispatch the `goal-verifier` agent:
+Parse `model_profile` from the config (default: `"balanced"`). For each bead being shipped that has a `## Validation` section, dispatch the `goal-verifier` agent. Add `model: opus` when `model_profile` is `"quality"`:
 
 ```
 Task(goal-verifier, "Verify goal completion for {BEAD_ID}. Validation criteria: {validation section}. What section: {what section}.")
+-- add model: opus if profile=quality
 ```
 
 **Interpret results:**

@@ -62,7 +62,9 @@ Workflow configuration -- toggle research, review, goal verification, parallelis
 }
 ```
 
-Created by `provision-memory.sh` on install. Existing projects receive it automatically on next session start via the version self-heal in `auto-recall.sh`. Read by `/lavra-design` (skip phases) and `/lavra-work` (parallelism, commits).
+Created by `provision-memory.sh` on install. Existing projects receive it automatically on next session start via the version self-heal in `auto-recall.sh`. Read by `/lavra-design` (skip phases), `/lavra-work` (parallelism, commits), `/lavra-review`, `/lavra-eng-review`, and `/lavra-ship`.
+
+`model_profile: "quality"` routes critical agents (`security-sentinel`, `architecture-strategist`, `goal-verifier`, `performance-oracle`) to opus. Default `"balanced"` keeps agents at their configured tier.
 
 ### `.beads/config/codebase-profile.md` (committed)
 

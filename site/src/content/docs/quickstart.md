@@ -59,7 +59,7 @@ The installer creates `.beads/config/Lavra.json` automatically. Edit to tune the
     "max_parallel_agents": 3, // max subagents running at once
     "commit_granularity": "task" // "task" (atomic, default) or "wave" (legacy)
   },
-  "model_profile": "balanced"
+  "model_profile": "balanced" // "balanced" (default) or "quality" (routes security-sentinel, architecture-strategist, goal-verifier, performance-oracle to opus)
 }
 ```
 
