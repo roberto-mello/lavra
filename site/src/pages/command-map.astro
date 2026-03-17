@@ -1,20 +1,12 @@
 ---
-// Full-page embed of the interactive command map
-// The HTML file is self-contained with its own styles and scripts
+import Base from '../layouts/Base.astro';
 ---
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Command Map | lavra</title>
-  <meta name="description" content="Interactive architecture diagram showing lavra's 30 agents, 22 commands, and 16 skills">
-  <style>
-    * { margin: 0; padding: 0; }
-    body { overflow: hidden; height: 100vh; }
-    iframe { width: 100%; height: 100vh; border: none; }
-  </style>
-</head>
-<body>
-  <iframe src="/command-map.html" title="lavra Command Map"></iframe>
-</body>
-</html>
+<Base title="Command Map" description="Interactive architecture diagram showing lavra's 30 agents, 27 commands, and 16 skills">
+  <iframe
+    src="/command-map.html"
+    title="lavra Command Map"
+    sandbox="allow-scripts allow-same-origin"
+    class="w-full border-none"
+    style="height: calc(100dvh - 64px);"
+  ></iframe>
+</Base>

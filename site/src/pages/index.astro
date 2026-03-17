@@ -1,104 +1,19 @@
 ---
 import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Problem from '../components/Problem.astro';
+import Pipeline from '../components/Pipeline.astro';
+import Knowledge from '../components/Knowledge.astro';
+import VideoDemo from '../components/VideoDemo.astro';
+import InstallCta from '../components/InstallCta.astro';
+import Footer from '../components/Footer.astro';
 ---
-<Base title="Home">
-  <main class="hero">
-    <h1>lavra</h1>
-    <p class="tagline">Multi-agent workflow engine for Claude Code, OpenCode, and Gemini CLI</p>
-    <div class="stats">
-      <div class="stat"><span class="stat-num">30</span><span class="stat-label">Agents</span></div>
-      <div class="stat"><span class="stat-num">22</span><span class="stat-label">Commands</span></div>
-      <div class="stat"><span class="stat-num">16</span><span class="stat-label">Skills</span></div>
-      <div class="stat"><span class="stat-num">3</span><span class="stat-label">Platforms</span></div>
-    </div>
-    <div class="cta">
-      <a href="/command-map" class="btn-primary">Explore the Architecture</a>
-      <a href="https://github.com/roberto-mello/lavra" class="btn-secondary" target="_blank">View on GitHub</a>
-    </div>
-  </main>
+<Base title="lavra">
+  <Hero />
+  <Problem />
+  <Pipeline />
+  <Knowledge />
+  <VideoDemo />
+  <InstallCta />
+  <Footer />
 </Base>
-
-<style>
-  .hero {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: calc(100vh - 50px);
-    padding: 40px 24px;
-    text-align: center;
-  }
-  h1 {
-    font-size: 64px;
-    font-weight: 800;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    letter-spacing: -0.04em;
-    color: #e2e8f0;
-    margin-bottom: 12px;
-  }
-  .tagline {
-    font-size: 18px;
-    color: #6b7280;
-    max-width: 480px;
-    line-height: 1.5;
-    margin-bottom: 40px;
-  }
-  .stats {
-    display: flex;
-    gap: 32px;
-    margin-bottom: 40px;
-  }
-  .stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-  }
-  .stat-num {
-    font-size: 28px;
-    font-weight: 700;
-    color: #93c5fd;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-  }
-  .stat-label {
-    font-size: 11px;
-    color: #4b5563;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .cta {
-    display: flex;
-    gap: 12px;
-  }
-  .btn-primary {
-    padding: 10px 24px;
-    background: #1e3a5f;
-    border: 1px solid #3b82f6;
-    border-radius: 6px;
-    color: #93c5fd;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.15s;
-  }
-  .btn-primary:hover { background: #2550a0; text-decoration: none; }
-  .btn-secondary {
-    padding: 10px 24px;
-    background: #1f2937;
-    border: 1px solid #374151;
-    border-radius: 6px;
-    color: #9ca3af;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.15s;
-  }
-  .btn-secondary:hover { background: #374151; color: #e2e8f0; text-decoration: none; }
-
-  @media (max-width: 640px) {
-    h1 { font-size: 40px; }
-    .tagline { font-size: 15px; }
-    .stats { gap: 20px; }
-    .stat-num { font-size: 22px; }
-    .cta { flex-direction: column; width: 100%; max-width: 280px; }
-    .btn-primary, .btn-secondary { text-align: center; }
-  }
-</style>
