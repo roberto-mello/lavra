@@ -1,0 +1,39 @@
+---
+const painPoints = [
+  { text: 'Same OAuth bug. Third time this month.', border: 'border-red-500' },
+  { text: 'New hire asks how billing works. Nobody remembers.', border: 'border-amber-500' },
+  { text: 'Agent rewrites a function it already fixed last week.', border: 'border-zinc-500' },
+  { text: 'Three engineers debug the same config issue independently.', border: 'border-red-500' },
+  { text: 'Migration guide exists somewhere. Good luck finding it.', border: 'border-amber-500' },
+  { text: 'Context lost every time the conversation resets.', border: 'border-zinc-500' },
+];
+---
+
+<section class="py-32 bg-bg" data-reveal>
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-16 items-center">
+
+      {/* Left: Content */}
+      <div>
+        <h2 class="text-4xl lg:text-5xl font-bold text-text tracking-tight mb-10">
+          Your AI agents forget everything.
+        </h2>
+        <ol class="space-y-0">
+          {painPoints.map((point, i) => (
+            <li class={`pl-4 py-3 border-l-2 ${point.border}`}>
+              <span class="text-text-muted text-base lg:text-lg">{point.text}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      {/* Right: Image placeholder */}
+      <div class="order-first lg:order-last flex items-center justify-center">
+        <div class="w-[350px] aspect-[3/4] rounded-2xl border border-border-light bg-surface flex items-center justify-center">
+          <span class="text-text-dim text-sm font-mono">forgetful-agent.jpg</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
