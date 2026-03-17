@@ -114,7 +114,7 @@ This plugin is a fork of [compound-engineering-plugin](https://github.com/EveryI
   - Trimmed all 28 agent descriptions to under 250 chars, moving verbose examples into agent bodies wrapped in `<examples>` tags
   - Added `disable-model-invocation: true` to 17 manual utility commands (they remain available when explicitly invoked via `/command-name` but don't clutter Claude's auto-suggestion context)
   - Added `disable-model-invocation: true` to 7 manual utility skills (lavra-knowledge, create-agent-skills, file-todos, skill-creator, git-worktree, rclone, gemini-imagegen)
-  - Core beads workflow commands (`/lavra-brainstorm`, `/lavra-plan`, `/lavra-work`, `/lavra-work-ralph`, `/lavra-work-teams`, `/lavra-review`, `/lavra-compound`, `/lavra-research`, `/lavra-plan-review`) remain fully auto-discoverable
+  - Core beads workflow commands (`/lavra-brainstorm`, `/lavra-plan`, `/lavra-work`, `/lavra-work-ralph`, `/lavra-work-teams`, `/lavra-review`, `/lavra-compound`, `/lavra-research`, `/lavra-eng-review`) remain fully auto-discoverable
 - **Model tier assignments**: Each agent specifies a `model:` field (haiku/sonnet/opus) based on reasoning complexity, reducing costs 60-70% compared to running all agents on the default model. High-frequency agents like `learnings-researcher` run on Haiku; deep reasoning agents like `architecture-strategist` run on Opus.
 
 ### Structural Changes

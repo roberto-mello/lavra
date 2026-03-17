@@ -29,7 +29,7 @@ A plugin for coding agents that orchestrates the full development lifecycle -- f
 
 </td>
 <td width="35%" align="center">
-<img src="images/forgeftul-agent.jpg" alt="Forgetful agent surrounded by scattered documents" width="280">
+<img src="site/src/assets/forgeftul-agent.jpg" alt="Forgetful agent surrounded by scattered documents" width="280">
 </td>
 </tr>
 </table>
@@ -48,7 +48,7 @@ A plugin for coding agents that orchestrates the full development lifecycle -- f
 
 </td>
 <td width="35%" align="center">
-<img src="images/agent-with-memory.jpg" alt="Agent with memory climbing stairs of compounding knowledge" width="280">
+<img src="site/src/assets/agent-with-memory.jpg" alt="Agent with memory climbing stairs of compounding knowledge" width="280">
 </td>
 </tr>
 </table>
@@ -111,7 +111,7 @@ cd lavra
 
 **Supporting (9):** `/lavra-quick` (fast path with escalation), `/lavra-learn` (knowledge curation), `/lavra-recall` (mid-session search), `/lavra-checkpoint` (save progress), `/lavra-retro` (weekly analytics), `/lavra-import`, `/lavra-triage`, `/changelog`, `/test-browser`
 
-**Power-user (6):** `/lavra-plan`, `/lavra-research`, `/lavra-plan-review`, `/lavra-review` (15 specialized review agents), `/lavra-work-ralph` (autonomous retry), `/lavra-work-teams` (persistent workers)
+**Power-user (6):** `/lavra-plan`, `/lavra-research`, `/lavra-eng-review`, `/lavra-review` (15 specialized review agents), `/lavra-work-ralph` (autonomous retry), `/lavra-work-teams` (persistent workers)
 
 **30 specialized agents** across review, research, design, workflow, and docs. Each runs at the right model tier to keep costs 60-70% lower than running everything on Opus.
 

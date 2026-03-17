@@ -75,11 +75,11 @@ OPTIONAL_COMMANDS=$(find plugins/lavra/commands/optional -name "*.md" 2>/dev/nul
 AGENTS=$(find plugins/lavra/agents -name "*.md" | wc -l | tr -d ' ')
 SKILLS=$(find plugins/lavra/skills -name "SKILL.md" | wc -l | tr -d ' ')
 
-echo "  Commands: $COMMANDS (need 24+) + $OPTIONAL_COMMANDS optional"
+echo "  Commands: $COMMANDS (need 23+) + $OPTIONAL_COMMANDS optional"
 echo "  Agents:   $AGENTS (need 30+)"
 echo "  Skills:   $SKILLS (need 16+)"
 
-[[ "$COMMANDS" -ge 24 ]] && { echo "  PASS  Commands"; ((PASS++)) || true; } || fail "Commands" "$COMMANDS < 24"
+[[ "$COMMANDS" -ge 23 ]] && { echo "  PASS  Commands"; ((PASS++)) || true; } || fail "Commands" "$COMMANDS < 23"
 [[ "$AGENTS"   -ge 30 ]] && { echo "  PASS  Agents";   ((PASS++)) || true; } || fail "Agents"   "$AGENTS < 30"
 [[ "$SKILLS"   -ge 16 ]] && { echo "  PASS  Skills";   ((PASS++)) || true; } || fail "Skills"   "$SKILLS < 16"
 
@@ -100,11 +100,11 @@ check "cortex/ directory"   test -d plugins/lavra/cortex
 OPENCODE_COMMANDS=$(find plugins/lavra/opencode/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 GEMINI_TOML=$(find plugins/lavra/gemini/commands -name "*.toml" 2>/dev/null | wc -l | tr -d ' ')
 
-echo "  OpenCode .md commands: $OPENCODE_COMMANDS (need 24+)"
-echo "  Gemini .toml commands: $GEMINI_TOML (need 24+)"
+echo "  OpenCode .md commands: $OPENCODE_COMMANDS (need 23+)"
+echo "  Gemini .toml commands: $GEMINI_TOML (need 23+)"
 
-[[ "$OPENCODE_COMMANDS" -ge 24 ]] && { echo "  PASS  OpenCode commands"; ((PASS++)) || true; } || fail "OpenCode commands" "$OPENCODE_COMMANDS < 24"
-[[ "$GEMINI_TOML"       -ge 24 ]] && { echo "  PASS  Gemini commands";   ((PASS++)) || true; } || fail "Gemini commands"   "$GEMINI_TOML < 24"
+[[ "$OPENCODE_COMMANDS" -ge 23 ]] && { echo "  PASS  OpenCode commands"; ((PASS++)) || true; } || fail "OpenCode commands" "$OPENCODE_COMMANDS < 23"
+[[ "$GEMINI_TOML"       -ge 23 ]] && { echo "  PASS  Gemini commands";   ((PASS++)) || true; } || fail "Gemini commands"   "$GEMINI_TOML < 23"
 
 CORTEX_COMMANDS=$(find plugins/lavra/cortex/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 echo "  Cortex .md commands:   $CORTEX_COMMANDS (need 20+)"

@@ -18,7 +18,7 @@ Explore ideas and create structured plans before writing code.
 | `/lavra-design` | Orchestrate full planning pipeline per phase: plan → research → review | After brainstorm — runs the entire design pipeline automatically |
 | `/lavra-plan` | Research and create epic with child beads | Start every feature - creates structured plan with research |
 | `/lavra-research` | Gather evidence with domain-matched research agents | For complex features - gathers best practices and prior art |
-| `/lavra-plan-review` | Multi-agent review of epic plan | Before implementation - catch issues early |
+| `/lavra-eng-review` | Multi-agent review of epic plan | Before implementation - catch issues early |
 | `/lavra-quick` | Fast-track small tasks with abbreviated plan | Quick fixes and small features that don't need full pipeline |
 
 ### Executing Work (3 commands)

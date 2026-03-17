@@ -193,7 +193,7 @@ Show the default agents for the confirmed stack and let the user disable specifi
 | `python` | kieran-python-reviewer, code-simplicity-reviewer, security-sentinel, performance-oracle |
 | `general` | code-simplicity-reviewer, security-sentinel, performance-oracle, architecture-strategist |
 
-**Default plan review agents** (subset, used for /lavra-plan-review):
+**Default plan review agents** (subset, used for /lavra-eng-review):
 
 | Stack | Default Plan Review Agents |
 |-------|---------------------------|
@@ -366,7 +366,7 @@ if [ -f ".beads/config/project-setup.md" ]; then
 fi
 ```
 
-### `/lavra-plan-review`
+### `/lavra-eng-review`
 
 Uses `plan_review_agents` from config (the lighter subset for plan review).
 

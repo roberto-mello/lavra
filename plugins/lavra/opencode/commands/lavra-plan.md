@@ -497,14 +497,14 @@ After creating the epic and child beads, use the **AskUserQuestion tool** to pre
 
 **Options:**
 1. **Run `/lavra-research`** - Gather evidence for each child bead with domain-matched research agents
-2. **Run `/lavra-plan-review`** - Get feedback from reviewers on the plan
+2. **Run `/lavra-eng-review`** - Get feedback from reviewers on the plan
 3. **Start `/lavra-work`** - Begin implementing the first child bead
 4. **Run `/lavra-work {EPIC_ID}`** - Work on multiple child beads in parallel
 5. **Simplify** - Reduce detail level
 
 Based on selection:
 - **`/lavra-research`** -> Call the /lavra-research command with the epic bead ID
-- **`/lavra-plan-review`** -> Call the /lavra-plan-review command with the epic bead ID
+- **`/lavra-eng-review`** -> Call the /lavra-eng-review command with the epic bead ID
 - **`/lavra-work`** -> Call the /lavra-work command with the first ready child bead ID
 - **`/lavra-work {EPIC_ID}`** -> Call the /lavra-work command with the epic bead ID
 - **Simplify** -> Ask "What should I simplify?" then regenerate simpler descriptions
@@ -512,5 +512,5 @@ Based on selection:
 
 **Tip:** If this plan originated from `/lavra-brainstorm`, the brainstorm's locked decisions are already embedded in child bead descriptions.
 
-Loop back to options after Simplify or Other changes until user selects `/lavra-work` or `/lavra-plan-review`.
+Loop back to options after Simplify or Other changes until user selects `/lavra-work` or `/lavra-eng-review`.
 </handoff>

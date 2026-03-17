@@ -221,7 +221,7 @@ const SOURCE_MAP = {
   'lavra-brainstorm': 'commands/lavra-brainstorm.md',
   'lavra-plan':       'commands/lavra-plan.md',
   'lavra-research':   'commands/lavra-research.md',
-  'lavra-plan-review':'commands/lavra-plan-review.md',
+  'lavra-eng-review':'commands/lavra-eng-review.md',
   'lavra-quick':      'commands/lavra-quick.md',
   'lavra-learn':      'commands/lavra-learn.md',
   'lavra-recall':     'commands/lavra-recall.md',
@@ -284,7 +284,7 @@ const DOCS_MAP = {
   'lavra-brainstorm': 'Explore requirements and approaches through collaborative dialogue before planning. Answers WHAT to build.',
   'lavra-plan':       'Transform feature descriptions into well-structured beads with research and multi-phase planning.',
   'lavra-research':   'Gather evidence for a plan using domain-matched research agents organized by technology.',
-  'lavra-plan-review':'Have multiple specialized agents review a plan in parallel to catch issues before implementation.',
+  'lavra-eng-review':'Have multiple specialized agents review a plan in parallel to catch issues before implementation.',
   'lavra-quick':      'Fast-track small tasks with abbreviated plan and immediate execution, skipping brainstorm and deepen.',
   'lavra-learn':      'Curate raw knowledge comments into structured, deduplicated, well-tagged entries in knowledge.jsonl.',
   'lavra-recall':     'Search the knowledge base mid-session and inject relevant context without restarting.',
@@ -348,7 +348,7 @@ const NODES = [
   { id:'lavra-brainstorm', label:'/lavra-brainstorm', sub:'Explore + CEO sharpen',       x:60,  y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
   { id:'lavra-plan',       label:'/lavra-plan',       sub:'Research & plan epic',        x:250, y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
   { id:'lavra-research',   label:'/lavra-research',   sub:'Domain-matched agents',       x:440, y:BY.design_phases, w:W.md, h:RH, layer:'commands', group:'design' },
-  { id:'lavra-plan-review',label:'/lavra-plan-review', sub:'Adversarial 4-agent review', x:630, y:BY.design_phases, w:W.lg, h:RH, layer:'commands', group:'design' },
+  { id:'lavra-eng-review',label:'/lavra-eng-review', sub:'Adversarial 4-agent review', x:630, y:BY.design_phases, w:W.lg, h:RH, layer:'commands', group:'design' },
 
   // == SUPPORTING COMMANDS ==
   { id:'lavra-quick',      label:'/lavra-quick',      sub:'Fast path + escalation',     x:60,  y:BY.supporting, w:W.sm, h:RH, layer:'commands', group:'supporting' },
@@ -422,12 +422,12 @@ const CONNS = [
   { from:'lavra-design', to:'lavra-brainstorm',  type:'orchestrates', label:'1' },
   { from:'lavra-design', to:'lavra-plan',        type:'orchestrates', label:'2' },
   { from:'lavra-design', to:'lavra-research',    type:'orchestrates', label:'3' },
-  { from:'lavra-design', to:'lavra-plan-review', type:'orchestrates', label:'4' },
+  { from:'lavra-design', to:'lavra-eng-review', type:'orchestrates', label:'4' },
 
   // == DESIGN SUB-PHASE FLOW ==
   { from:'lavra-brainstorm', to:'lavra-plan',        type:'orchestrates', label:'scope locked' },
   { from:'lavra-plan',       to:'lavra-research',    type:'orchestrates', label:'gaps found' },
-  { from:'lavra-research',   to:'lavra-plan-review', type:'orchestrates', label:'evidence gathered' },
+  { from:'lavra-research',   to:'lavra-eng-review', type:'orchestrates', label:'evidence gathered' },
 
   // == WORK INTERNAL PHASES ==
   { from:'lavra-work', to:'lavra-learn',   type:'orchestrates', label:'auto after review' },
@@ -452,10 +452,10 @@ const CONNS = [
   { from:'lavra-research', to:'ag-githistory',type:'dispatches' },
 
   // == PLAN-REVIEW DISPATCHES ==
-  { from:'lavra-plan-review', to:'ag-arch',      type:'dispatches' },
-  { from:'lavra-plan-review', to:'ag-security',  type:'dispatches' },
-  { from:'lavra-plan-review', to:'ag-perf',      type:'dispatches' },
-  { from:'lavra-plan-review', to:'ag-simplicity',type:'dispatches' },
+  { from:'lavra-eng-review', to:'ag-arch',      type:'dispatches' },
+  { from:'lavra-eng-review', to:'ag-security',  type:'dispatches' },
+  { from:'lavra-eng-review', to:'ag-perf',      type:'dispatches' },
+  { from:'lavra-eng-review', to:'ag-simplicity',type:'dispatches' },
 
   // == FULL REVIEW DISPATCHES ==
   { from:'lavra-review', to:'ag-rails',      type:'dispatches' },
@@ -517,9 +517,9 @@ const CONNS = [
 const PRESET_NODES = {
   full: null,
   pipeline: ['lavra-design','lavra-work','lavra-qa','lavra-ship',
-             'lavra-brainstorm','lavra-plan','lavra-research','lavra-plan-review',
+             'lavra-brainstorm','lavra-plan','lavra-research','lavra-eng-review',
              'ag-goal','cfg-lavra'],
-  'design-deep': ['lavra-design','lavra-brainstorm','lavra-plan','lavra-research','lavra-plan-review',
+  'design-deep': ['lavra-design','lavra-brainstorm','lavra-plan','lavra-research','lavra-eng-review',
                    'ag-best','ag-framework','ag-learnings','ag-repo','ag-githistory',
                    'ag-arch','ag-security','ag-perf','ag-simplicity',
                    'sk-brainstorming',

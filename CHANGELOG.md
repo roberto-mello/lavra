@@ -61,7 +61,7 @@ See [docs/releases/v0.7.0.md](docs/releases/v0.7.0.md) for the full release note
 
 ### Fixed
 - **`/lavra-review` agent findings inventory** - Added explicit inventory step before synthesis to prevent silently dropping agent output when building final review
-- **`/lavra-plan-review` apply-feedback protocol** - Replaced vague "Apply feedback" option with explicit Steps A-D: build numbered checklist of all recommendations, apply each one-by-one marking done or skipped with reason, completeness verification pass, then log a DECISION comment summarizing what changed
+- **`/lavra-eng-review` apply-feedback protocol** - Replaced vague "Apply feedback" option with explicit Steps A-D: build numbered checklist of all recommendations, apply each one-by-one marking done or skipped with reason, completeness verification pass, then log a DECISION comment summarizing what changed
 - **`/lavra-deepen` completeness verification** - Now builds per-bead inventory of agent findings before finalizing, preventing missed recommendations during synthesis
 - **`/lavra-work` knowledge logging requirements** - Added trigger table showing exactly when to log (surprises, choices, errors, patterns, constraints); logging is now mandatory per task with explicit gate before marking task complete
 - **`/lavra-parallel` knowledge logging framing** - Fixed ralph prompt which said "only on final success or failure", actively encouraging batching; aligned teams worker prompt with inline-first framing

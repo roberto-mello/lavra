@@ -28,12 +28,13 @@ Commands are in `plugins/lavra/commands/`:
 | `/lavra-learn` | lavra-learn.md | Curate knowledge into structured entries |
 | `/lavra-recall` | lavra-recall.md | Search knowledge base mid-session |
 
-**Planning & Triage (4):**
+**Planning & Triage (5):**
 
 | Command | File | Description |
 |---------|------|-------------|
 | `/lavra-research` | lavra-research.md | Gather evidence with domain-matched agents |
-| `/lavra-plan-review` | lavra-plan-review.md | Multi-agent plan review |
+| `/lavra-ceo-review` | lavra-ceo-review.md | CEO/founder-mode plan review -- scope + business fit validation |
+| `/lavra-eng-review` | lavra-eng-review.md | Engineering review -- architecture, simplicity, security, performance |
 | `/lavra-triage` | lavra-triage.md | Prioritize and categorize beads |
 | `/lavra-import` | lavra-import.md | Import markdown plans into beads |
 

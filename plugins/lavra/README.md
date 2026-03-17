@@ -30,7 +30,7 @@ See the [marketplace README](../../README.md) for full details.
 | `/lavra-brainstorm` | Explore ideas collaboratively before planning |
 | `/lavra-plan` | Research and plan using multiple agents |
 | `/lavra-research` | Gather evidence with domain-matched research agents |
-| `/lavra-plan-review` | Multi-agent review of epic plan |
+| `/lavra-eng-review` | Multi-agent review of epic plan |
 | `/lavra-triage` | Prioritize and categorize child beads |
 | `/lavra-work` | Work on one or many beads -- auto-routes single vs. multi-bead |
 | `/lavra-review` | Multi-agent code review before closing |

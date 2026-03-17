@@ -376,13 +376,13 @@ After updating all child beads, use the **AskUserQuestion tool** to present thes
 **Question:** "Plan deepened for epic `{EPIC_ID}`. What would you like to do next?"
 
 **Options:**
-1. **Run `/lavra-plan-review`** - Get feedback from reviewers on enhanced plan
+1. **Run `/lavra-eng-review`** - Get feedback from reviewers on enhanced plan
 2. **Start `/lavra-work`** - Begin implementing the first child bead
 3. **Deepen further** - Run another round of research on specific sections
 4. **View changes** - Show what was added to each child bead
 
 Based on selection:
-- **`/lavra-plan-review`** -> Call the /lavra-plan-review command with the epic bead ID
+- **`/lavra-eng-review`** -> Call the /lavra-eng-review command with the epic bead ID
 - **`/lavra-work`** -> Call the /lavra-work command with the first ready child bead ID
 - **Deepen further** -> Ask which sections need more research, then re-run those agents
 - **View changes** -> Show before/after for each child bead

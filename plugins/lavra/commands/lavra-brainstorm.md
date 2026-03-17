@@ -248,6 +248,41 @@ bd comments add {EPIC_BEAD_ID} "PATTERN: {patterns to follow}"
 
 ### Phase 6: Sharpen
 
+**6.0 Pre-Sharpen: Adversarial Audit**
+
+Before recommending a scope mode, run these checks (use Bash/Grep/Read/Glob as needed):
+
+**A. Premise Challenge**
+- Is this the right problem? Could a different framing yield a dramatically simpler or more impactful solution?
+- What is the actual user/business outcome? Is this the most direct path, or is it solving a proxy problem?
+- What happens if we do nothing? Real pain point or hypothetical one?
+
+**B. Existing Code Leverage**
+- For every sub-problem in the proposed phases, identify existing code that already partially or fully solves it.
+- Note any phase that rebuilds something already present — and whether the plan reuses or rebuilds it.
+
+**C. Dream State Mapping**
+
+Map the trajectory in one table:
+```
+CURRENT STATE       → THIS PLAN DELIVERS       → 12-MONTH IDEAL
+[describe briefly]    [describe delta]            [describe target]
+```
+Does this plan move toward the 12-month ideal or away from it?
+
+**D. Temporal Interrogation** (skip for SCOPE REDUCTION)
+
+Walk through implementation in your head and surface unresolved decisions now:
+- Hour 1 (foundations): What must the implementer know before writing a line?
+- Hours 2–3 (core logic): What ambiguities will they hit mid-build?
+- Hours 4–5 (integration): What will surprise them?
+- Hour 6+ (polish/tests): What will they wish they'd planned for?
+
+Log key findings:
+```bash
+bd comments add {EPIC_BEAD_ID} "INVESTIGATION: Pre-sharpen audit -- {key findings}"
+```
+
 Brainstorming expands possibilities. This phase forces contraction. Of everything discussed, what is the MVP that proves the thesis?
 
 **6.1 Evaluate scope and recommend a mode:**
@@ -257,6 +292,12 @@ Review the full conversation -- the vision, requirements, phases, and locked dec
 - **SCOPE EXPANSION**: "The 10-star version of this is..." -- recommend when the initial idea is too small, when there is an obvious larger opportunity the user has not considered, or when the phases feel like a fraction of what is needed.
 - **HOLD SCOPE**: "The scope is right. Here is how to make it bulletproof." -- recommend when the idea is well-sized, when the phases cover the problem space without excess, and when the locked decisions are sound.
 - **SCOPE REDUCTION**: "Strip to essentials. The 80/20 version is..." -- recommend when feature creep is happening, when phases have grown beyond what a first cut needs, or when nice-to-haves have crept into must-haves.
+
+**Mode-specific depth (run before presenting your recommendation):**
+
+- **SCOPE EXPANSION**: Articulate (a) the 10x version — what's 10x more ambitious for 2x effort? (b) the platonic ideal — what would the best engineer with perfect taste build, starting from user experience not architecture? (c) at least 3 delight opportunities — adjacent 30-min improvements that make users think "nice, they thought of that."
+- **HOLD SCOPE**: Check if the plan touches >8 files or introduces >2 new classes/services. If yes, challenge whether the goal can be achieved with fewer moving parts. Identify minimum change set.
+- **SCOPE REDUCTION**: Identify the absolute minimum that ships core value. Explicitly list what becomes a follow-up.
 
 Use **AskUserQuestion tool** to present your recommendation with a brief rationale (2-3 sentences) and let the user confirm or pick a different mode.
 

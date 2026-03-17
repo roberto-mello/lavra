@@ -64,6 +64,10 @@
 {"created_at":"2026-03-13T19:58:14Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-qoe","issue_id":"bdcompound-8ii","type":"blocks"}
 {"created_at":"2026-03-13T19:58:13Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-ubd","issue_id":"bdcompound-8ii","type":"blocks"}
 {"created_at":"2026-03-13T19:58:14Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-vpb","issue_id":"bdcompound-8ii","type":"blocks"}
+{"created_at":"2026-03-17T13:00:34Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-9er","issue_id":"bdcompound-9er.1","type":"parent-child"}
+{"created_at":"2026-03-17T13:00:35Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-9er","issue_id":"bdcompound-9er.2","type":"parent-child"}
+{"created_at":"2026-03-17T13:00:36Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-9er","issue_id":"bdcompound-9er.3","type":"parent-child"}
+{"created_at":"2026-03-17T13:00:38Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-9er","issue_id":"bdcompound-9er.4","type":"parent-child"}
 {"created_at":"2026-03-12T09:07:51Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-9f5","issue_id":"bdcompound-9f5.1","type":"parent-child"}
 {"created_at":"2026-03-12T09:08:03Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-9f5","issue_id":"bdcompound-9f5.2","type":"parent-child"}
 {"created_at":"2026-03-12T09:09:23Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-9f5.1","issue_id":"bdcompound-9f5.2","type":"blocks"}
@@ -97,6 +101,29 @@
 {"created_at":"2026-03-11T14:53:57Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-end","issue_id":"bdcompound-eyl","type":"blocks"}
 {"created_at":"2026-03-11T14:53:57Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hrs","issue_id":"bdcompound-eyl","type":"blocks"}
 {"created_at":"2026-03-11T14:53:57Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-tnt","issue_id":"bdcompound-eyl","type":"blocks"}
+{"created_at":"2026-03-16T18:46:53Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0","issue_id":"bdcompound-hm0.1","type":"parent-child"}
+{"created_at":"2026-03-16T18:47:02Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0","issue_id":"bdcompound-hm0.2","type":"parent-child"}
+{"created_at":"2026-03-16T18:48:14Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.1","issue_id":"bdcompound-hm0.2","type":"blocks"}
+{"created_at":"2026-03-16T18:47:10Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0","issue_id":"bdcompound-hm0.3","type":"parent-child"}
+{"created_at":"2026-03-16T18:48:15Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.1","issue_id":"bdcompound-hm0.3","type":"blocks"}
+{"created_at":"2026-03-16T18:48:16Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.2","issue_id":"bdcompound-hm0.3","type":"blocks"}
+{"created_at":"2026-03-16T18:47:21Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0","issue_id":"bdcompound-hm0.4","type":"parent-child"}
+{"created_at":"2026-03-16T18:48:15Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.1","issue_id":"bdcompound-hm0.4","type":"blocks"}
+{"created_at":"2026-03-16T18:47:30Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0","issue_id":"bdcompound-hm0.5","type":"parent-child"}
+{"created_at":"2026-03-16T18:48:15Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.1","issue_id":"bdcompound-hm0.5","type":"blocks"}
+{"created_at":"2026-03-16T18:47:36Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0","issue_id":"bdcompound-hm0.6","type":"parent-child"}
+{"created_at":"2026-03-16T18:48:15Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.1","issue_id":"bdcompound-hm0.6","type":"blocks"}
+{"created_at":"2026-03-16T18:48:16Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.2","issue_id":"bdcompound-hm0.6","type":"blocks"}
+{"created_at":"2026-03-16T18:47:50Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0","issue_id":"bdcompound-hm0.7","type":"parent-child"}
+{"created_at":"2026-03-16T18:48:16Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.1","issue_id":"bdcompound-hm0.7","type":"blocks"}
+{"created_at":"2026-03-16T18:47:59Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0","issue_id":"bdcompound-hm0.8","type":"parent-child"}
+{"created_at":"2026-03-16T18:48:16Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.3","issue_id":"bdcompound-hm0.8","type":"blocks"}
+{"created_at":"2026-03-16T18:48:16Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.4","issue_id":"bdcompound-hm0.8","type":"blocks"}
+{"created_at":"2026-03-16T18:48:17Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.5","issue_id":"bdcompound-hm0.8","type":"blocks"}
+{"created_at":"2026-03-16T18:48:17Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.6","issue_id":"bdcompound-hm0.8","type":"blocks"}
+{"created_at":"2026-03-16T18:48:17Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.7","issue_id":"bdcompound-hm0.8","type":"blocks"}
+{"created_at":"2026-03-16T18:48:06Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0","issue_id":"bdcompound-hm0.9","type":"parent-child"}
+{"created_at":"2026-03-16T18:48:17Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0.8","issue_id":"bdcompound-hm0.9","type":"blocks"}
 {"created_at":"2026-03-11T14:53:56Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-end","issue_id":"bdcompound-hrs","type":"blocks"}
 {"created_at":"2026-03-11T14:53:56Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-i4w","issue_id":"bdcompound-hrs","type":"blocks"}
 {"created_at":"2026-03-11T14:53:55Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-32p","issue_id":"bdcompound-i4w","type":"blocks"}
@@ -118,6 +145,7 @@
 {"created_at":"2026-02-21T01:01:37Z","created_by":"bootstrap","depends_on_id":"bdcompound-a3a","issue_id":"bdcompound-obj","type":"blocks"}
 {"created_at":"2026-02-21T01:01:37Z","created_by":"bootstrap","depends_on_id":"bdcompound-zgi","issue_id":"bdcompound-obj","type":"blocks"}
 {"created_at":"2026-03-11T14:53:56Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-32p","issue_id":"bdcompound-oea","type":"blocks"}
+{"created_at":"2026-03-16T19:12:04Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-hm0","issue_id":"bdcompound-qar","type":"relates-to"}
 {"created_at":"2026-03-11T14:53:56Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-end","issue_id":"bdcompound-qyg","type":"blocks"}
 {"created_at":"2026-03-11T14:53:56Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-i4w","issue_id":"bdcompound-qyg","type":"blocks"}
 {"created_at":"2026-03-13T19:58:14Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-8ii","issue_id":"bdcompound-rgg","type":"blocks"}

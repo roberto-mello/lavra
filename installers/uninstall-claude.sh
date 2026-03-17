@@ -93,7 +93,7 @@ if [ -d "$COMMANDS_DIR" ]; then
   PLUGIN_COMMANDS=(
     lavra-plan.md lavra-work.md lavra-work-ralph.md lavra-work-teams.md lavra-parallel.md lavra-review.md lavra-checkpoint.md
     lavra-brainstorm.md lavra-compound.md
-    lavra-research.md lavra-plan-review.md lavra-triage.md
+    lavra-research.md lavra-eng-review.md lavra-triage.md
     changelog.md create-agent-skill.md deploy-docs.md
     heal-skill.md lfg.md
     release-docs.md report-bug.md

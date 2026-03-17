@@ -145,7 +145,7 @@ const NODES = [
   { id:'lavra-design',     label:'/lavra-design',     sub:'Full pipeline (1-4)',      x:240,  y:BY.planning,    w:W.md, h:RH, layer:'commands', group:'planning' },
   { id:'lavra-plan',       label:'/lavra-plan',        sub:'Research & plan epic',    x:420,  y:BY.planning,    w:W.md, h:RH, layer:'commands', group:'planning' },
   { id:'lavra-deepen',     label:'/lavra-deepen',      sub:'Parallel deepening',      x:600,  y:BY.planning,    w:W.md, h:RH, layer:'commands', group:'planning' },
-  { id:'lavra-plan-review',label:'/lavra-plan-review', sub:'Multi-agent plan review', x:780,  y:BY.planning,    w:W.md, h:RH, layer:'commands', group:'planning' },
+  { id:'lavra-eng-review',label:'/lavra-eng-review', sub:'Multi-agent plan review', x:780,  y:BY.planning,    w:W.md, h:RH, layer:'commands', group:'planning' },
 
   // ── Execution band ────────────────────────────────────────────────────────
   { id:'lavra-quick',    label:'/lavra-quick',    sub:'Fast-track tasks',         x:60,  y:BY.execution, w:W.md, h:RH, layer:'commands', group:'execution' },
@@ -202,7 +202,7 @@ const CONNS = [
   { from:'lavra-design', to:'lavra-brainstorm', type:'orchestrates', label:'1' },
   { from:'lavra-design', to:'lavra-plan',       type:'orchestrates', label:'2' },
   { from:'lavra-design', to:'lavra-deepen',     type:'orchestrates', label:'3' },
-  { from:'lavra-design', to:'lavra-plan-review',type:'orchestrates', label:'4' },
+  { from:'lavra-design', to:'lavra-eng-review',type:'orchestrates', label:'4' },
 
   // lfg orchestrates
   { from:'lfg', to:'lavra-plan',    type:'orchestrates' },
@@ -229,13 +229,13 @@ const CONNS = [
   { from:'lavra-plan', to:'lavra-deepen', type:'suggests', label:'handoff' },
 
   // lavra-deepen → plan-review
-  { from:'lavra-deepen', to:'lavra-plan-review', type:'suggests', label:'handoff' },
+  { from:'lavra-deepen', to:'lavra-eng-review', type:'suggests', label:'handoff' },
 
-  // lavra-plan-review → review agents
-  { from:'lavra-plan-review', to:'ag-arch',      type:'dispatches' },
-  { from:'lavra-plan-review', to:'ag-security',  type:'dispatches' },
-  { from:'lavra-plan-review', to:'ag-perf',      type:'dispatches' },
-  { from:'lavra-plan-review', to:'ag-simplicity',type:'dispatches' },
+  // lavra-eng-review → review agents
+  { from:'lavra-eng-review', to:'ag-arch',      type:'dispatches' },
+  { from:'lavra-eng-review', to:'ag-security',  type:'dispatches' },
+  { from:'lavra-eng-review', to:'ag-perf',      type:'dispatches' },
+  { from:'lavra-eng-review', to:'ag-simplicity',type:'dispatches' },
 
   // lavra-work
   { from:'lavra-work', to:'ag-simplicity',   type:'dispatches', label:'post-task' },
@@ -273,12 +273,12 @@ const CONNS = [
 // ── Presets ───────────────────────────────────────────────────────────────────
 const PRESET_NODES = {
   full: null,
-  workflow: ['lavra-brainstorm','lavra-design','lavra-plan','lavra-deepen','lavra-plan-review',
+  workflow: ['lavra-brainstorm','lavra-design','lavra-plan','lavra-deepen','lavra-eng-review',
              'lavra-work','lavra-parallel','lavra-review','lavra-compound'],
   review:  ['lavra-review','sk-project-setup',
             'ag-rails','ag-dhh','ag-ts','ag-python','ag-security','ag-perf','ag-simplicity','ag-arch',
             'ag-migration','ag-drift','ag-deploy','ag-integrity','ag-pattern','ag-races','ag-git'],
-  planning: ['lavra-brainstorm','lavra-design','lavra-plan','lavra-deepen','lavra-plan-review',
+  planning: ['lavra-brainstorm','lavra-design','lavra-plan','lavra-deepen','lavra-eng-review',
              'ag-best','ag-framework','ag-learnings','ag-repo','ag-githistory',
              'ag-arch','ag-security','ag-perf','ag-simplicity'],
 };

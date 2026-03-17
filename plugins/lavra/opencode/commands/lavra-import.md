@@ -192,7 +192,7 @@ Details about UI changes...
 Plan imported as epic `{EPIC_ID}`. What would you like to do next?
 
 1. **Run `/lavra-research {EPIC_ID}`** - Gather evidence for each child bead with domain-matched research agents
-2. **Run `/lavra-plan-review {EPIC_ID}`** - Get feedback from reviewers on the plan
+2. **Run `/lavra-eng-review {EPIC_ID}`** - Get feedback from reviewers on the plan
 3. **Start `/lavra-work {EPIC_ID}.1`** - Begin implementing the first child bead
 4. **View epic** - Show the full epic bead details
 </handoff>

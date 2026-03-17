@@ -40,7 +40,7 @@ Orchestrate the full six-phase design pipeline as a single invocation: brainstor
 <context>
 **Note: The current year is 2026.**
 
-**Architecture decisions (locked):** This command is a pure orchestrator. It delegates to `/lavra-brainstorm`, `/lavra-plan`, `/lavra-research`, and `/lavra-plan-review`. No planning logic, research dispatch, or bead creation lives here. When those commands improve, this command automatically inherits the improvements.
+**Architecture decisions (locked):** This command is a pure orchestrator. It delegates to `/lavra-brainstorm`, `/lavra-plan`, `/lavra-research`, and `/lavra-eng-review`. No planning logic, research dispatch, or bead creation lives here. When those commands improve, this command automatically inherits the improvements.
 
 **Design principle:** The output of `/lavra-design` must be so good that `/lavra-work` execution is mechanical. The final plan must be detailed enough that subagents can implement without asking questions.
 
@@ -319,7 +319,7 @@ Display the progress banner:
 Run the plan review command:
 
 ```
-/lavra-plan-review {EPIC_ID}
+/lavra-eng-review {EPIC_ID}
 ```
 
 This dispatches 4 agents in parallel:
@@ -330,7 +330,7 @@ This dispatches 4 agents in parallel:
 
 **GATE: User reviews findings before final plan.**
 
-After `/lavra-plan-review` completes, present its findings summary and categorize them:
+After `/lavra-eng-review` completes, present its findings summary and categorize them:
 
 **Safe to auto-apply** (do these without asking):
 - Missing test cases -- add to child bead Testing section
@@ -560,7 +560,7 @@ wc -l < .beads/memory/knowledge.jsonl
 </success_criteria>
 
 <guardrails>
-- **Pure orchestration only** -- NEVER duplicate logic from `/lavra-brainstorm`, `/lavra-plan`, `/lavra-research`, or `/lavra-plan-review`. Delegate to them.
+- **Pure orchestration only** -- NEVER duplicate logic from `/lavra-brainstorm`, `/lavra-plan`, `/lavra-research`, or `/lavra-eng-review`. Delegate to them.
 - **NEVER CODE** -- This command produces plans, not implementations
 - **Do not skip steps silently** -- Always display progress banners so the user knows where they are
 - **Do not invent new research or review agents** -- Use only what the delegated commands already provide

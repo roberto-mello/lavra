@@ -36,7 +36,7 @@ Orchestrate the full six-phase design pipeline as a single invocation: brainstor
 <context>
 **Note: The current year is 2026.**
 
-**Architecture decisions (locked):** This command is a pure orchestrator. It delegates to `/lavra-brainstorm`, `/lavra-plan`, `/lavra-research`, and `/lavra-plan-review`. No planning logic, research dispatch, or bead creation lives here. When those commands improve, this command automatically inherits the improvements.
+**Architecture decisions (locked):** This command is a pure orchestrator. It delegates to `/lavra-brainstorm`, `/lavra-plan`, `/lavra-research`, `/lavra-ceo-review`, and `/lavra-eng-review`. No planning logic, research dispatch, or bead creation lives here. When those commands improve, this command automatically inherits the improvements.
 
 **Design principle:** The output of `/lavra-design` must be so good that `/lavra-work` execution is mechanical. The final plan must be detailed enough that subagents can implement without asking questions.
 
@@ -294,9 +294,9 @@ If research reveals the plan needs major changes (new child beads, removed child
 ----------------------------------------------------
 ```
 
-## Phase 5: Adversarial Review (Auto -- 4 agents)
+## Phase 5: Review (CEO review → engineering agents)
 
-**Skip condition:** If `lavra.json` config has `workflow.plan_review: false`, skip to Phase 6 with a note: "Plan review skipped per lavra.json config."
+### Step 5a: CEO Review (scope + business fit)
 
 Display the progress banner:
 
@@ -307,15 +307,57 @@ Display the progress banner:
   [x] Plan ({N} child beads)
   [x] Researched
   [x] Revised
-  [ ] Reviewing...
+  [ ] CEO Review (scope + business fit)...
+  [ ] Engineering Review pending
   [ ] Final plan pending
 ----------------------------------------------------
 ```
 
-Run the plan review command:
+Run the CEO review command:
 
 ```
-/lavra-plan-review {EPIC_ID}
+/lavra-ceo-review {EPIC_ID}
+```
+
+This is a fully interactive review — the user will respond to stop-per-issue questions. Output: validated scope and direction, NOT in scope list, dream state delta, failure modes, TODOs.
+
+**GATE: After CEO review, ask user:**
+
+Use the **AskUserQuestion tool**:
+
+**Question:** "CEO review complete. Ready to proceed to engineering review (4 parallel agents: architecture, simplicity, security, performance)?"
+
+**Options:**
+1. **Proceed to engineering review** -- Continue to Step 5b
+2. **Revise plan first** -- Make changes based on CEO review, then continue
+3. **Stop here** -- Skip engineering review (proceed directly to Phase 6)
+
+If "Revise plan first": accept changes, re-validate, then ask again.
+If "Stop here": skip Step 5b and jump to Phase 6 with a note: "Engineering review skipped per user choice after CEO review."
+
+### Step 5b: Engineering Review (technical depth)
+
+**Skip condition:** If `lavra.json` config has `workflow.plan_review: false`, skip with a note: "Engineering review skipped per lavra.json config."
+
+Display the progress banner:
+
+```
+----------------------------------------------------
+  Engineering Review: {EPIC_ID} -- {epic_title}
+  [x] Brainstorm
+  [x] Plan ({N} child beads)
+  [x] Researched
+  [x] Revised
+  [x] CEO Review
+  [ ] Engineering Review (4 agents)...
+  [ ] Final plan pending
+----------------------------------------------------
+```
+
+Run the engineering review command:
+
+```
+/lavra-eng-review {EPIC_ID}
 ```
 
 This dispatches 4 agents in parallel:
@@ -326,7 +368,7 @@ This dispatches 4 agents in parallel:
 
 **GATE: User reviews findings before final plan.**
 
-After `/lavra-plan-review` completes, present its findings summary and categorize them:
+After `/lavra-eng-review` completes, present its findings summary and categorize them:
 
 **Safe to auto-apply** (do these without asking):
 - Missing test cases -- add to child bead Testing section
@@ -367,7 +409,7 @@ Display the progress banner:
   [x] Plan ({N} child beads)
   [x] Researched
   [x] Revised
-  [x] Reviewed (4 agents)
+  [x] CEO Review + Engineering Review (4 agents)
   [ ] Locking final plan...
 ----------------------------------------------------
 ```
@@ -545,7 +587,7 @@ wc -l < .beads/memory/knowledge.jsonl
 - Phase 1 (brainstorm) output feeds directly into Phase 2 (plan) as locked decisions
 - Phase 3 (research) gathers evidence without modifying the plan
 - Phase 4 (revise) integrates research findings into bead descriptions
-- Phase 5 (review) catches blind spots with 4 parallel agents
+- Phase 5 (review) catches blind spots: CEO review validates direction, engineering review (4 parallel agents) catches technical issues
 - Phase 6 (lock) ensures every child bead has file-level scope, dependency ordering, locked decisions, known risks, and anti-patterns
 - User interaction is reduced to: brainstorm dialogue + scope confirmation + plan confirmation + review trade-off decisions only
 - Bead IDs, knowledge comments, and enriched descriptions flow correctly between all phases
@@ -556,7 +598,7 @@ wc -l < .beads/memory/knowledge.jsonl
 </success_criteria>
 
 <guardrails>
-- **Pure orchestration only** -- NEVER duplicate logic from `/lavra-brainstorm`, `/lavra-plan`, `/lavra-research`, or `/lavra-plan-review`. Delegate to them.
+- **Pure orchestration only** -- NEVER duplicate logic from `/lavra-brainstorm`, `/lavra-plan`, `/lavra-research`, `/lavra-ceo-review`, or `/lavra-eng-review`. Delegate to them.
 - **NEVER CODE** -- This command produces plans, not implementations
 - **Do not skip steps silently** -- Always display progress banners so the user knows where they are
 - **Do not invent new research or review agents** -- Use only what the delegated commands already provide
