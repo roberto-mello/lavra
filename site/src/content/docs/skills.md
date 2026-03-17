@@ -19,3 +19,7 @@ Skills are reusable instruction sets installed into `.claude/skills/`. Your agen
 | `lavra-knowledge` | Captures solved problems as structured knowledge entries for fast future recall |
 | `project-setup` | Detects your tech stack, lets you toggle review agents, and saves config to `.beads/config/project-setup.md` |
 | `skill-creator` | Guide for creating new skills that extend your agent with specialized knowledge or workflows |
+
+---
+
+See the [Command Map](/command-map) for a visual overview of how all commands, agents, and skills connect.
