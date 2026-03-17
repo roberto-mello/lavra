@@ -6,6 +6,8 @@ order: 5
 
 # Command Reference
 
+See the [Command Map](/command-map) for a visual overview of how all commands, agents, and skills connect.
+
 ## Workflow
 
 These commands cover the end-to-end development loop from idea to shipped PR.
@@ -62,7 +64,3 @@ These commands are not installed by default. Copy from `commands/optional/` to `
 | `/xcode-test` | Build and test iOS apps on simulator using XcodeBuildMCP |
 | `/reproduce-bug` | Reproduce and investigate a bug using logs, console inspection, and browser screenshots |
 | `/generate-command` | Create a new custom slash command following conventions and best practices |
-
----
-
-See the [Command Map](/command-map) for a visual overview of how all commands, agents, and skills connect.

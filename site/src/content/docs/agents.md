@@ -8,6 +8,8 @@ order: 9
 
 Agents are dispatched automatically by Lavra's workflow commands — you don't invoke them directly. They run as subagents with specialized instructions for a specific domain.
 
+See the [Command Map](/command-map) for a visual overview of how all commands, agents, and skills connect.
+
 ## Review (16)
 
 Dispatched by `/lavra-review`, `/lavra-work`, and `/lavra-ship` to catch issues before code ships.
@@ -70,7 +72,3 @@ Used across various commands for specific task types.
 | Agent | Description |
 |-------|-------------|
 | `ankane-readme-writer` | Creates or updates README files following Ankane-style template for Ruby gems |
-
----
-
-See the [Command Map](/command-map) for a visual overview of how all commands, agents, and skills connect.
