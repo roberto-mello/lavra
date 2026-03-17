@@ -74,13 +74,20 @@ When prompted "Run codebase analysis?", choose Y. This dispatches 3 parallel age
 
 ### 1. Design
 
-Describe the feature — lavra creates the beads, runs research agents, and produces a plan:
+Describe the feature — lavra runs the full six-phase design pipeline:
 
 ```
 /lavra-design "add two-factor authentication with TOTP and QR codes"
 ```
 
-This dispatches domain-matched research agents in parallel, then creates an epic with child beads for each implementation step. Review and adjust the plan before moving on.
+1. **Brainstorm** — interactive interview to clarify scope, constraints, and success criteria
+2. **Plan** — generates a structured multi-phase implementation plan
+3. **Research** — dispatches domain-matched agents in parallel (security practices, framework docs, existing codebase patterns)
+4. **Revise** — integrates research findings back into the plan
+5. **Review** — four adversarial agents (CEO, engineering, security, simplicity) challenge the plan
+6. **Lock** — final plan becomes an epic bead with child tasks ready for `/lavra-work`
+
+The output is detailed enough that implementation is mechanical — subagents don't need to ask questions.
 
 ### 2. Work
 
@@ -123,16 +130,16 @@ When you start a new session:
 
 You get relevant learnings without manually searching!
 
-## Available Commands
+## Main Commands
 
 | Command | Use When |
 |---------|----------|
-| `/lavra-design "description"` | Starting any feature — creates beads, runs research, builds plan |
+| `/lavra-design "description"` | Full design pipeline with interview, research, CEO and engineering reviews, planning |
 | `/lavra-work {id}` | Working through a bead or epic |
 | `/lavra-qa {id}` | Verifying a feature in a real browser before shipping |
-| `/lavra-ship {id}` | Shipping — closes beads, security scan, opens PR |
-| `/lavra-review {id}` | On-demand multi-agent code review |
-| `/lavra-checkpoint` | Save progress mid-session |
+| `/lavra-ship {id}` | Shipping. Closes beads, security scan, opens PR |
+| `/lavra-quick` | Fast-track small tasks. Abbreviated plan then straight to execution |
+| `/lavra-checkpoint` | When you've been working outside the pipeline (ad-hoc sessions). Save session progress by filing beads, capturing knowledge, and syncing state |
 
 ## Manual Knowledge Search
 
