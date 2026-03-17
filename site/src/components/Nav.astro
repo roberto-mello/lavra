@@ -1,6 +1,27 @@
 ---
-// Placeholder Nav -- will be fully implemented in bdcompound-hm0.2
+// Nav.astro -- Sticky site navigation
 ---
-<nav class="sticky top-0 z-40 bg-bg/80 backdrop-blur-md border-b border-border h-16 flex items-center px-6">
-  <a href="/" class="font-mono font-bold text-accent">lavra</a>
+<nav class="sticky top-0 z-40 bg-bg/80 backdrop-blur-md border-b border-border h-16">
+  <div class="grid grid-cols-[auto_1fr_auto] items-center px-6 max-w-7xl mx-auto h-full">
+    <a href="/" class="font-mono font-bold text-accent hover:text-accent/80 transition-colors duration-200">
+      lavra
+    </a>
+    <div></div>
+    <div class="flex gap-6 items-center">
+      <a href="#" class="text-sm text-text-muted hover:text-text transition-colors duration-200">
+        Docs
+      </a>
+      <a href="/command-map" class="text-sm text-text-muted hover:text-text transition-colors duration-200">
+        Command Map
+      </a>
+      <a
+        href="https://github.com/roberto-mello/lavra"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-sm text-text-muted hover:text-text transition-colors duration-200"
+      >
+        GitHub
+      </a>
+    </div>
+  </div>
 </nav>
