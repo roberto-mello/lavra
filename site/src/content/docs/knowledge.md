@@ -86,4 +86,4 @@ Raw knowledge comments logged during work are functional but often terse. `/lavr
 /lavra-learn beads-abc beads-xyz
 ```
 
-Run this after shipping a feature to make sure the insights survive.
+Run this after shipping a feature to turn terse in-the-moment comments into well-tagged, searchable entries that surface reliably in future sessions.
