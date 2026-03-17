@@ -1,3 +1,9 @@
+---
+title: Cost Optimization
+description: How lavra assigns agents to model tiers for optimal cost and performance
+order: 9
+---
+
 # Cost Optimization
 
 How lavra assigns agents to model tiers for optimal cost/performance balance.

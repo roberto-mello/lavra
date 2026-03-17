@@ -1,3 +1,9 @@
+---
+title: Architecture
+description: Memory system design, plugin structure, and platform internals
+order: 3
+---
+
 # Architecture
 
 Memory system design, plugin structure, and changes from the upstream Compound Engineering plugin.

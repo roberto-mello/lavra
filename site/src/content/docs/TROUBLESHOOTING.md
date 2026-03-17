@@ -1,3 +1,9 @@
+---
+title: Troubleshooting
+description: Debugging guides for memory features, common issues, and platform migration
+order: 6
+---
+
 # Troubleshooting
 
 Debugging guides for memory features, common issues, and migration across all supported platforms.

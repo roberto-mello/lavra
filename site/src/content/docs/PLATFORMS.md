@@ -1,3 +1,9 @@
+---
+title: Platform Support
+description: Installation and setup for OpenCode, Gemini CLI, Cortex Code, and Codex CLI
+order: 4
+---
+
 # Multi-Platform Support
 
 Installation and setup instructions for all supported platforms: OpenCode, Gemini CLI, Cortex Code, and Codex CLI.

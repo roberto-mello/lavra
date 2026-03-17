@@ -1,3 +1,9 @@
+---
+title: Security Model
+description: Threat model and defense-in-depth strategy for user-supplied content
+order: 5
+---
+
 # Security Model
 
 This document covers the threat model and defense-in-depth strategy for user-supplied content in lavra.

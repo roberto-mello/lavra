@@ -1,0 +1,22 @@
+---
+import { getCollection } from 'astro:content';
+import Doc from '../../layouts/Doc.astro';
+
+export async function getStaticPaths() {
+  const docs = await getCollection('docs');
+  return docs.map(doc => ({
+    params: {
+      // URL slug: lowercase, underscores to hyphens
+      slug: doc.slug.toLowerCase().replace(/_/g, '-'),
+    },
+    props: { doc },
+  }));
+}
+
+const { doc } = Astro.props;
+const { Content } = await doc.render();
+---
+
+<Doc title={doc.data.title} description={doc.data.description} currentSlug={doc.slug}>
+  <Content />
+</Doc>

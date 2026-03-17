@@ -82,6 +82,7 @@
 {"created_at":"2026-03-12T12:52:04Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-9f5","issue_id":"bdcompound-9f5.9","type":"parent-child"}
 {"created_at":"2026-03-12T12:52:09Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-9f5.1","issue_id":"bdcompound-9f5.9","type":"blocks"}
 {"created_at":"2026-03-12T12:52:09Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-9f5.7","issue_id":"bdcompound-9f5.9","type":"blocks"}
+{"created_at":"2026-03-17T14:11:36Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-ek0","issue_id":"bdcompound-axj","type":"blocks"}
 {"created_at":"2026-02-21T01:01:37Z","created_by":"bootstrap","depends_on_id":"bdcompound-18w","issue_id":"bdcompound-b36","type":"parent-child"}
 {"created_at":"2026-02-21T01:01:37Z","created_by":"bootstrap","depends_on_id":"bdcompound-eag","issue_id":"bdcompound-eag.1","type":"parent-child"}
 {"created_at":"2026-02-21T01:01:37Z","created_by":"bootstrap","depends_on_id":"bdcompound-eag","issue_id":"bdcompound-eag.2","type":"parent-child"}

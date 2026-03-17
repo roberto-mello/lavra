@@ -1,0 +1,74 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const allDocs = await getCollection('docs');
+
+const sections = [
+  {
+    label: 'Getting Started',
+    slugs: ['quickstart'],
+  },
+  {
+    label: 'Reference',
+    slugs: ['CATALOG', 'ARCHITECTURE', 'PLATFORMS', 'SECURITY', 'TROUBLESHOOTING'],
+  },
+  {
+    label: 'Configuration',
+    slugs: ['AUTONOMOUS_EXECUTION', 'MODEL_SELECTION', 'COST'],
+  },
+  {
+    label: 'Development',
+    slugs: ['xml-tag-standard'],
+  },
+  {
+    label: 'Releases',
+    slugs: ['releases/v0.7.0'],
+  },
+];
+
+const docsBySlug = Object.fromEntries(allDocs.map(d => [d.slug, d]));
+
+function urlSlug(slug: string) {
+  return slug.toLowerCase().replace(/_/g, '-');
+}
+---
+
+<Base title="Docs" description="Documentation for lavra -- the multi-agent workflow plugin for AI coding assistants.">
+  <div class="max-w-5xl mx-auto px-6 py-16">
+
+    <div class="mb-12">
+      <p class="font-mono text-text-muted text-sm uppercase tracking-wider mb-3">Documentation</p>
+      <h1 class="text-4xl font-black tracking-tight text-text">lavra docs</h1>
+      <p class="text-lg text-text-muted mt-4 max-w-xl">
+        Everything you need to install, configure, and get the most out of lavra.
+      </p>
+    </div>
+
+    <div class="space-y-12">
+      {sections.map(section => {
+        const docs = section.slugs.map(s => docsBySlug[s]).filter(Boolean);
+        if (docs.length === 0) return null;
+        return (
+          <div>
+            <h2 class="text-xs font-mono uppercase tracking-wider text-text-dim mb-4">{section.label}</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {docs.map(doc => (
+                <a
+                  href={`/docs/${urlSlug(doc.slug)}`}
+                  class="group block bg-surface border border-border hover:border-accent/50 rounded-xl p-5 transition-colors duration-150"
+                >
+                  <h3 class="font-semibold text-text group-hover:text-accent transition-colors duration-150 mb-1">
+                    {doc.data.title}
+                  </h3>
+                  <p class="text-sm text-text-muted leading-relaxed">{doc.data.description}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+  </div>
+</Base>

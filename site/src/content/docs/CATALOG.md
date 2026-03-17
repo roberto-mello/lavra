@@ -1,3 +1,9 @@
+---
+title: Command Catalog
+description: Full listing of all commands, agents, skills, hooks, and MCP servers
+order: 2
+---
+
 # Component Catalog
 
 Full listing of all commands, agents, skills, hooks, and MCP servers included in lavra.

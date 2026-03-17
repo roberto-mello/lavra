@@ -1,3 +1,9 @@
+---
+title: Model Selection
+description: Choose which Claude models to use per performance tier in OpenCode
+order: 8
+---
+
 # Model Selection for OpenCode
 
 The OpenCode installer supports interactive model selection, allowing you to choose which Claude models to use for each performance tier (haiku/sonnet/opus).

@@ -1,3 +1,9 @@
+---
+title: Autonomous Execution
+description: Configure permissions for lavra-work-ralph and lavra-work-teams
+order: 7
+---
+
 # Autonomous Execution
 
 How to configure permissions for `/lavra-work-ralph` and `/lavra-work-teams` modes.
