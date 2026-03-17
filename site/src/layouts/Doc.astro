@@ -36,7 +36,8 @@ const sections = [
   },
 ];
 
-const docsBySlug = Object.fromEntries(allDocs.map(d => [d.slug, d]));
+// Astro 5 glob loader uses `id` (filename without extension) instead of `slug`
+const docsBySlug = Object.fromEntries(allDocs.map(d => [d.id.replace(/\.md$/, ''), d]));
 
 function label(slug: string) {
   return docsBySlug[slug]?.data.title ?? slug;
@@ -56,7 +57,7 @@ function label(slug: string) {
               {section.slugs.filter(s => docsBySlug[s]).map(slug => (
                 <li>
                   <a
-                    href={`/docs/${slug.toLowerCase().replace(/_/g, '-')}`}
+                    href={`/docs/${slug.toLowerCase().replace(/_/g, '-').replace(/\./g, '')}`}
                     class={`block text-sm px-2 py-1 rounded transition-colors duration-150 ${
                       currentSlug === slug
                         ? 'text-accent bg-accent-dim/20 font-medium'
