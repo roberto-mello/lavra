@@ -380,3 +380,14 @@ The shipping and pattern analysis is table stakes. The real value is in Phase 6:
 Always save the snapshot, even for the first retro. Future retros depend on having historical data for comparison. The snapshot format must remain stable across versions.
 
 </guardrails>
+
+<handoff>
+After presenting the retrospective report, use the **AskUserQuestion tool**:
+
+**Question:** "Retro complete for the last {N} days. What would you like to do next?"
+
+**Options:**
+1. **`/lavra-triage`** -- Triage the backlog: review deferred and open beads and decide what to carry forward, dismiss, or reprioritize
+2. **`/lavra-learn`** -- Curate the raw knowledge comments surfaced this week into structured entries
+3. **Done** -- Close out the session
+</handoff>

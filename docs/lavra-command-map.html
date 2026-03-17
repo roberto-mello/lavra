@@ -504,7 +504,8 @@ const CONNS = [
   { from:'kn-fts5',          to:'kn-recall',   type:'feeds' },
   { from:'kn-recall',        to:'lavra-work',  type:'feeds', label:'session start' },
   { from:'kn-recall',        to:'lavra-design',type:'feeds', label:'session start' },
-  { from:'lavra-retro',      to:'kn-jsonl',    type:'feeds', label:'PATTERN synthesis' },
+  { from:'lavra-retro',      to:'kn-jsonl',    type:'feeds',    label:'PATTERN synthesis' },
+  { from:'lavra-retro',      to:'lavra-triage',type:'suggests', label:'backlog review' },
 
   // == SESSION STATE ==
   { from:'lavra-work',       to:'kn-session',  type:'feeds', label:'write at milestones' },
