@@ -90,7 +90,6 @@ Skills are in `plugins/lavra/skills/`:
 - **gemini-imagegen**: Generate images using Google's Gemini
 - **project-setup**: Project stack detection, review agent config, and optional brownfield codebase analysis
 - **rclone**: Cloud storage file management with rclone
-- **skill-creator**: Create new skills from templates
 
 ## Subagent Integration
 

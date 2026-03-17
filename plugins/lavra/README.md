@@ -90,7 +90,6 @@ All 27 agents include model tier assignments for optimal cost/performance balanc
 | `agent-browser` | Browser automation for testing and screenshots |
 | `file-todos` | Find and manage TODO comments in code |
 | `project-setup` | Project environment setup and onboarding automation |
-| `skill-creator` | Create new skills from templates |
 
 ### Optional (in `skills/optional/`, copy to install)
 

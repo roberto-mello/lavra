@@ -92,7 +92,7 @@ if [ -d "$TARGET/skills" ]; then
     git-worktree brainstorming create-agent-skills agent-native-architecture
     lavra-knowledge agent-browser andrew-kane-gem-writer dhh-rails-style
     dspy-ruby every-style-editor file-todos frontend-design gemini-imagegen
-    rclone skill-creator
+    rclone
   )
 
   for skill in "${PLUGIN_SKILLS[@]}"; do

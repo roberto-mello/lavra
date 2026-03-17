@@ -23,7 +23,7 @@ If a `session-state.md` file exists in `.beads/memory/` (written by `/lavra-work
 
 ## memory-capture (PostToolUse on Bash)
 
-Runs after every Bash tool call. Watches for `bd comment add` commands that include a knowledge prefix, then parses and stores the entry in `.beads/memory/knowledge.jsonl`.
+Runs after every Bash tool call. Watches for `bd comments add` commands that include a knowledge prefix, then parses and stores the entry in `.beads/memory/knowledge.jsonl`.
 
 **Recognized prefixes:**
 
@@ -38,7 +38,7 @@ Runs after every Bash tool call. Watches for `bd comment add` commands that incl
 
 **Example:**
 ```bash
-bd comment add beads-abc "LEARNED: Astro 5 uses id not slug for glob loader entries"
+bd comments add beads-abc "LEARNED: Astro 5 uses id not slug for glob loader entries"
 ```
 
 The hook auto-tags entries based on keywords in the content. After 1000 entries, the oldest 500 are archived to `knowledge.archive.jsonl`.

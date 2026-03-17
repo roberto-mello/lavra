@@ -1,37 +1,54 @@
 ---
 // Pipeline.astro -- Four-command workflow + stats row
 const cards = [
-  { command: '/lavra-design', subtitle: 'Plan with domain-matched research agents' },
-  { command: '/lavra-work', subtitle: 'Execute with parallel subagents and knowledge recall' },
-  { command: '/lavra-review', subtitle: 'Adversarial review with 4+ specialized agents' },
-  { command: '/lavra-qa', subtitle: 'Browser-based testing from the user\'s perspective', optional: true },
+  { command: '/lavra-design', subtitle: 'What to build. Vision & success criteria. Create beads issues with domain-matched research agents that match the plan', href: '/lavra-design' },
+  { command: '/lavra-work', subtitle: 'Implement with parallel subagents, automatic knowledge recall feeding correct context, multi-agent reviews and fixes', href: '/lavra-work' },
+  { command: '/lavra-qa', subtitle: 'Browser-based testing from the user\'s perspective', optional: true, href: '/lavra-qa' },
+  { command: '/lavra-ship', subtitle: 'Automated shipping with tests, security scans, and PR creation', href: '/lavra-ship' },
 ];
 
 const stats = [
   { value: '30', label: 'Agents' },
   { value: '27', label: 'Commands' },
-  { value: '16', label: 'Skills' },
+  { value: '15', label: 'Skills' },
   { value: '4', label: 'Platforms' },
 ];
 ---
 
 <section class="py-32 bg-bg">
   <div class="max-w-7xl mx-auto px-6">
-    <h2 data-reveal class="text-4xl lg:text-5xl font-bold text-accent tracking-tight text-left">
-      Four commands. Full pipeline.
-    </h2>
-    <p data-reveal class="text-lg text-text-muted mt-4 mb-12">
-      From idea to shipped code. Each command compounds what came before.
-    </p>
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_720px] gap-12 lg:gap-16 items-start">
 
-    <div class="ml-auto max-w-[720px]">
+    {/* Left: title + stats */}
+    <div>
+      <h2 data-reveal class="text-4xl lg:text-5xl font-bold text-accent tracking-tight">
+        Four commands in the main pipeline.
+      </h2>
+      <p data-reveal class="text-lg text-text-muted mt-4 mb-12 lg:mb-0">
+        From idea to shipped code. Power users can tap in directly to related commands and skills.
+      </p>
+
+      {/* Stats -- visible on lg, tucked under title in 2x2 grid */}
+      <div data-reveal class="hidden lg:grid grid-cols-2 gap-x-12 gap-y-8 mt-16">
+        {stats.map((stat) => (
+          <div>
+            <div class="font-mono text-3xl lg:text-4xl font-bold text-accent">{stat.value}</div>
+            <div class="text-sm text-text-muted mt-1">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Right: cards */}
+    <div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {cards.map((card, i) => (
-          <div
+          <a
+            href={card.href || '#'}
             data-reveal
             style={`--index: ${i}`}
             class:list={[
-              'bg-surface rounded-2xl p-8',
+              'bg-surface rounded-2xl p-8 block transition-colors duration-200 hover:border-accent/50',
               card.optional ? 'border border-dashed border-border' : 'border border-border',
             ]}
           >
@@ -44,18 +61,21 @@ const stats = [
               )}
             </div>
             <p class="text-text-muted text-sm mt-2">{card.subtitle}</p>
-          </div>
+          </a>
         ))}
       </div>
 
-      <div data-reveal class="mt-16 flex flex-wrap justify-end gap-8 lg:gap-12">
+      {/* Stats -- mobile only (below cards) */}
+      <div data-reveal class="mt-12 flex flex-wrap gap-8 lg:hidden">
         {stats.map((stat) => (
-          <div class="text-right">
-            <div class="font-mono text-3xl lg:text-4xl font-bold text-accent">{stat.value}</div>
+          <div>
+            <div class="font-mono text-3xl font-bold text-accent">{stat.value}</div>
             <div class="text-sm text-text-muted mt-1">{stat.label}</div>
           </div>
         ))}
       </div>
+    </div>
+
     </div>
   </div>
 </section>

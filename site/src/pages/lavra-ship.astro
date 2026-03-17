@@ -1,0 +1,102 @@
+---
+import Base from '../layouts/Base.astro';
+import Footer from '../components/Footer.astro';
+---
+<Base title="/lavra-ship" description="Code-ready to PR-open. Fully automated shipping pipeline with tests, security scans, and knowledge capture.">
+
+  {/* Hero */}
+  <section class="hero-gradient min-h-[60dvh] flex items-center">
+    <div class="max-w-7xl mx-auto px-6 py-24 w-full">
+      <p class="font-mono text-text-muted text-sm uppercase tracking-wider mb-4">Shipping Pipeline</p>
+      <h1 class="text-4xl lg:text-6xl font-black tracking-tight text-text leading-[1.1]">
+        <span class="text-accent">/</span>lavra-ship
+      </h1>
+      <p class="text-lg lg:text-xl text-text-muted mt-6 max-w-xl">
+        Code-ready to PR-open. Fully automated. Pre-flight checks, tests, security scan, PR creation, and knowledge capture in one command.
+      </p>
+    </div>
+  </section>
+
+  {/* Ship Pipeline -- snake layout */}
+  <section class="py-32 bg-bg" data-reveal>
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-3xl lg:text-4xl font-bold text-text tracking-tight mb-4">Six-phase pipeline</h2>
+      <p class="text-lg text-text-muted mb-16 max-w-2xl">
+        Each phase runs sequentially. If any phase fails, the pipeline stops and reports what went wrong.
+      </p>
+
+      {/* Row 1: left to right */}
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        {[
+          { phase: 1, label: 'Pre-flight', sub: 'Branch safety, uncommitted changes', color: 'text-text-muted', borderColor: 'border-zinc-500' },
+          { phase: 2, label: 'Sync', sub: 'Fetch & rebase on main', color: 'text-text-muted', borderColor: 'border-zinc-500' },
+          { phase: 3, label: 'Tests', sub: 'Auto-detect runner, run suite', color: 'text-amber-500', borderColor: 'border-amber-500' },
+        ].map((phase) => (
+          <div class={`bg-surface border border-border ${phase.borderColor} border-t-2 rounded-2xl p-6`}>
+            <span class={`font-mono text-xs ${phase.color} tracking-wider uppercase`}>Phase {phase.phase}</span>
+            <h3 class="text-xl font-bold text-text mt-2">{phase.label}</h3>
+            <p class="text-text-dim text-sm mt-2">{phase.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Arrow down indicator */}
+      <div class="flex justify-end pr-[16.67%] mb-6">
+        <span class="text-text-dim text-2xl">&darr;</span>
+      </div>
+
+      {/* Row 2: right to left (reversed) */}
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { phase: 6, label: 'Close beads', sub: 'Capture knowledge, close with PR link', color: 'text-accent', borderColor: 'border-accent' },
+          { phase: 5, label: 'Open PR', sub: 'Generate title, summary, test results', color: 'text-accent', borderColor: 'border-accent' },
+          { phase: 4, label: 'Security scan', sub: 'Secrets, debug leftovers, hardcoded values', color: 'text-red-500', borderColor: 'border-red-500' },
+        ].map((phase) => (
+          <div class={`bg-surface border border-border ${phase.borderColor} border-t-2 rounded-2xl p-6`}>
+            <span class={`font-mono text-xs ${phase.color} tracking-wider uppercase`}>Phase {phase.phase}</span>
+            <h3 class="text-xl font-bold text-text mt-2">{phase.label}</h3>
+            <p class="text-text-dim text-sm mt-2">{phase.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Result badge */}
+      <div class="mt-16 inline-flex items-center gap-3 px-6 py-4 bg-accent/10 border-2 border-accent/30 rounded-xl">
+        <span class="font-mono text-accent font-semibold">PR #142 opened -- 3 beads closed -- knowledge captured</span>
+      </div>
+    </div>
+  </section>
+
+  {/* What gets checked */}
+  <section class="py-32 bg-bg border-t border-border" data-reveal>
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-3xl lg:text-4xl font-bold text-text tracking-tight mb-8">What the security scan catches</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl">
+        {[
+          'Hardcoded secrets and API keys',
+          'Debug statements (console.log, debugger, binding.pry)',
+          'TODO/FIXME/HACK comments left behind',
+          'Unvalidated user input',
+          'Exposed internal endpoints',
+          'Dependency vulnerabilities',
+        ].map((item) => (
+          <div class="flex items-start gap-3 bg-surface border border-border rounded-xl p-4">
+            <span class="text-red-500 font-mono text-sm mt-0.5 shrink-0">&bull;</span>
+            <span class="text-text-muted text-sm">{item}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* Finale */}
+  <section class="py-24 hero-gradient" data-reveal>
+    <div class="max-w-7xl mx-auto px-6 text-center">
+      <p class="text-3xl lg:text-4xl font-bold text-text">From code to PR.<br><span class="text-accent">Zero manual steps.</span></p>
+      <p class="text-text-muted text-lg mt-4">Tests. Security. PR. Knowledge. All automated.</p>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

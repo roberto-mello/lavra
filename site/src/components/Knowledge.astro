@@ -1,49 +1,48 @@
 ---
 import TerminalMockup from './TerminalMockup.astro';
+import { Image } from 'astro:assets';
+import agentWithMemory from '../assets/agent-with-memory.jpg';
 ---
 
 <section class="py-32 bg-bg" data-reveal>
   <div class="max-w-7xl mx-auto px-6">
-    <h2 class="text-4xl lg:text-5xl font-bold text-text tracking-tight mb-4">Compounding memory</h2>
-    <p class="text-lg text-text-muted mb-16 max-w-2xl">Your agents learn from every session. Knowledge captured today is automatically recalled when relevant.</p>
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-12 items-center mb-16">
+      <div>
+        <h2 class="text-4xl lg:text-5xl font-bold text-text tracking-tight mb-4">Compounding memory</h2>
+        <p class="text-lg text-text-muted max-w-2xl">Your agents learn from every session. Knowledge captured today is automatically recalled when relevant.</p>
+      </div>
+      <div class="hidden lg:block">
+        <Image src={agentWithMemory} alt="An AI agent with persistent memory across sessions" width={320} class="rounded-2xl border border-border-light" loading="lazy" decoding="async" />
+      </div>
+    </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-      {/* Left: Capture */}
-      <TerminalMockup title="Capture -- March 2026">
+      {/* Left: Capture -- matches Remotion LavraV3 KnowledgeSystemScene */}
+      <TerminalMockup title="March 2025">
         <div>
-          <p><span class="text-accent">$</span> <span class="text-text">bd comments add BD-042</span> <span class="text-amber-400">"LEARNED: OAuth redirect</span></p>
-          <p><span class="text-amber-400">  URI must match exactly -- no trailing slash"</span></p>
+          <p><span class="text-accent">$</span> <span class="text-text">/lavra-work BD-042</span></p>
+          <p><span class="text-text-muted">Implementing OAuth integration...</span></p>
+          <p><span class="text-accent">Review passed.</span></p>
           <p>&nbsp;</p>
-          <p><span class="text-text-dim">Comment added to BD-042</span></p>
-          <p>&nbsp;</p>
-          <p><span class="text-accent">$</span> <span class="text-text">bd comments add BD-042</span> <span class="text-amber-400">"FACT: Token refresh</span></p>
-          <p><span class="text-amber-400">  endpoint rate-limited to 10 req/s per tenant"</span></p>
-          <p>&nbsp;</p>
-          <p><span class="text-text-dim">Comment added to BD-042</span></p>
-          <p>&nbsp;</p>
-          <p><span class="text-accent">$</span> <span class="text-text">bd comments add BD-042</span> <span class="text-amber-400">"DECISION: Using PKCE</span></p>
-          <p><span class="text-amber-400">  flow -- simpler than client credentials for CLI"</span></p>
-          <p>&nbsp;</p>
-          <p><span class="text-text-dim">Comment added to BD-042</span></p>
+          <p><span class="text-accent">[auto-captured]</span></p>
+          <p><span class="text-text-muted">  LEARNED: Redirect URI must match exactly</span></p>
+          <p><span class="text-text-muted">  PATTERN: Validate callbacks server-side</span></p>
+          <p><span class="text-text-muted">  DECISION: Use PKCE for public clients</span></p>
         </div>
       </TerminalMockup>
 
-      {/* Right: Recall */}
-      <TerminalMockup title="Recall -- April 2026">
+      {/* Right: Recall -- matches Remotion LavraV3 KnowledgeSystemScene */}
+      <TerminalMockup title="Three weeks later">
         <div>
-          <p><span class="text-accent">[auto-recall]</span> <span class="text-text-muted">Searching knowledge for: oauth, token, auth</span></p>
+          <p><span class="text-accent">$</span> <span class="text-text">/lavra-work BD-089</span></p>
           <p>&nbsp;</p>
-          <p><span class="text-text-muted">Found 3 relevant entries:</span></p>
+          <p><span class="text-accent">[auto-recall]</span> <span class="text-text-muted">3 entries matched</span></p>
+          <p><span class="text-text-muted">  LEARNED: Redirect URI must match exactly</span></p>
+          <p><span class="text-text-muted">  PATTERN: Validate callbacks server-side</span></p>
+          <p><span class="text-text-muted">  DECISION: Use PKCE for public clients</span></p>
           <p>&nbsp;</p>
-          <p>  <span class="text-accent font-bold">LEARNED:</span> <span class="text-text">OAuth redirect URI must match exactly</span></p>
-          <p>  <span class="text-text">         -- no trailing slash</span></p>
-          <p>  <span class="text-accent font-bold">FACT:</span>    <span class="text-text">Token refresh endpoint rate-limited to</span></p>
-          <p>  <span class="text-text">         10 req/s per tenant</span></p>
-          <p>  <span class="text-accent font-bold">DECISION:</span> <span class="text-text">Using PKCE flow -- simpler than client</span></p>
-          <p>  <span class="text-text">            credentials for CLI</span></p>
-          <p>&nbsp;</p>
-          <p><span class="text-text-muted">Injecting into session context...</span></p>
+          <p><span class="text-text-dim">Starting with context...</span></p>
         </div>
       </TerminalMockup>
 

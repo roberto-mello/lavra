@@ -1,5 +1,7 @@
 ---
 import TerminalMockup from './TerminalMockup.astro';
+import { Image } from 'astro:assets';
+import logo from '../assets/lavra-1-transparent.png';
 ---
 
 <section class="hero-gradient min-h-[100dvh] flex items-center">
@@ -8,9 +10,10 @@ import TerminalMockup from './TerminalMockup.astro';
 
       <!-- Left Column -->
       <div>
-        <p class="font-mono text-accent text-sm uppercase tracking-wider mb-4">MULTI-AGENT WORKFLOW ENGINE</p>
-        <h1 class="text-4xl lg:text-6xl font-black tracking-tight text-text leading-[1.1]">Your AI agents,<br>with memory</h1>
-        <p class="text-lg lg:text-xl text-text-muted mt-6 max-w-lg">lavra gives your coding agents persistent memory, multi-agent workflows, and knowledge that compounds across sessions.</p>
+        <Image src={logo} alt="Lavra -- Compound Engineering & Memory for Agents" width={400} class="mb-8" />
+        <p class="font-mono text-accent text-sm uppercase tracking-wider mb-4">Compound Engineering Workflows with Memory for AI Agents</p>
+        <h1 class="text-4xl lg:text-6xl font-black tracking-tight text-text leading-[1.1]">Build better and faster</h1>
+        <p class="text-lg lg:text-xl text-text-muted mt-6 max-w-lg">Lavra gives your coding agents persistent memory, multi-agent compound engineering workflows, and knowledge that compounds across sessions.</p>
 
         <div class="mt-8 flex flex-wrap gap-4">
           <a href="#install" class="inline-flex items-center px-6 py-3 rounded-lg border-2 border-accent text-accent font-semibold text-sm hover:bg-accent hover:text-bg transition-colors duration-200">Get Started</a>

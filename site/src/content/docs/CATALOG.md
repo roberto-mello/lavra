@@ -118,7 +118,6 @@ The most frequently invoked agents (learnings-researcher, repo-research-analyst)
 | `gemini-imagegen` | Generate images using Google's Gemini |
 | `project-setup` | Project stack detection, review agent config, and optional codebase analysis |
 | `rclone` | Cloud storage file management with rclone |
-| `skill-creator` | Create new skills from templates |
 
 ## MCP Servers
 

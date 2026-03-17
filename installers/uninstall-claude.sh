@@ -152,7 +152,7 @@ else
 fi
 
 if [ -d "$SKILLS_DIR" ]; then
-  PLUGIN_SKILLS=(git-worktree brainstorming create-agent-skills agent-native-architecture lavra-knowledge agent-browser andrew-kane-gem-writer dhh-rails-style dspy-ruby every-style-editor file-todos frontend-design gemini-imagegen rclone skill-creator)
+  PLUGIN_SKILLS=(git-worktree brainstorming create-agent-skills agent-native-architecture lavra-knowledge agent-browser andrew-kane-gem-writer dhh-rails-style dspy-ruby every-style-editor file-todos frontend-design gemini-imagegen rclone)
 
   for skill in "${PLUGIN_SKILLS[@]}"; do
     if [ -L "$SKILLS_DIR/$skill" ]; then
