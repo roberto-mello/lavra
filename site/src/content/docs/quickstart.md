@@ -41,14 +41,24 @@ ls -la .beads/memory/        # Should see knowledge.jsonl, recall.sh
 
 ### Workflow config (automatic)
 
-The installer creates `.beads/config/lavra.json` with default settings. Edit to toggle:
-- `workflow.research` -- skip research phase in `/lavra-design`
-- `workflow.plan_review` -- skip plan review phase in `/lavra-design`
-- `workflow.goal_verification` -- skip goal verification in `/lavra-work` and `/lavra-ship`
-- `execution.max_parallel_agents` -- limit parallel subagents (default: 3)
-- `execution.commit_granularity` -- `"task"` (default, atomic) or `"wave"` (legacy)
+The installer creates `.beads/config/lavra.json` automatically. Edit to tune the workflow:
 
-Existing projects get this file automatically on next session start (version self-heal).
+```json
+{
+  "workflow": {
+    "research": true,        // run research agents in /lavra-design
+    "plan_review": true,     // run plan review phase in /lavra-design
+    "goal_verification": true // verify completion criteria in /lavra-work and /lavra-ship
+  },
+  "execution": {
+    "max_parallel_agents": 3, // max subagents running at once
+    "commit_granularity": "task" // "task" (atomic, default) or "wave" (legacy)
+  },
+  "model_profile": "balanced"
+}
+```
+
+Existing projects get this file automatically on next session start.
 
 ### Codebase analysis (optional, for brownfield projects)
 
