@@ -1,0 +1,71 @@
+---
+// Footer.astro -- Site footer with brand, links, and platform list
+const productLinks = [
+  { label: 'Docs', href: '#' },
+  { label: 'Command Map', href: '/command-map' },
+];
+
+const resourceLinks = [
+  { label: 'GitHub', href: 'https://github.com/roberto-mello/lavra', external: true },
+  { label: 'Changelog', href: '#' },
+];
+
+const platforms = ['Claude Code', 'OpenCode', 'Gemini CLI', 'Cortex Code'];
+---
+
+<footer class="py-16 border-t border-border">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-8 md:gap-16">
+      <!-- Brand -->
+      <div>
+        <span class="font-mono text-lg font-bold text-accent">lavra</span>
+        <p class="text-sm text-text-muted mt-2">Multi-agent workflow engine</p>
+      </div>
+
+      <!-- Product -->
+      <div>
+        <h3 class="text-xs uppercase tracking-wider text-text-dim font-bold mb-3">Product</h3>
+        <ul class="space-y-2">
+          {productLinks.map((link) => (
+            <li>
+              <a href={link.href} class="text-sm text-text-muted hover:text-text">{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Resources -->
+      <div>
+        <h3 class="text-xs uppercase tracking-wider text-text-dim font-bold mb-3">Resources</h3>
+        <ul class="space-y-2">
+          {resourceLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class="text-sm text-text-muted hover:text-text"
+                {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Platforms -->
+      <div>
+        <h3 class="text-xs uppercase tracking-wider text-text-dim font-bold mb-3">Platforms</h3>
+        <ul class="space-y-2">
+          {platforms.map((name) => (
+            <li class="text-sm text-text-dim">{name}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="mt-12 pt-6 border-t border-border text-center text-xs text-text-dim">
+      2025-2026 lavra
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,105 @@
+---
+// InstallCta.astro -- Install command with tab switcher and copy button
+---
+
+<section id="install" class="min-h-[60dvh] flex items-center hero-gradient" data-reveal>
+  <div class="max-w-7xl mx-auto px-6 text-center w-full">
+    <h2 class="text-4xl lg:text-5xl font-bold text-text mb-8">
+      Get started
+    </h2>
+
+    <div class="max-w-lg mx-auto bg-surface border border-border rounded-xl overflow-hidden">
+      <!-- Tab bar -->
+      <div class="flex border-b border-border" role="tablist">
+        <button
+          role="tab"
+          aria-selected="true"
+          data-tab="npx"
+          class="flex-1 py-3 text-sm font-mono text-center cursor-pointer transition-colors text-accent border-b-2 border-accent bg-bg"
+        >
+          npx
+        </button>
+        <button
+          role="tab"
+          aria-selected="false"
+          data-tab="bunx"
+          class="flex-1 py-3 text-sm font-mono text-center cursor-pointer transition-colors text-text-dim hover:text-text-muted"
+        >
+          bunx
+        </button>
+      </div>
+
+      <!-- Code area -->
+      <div class="p-4 flex items-center justify-between gap-4">
+        <code id="install-command" class="font-mono text-sm text-text">npx lavra@latest</code>
+        <button
+          id="copy-btn"
+          class="p-2 rounded-lg hover:bg-border/50 transition-colors text-text-muted"
+          aria-label="Copy to clipboard"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M200,32H163.74A47.92,47.92,0,0,0,128,8a47.92,47.92,0,0,0-35.74,16H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V40A16,16,0,0,0,200,32Zm-72-8a32,32,0,0,1,32,32H96A32,32,0,0,1,128,24Zm72,192H56V40H93.63A47.78,47.78,0,0,0,80,56v8a8,8,0,0,0,8,8h80a8,8,0,0,0,8-8V56a47.78,47.78,0,0,0-13.63-16H200Z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Platform list -->
+    <div class="mt-8 flex flex-wrap justify-center gap-4">
+      <span class="text-sm text-text-dim">Claude Code</span>
+      <span class="text-sm text-text-dim">OpenCode</span>
+      <span class="text-sm text-text-dim">Gemini CLI</span>
+      <span class="text-sm text-text-dim">Cortex Code</span>
+    </div>
+  </div>
+</section>
+
+<script>
+  const clipboardSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M200,32H163.74A47.92,47.92,0,0,0,128,8a47.92,47.92,0,0,0-35.74,16H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V40A16,16,0,0,0,200,32Zm-72-8a32,32,0,0,1,32,32H96A32,32,0,0,1,128,24Zm72,192H56V40H93.63A47.78,47.78,0,0,0,80,56v8a8,8,0,0,0,8,8h80a8,8,0,0,0,8-8V56a47.78,47.78,0,0,0-13.63-16H200Z"/></svg>';
+  const checkSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>';
+
+  const commands: Record<string, string> = {
+    npx: 'npx lavra@latest',
+    bunx: 'bunx lavra@latest',
+  };
+
+  let activeTab = 'npx';
+  const tabs = document.querySelectorAll<HTMLButtonElement>('[data-tab]');
+  const commandEl = document.getElementById('install-command')!;
+  const copyBtn = document.getElementById('copy-btn')!;
+
+  // Tab switching
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const id = tab.dataset.tab!;
+      if (id === activeTab) return;
+      activeTab = id;
+
+      tabs.forEach((t) => {
+        const isActive = t.dataset.tab === id;
+        t.setAttribute('aria-selected', String(isActive));
+        if (isActive) {
+          t.classList.add('text-accent', 'border-b-2', 'border-accent', 'bg-bg');
+          t.classList.remove('text-text-dim', 'hover:text-text-muted');
+        } else {
+          t.classList.remove('text-accent', 'border-b-2', 'border-accent', 'bg-bg');
+          t.classList.add('text-text-dim', 'hover:text-text-muted');
+        }
+      });
+
+      commandEl.textContent = commands[id];
+    });
+  });
+
+  // Copy to clipboard
+  copyBtn.addEventListener('click', () => {
+    const text = commandEl.textContent?.trim() ?? '';
+    navigator.clipboard.writeText(text);
+
+    copyBtn.innerHTML = checkSvg;
+    copyBtn.setAttribute('aria-label', 'Copied!');
+
+    setTimeout(() => {
+      copyBtn.innerHTML = clipboardSvg;
+      copyBtn.setAttribute('aria-label', 'Copy to clipboard');
+    }, 1500);
+  });
+</script>
