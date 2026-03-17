@@ -8,23 +8,27 @@ order: 1
 
 ## Installation
 
+Install into the current project for your AI coding agent:
+
 ```bash
-npx lavra@latest
+npx lavra@latest --claude      # Claude Code
+npx lavra@latest --opencode    # OpenCode
+npx lavra@latest --gemini      # Gemini CLI
+```
+
+Or install globally so lavra is available in every project:
+
+```bash
+npx lavra@latest --global
 ```
 
 Or with Bun:
 
 ```bash
-bunx lavra@latest
+bunx lavra@latest --claude
 ```
 
-Or manually from the plugin directory:
-
-```bash
-./install.sh /path/to/your-project
-```
-
-Restart Claude Code after installing.
+Restart your agent after installing to pick up the new commands and hooks.
 
 ## Verify Installation
 
