@@ -86,4 +86,4 @@ Raw knowledge comments logged during work are functional but often terse. `/lavr
 /lavra-learn beads-abc beads-xyz
 ```
 
-`/lavra-work` calls `/lavra-learn` automatically at the end of each bead. `/lavra-checkpoint` prompts you to run it if it detects captured knowledge. You'd invoke it manually after ad-hoc sessions where you worked outside the pipeline.
+`/lavra-work` calls `/lavra-learn` automatically at the end of each bead. `/lavra-checkpoint` prompts you to run it if it detects captured knowledge. If you've been coding outside the pipeline — direct edits, quick fixes, exploratory work — run `/lavra-learn` manually before ending the session to curate whatever you captured.
