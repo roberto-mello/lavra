@@ -72,73 +72,44 @@ When prompted "Run codebase analysis?", choose Y. This dispatches 3 parallel age
 
 ## Your First Workflow
 
-### 1. Create a bead
+### 1. Design
 
-```bash
-bd create "Add user profile page" -d "Display user info with edit capability"
-# Returns: BD-001
-```
-
-### 2. Plan it (optional but recommended)
+Describe the feature — lavra creates the beads, runs research agents, and produces a plan:
 
 ```
-/lavra-plan BD-001
+/lavra-design "add two-factor authentication with TOTP and QR codes"
 ```
 
-This dispatches research agents to gather:
-- Best practices for profile pages
-- Framework documentation
-- Existing patterns in your codebase
+This dispatches domain-matched research agents in parallel, then creates an epic with child beads for each implementation step. Review and adjust the plan before moving on.
 
-Creates child beads for each step.
+### 2. Work
 
-### 3. Work on it
+Pick up the epic and lavra works through the child beads automatically:
 
 ```
-/lavra-work BD-001.1
+/lavra-work BD-001
 ```
 
-This:
-- Shows you relevant knowledge automatically
-- Updates status to in_progress
-- Offers investigation if you want it
+For each bead it:
+- Recalls relevant knowledge from past sessions automatically
+- Implements with parallel subagents where possible
+- Runs multi-agent code review and fixes issues
+- Commits atomically and closes the bead
 
-### 4. Implement
+### 3. QA (optional)
 
-Just code normally:
-```bash
-# Edit files
-# Make commits
-```
-
-### 5. Log learnings
-
-```bash
-bd comments add BD-001.1 "LEARNED: Profile images should be lazy-loaded for performance"
-bd comments add BD-001.1 "DECISION: Using Gravatar for default avatars"
-bd comments add BD-001.1 "FACT: Max upload size is 5MB (nginx limit)"
-```
-
-These get auto-captured to `.beads/memory/knowledge.jsonl`.
-
-### 6. Review
+Verify the feature from a user's perspective in a real browser:
 
 ```
-/lavra-review BD-001.1
+/lavra-qa BD-001
 ```
 
-This dispatches multiple reviewers:
-- Security audit
-- Performance check
-- Code quality review
-- Architecture validation
+### 4. Ship
 
-Creates follow-up beads for any issues found.
+Automated end-to-end: close remaining beads, run security scan, open PR:
 
-### 7. Close
-
-```bash
-bd close BD-001.1
+```
+/lavra-ship BD-001
 ```
 
 ## Next Session
@@ -156,11 +127,12 @@ You get relevant learnings without manually searching!
 
 | Command | Use When |
 |---------|----------|
-| `/lavra-plan {id or desc}` | Starting a complex feature, need research |
-| `/lavra-work {id}` | Starting work on a bead |
-| `/lavra-review {id}` | Before closing a bead, want multi-agent review |
-| `/lavra-research {id or question}` | Need deep understanding before implementing |
-| `/lavra-checkpoint` | Want to save progress during long session |
+| `/lavra-design "description"` | Starting any feature — creates beads, runs research, builds plan |
+| `/lavra-work {id}` | Working through a bead or epic |
+| `/lavra-qa {id}` | Verifying a feature in a real browser before shipping |
+| `/lavra-ship {id}` | Shipping — closes beads, security scan, opens PR |
+| `/lavra-review {id}` | On-demand multi-agent code review |
+| `/lavra-checkpoint` | Save progress mid-session |
 
 ## Manual Knowledge Search
 
@@ -181,42 +153,28 @@ You get relevant learnings without manually searching!
 ## Example: Full Feature Flow
 
 ```bash
-# Day 1: Research and planning
-bd create "Add two-factor authentication" -d "TOTP-based 2FA with QR codes"
-# => BD-050
-
-/lavra-plan BD-050
-# Researches best practices, security considerations, framework options
-# Creates child beads:
+# Design the feature -- creates epic BD-050 with child beads
+/lavra-design "add two-factor authentication with TOTP and QR codes"
+# Runs security and framework research agents in parallel
+# Creates:
+#   BD-050:   [epic] Two-factor authentication
 #   BD-050.1: Database schema for OTP secrets
 #   BD-050.2: QR code generation endpoint
 #   BD-050.3: Verification endpoint
 #   BD-050.4: Settings UI
 
-# Day 2: Implement first step
-/lavra-work BD-050.1
-# Auto-recalls security knowledge from yesterday's research
+# Work through the epic
+/lavra-work BD-050
+# Recalls security knowledge automatically
+# Implements each child bead with parallel subagents
+# Commits atomically, runs review, closes each bead
 
-# Edit files, create migration
-git add -A
-git commit -m "Add OTP secrets table"
+# Verify in a real browser
+/lavra-qa BD-050
 
-bd comments add BD-050.1 "LEARNED: OTP secrets MUST be encrypted at rest"
-bd comments add BD-050.1 "DECISION: Using rotp gem for TOTP generation"
-bd comments add BD-050.1 "FACT: Backup codes needed for account recovery"
-
-/lavra-review BD-050.1
-# Security review catches missing index on user_id
-# Creates BD-051: Add index to otp_secrets.user_id
-
-# Fix the issue
-git add -A
-git commit -m "Add index to otp_secrets.user_id"
-bd close BD-051
-
-bd close BD-050.1
-
-# Continue with BD-050.2...
+# Ship it
+/lavra-ship BD-050
+# Closes remaining beads, runs security scan, opens PR
 ```
 
 ## Tips
