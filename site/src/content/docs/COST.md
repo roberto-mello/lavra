@@ -1,30 +1,33 @@
 ---
 title: Cost Optimization
-description: How lavra assigns agents to model tiers for optimal cost and performance
+description: How Lavra assigns agents to model tiers for optimal cost and performance
 order: 9
 ---
 
 # Cost Optimization
 
-How lavra assigns agents to model tiers for optimal cost/performance balance.
-
-[Back to README](../README.md)
+How Lavra assigns its 30 agents to model tiers for optimal cost/performance balance.
 
 ## Tier Breakdown
 
-The plugin's 28 agents are assigned to three model tiers based on reasoning complexity:
+| Tier | Count | Agents |
+|------|-------|--------|
+| **haiku** | 5 | `ankane-readme-writer`, `framework-docs-researcher`, `learnings-researcher`, `repo-research-analyst`, `lint` |
+| **sonnet** | 18 | Most reviewers and workflow agents |
+| **inherit** | 7 | `agent-native-reviewer`, `architecture-strategist`, `data-integrity-guardian`, `data-migration-expert`, `julik-frontend-races-reviewer`, `performance-oracle`, `spec-flow-analyzer` |
 
-| Tier | Agents | Use Case | Cost Impact |
-|------|--------|----------|-------------|
-| **Haiku** | 5 | Structured information retrieval, template-based output | Lowest cost, fastest response |
-| **Sonnet** | 14 | Moderate judgment with established patterns | Balanced cost/quality |
-| **Opus** | 9 | Deep architectural reasoning, nuanced security analysis | Premium quality for critical decisions |
+`inherit` means the agent runs at whatever model the calling command uses — typically sonnet.
 
-## Key Optimizations
+## Design Rationale
 
-- Most frequently invoked agents (`learnings-researcher`, `repo-research-analyst`) use Haiku
-- Review workflows like `/lavra-review` fire 13+ agents, mostly Sonnet tier
-- Opus reserved for architectural/security decisions requiring deep reasoning
-- Commands automatically dispatch agents at their assigned tier via frontmatter `model:` field
+- **Haiku** for structured, template-based tasks: README generation, knowledge search, linting — fast and cheap
+- **Sonnet** for the bulk of review and research work — good judgment on well-defined tasks
+- **Inherit** for agents whose quality scales with the calling context — if you invoke them on opus, they get opus too
 
-This tiering reduces costs by 60-70% compared to running all agents on Opus while maintaining quality where it matters.
+## Cost at Scale
+
+`/lavra-review` dispatches up to 13 agents in parallel. With the default sonnet tier, a full review run costs roughly the same as 2–3 manual code review messages. The haiku agents (linting, knowledge search) add negligible cost.
+
+## Configuring Model Quality
+
+The `model_profile` field in `.beads/config/lavra.json` is reserved for a planned quality mode that will route critical agents (`security-sentinel`, `architecture-strategist`, `goal-verifier`, `performance-oracle`) to opus automatically. Currently it has no effect.
