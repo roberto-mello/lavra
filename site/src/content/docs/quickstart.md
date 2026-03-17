@@ -9,12 +9,22 @@ order: 1
 ## Installation
 
 ```bash
-# From the plugin directory
-cd ~/Documents/projects/lavra
-./install.sh /path/to/your-project
-
-# Restart Claude Code
+npx lavra@latest
 ```
+
+Or with Bun:
+
+```bash
+bunx lavra@latest
+```
+
+Or manually from the plugin directory:
+
+```bash
+./install.sh /path/to/your-project
+```
+
+Restart Claude Code after installing.
 
 ## Verify Installation
 
@@ -254,8 +264,7 @@ The plugin references compound-engineering agents but doesn't install them. If y
 ## Uninstall
 
 ```bash
-cd ~/Documents/projects/lavra
-./uninstall.sh /path/to/your-project
+npx lavra@latest --uninstall
 ```
 
 This removes the plugin but **preserves**:
