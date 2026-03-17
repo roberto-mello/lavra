@@ -17,7 +17,7 @@ These four locations must all have the target version:
 - `LAVRA_VERSION` constant in `plugins/lavra/hooks/auto-recall.sh`
 - Version string in `plugins/lavra/hooks/provision-memory.sh` (the `echo "X.Y.Z"` line)
 
-Also verify that `docs/lavra-command-map.html` reflects current nodes/connections (new commands, agents, or skills should be added).
+Also verify that `site/public/command-map.html` reflects current nodes/connections (new commands, agents, or skills should be added).
 
 The pre-release check (step 3) will catch any mismatch, but fix them before running it.
 

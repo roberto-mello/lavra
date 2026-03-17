@@ -13,7 +13,7 @@ A plugin for coding agents that orchestrates the full development lifecycle -- f
 [![Gemini CLI](https://img.shields.io/badge/Gemini_CLI-4285F4?logo=google&logoColor=white)](https://github.com/google-gemini/gemini-cli)
 [![Cortex Code](https://img.shields.io/badge/Cortex_Code-29B5E8?logo=snowflake&logoColor=white)](https://www.snowflake.com/en/product/features/cortex-code/)
 
-**[Quick Start](plugins/lavra/docs/quickstart.md)** | **[Full Catalog](docs/CATALOG.md)** | **[Architecture](docs/ARCHITECTURE.md)** | **[Security](docs/SECURITY.md)** | **[v0.7.0 Release Notes](docs/releases/v0.7.0.md)**
+**[Quick Start](plugins/lavra/docs/quickstart.md)** | **[Full Catalog](docs/CATALOG.md)** | **[Architecture](docs/ARCHITECTURE.md)** | **[Security](docs/SECURITY.md)** | **[Command Map](https://lavra.dev/command-map)** | **[v0.7.0 Release Notes](docs/releases/v0.7.0.md)**
 
 <table>
 <tr>

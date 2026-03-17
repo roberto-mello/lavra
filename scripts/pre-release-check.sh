@@ -113,10 +113,10 @@ echo "  Cortex .md commands:   $CORTEX_COMMANDS (need 20+)"
 echo ""
 echo "=== Command map ==="
 
-check "docs/lavra-command-map.html exists" test -f docs/lavra-command-map.html
+check "site/public/command-map.html exists" test -f site/public/command-map.html
 
 # Verify command map references current node counts (spot check: NODES array has entries)
-MAP_NODES=$(grep -c "id:'" docs/lavra-command-map.html || echo 0)
+MAP_NODES=$(grep -c "id:'" site/public/command-map.html || echo 0)
 echo "  Command map nodes: $MAP_NODES (need 40+)"
 [[ "$MAP_NODES" -ge 40 ]] && { echo "  PASS  Command map nodes"; ((PASS++)) || true; } || fail "Command map nodes" "$MAP_NODES < 40"
 
