@@ -31,30 +31,43 @@ The `memory-capture` hook detects this, parses it, and stores it in `.beads/memo
 
 ## Storage
 
-Knowledge is stored in `.beads/memory/knowledge.jsonl` — one JSON object per line:
+Knowledge is stored in two places that stay in sync:
+
+**`.beads/memory/knowledge.jsonl`** — the source of truth, committed to git so knowledge is shared across your team and persists across machines:
 
 ```json
 {"key": "learned-oauth-redirect", "type": "learned", "content": "OAuth redirect URI must match exactly", "tags": ["oauth", "auth"], "ts": 1706918400, "bead": "beads-abc"}
 ```
 
-The file is committed to git alongside your beads, so knowledge is shared across your team and persists across machines.
+**`.beads/memory/knowledge.db`** — a local SQLite database (gitignored) built from the JSONL file, used for fast search. It has an FTS5 virtual table with a Porter stemmer, so searching "authenticate" also matches "authentication" and "authenticated". Results are ranked by BM25 relevance — entries that match more of your search terms, and in more important fields (content over tags), rank higher.
 
-**Rotation:** After 1000 entries, the oldest 500 are archived to `knowledge.archive.jsonl` to keep recall fast.
+The SQLite DB is rebuilt automatically from the JSONL on first use and kept in sync as new entries are added.
+
+**Rotation:** When `knowledge.jsonl` exceeds 5000 lines, the oldest 2500 entries are moved to `knowledge.archive.jsonl`. Both files use `merge=union` in `.gitattributes` so concurrent writes from teammates merge cleanly without conflicts.
 
 ## Searching manually
 
+Mid-session, use the slash command to search and inject relevant entries into your agent's context:
+
+```
+/lavra-recall authentication
+/lavra-recall BD-050
+```
+
+Or search directly from the shell:
+
 ```bash
-# Search current knowledge
-.beads/memory/recall.sh <keywords>
+# Search by keyword (uses SQLite FTS + BM25 ranking)
+.beads/memory/recall.sh "authentication"
 
-# Include archived entries
-.beads/memory/recall.sh --all <keywords>
-```
+# Filter by type
+.beads/memory/recall.sh "jwt" --type learned
 
-Or mid-session:
+# Show recent entries
+.beads/memory/recall.sh --recent 10
 
-```
-/lavra-recall <keywords>
+# Show stats
+.beads/memory/recall.sh --stats
 ```
 
 ## Curating knowledge
