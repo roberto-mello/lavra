@@ -242,9 +242,5 @@ This removes the plugin but **preserves**:
 
 ## Next Steps
 
-Once you're comfortable with the basic workflow:
-
-1. Read the full [README.md](README.md) for all features
-2. Check [COMPARISON.md](../COMPARISON.md) to understand vs semantic-beads
-3. Customize the commands in `.claude/commands/` for your workflow
-4. Add custom tags to `.claude/hooks/memory-capture.sh` for better search
+- Read the [README](https://github.com/roberto-mello/lavra#readme) for the full feature overview
+- Browse the [Command Reference](/docs/commands) for all available commands
