@@ -7,9 +7,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Claude Code plugin marketplace that provides beads-based persistent memory with compound-engineering's multi-agent workflows. The primary plugin is `lavra`, located at `plugins/lavra/`.
 
 The plugin provides:
-- 30 specialized agents (16 review, 5 research, 3 design, 5 workflow, 1 docs)
-- 23 core commands + 5 optional domain-specific commands (in commands/optional/)
-- 15 skills (8 core + 7 optional: git-worktree, brainstorming, create-agent-skills, agent-browser, dhh-rails-style, etc.)
+- Specialized agents across review, research, design, workflow, and docs categories
+- Core commands + optional domain-specific commands (in commands/optional/)
+- Skills (core + optional: git-worktree, brainstorming, create-agent-skills, agent-browser, dhh-rails-style, etc.)
 - 4 hooks (auto-recall, memory-capture, subagent-wrapup, teammate-idle-check)
 - 1 MCP server (Context7 for framework documentation)
 - Automatic knowledge capture from beads comments (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION/DEVIATION)
@@ -36,9 +36,9 @@ lavra/                              # Marketplace root
 │   └── lavra/                      # Plugin root
 │       ├── .claude-plugin/
 │       │   └── plugin.json         # Plugin manifest (v0.7.0)
-│       ├── agents/                 # 30 agents (review/, research/, design/, workflow/, docs/)
-│       ├── commands/               # 23 core commands + optional/
-│       ├── skills/                 # 15 skills (8 core + 7 optional) with supporting files
+│       ├── agents/                 # agents (review/, research/, design/, workflow/, docs/)
+│       ├── commands/               # core commands + optional/
+│       ├── skills/                 # skills (core + optional) with supporting files
 │       ├── hooks/                  # hooks.json, auto-recall.sh, memory-capture.sh, subagent-wrapup.sh, teammate-idle-check.sh, recall.sh
 │       ├── opencode/               # OpenCode TypeScript plugin
 │       ├── gemini/                 # Gemini CLI hook configuration
