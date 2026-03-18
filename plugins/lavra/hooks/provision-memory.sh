@@ -2,7 +2,7 @@
 #
 # Shared memory provisioning for lavra
 #
-# Provides a single function to set up .beads/memory/ with knowledge tracking.
+# Provides a single function to set up .lavra/ with knowledge tracking.
 # Used by auto-recall.sh (native plugin), check-memory.sh (global install),
 # and install.sh (manual install) to avoid duplicating setup logic.
 #
@@ -15,9 +15,12 @@ provision_memory_dir() {
   local PROJECT_DIR="$1"
   local HOOKS_SOURCE_DIR="$2"
 
-  local MEMORY_DIR="$PROJECT_DIR/.beads/memory"
+  local MEMORY_DIR="$PROJECT_DIR/.lavra/memory"
+  local LAVRA_DIR="$PROJECT_DIR/.lavra"
 
-  mkdir -p "$MEMORY_DIR"
+  mkdir -p -m 700 "$MEMORY_DIR"
+  mkdir -p -m 700 "$PROJECT_DIR/.lavra/config"
+  mkdir -p -m 700 "$PROJECT_DIR/.lavra/retros"
 
   # Create empty knowledge file if missing
   if [[ ! -f "$MEMORY_DIR/knowledge.jsonl" ]]; then
@@ -36,41 +39,41 @@ provision_memory_dir() {
     chmod +x "$MEMORY_DIR/knowledge-db.sh"
   fi
 
-  # Setup .gitattributes for union merge (per-directory, scoped to .beads/memory/)
-  local GITATTR="$MEMORY_DIR/.gitattributes"
+  # Setup .lavra/.gitattributes for union merge (folder-level, paths use memory/ prefix)
+  local GITATTR="$LAVRA_DIR/.gitattributes"
 
-  if [[ ! -f "$GITATTR" ]] || ! grep -q 'knowledge.jsonl' "$GITATTR" 2>/dev/null; then
-    echo "knowledge.jsonl merge=union" > "$GITATTR"
-    echo "knowledge.archive.jsonl merge=union" >> "$GITATTR"
+  if [[ ! -f "$GITATTR" ]] || ! grep -q 'memory/knowledge.jsonl' "$GITATTR" 2>/dev/null; then
+    echo "memory/knowledge.jsonl merge=union" > "$GITATTR"
+    echo "memory/knowledge.archive.jsonl merge=union" >> "$GITATTR"
   fi
 
   # Write installed version for staleness detection by auto-recall.sh
-  echo "0.7.0" > "$MEMORY_DIR/.lavra-version"
+  # .lavra-version lives at .lavra/ root, not .lavra/memory/
+  echo "0.8.0" > "$LAVRA_DIR/.lavra-version"
 
-  # Create .beads/memory/.gitignore to ignore the SQLite FTS cache and ephemeral state
-  # (rebuilt from knowledge.jsonl on first use — no need to commit it)
-  local MEMORY_GITIGNORE="$MEMORY_DIR/.gitignore"
-  if [[ ! -f "$MEMORY_GITIGNORE" ]]; then
-    cat > "$MEMORY_GITIGNORE" << 'EOF'
+  # Create .lavra/.gitignore (folder-level) to ignore SQLite cache and ephemeral state
+  # Paths are relative to .lavra/ root, so they use memory/ prefix
+  local LAVRA_GITIGNORE="$LAVRA_DIR/.gitignore"
+  if [[ ! -f "$LAVRA_GITIGNORE" ]]; then
+    cat > "$LAVRA_GITIGNORE" << 'EOF'
 # SQLite FTS cache (rebuilt from knowledge.jsonl on first use)
-knowledge.db
-knowledge.db-journal
-knowledge.db-wal
-knowledge.db-shm
+memory/knowledge.db
+memory/knowledge.db-journal
+memory/knowledge.db-wal
+memory/knowledge.db-shm
 
 # Ephemeral session state (survives compaction, recalled once, then deleted)
-session-state.md
+memory/session-state.md
 EOF
-  elif ! grep -q 'session-state.md' "$MEMORY_GITIGNORE" 2>/dev/null; then
+  elif ! grep -q 'session-state.md' "$LAVRA_GITIGNORE" 2>/dev/null; then
     # Append session-state.md to existing gitignore if missing
-    echo "" >> "$MEMORY_GITIGNORE"
-    echo "# Ephemeral session state (survives compaction, recalled once, then deleted)" >> "$MEMORY_GITIGNORE"
-    echo "session-state.md" >> "$MEMORY_GITIGNORE"
+    echo "" >> "$LAVRA_GITIGNORE"
+    echo "# Ephemeral session state (survives compaction, recalled once, then deleted)" >> "$LAVRA_GITIGNORE"
+    echo "memory/session-state.md" >> "$LAVRA_GITIGNORE"
   fi
 
   # Create default lavra.json config if missing
-  local CONFIG_DIR="$PROJECT_DIR/.beads/config"
-  mkdir -p "$CONFIG_DIR"
+  local CONFIG_DIR="$PROJECT_DIR/.lavra/config"
   if [[ ! -f "$CONFIG_DIR/lavra.json" ]]; then
     cat > "$CONFIG_DIR/lavra.json" << 'EOF'
 {
@@ -88,41 +91,38 @@ EOF
 EOF
   fi
 
-  # Check if project .gitignore contains a .beads/ pattern, which would cause
-  # all beads issue/comment data to be untracked (data loss risk on new clones).
-  # bd init no longer adds .beads/ to project .gitignore — if it's there, it's
-  # from an older version of lavra or a manual addition.
+  # Check if project .gitignore contains a .lavra/ pattern, which would cause
+  # all Lavra knowledge and config data to be untracked (data loss risk on new clones).
   if git -C "$PROJECT_DIR" rev-parse --git-dir &>/dev/null 2>&1; then
     local GITIGNORE="$PROJECT_DIR/.gitignore"
-    if [[ -f "$GITIGNORE" ]] && grep -qE '^\s*\.beads/?(\s|$)' "$GITIGNORE" 2>/dev/null \
-      && ! grep -qE '^\s*!\.beads/' "$GITIGNORE" 2>/dev/null; then
+    if [[ -f "$GITIGNORE" ]] && grep -qE '^\s*\.lavra/?(\s|$)' "$GITIGNORE" 2>/dev/null \
+      && ! grep -qE '^\s*!\.lavra/' "$GITIGNORE" 2>/dev/null; then
       echo ""
-      echo "[!] Warning: .beads/ is listed in your project .gitignore."
-      echo "    This means your beads issues, comments, and knowledge are not"
+      echo "[!] Warning: .lavra/ is listed in your project .gitignore."
+      echo "    This means your Lavra knowledge and config are not"
       echo "    tracked by git. If you lose your local copy, all of this data"
       echo "    will be permanently lost."
       echo ""
-      echo "    Modern beads (bd init) no longer adds .beads/ to .gitignore."
-      echo "    If you want .beads/ to be invisible to git, use: bd init --stealth"
-      echo "    (which uses .git/info/exclude instead, keeping data safe)."
+      echo "    To keep .lavra/ invisible to git without data loss, use git's"
+      echo "    exclude file: echo '.lavra/' >> .git/info/exclude"
       echo ""
       if [[ "${BEADS_AUTO_YES:-false}" == "true" ]] || ! [[ -t 0 ]]; then
         # Non-interactive mode (hook context or --yes flag): warn but don't modify
         echo "    [non-interactive] Leaving .gitignore unchanged. Re-run install to fix interactively."
       else
-        read -r -p "    Remove .beads/ from .gitignore? [Y/n] " response
+        read -r -p "    Remove .lavra/ from .gitignore? [Y/n] " response
         case "${response:-Y}" in
           [nN]|[nN][oO])
-            echo "    Left unchanged. Your beads data may not be committed to git."
+            echo "    Left unchanged. Your Lavra data may not be committed to git."
             ;;
           *)
-            # Remove lines matching .beads/ (with optional trailing slash and whitespace)
+            # Remove lines matching .lavra/ (with optional trailing slash and whitespace)
             local TMPFILE
             TMPFILE=$(mktemp)
-            grep -vE '^\s*\.beads/?(\s|$)' "$GITIGNORE" > "$TMPFILE"
+            grep -vE '^\s*\.lavra/?(\s|$)' "$GITIGNORE" > "$TMPFILE"
             mv "$TMPFILE" "$GITIGNORE"
-            echo "    Removed .beads/ from .gitignore."
-            echo "    Run: git add .beads/ && git commit -m 'track beads data'"
+            echo "    Removed .lavra/ from .gitignore."
+            echo "    Run: git add .lavra/ && git commit -m 'track lavra data'"
             ;;
         esac
       fi
@@ -130,16 +130,15 @@ EOF
     fi
   fi
 
-  # Stage specific known files only (use -f to override parent .gitignore
-  # in case negation rules haven't been picked up yet by this git session)
+  # Stage specific known files only (no -f: respect user's .gitignore)
   if git -C "$PROJECT_DIR" rev-parse --git-dir &>/dev/null 2>&1; then
-    (cd "$PROJECT_DIR" && git add -f \
-      .beads/memory/knowledge.jsonl \
-      .beads/memory/.gitattributes \
-      .beads/memory/.gitignore \
-      .beads/memory/.lavra-version \
-      .beads/memory/recall.sh \
-      .beads/memory/knowledge-db.sh \
+    (cd "$PROJECT_DIR" && git add \
+      .lavra/.gitattributes \
+      .lavra/.gitignore \
+      .lavra/.lavra-version \
+      .lavra/memory/knowledge.jsonl \
+      .lavra/memory/recall.sh \
+      .lavra/memory/knowledge-db.sh \
       2>/dev/null) || true
   fi
 }
