@@ -33,6 +33,35 @@ jobs:
       - name: Run compatibility tests
         run: cd scripts && bun run test-compatibility.ts
 
+      - name: Verify catalog accuracy
+        # SYNC: This step must stay in sync with the "Catalog accuracy" section
+        # in scripts/pre-release-check.sh. When modifying either, update the other.
+        run: |
+          CATALOG_COMMANDS=$(grep -E '^\|' site/src/content/docs/CATALOG.md | \
+            grep -oE '`/[a-z][a-z0-9-]+`' | tr -d '`' | sed 's|^/||' | sort -u)
+
+          ACTUAL_COMMANDS=$(find plugins/lavra/commands -name "*.md" | \
+            xargs -I{} basename {} .md 2>/dev/null | sort -u)
+
+          FAIL=0
+
+          while IFS= read -r cmd; do
+            if ! echo "$ACTUAL_COMMANDS" | grep -qx "$cmd"; then
+              echo "❌ Catalog ghost: /${cmd} listed in CATALOG.md but no ${cmd}.md file found"
+              FAIL=1
+            fi
+          done <<< "$CATALOG_COMMANDS"
+
+          while IFS= read -r cmd; do
+            if ! echo "$CATALOG_COMMANDS" | grep -qx "$cmd"; then
+              echo "❌ Missing from catalog: ${cmd}.md exists but /${cmd} not in CATALOG.md"
+              FAIL=1
+            fi
+          done <<< "$ACTUAL_COMMANDS"
+
+          [[ "$FAIL" -eq 0 ]] || exit 1
+          echo "✅ Catalog accurate (no ghosts, no missing entries)"
+
   test-installation:
     name: Multi-Platform Installation Tests
     runs-on: macos-latest
@@ -167,3 +196,32 @@ jobs:
           [[ "$CORTEX_COMMANDS" -ge 20 ]] || { echo "❌ Cortex .md commands missing"; exit 1; }
 
           echo "✅ All source files and conversion outputs verified"
+
+      - name: Verify catalog accuracy
+        # SYNC: This step must stay in sync with the "Catalog accuracy" section
+        # in scripts/pre-release-check.sh. When modifying either, update the other.
+        run: |
+          CATALOG_COMMANDS=$(grep -E '^\|' site/src/content/docs/CATALOG.md | \
+            grep -oE '`/[a-z][a-z0-9-]+`' | tr -d '`' | sed 's|^/||' | sort -u)
+
+          ACTUAL_COMMANDS=$(find plugins/lavra/commands -name "*.md" | \
+            xargs -I{} basename {} .md 2>/dev/null | sort -u)
+
+          FAIL=0
+
+          while IFS= read -r cmd; do
+            if ! echo "$ACTUAL_COMMANDS" | grep -qx "$cmd"; then
+              echo "❌ Catalog ghost: /${cmd} listed in CATALOG.md but no ${cmd}.md file found"
+              FAIL=1
+            fi
+          done <<< "$CATALOG_COMMANDS"
+
+          while IFS= read -r cmd; do
+            if ! echo "$CATALOG_COMMANDS" | grep -qx "$cmd"; then
+              echo "❌ Missing from catalog: ${cmd}.md exists but /${cmd} not in CATALOG.md"
+              FAIL=1
+            fi
+          done <<< "$ACTUAL_COMMANDS"
+
+          [[ "$FAIL" -eq 0 ]] || exit 1
+          echo "✅ Catalog accurate (no ghosts, no missing entries)"

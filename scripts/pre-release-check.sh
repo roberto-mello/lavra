@@ -121,6 +121,44 @@ echo "  Command map nodes: $MAP_NODES (need 40+)"
 [[ "$MAP_NODES" -ge 40 ]] && { echo "  PASS  Command map nodes"; ((PASS++)) || true; } || fail "Command map nodes" "$MAP_NODES < 40"
 
 echo ""
+echo "=== Catalog accuracy ==="
+# SYNC: This section must stay in sync with the verify-docs step in .github/workflows/test-installation.yml.
+# When modifying either, update the other.
+
+# Extract command names from CATALOG.md table rows only (lines starting with |)
+# to avoid matching prose mentions like "Included in `/lavra-design`"
+CATALOG_COMMANDS=$(grep -E '^\|' site/src/content/docs/CATALOG.md | \
+  grep -oE '`/[a-z][a-z0-9-]+`' | tr -d '`' | sed 's|^/||' | sort -u)
+
+# Actual command files (core + optional, recurse into subdirs)
+ACTUAL_COMMANDS=$(find plugins/lavra/commands -name "*.md" | \
+  xargs -I{} basename {} .md 2>/dev/null | sort -u)
+
+GHOST_COUNT=0
+MISSING_COUNT=0
+
+# Check for ghost commands (in catalog, no file exists)
+while IFS= read -r cmd; do
+  if ! echo "$ACTUAL_COMMANDS" | grep -qx "$cmd"; then
+    fail "Catalog ghost" "/${cmd} listed in CATALOG.md but no ${cmd}.md file found"
+    ((GHOST_COUNT++)) || true
+  fi
+done <<< "$CATALOG_COMMANDS"
+
+# Check for missing catalog entries (file exists, not in catalog)
+while IFS= read -r cmd; do
+  if ! echo "$CATALOG_COMMANDS" | grep -qx "$cmd"; then
+    fail "Missing from catalog" "${cmd}.md exists but /${cmd} not in CATALOG.md"
+    ((MISSING_COUNT++)) || true
+  fi
+done <<< "$ACTUAL_COMMANDS"
+
+if [[ "$GHOST_COUNT" -eq 0 && "$MISSING_COUNT" -eq 0 ]]; then
+  echo "  PASS  Catalog accuracy (no ghosts, no missing entries)"
+  ((PASS++)) || true
+fi
+
+echo ""
 echo "=== Compatibility tests ==="
 (cd scripts && bun run test-compatibility.ts) && { echo "  PASS  Compatibility tests"; ((PASS++)) || true; } || fail "Compatibility tests" "see output above"
 
