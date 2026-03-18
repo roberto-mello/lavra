@@ -19,7 +19,7 @@ These four locations must all have the target version:
 
 Also verify that `site/public/command-map.html` reflects current nodes/connections (new commands, agents, or skills should be added).
 
-Verify that the three reference docs match current plugin contents:
+Verify that the five reference docs match current plugin contents:
 
 - `site/src/content/docs/commands.md` — check against command frontmatter descriptions:
   ```bash
@@ -33,6 +33,12 @@ Verify that the three reference docs match current plugin contents:
   ```bash
   grep '^description:' plugins/lavra/skills/*/SKILL.md
   ```
+- `site/src/content/docs/CATALOG.md` — command ghost/missing checks are automated (pre-release-check.sh catches them). Still verify manually: agent/skill counts and listings match plugin contents, hook count matches `plugins/lavra/hooks/hooks.json`, and agent model tiers match frontmatter:
+  ```bash
+  grep '^model:' plugins/lavra/agents/**/*.md | sort | uniq -c
+  for f in plugins/lavra/commands/*.md plugins/lavra/commands/optional/*.md; do basename "$f" .md; done | sort
+  ```
+- `site/src/content/docs/PLATFORMS.md` — verify the feature support table matches what each installer actually installs. Check `installers/install-gemini.sh`, `installers/install-opencode.sh`, and `installers/install-cortex.sh` for what they copy.
 
 If any command, agent, or skill was added, renamed, or had its description changed since the last release, update the corresponding doc before proceeding.
 
@@ -47,8 +53,9 @@ bash scripts/pre-release-check.sh
 This replicates the CI `verify-release` job locally:
 - Version consistency between `plugin.json` and `marketplace.json`
 - Conversion outputs generated (OpenCode + Gemini)
-- Component counts (25+ commands, 28+ agents, 15+ skills)
+- Component counts (23+ commands, 30+ agents, 15+ skills)
 - Source files present
+- Catalog accuracy: ghost commands (in CATALOG.md, no file) and missing entries (file exists, not in catalog) both fail
 - Compatibility tests pass
 
 **Do not proceed if any check fails.**
@@ -168,6 +175,8 @@ Do NOT delete and recreate the tag. Bump to a patch version, fix, and release th
 `scripts/pre-release-check.sh` mirrors the `verify-release` job in `.github/workflows/test-installation.yml`.
 
 **When modifying either file, always update the other.** Both files have a `SYNC:` comment pointing to each other as a reminder. If CI adds a new check, add it to the script. If the script adds a new check, add it to CI.
+
+The catalog accuracy check (`=== Catalog accuracy ===`) also appears in the `test-compatibility` job, which runs on every PR to `main`. If you change the catalog check logic in pre-release-check.sh, update both CI locations.
 
 ## Key facts
 
