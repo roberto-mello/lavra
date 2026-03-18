@@ -315,7 +315,7 @@ bd create "{title}" --type epic -d "{overview description with research findings
 
 **For each implementation step, create a child bead with thorough descriptions:**
 
-Each child bead description MUST follow this structure. **Size budget: 150 lines max per child bead.** If a child bead exceeds 150 lines, it has too much scope -- split it into 2-3 smaller beads.
+Each child bead description MUST follow this structure. **Completeness over brevity** -- include every decision the agent needs so it makes zero judgment calls. If that takes 300 lines, fine. If 50, also fine. **Scope budget: ~1000 LOC of changes per bead.** If a bead would require more than ~1000 lines of code changes, split it into smaller beads.
 
 ```
 ## What
@@ -418,7 +418,8 @@ After creating all child beads, run a warning-only validation pass before final 
 2. **File-scope conflicts** — No two independent (non-dependent) child beads claim overlapping files (e.g., both modifying `src/auth/*`)
 3. **Sources section** — Epic bead has a non-empty Sources section
 4. **Brainstorm reference** — If a brainstorm bead was used in Step 0, the Sources section includes a `Brainstorm:` entry
-5. **Size budget** — Each child bead description is under 150 lines. If over, flag for splitting into smaller beads before proceeding
+5. **Completeness** — Each child bead description has enough detail that the implementing agent makes zero judgment calls. Missing What/Context/Decisions/Testing/Validation sections = incomplete.
+6. **Scope budget** — Each child bead targets ~1000 LOC of changes or fewer. If estimated changes exceed this, flag for splitting.
 
 **Output format:**
 
@@ -428,7 +429,8 @@ Cross-Check Results for {EPIC_ID}
 ! WARNING: {CHILD_ID} lacks "Files" section
 ! WARNING: {CHILD_1} and {CHILD_2} both modify src/auth/* without a dependency
 ! WARNING: Sources section missing brainstorm reference (brainstorm {ID} found)
-! WARNING: {CHILD_ID} exceeds 150-line size budget ({N} lines) -- split recommended
+! WARNING: {CHILD_ID} estimated >1000 LOC of changes -- split recommended
+! WARNING: {CHILD_ID} missing required section(s): {missing sections}
 v PASS: All child beads have Testing and Validation sections
 v PASS: DAG validation passes (bd swarm validate)
 
@@ -467,12 +469,13 @@ Address any warnings before finalizing the plan.
 
 <success_criteria>
 - Epic bead created with clear, searchable title
-- All child bead descriptions include What/Context/Testing/Validation/Files/Dependencies sections
+- All child bead descriptions include What/Context/Decisions/Testing/Validation/Files/Dependencies sections
+- Each child bead description is complete enough that the implementing agent makes zero judgment calls
+- Each child bead targets ~1000 LOC of changes or fewer
 - No two independent child beads modify the same files
 - Dependencies correctly set between beads
 - Research findings captured as knowledge comments (INVESTIGATION/PATTERN/FACT)
 - `bd swarm validate {EPIC_ID}` passes without warnings
-- Each child bead is reviewable and closeable based solely on its description
 </success_criteria>
 
 <guardrails>
@@ -482,7 +485,7 @@ Address any warnings before finalizing the plan.
 - Knowledge is auto-captured and will be available in future sessions
 - Child beads can be worked on independently with `/lavra-work`
 - Use `bd ready` to see which child beads are ready to work on
-- Each child bead should be reviewable and closeable based solely on its description's testing/validation criteria
+- Each child bead description is complete enough that the implementing agent makes zero judgment calls
 - NEVER CODE! Just research and write the plan.
 </guardrails>
 

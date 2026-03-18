@@ -1,7 +1,7 @@
 ---
 name: lavra-work
 description: Execute work on one or many beads -- auto-routes between single-bead and multi-bead paths based on input
-argument-hint: "[bead ID, epic ID, comma-separated IDs, or empty for all ready beads] [--yes]"
+argument-hint: "[bead ID, epic ID, comma-separated IDs, or empty for all ready beads] [--yes] [--no-parallel]"
 ---
 
 <objective>
@@ -21,6 +21,7 @@ Execute work on beads efficiently while maintaining quality and finishing featur
 Parse flags from the `$ARGUMENTS` string:
 
 - `--yes`: skip user approval gate (but NOT pre-push review)
+- `--no-parallel`: disable parallel agent dispatch in multi-bead mode. Beads execute one at a time, giving you a review pause between each. Useful when you want to review each bead's output before the next one starts.
 
 Remaining arguments (after removing flags) are the bead input: a single bead ID, an epic bead ID, comma-separated IDs, a specification path, or empty.
 
@@ -687,6 +688,8 @@ If the config file does not exist or `reviewer_context_note` is absent, the Revi
 ```bash
 PRE_WAVE_SHA=$(git rev-parse HEAD)
 ```
+
+**Respect `--no-parallel` flag:** If `--no-parallel` is set, override `max_parallel_agents` to 1. Each bead executes alone, and after each bead completes (Phase M8 verification), pause for user review before starting the next bead. This gives the human time to review each bead's output individually instead of batching.
 
 **Respect `max_parallel_agents`:** If the wave has more beads than `max_parallel_agents` (from lavra.json, default 3), split the wave into sub-waves of that size. Execute sub-waves sequentially within the wave.
 

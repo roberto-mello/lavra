@@ -457,18 +457,16 @@ bd dep relate {NEW_BEAD_ID} {EPIC_ID}
 
 This makes deferred items trackable -- `/lavra-retro` can surface them and `/lavra-triage` can reprioritize.
 
-**6.2d Size budget enforcement:**
+**6.2d Scope budget enforcement:**
 
-Check line counts for the epic and each child bead:
-- Epic max: 100 lines
-- Child bead max: 150 lines
-
-If a child bead exceeds 150 lines, **split it** into 2-3 smaller beads:
+Estimate the LOC of changes each child bead will produce. If a child bead would require more than ~1000 lines of code changes, **split it** into 2-3 smaller beads:
 - Each new bead gets a focused slice of the original scope
 - Link via `depends_on` to preserve execution ordering where needed
 - Each inherits the parent epic and relevant Locked Decisions
 - Close the original oversized bead: `bd close {BEAD_ID} --reason="split into {NEW_ID_1}, {NEW_ID_2}"`
 - This is lossless -- scope is distributed, not compressed
+
+**Completeness check:** Verify each child bead description contains enough detail that the implementing agent makes zero judgment calls. Missing What/Context/Decisions/Testing/Validation sections = incomplete -- fill them from accumulated context before locking.
 
 **6.3 Update the epic with the final plan annotation:**
 
