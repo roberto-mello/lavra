@@ -118,7 +118,7 @@ Usage:
 bd comments add BD-001 "LEARNED: OAuth redirect URI must match exactly"
 ```
 
-Knowledge is stored in `.beads/memory/knowledge.jsonl` and automatically recalled at the start of each session.
+Knowledge is stored in `.lavra/memory/knowledge.jsonl` and automatically recalled at the start of each session.
 
 ## License
 

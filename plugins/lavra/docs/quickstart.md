@@ -18,14 +18,14 @@ cd /path/to/your-project
 # Check that files were created
 ls -la .claude/hooks/        # Should see auto-recall.sh, memory-capture.sh
 ls -la .claude/commands/     # Should see lavra-*.md files
-ls -la .beads/memory/        # Should see knowledge.jsonl, recall.sh
+ls -la .lavra/memory/        # Should see knowledge.jsonl, recall.sh
 ```
 
 ## Configuration
 
 ### Workflow config (automatic)
 
-The installer creates `.beads/config/lavra.json` with default settings. Edit to toggle:
+The installer creates `.lavra/config/lavra.json` with default settings. Edit to toggle:
 - `workflow.research` -- skip research phase in `/lavra-design`
 - `workflow.plan_review` -- skip plan review phase in `/lavra-design`
 - `workflow.goal_verification` -- skip goal verification in `/lavra-work` and `/lavra-ship`
@@ -42,7 +42,7 @@ If you're installing lavra into an existing project, run `/project-setup` to gen
 /project-setup
 ```
 
-When prompted "Run codebase analysis?", choose Y. This dispatches 3 parallel agents to analyze your stack, architecture, and conventions, saving the results to `.beads/config/codebase-profile.md`. This file is used by `/lavra-design` and `/lavra-work` as planning context.
+When prompted "Run codebase analysis?", choose Y. This dispatches 3 parallel agents to analyze your stack, architecture, and conventions, saving the results to `.lavra/config/codebase-profile.md`. This file is used by `/lavra-design` and `/lavra-work` as planning context.
 
 ## Your First Workflow
 
@@ -93,7 +93,7 @@ bd comments add BD-001.1 "DECISION: Using Gravatar for default avatars"
 bd comments add BD-001.1 "FACT: Max upload size is 5MB (nginx limit)"
 ```
 
-These get auto-captured to `.beads/memory/knowledge.jsonl`.
+These get auto-captured to `.lavra/memory/knowledge.jsonl`.
 
 ### 6. Review
 
@@ -140,16 +140,16 @@ You get relevant learnings without manually searching!
 
 ```bash
 # Search by keyword
-.beads/memory/recall.sh "authentication"
+.lavra/memory/recall.sh "authentication"
 
 # Show recent
-.beads/memory/recall.sh --recent 10
+.lavra/memory/recall.sh --recent 10
 
 # Show stats
-.beads/memory/recall.sh --stats
+.lavra/memory/recall.sh --stats
 
 # Filter by type
-.beads/memory/recall.sh "jwt" --type learned
+.lavra/memory/recall.sh "jwt" --type learned
 ```
 
 ## Example: Full Feature Flow
@@ -219,7 +219,7 @@ bd close BD-050.1
 
 ```bash
 # Check if knowledge exists
-.beads/memory/recall.sh --stats
+.lavra/memory/recall.sh --stats
 
 # Check if hook is installed
 ls -la .claude/hooks/auto-recall.sh
