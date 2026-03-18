@@ -5,7 +5,7 @@
     "email": "roberto.mello@gmail.com"
   },
   "metadata": {
-    "description": "Beads-based persistent memory with multi-agent workflows",
+    "description": "Compound engineering with persistent memory and multi-agent workflows based on beads",
     "version": "1.0.0"
   },
   "plugins": [
@@ -13,7 +13,7 @@
       "name": "lavra",
       "source": "./plugins/lavra",
       "description": "30 specialized agents, 28 commands, 15 skills, persistent memory with auto-recall",
-      "version": "0.8.0",
+      "version": "0.7.0",
       "tags": [
         "beads",
         "memory",

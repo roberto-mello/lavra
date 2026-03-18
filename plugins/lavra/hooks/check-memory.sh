@@ -91,6 +91,7 @@ PROVISION_SCRIPT="$HOOKS_SOURCE_DIR/provision-memory.sh"
 
 if [ -f "$PROVISION_SCRIPT" ]; then
   source "$PROVISION_SCRIPT"
+  migrate_beads_to_lavra "."
   provision_memory_dir "." "$HOOKS_SOURCE_DIR"
 else
   # Fallback: minimal setup if provision script missing

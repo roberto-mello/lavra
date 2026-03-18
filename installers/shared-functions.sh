@@ -6,6 +6,32 @@
 # common functionality across all platforms.
 #
 
+# Print lavra ASCII art banner
+print_banner() {
+  local platform="${1:-}"
+  local version="${2:-0.7.0}"
+
+  # #10b981 → closest 256-color: 35 (medium spring green)
+  local GREEN='\033[38;5;35m'
+  local DIM='\033[2m'
+  local RESET='\033[0m'
+
+  printf "${GREEN}"
+  printf '  ██╗      █████╗ ██╗   ██╗██████╗  █████╗ \n'
+  printf '  ██║     ██╔══██╗██║   ██║██╔══██╗██╔══██╗\n'
+  printf '  ██║     ███████║██║   ██║██████╔╝███████║\n'
+  printf '  ██║     ██╔══██║╚██╗ ██╔╝██╔══██╗██╔══██║\n'
+  printf '  ███████╗██║  ██║ ╚████╔╝ ██║  ██║██║  ██║\n'
+  printf '  ╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝\n'
+  printf "${RESET}"
+  if [ -n "$platform" ]; then
+    printf "  ${DIM}v${version} · ${platform}${RESET}\n"
+  else
+    printf "  ${DIM}v${version}${RESET}\n"
+  fi
+  printf "\n"
+}
+
 # Create directory with symlink handling
 # Handles dotfiles repos where config directories are symlinks
 create_dir_with_symlink_handling() {

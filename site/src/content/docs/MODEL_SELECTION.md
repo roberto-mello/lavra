@@ -21,7 +21,7 @@ Lavra maps its agents to three performance tiers. For OpenCode and Gemini CLI, y
 When installing for OpenCode, you'll be prompted to customize model mappings:
 
 ```bash
-npx lavra@latest --opencode
+npx @lavralabs/lavra@latest --opencode
 # Customize models? (y/N):
 ```
 
@@ -30,7 +30,7 @@ Select `y` to pick models for each tier from your available OpenCode models.
 To skip prompts and use defaults:
 
 ```bash
-npx lavra@latest --opencode --yes
+npx @lavralabs/lavra@latest --opencode --yes
 ```
 
 ## OpenCode — Manual Configuration

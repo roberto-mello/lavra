@@ -90,7 +90,7 @@ Anyone using coding agents who wants consistent, high-quality output instead of 
 **Requires:** [beads CLI](https://github.com/steveyegge/beads), `jq`, `sqlite3`
 
 ```bash
-npx lavra@latest
+npx @lavralabs/lavra@latest
 ```
 
 Or manual:

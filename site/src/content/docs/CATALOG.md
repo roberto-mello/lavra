@@ -19,11 +19,11 @@ See the [Command Reference](/docs/commands) for descriptions and direct links, o
 | `/lavra-design` | Orchestrate the full design pipeline, brainstorm, plan, research, revise, review, lock | Runs the entire design pipeline automatically |
 | `/lavra-brainstorm` | Explore requirements and approaches through collaborative dialogue before planning | When requirements are unclear or you need to explore approaches. Included in `/lavra-design` |
 | `/lavra-plan` | Transform feature descriptions into well-structured beads with parallel research and multi-phase planning | Start every feature, creates a structured plan with research. Included in `/lavra-design` |
+| `/lavra-review` | Perform exhaustive code reviews using multi-agent analysis and ultra-thinking | Before closing beads, comprehensive quality check. Included in `/lavra-design` |
 | `/lavra-quick` | Fast-track small tasks, abbreviated plan then straight to execution | Quick fixes and small features that don't need the full pipeline |
 | `/lavra-work` | Execute work on one or many beads, auto-routes between single-bead and multi-bead paths based on input | Standard workflow, any number of beads |
 | `/lavra-work-ralph` | Autonomous retry mode, iterates until completion criteria are met or retry budget is exhausted | Hands-off execution with self-correction |
 | `/lavra-work-teams` | Work on multiple beads with persistent worker teammates that self-organize through a ready queue | Speed up delivery with team parallelism |
-| `/lavra-review` | Perform exhaustive code reviews using multi-agent analysis and ultra-thinking | Before closing beads, comprehensive quality check. Included in `/lavra-design` |
 | `/lavra-qa` | Browser-based QA verification of the running app, systematic testing from the user's perspective | After implementation, verify the feature works end to end |
 | `/lavra-ship` | Fully automated ship sequence from code-ready to PR-open with beads closed and knowledge captured | When work is done, opens PR, closes beads, pushes |
 | `/lavra-checkpoint` | Save session progress by filing beads, capturing knowledge, and syncing state | Mid-session, checkpoint your work before context runs out |

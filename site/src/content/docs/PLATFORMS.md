@@ -22,15 +22,15 @@ Lavra supports four AI coding agents. The core memory system (hooks, knowledge c
 ## Claude Code
 
 ```bash
-npx lavra@latest --claude       # local project
-npx lavra@latest --global       # all projects (~/.claude/)
+npx @lavralabs/lavra@latest --claude       # local project
+npx @lavralabs/lavra@latest --global       # all projects (~/.claude/)
 ```
 
 ## OpenCode
 
 ```bash
-npx lavra@latest --opencode           # local project
-npx lavra@latest --opencode --yes     # skip model selection prompts
+npx @lavralabs/lavra@latest --opencode           # local project
+npx @lavralabs/lavra@latest --opencode --yes     # skip model selection prompts
 ```
 
 The installer copies a TypeScript plugin to `.opencode/plugins/lavra/` (local) or `~/.config/opencode/plugins/lavra/` (global) and installs dependencies with Bun. Commands, agents, and skills are converted to OpenCode format automatically.
@@ -52,7 +52,7 @@ Check plugin is loading (look for these in OpenCode output):
 ## Gemini CLI
 
 ```bash
-npx lavra@latest --gemini       # local project
+npx @lavralabs/lavra@latest --gemini       # local project
 ```
 
 The installer converts commands to `.toml` format and copies commands, agents, skills, and hooks to `.gemini/` (local) or `~/.config/gemini/` (global). Memory capture and auto-recall work via the same stdin/stdout JSON protocol as Claude Code. Context7 MCP is configured automatically in `~/.config/gemini/settings.json`.

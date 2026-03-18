@@ -16,7 +16,7 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Version of lavra that wrote this hook (updated by installer)
-LAVRA_VERSION="0.8.0"
+LAVRA_VERSION="0.7.0"
 
 # Exit silently if bd is not installed
 if ! command -v bd &>/dev/null; then

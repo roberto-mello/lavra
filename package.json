@@ -1,7 +1,7 @@
 {
-  "name": "lavra",
-  "version": "0.6.8",
-  "description": "Persistent memory and multi-agent workflows for Claude Code, OpenCode, and Gemini CLI",
+  "name": "@lavralabs/lavra",
+  "version": "0.7.0-1",
+  "description": "Compound engineering with persistent memory and multi-agent workflows based on beads for Claude Code, OpenCode, Gemini CLI, and Cortex Code",
   "bin": {
     "lavra": "bin/install.js",
     "bd-plan-view": "bin/plan-view.js",
@@ -10,6 +10,7 @@
   "files": [
     "bin/",
     "plugins/",
+    "installers/",
     "install.sh",
     "uninstall.sh",
     "scripts/",

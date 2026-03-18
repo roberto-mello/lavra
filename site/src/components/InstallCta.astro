@@ -31,7 +31,7 @@
 
       <!-- Code area -->
       <div class="p-4 flex items-center justify-between gap-4">
-        <code id="install-command" class="font-mono text-sm text-text">npx lavra@latest</code>
+        <code id="install-command" class="font-mono text-sm text-text">npx @lavralabs/lavra@latest</code>
         <button
           id="copy-btn"
           class="p-2 rounded-lg hover:bg-border/50 transition-colors text-text-muted"
@@ -57,8 +57,8 @@
   const checkSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>';
 
   const commands: Record<string, string> = {
-    npx: 'npx lavra@latest',
-    bunx: 'bunx lavra@latest',
+    npx: 'npx @lavralabs/lavra@latest',
+    bunx: 'bunx @lavralabs/lavra@latest',
   };
 
   let activeTab = 'npx';

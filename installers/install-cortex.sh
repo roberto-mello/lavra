@@ -74,13 +74,12 @@ if [ ! -d "$PLUGIN_DIR" ]; then
   exit 1
 fi
 
-echo "lavra Cortex Code Installer"
-echo ""
-echo "Target: $TARGET"
+print_banner "Cortex Code" "0.7.0"
+echo "  Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
-  echo "Type: Global installation"
+  echo "  Type: Global installation"
 else
-  echo "Type: Project-specific installation"
+  echo "  Type: Project-specific installation"
 fi
 echo ""
 

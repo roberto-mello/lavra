@@ -83,12 +83,12 @@ if [ ! -d "$PLUGIN_DIR" ]; then
   exit 1
 fi
 
-echo "lavra plugin installer"
-echo "Plugin: $PLUGIN_DIR"
+print_banner "Claude Code" "0.7.0"
+echo "  Plugin: $PLUGIN_DIR"
 if [ "$GLOBAL_INSTALL" = true ]; then
-  echo "Target: $TARGET (global)"
+  echo "  Target: $TARGET (global)"
 else
-  echo "Target: $TARGET (project-specific)"
+  echo "  Target: $TARGET (project-specific)"
 fi
 echo ""
 

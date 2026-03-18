@@ -55,13 +55,12 @@ fi
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
 
-echo "lavra Gemini CLI Installer"
-echo ""
-echo "Target: $TARGET"
+print_banner "Gemini CLI" "0.7.0"
+echo "  Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
-  echo "Type: Global installation"
+  echo "  Type: Global installation"
 else
-  echo "Type: Project-specific installation"
+  echo "  Type: Project-specific installation"
 fi
 echo ""
 

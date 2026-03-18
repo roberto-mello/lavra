@@ -11,22 +11,22 @@ order: 1
 Install into the current project for your AI coding agent:
 
 ```bash
-npx lavra@latest --claude      # Claude Code
-npx lavra@latest --opencode    # OpenCode
-npx lavra@latest --gemini      # Gemini CLI
-npx lavra@latest --cortex      # Cortex Code
+npx @lavralabs/lavra@latest --claude      # Claude Code
+npx @lavralabs/lavra@latest --opencode    # OpenCode
+npx @lavralabs/lavra@latest --gemini      # Gemini CLI
+npx @lavralabs/lavra@latest --cortex      # Cortex Code
 ```
 
 Or install globally so Lavra is available in every project:
 
 ```bash
-npx lavra@latest --global
+npx @lavralabs/lavra@latest --global
 ```
 
 Or with Bun:
 
 ```bash
-bunx lavra@latest --claude
+bunx @lavralabs/lavra@latest --claude
 ```
 
 Restart your agent after installing to pick up the new commands and hooks.
@@ -257,7 +257,7 @@ The plugin references compound-engineering agents but doesn't install them. If y
 ## Uninstall
 
 ```bash
-npx lavra@latest --uninstall
+npx @lavralabs/lavra@latest --uninstall
 ```
 
 This removes the plugin but **preserves**:

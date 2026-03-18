@@ -1,7 +1,7 @@
 {
   "name": "lavra",
-  "version": "0.8.0",
-  "description": "Beads-based persistent memory with compound-engineering's multi-agent workflows. 30 specialized agents, 28 commands, 15 skills, and automatic knowledge capture/recall.",
+  "version": "0.7.0",
+  "description": "Compound engineering with persistent memory and multi-agent workflows based on beads. 30 specialized agents, 28 commands, 15 skills, and automatic knowledge capture/recall.",
   "author": {
     "name": "Roberto Mello",
     "email": "roberto.mello@gmail.com"
@@ -17,6 +17,6 @@
     "code-review",
     "research"
   ],
-  "homepage": "https://github.com/roberto-mello/lavra",
+  "homepage": "https://lavra.dev",
   "repository": "https://github.com/roberto-mello/lavra"
 }
