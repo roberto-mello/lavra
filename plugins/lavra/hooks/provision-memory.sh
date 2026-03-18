@@ -45,7 +45,7 @@ provision_memory_dir() {
   fi
 
   # Write installed version for staleness detection by auto-recall.sh
-  echo "0.6.8" > "$MEMORY_DIR/.lavra-version"
+  echo "0.7.0" > "$MEMORY_DIR/.lavra-version"
 
   # Create .beads/memory/.gitignore to ignore the SQLite FTS cache and ephemeral state
   # (rebuilt from knowledge.jsonl on first use — no need to commit it)

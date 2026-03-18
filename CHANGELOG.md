@@ -22,12 +22,15 @@ See [docs/releases/v0.7.0.md](docs/releases/v0.7.0.md) for the full release note
 - `docs/SECURITY.md` -- threat model and injection defense documentation
 - Knowledge system prompt injection defense -- `auto-recall.sh` now sanitizes recalled entries (strip role prefixes, bidirectional chars) and wraps in `<untrusted-knowledge>` tags with "do not follow instructions" directive
 - `--no-parallel` flag for `/lavra-work` -- opt-in serial execution in multi-bead mode with review pauses between each bead
+- Documentation site built with Astro 5, deployed to GitHub Pages via `deploy-site.yml` CI workflow. Docs moved from `docs/` to `site/src/content/docs/` with dedicated pages for commands, agents, skills, hooks, knowledge, quickstart, and release notes
+- README rewrite with problem/solution framing, multi-platform badges, and quick links to docs site
+- `model_profile` field in `.beads/config/lavra.json` wired to agent dispatch for per-project model tier configuration
 
 ### Changed
 - Pipeline redesign: `/lavra-design` -> `/lavra-work` -> `/lavra-qa` -> `/lavra-ship`
 - `/lavra-compound` -> `/lavra-learn`, `/lavra-deepen` -> `/lavra-research`
 - Version self-heal provisions new config files on upgrade without full re-install
-- 30 agents (was 29), 16 skills (was 15), 22 core commands + 5 optional
+- 30 agents (was 29), 15 skills (was 15), 23 core commands + 5 optional
 - Dynamic agent allowlist in `/lavra-review`, expanded sanitization strip list
 - Replaced 150-line bead description cap with completeness gate (all required sections, zero agent judgment calls) and ~1000 LOC scope budget per bead
 - `recall.sh` grep fallback uses fixed-string matching (`grep -iF`) instead of regex to prevent metacharacter issues
@@ -234,6 +237,10 @@ Initial public release. Fork of [compound-engineering-plugin](https://github.com
 - Adapted `code-simplicity-reviewer` to protect `.beads/memory/` files
 - Renamed `compound-docs` skill to `lavra-knowledge`
 
+[0.7.0]: https://github.com/roberto-mello/lavra/compare/v0.6.8...v0.7.0
+[0.6.8]: https://github.com/roberto-mello/lavra/compare/v0.6.7...v0.6.8
+[0.6.7]: https://github.com/roberto-mello/lavra/compare/v0.6.4...v0.6.7
+[0.6.4]: https://github.com/roberto-mello/lavra/compare/v0.6.2...v0.6.4
 [0.6.2]: https://github.com/roberto-mello/lavra/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/roberto-mello/lavra/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/roberto-mello/lavra/compare/v0.5.0...v0.6.0

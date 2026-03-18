@@ -9,8 +9,8 @@ This is a Claude Code plugin marketplace that provides beads-based persistent me
 The plugin provides:
 - 30 specialized agents (16 review, 5 research, 3 design, 5 workflow, 1 docs)
 - 23 core commands + 5 optional domain-specific commands (in commands/optional/)
-- 16 skills (git-worktree, brainstorming, create-agent-skills, agent-browser, dhh-rails-style, etc.)
-- 3 hooks for automatic knowledge capture, recall, and subagent wrapup
+- 15 skills (8 core + 7 optional: git-worktree, brainstorming, create-agent-skills, agent-browser, dhh-rails-style, etc.)
+- 4 hooks (auto-recall, memory-capture, subagent-wrapup, teammate-idle-check)
 - 1 MCP server (Context7 for framework documentation)
 - Automatic knowledge capture from beads comments (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION/DEVIATION)
 - Automatic knowledge recall at session start based on current beads
@@ -35,11 +35,11 @@ lavra/                              # Marketplace root
 ├── plugins/
 │   └── lavra/                      # Plugin root
 │       ├── .claude-plugin/
-│       │   └── plugin.json         # Plugin manifest (v0.6.0)
+│       │   └── plugin.json         # Plugin manifest (v0.7.0)
 │       ├── agents/                 # 30 agents (review/, research/, design/, workflow/, docs/)
 │       ├── commands/               # 23 core commands + optional/
-│       ├── skills/                 # 16 skills with supporting files
-│       ├── hooks/                  # hooks.json, auto-recall.sh, memory-capture.sh, subagent-wrapup.sh, recall.sh
+│       ├── skills/                 # 15 skills (8 core + 7 optional) with supporting files
+│       ├── hooks/                  # hooks.json, auto-recall.sh, memory-capture.sh, subagent-wrapup.sh, teammate-idle-check.sh, recall.sh
 │       ├── opencode/               # OpenCode TypeScript plugin
 │       ├── gemini/                 # Gemini CLI hook configuration
 │       ├── gemini-extension.json   # Gemini extension manifest

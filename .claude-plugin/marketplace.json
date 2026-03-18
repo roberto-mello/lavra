@@ -12,8 +12,8 @@
     {
       "name": "lavra",
       "source": "./plugins/lavra",
-      "description": "30 specialized agents, 27 commands, 15 skills, persistent memory with auto-recall",
-      "version": "0.6.8",
+      "description": "30 specialized agents, 28 commands, 15 skills, persistent memory with auto-recall",
+      "version": "0.7.0",
       "tags": [
         "beads",
         "memory",

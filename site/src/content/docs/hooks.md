@@ -1,12 +1,12 @@
 ---
 title: Hooks
-description: How Lavra's three automatic hooks work — session recall, knowledge capture, and subagent wrapup.
+description: How Lavra's four automatic hooks work — session recall, knowledge capture, subagent wrapup, and teammate idle check.
 order: 6
 ---
 
 # Hooks
 
-Lavra ships three hooks that run automatically during your Claude Code session. You don't invoke them directly — they fire in the background based on what you do.
+Lavra ships four hooks that run automatically during your Claude Code session. You don't invoke them directly — they fire in the background based on what you do.
 
 ## auto-recall (SessionStart)
 
@@ -55,3 +55,14 @@ Runs when a subagent finishes. Blocks the subagent from completing until it has 
 This ensures knowledge compounds across parallel agent work — every subagent leaves a trail.
 
 > **Note:** This hook does not fire for `/lavra-work-teams` teammates, which use a separate `COMPLETED → ACCEPTED` handoff protocol.
+
+## teammate-idle-check (TeammateIdle)
+
+Runs when a `/lavra-work-teams` teammate goes idle. Checks whether there are still beads in the ready queue and blocks the teammate from stopping if work remains.
+
+**How it works:**
+1. Runs `bd ready` to check for remaining beads
+2. If beads are available, returns a `decision:block` JSON response that prevents the teammate from idling
+3. If no beads remain, allows the teammate to stop gracefully
+
+This keeps persistent worker teammates active as long as there's work to do.

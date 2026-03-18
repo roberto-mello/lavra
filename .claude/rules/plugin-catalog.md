@@ -5,11 +5,11 @@ globs: "**/plugins/**,**/agents/**,**/commands/**,**/skills/**"
 
 # Plugin Catalog
 
-## Commands (22 core + 5 optional)
+## Commands (23 core + 5 optional)
 
 Commands are in `plugins/lavra/commands/`:
 
-**Beads Workflow (14):**
+**Beads Workflow (15):**
 
 | Command | File | Description |
 |---------|------|-------------|
@@ -71,9 +71,9 @@ Agents are in `plugins/lavra/agents/`:
 
 **Docs (1)**: ankane-readme-writer
 
-## Skills (16)
+## Skills (15: 8 core + 7 optional)
 
-Skills are in `plugins/lavra/skills/`:
+Skills are in `plugins/lavra/skills/` (core) and `plugins/lavra/skills/optional/` (optional):
 
 - **git-worktree**: Manage git worktrees for parallel bead work
 - **brainstorming**: Structured brainstorming with bead output
