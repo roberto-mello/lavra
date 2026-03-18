@@ -11,7 +11,7 @@
 #
 # What this PRESERVES:
 #   - .beads/ directory and all data
-#   - .beads/memory/ and knowledge.jsonl (your accumulated knowledge)
+#   - .lavra/ directory and knowledge.jsonl (your accumulated knowledge)
 #   - Any beads you created
 #   - .mcp.json (may contain non-plugin MCP servers)
 #
@@ -222,12 +222,13 @@ if [ $REMOVED_COUNT -gt 0 ]; then
   echo ""
   echo "PRESERVED:"
   echo "  - .beads/ directory with all your data"
-  echo "  - .beads/memory/knowledge.jsonl with accumulated knowledge"
+  echo "  - .lavra/ directory with accumulated knowledge and config"
+  echo "  - .beads/ directory with all your beads data"
   echo "  - All beads you created"
   echo "  - .mcp.json (remove manually if no longer needed)"
   echo ""
-  echo "To completely remove beads data:"
-  echo "  rm -rf $TARGET/.beads/"
+  echo "To fully remove Lavra data:"
+  echo "  rm -rf $TARGET/.lavra/"
   echo ""
   echo "Restart Claude Code to complete uninstallation."
 else

@@ -107,19 +107,19 @@ if [ -d "$TARGET/skills" ]; then
 fi
 
 # Remove memory scripts (keep knowledge.jsonl - that's user data)
-if [ -d "$TARGET/.beads/memory" ]; then
+if [ -d "$TARGET/.lavra/memory" ]; then
   # Remove plugin scripts only
-  if [ -f "$TARGET/.beads/memory/recall.sh" ]; then
-    rm "$TARGET/.beads/memory/recall.sh"
+  if [ -f "$TARGET/.lavra/memory/recall.sh" ]; then
+    rm "$TARGET/.lavra/memory/recall.sh"
     echo "  ✓ Removed recall.sh"
   fi
-  if [ -f "$TARGET/.beads/memory/knowledge-db.sh" ]; then
-    rm "$TARGET/.beads/memory/knowledge-db.sh"
+  if [ -f "$TARGET/.lavra/memory/knowledge-db.sh" ]; then
+    rm "$TARGET/.lavra/memory/knowledge-db.sh"
     echo "  ✓ Removed knowledge-db.sh"
   fi
 
   # Note: knowledge.jsonl and knowledge.archive.jsonl are preserved (user data)
-  if [ -f "$TARGET/.beads/memory/knowledge.jsonl" ]; then
+  if [ -f "$TARGET/.lavra/memory/knowledge.jsonl" ]; then
     echo "  ⊘ Kept knowledge.jsonl (user data preserved)"
   fi
 fi

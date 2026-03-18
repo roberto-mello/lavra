@@ -4,8 +4,8 @@
 #
 # What this installs:
 #   - Memory capture and auto-recall hooks
-#   - Knowledge store (.beads/memory/knowledge.jsonl)
-#   - Recall script (.beads/memory/recall.sh)
+#   - Knowledge store (.lavra/memory/knowledge.jsonl)
+#   - Recall script (.lavra/memory/recall.sh)
 #   - Beads-aware workflow commands (24 core commands)
 #   - Specialized agents (29 agent definitions)
 #   - Skills (16 skills including git-worktree, brainstorming, etc.)
@@ -145,15 +145,10 @@ else
 
   if [ -f "$PROVISION_SCRIPT" ]; then
     source "$PROVISION_SCRIPT"
+    migrate_beads_to_lavra "$TARGET"
     provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
     echo "  - Memory system configured"
   fi
-
-  # Provision config directory for project-setup and other config files.
-  # Separate from .beads/memory/ because memory uses merge=union gitattributes
-  # which would corrupt YAML frontmatter — config needs normal git merge behavior.
-  mkdir -p "$TARGET/.beads/config"
-  echo "  - Config directory provisioned (.beads/config/)"
 fi
 
 # Install hooks (only for project-specific installs)
@@ -470,8 +465,8 @@ if [ "$GLOBAL_INSTALL" = false ]; then
   echo "  Memory System:"
   echo "    - Auto-recall at session start (based on current beads)"
   echo "    - Auto-capture from bd comment (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION)"
-  echo "    - Knowledge stored at .beads/memory/knowledge.jsonl"
-  echo "    - Search: .beads/memory/recall.sh \"keyword\""
+  echo "    - Knowledge stored at .lavra/memory/knowledge.jsonl"
+  echo "    - Search: .lavra/memory/recall.sh \"keyword\""
   echo ""
 fi
 

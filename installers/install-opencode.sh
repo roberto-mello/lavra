@@ -5,7 +5,7 @@
 # What this installs:
 #   - TypeScript plugin (plugin.ts) for hook integration
 #   - Memory capture and auto-recall hooks
-#   - Knowledge store (.beads/memory/knowledge.jsonl)
+#   - Knowledge store (.lavra/memory/knowledge.jsonl)
 #   - Converted commands, agents, and skills
 #   - MCP server configuration documentation
 #
@@ -231,6 +231,7 @@ else
   echo "[6/6] Provisioning memory system..."
 
   source "$PLUGIN_DIR/hooks/provision-memory.sh"
+  migrate_beads_to_lavra "$TARGET"
   provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
 
   echo "  - Memory system ready"

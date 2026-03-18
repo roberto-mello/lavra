@@ -5,7 +5,7 @@
 # What this installs:
 #   - Extension manifest (gemini-extension.json)
 #   - Memory capture and auto-recall hooks
-#   - Knowledge store (.beads/memory/knowledge.jsonl)
+#   - Knowledge store (.lavra/memory/knowledge.jsonl)
 #   - Converted commands (.toml format), agents, and skills
 #   - MCP server configuration documentation
 #
@@ -167,6 +167,7 @@ else
   echo "[4/4] Provisioning memory system..."
 
   source "$PLUGIN_DIR/hooks/provision-memory.sh"
+  migrate_beads_to_lavra "$TARGET"
   provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
 
   echo "  - Memory system ready"

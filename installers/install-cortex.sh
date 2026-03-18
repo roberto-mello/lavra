@@ -4,7 +4,7 @@
 #
 # What this installs:
 #   - Memory capture and auto-recall hooks
-#   - Knowledge store (.beads/memory/knowledge.jsonl)
+#   - Knowledge store (.lavra/memory/knowledge.jsonl)
 #   - Converted commands, agents, and skills
 #
 # Usage:
@@ -153,6 +153,7 @@ else
 
   if [ -f "$PROVISION_SCRIPT" ]; then
     source "$PROVISION_SCRIPT"
+    migrate_beads_to_lavra "$TARGET"
     provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
     echo "  - Memory system configured"
   fi
@@ -435,8 +436,8 @@ if [ "$GLOBAL_INSTALL" = false ]; then
   echo "  Memory System:"
   echo "    - Auto-recall at session start (based on current beads)"
   echo "    - Auto-capture from bd comment (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION)"
-  echo "    - Knowledge stored at .beads/memory/knowledge.jsonl"
-  echo "    - Search: .beads/memory/recall.sh \"keyword\""
+  echo "    - Knowledge stored at .lavra/memory/knowledge.jsonl"
+  echo "    - Search: .lavra/memory/recall.sh \"keyword\""
   echo ""
 fi
 

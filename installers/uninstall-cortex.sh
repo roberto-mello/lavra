@@ -11,7 +11,7 @@
 #
 # What this PRESERVES:
 #   - .beads/ directory and all data
-#   - .beads/memory/ and knowledge.jsonl (your accumulated knowledge)
+#   - .lavra/ directory and knowledge.jsonl (your accumulated knowledge)
 #   - Any beads you created
 #
 # Usage:
@@ -218,11 +218,12 @@ if [ $REMOVED_COUNT -gt 0 ]; then
   echo ""
   echo "PRESERVED:"
   echo "  - .beads/ directory with all your data"
-  echo "  - .beads/memory/knowledge.jsonl with accumulated knowledge"
+  echo "  - .lavra/ directory with accumulated knowledge and config"
+  echo "  - .beads/ directory with all your beads data"
   echo "  - All beads you created"
   echo ""
-  echo "To completely remove beads data:"
-  echo "  rm -rf $TARGET/.beads/"
+  echo "To fully remove Lavra data:"
+  echo "  rm -rf $TARGET/.lavra/"
   echo ""
   echo "Restart Cortex Code to complete uninstallation."
 else
