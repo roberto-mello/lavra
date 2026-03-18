@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 220" width="440" height="220" font-family="system-ui, sans-serif">
+  <rect width="440" height="220" fill="white" rx="8"/>
+  <text x="220" y="24" text-anchor="middle" font-size="16" font-weight="600" fill="#111827">Functional Scores</text>
+  <g transform="translate(10, 30)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" width="200" height="100" font-family="system-ui, sans-serif">
+  <text x="100.0" y="18" text-anchor="middle" font-size="12" fill="#374151">Control S1</text>
+  <text x="100.0" y="35" text-anchor="middle" font-size="14" font-weight="600" fill="#16a34a">60/60</text>
+  <rect x="20.0" y="45" width="160" height="20" fill="#e5e7eb" rx="4"/>
+  <rect x="20.0" y="45" width="160.0" height="20" fill="#16a34a" rx="4"/>
+</svg></g>
+  <g transform="translate(220, 30)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" width="200" height="100" font-family="system-ui, sans-serif">
+  <text x="100.0" y="18" text-anchor="middle" font-size="12" fill="#374151">Lavra S1</text>
+  <text x="100.0" y="35" text-anchor="middle" font-size="14" font-weight="600" fill="#16a34a">60/60</text>
+  <rect x="20.0" y="45" width="160" height="20" fill="#e5e7eb" rx="4"/>
+  <rect x="20.0" y="45" width="160.0" height="20" fill="#16a34a" rx="4"/>
+</svg></g>
+  <g transform="translate(10, 120)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" width="200" height="100" font-family="system-ui, sans-serif">
+  <text x="100.0" y="18" text-anchor="middle" font-size="12" fill="#374151">Control S2</text>
+  <text x="100.0" y="35" text-anchor="middle" font-size="14" font-weight="600" fill="#16a34a">60/60</text>
+  <rect x="20.0" y="45" width="160" height="20" fill="#e5e7eb" rx="4"/>
+  <rect x="20.0" y="45" width="160.0" height="20" fill="#16a34a" rx="4"/>
+</svg></g>
+  <g transform="translate(220, 120)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" width="200" height="100" font-family="system-ui, sans-serif">
+  <text x="100.0" y="18" text-anchor="middle" font-size="12" fill="#374151">Lavra S2</text>
+  <text x="100.0" y="35" text-anchor="middle" font-size="14" font-weight="600" fill="#16a34a">60/60</text>
+  <rect x="20.0" y="45" width="160" height="20" fill="#e5e7eb" rx="4"/>
+  <rect x="20.0" y="45" width="160.0" height="20" fill="#16a34a" rx="4"/>
+</svg></g>
+</svg>

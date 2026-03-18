@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 320" width="600" height="320" font-family="system-ui, -apple-system, sans-serif">
+  <rect width="600" height="320" fill="white" rx="8"/>
+  <text x="300.0" y="24" text-anchor="middle" font-size="16" font-weight="600" fill="#111827">Wall Time (seconds)</text>
+  
+    <rect x="70" y="35" width="12" height="12" fill="#6b7280" rx="2"/>
+    <text x="86" y="45" font-size="11" fill="#374151">Control</text>
+    <rect x="150" y="35" width="12" height="12" fill="#0f766e" rx="2"/>
+    <text x="166" y="45" font-size="11" fill="#0f766e">Lavra</text>
+    
+  <line x1="70" y1="260.0" x2="580" y2="260.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="264.0" text-anchor="end" font-size="11" fill="#6b7280">0</text>
+<line x1="70" y1="218.0" x2="580" y2="218.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="222.0" text-anchor="end" font-size="11" fill="#6b7280">133</text>
+<line x1="70" y1="176.0" x2="580" y2="176.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="180.0" text-anchor="end" font-size="11" fill="#6b7280">266</text>
+<line x1="70" y1="134.0" x2="580" y2="134.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="138.0" text-anchor="end" font-size="11" fill="#6b7280">399</text>
+<line x1="70" y1="92.0" x2="580" y2="92.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="96.0" text-anchor="end" font-size="11" fill="#6b7280">532</text>
+<line x1="70" y1="50.0" x2="580" y2="50.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="54.0" text-anchor="end" font-size="11" fill="#6b7280">665</text>
+
+  <rect x="78.5" y="210.7" width="59.5" height="49.3" fill="#6b7280" rx="3"/>
+<text x="108.2" y="205.7" text-anchor="middle" font-size="11" fill="#374151">156.0s</text>
+<rect x="146.5" y="202.5" width="59.5" height="57.5" fill="#0f766e" rx="3"/>
+<text x="176.2" y="197.5" text-anchor="middle" font-size="11" fill="#0f766e">182.0s</text>
+<text x="155.0" y="280.0" text-anchor="middle" font-size="12" fill="#374151">Session 1</text>
+<rect x="248.5" y="220.5" width="59.5" height="39.5" fill="#6b7280" rx="3"/>
+<text x="278.2" y="215.5" text-anchor="middle" font-size="11" fill="#374151">125.0s</text>
+<rect x="316.5" y="134.9" width="59.5" height="125.1" fill="#0f766e" rx="3"/>
+<text x="346.2" y="129.9" text-anchor="middle" font-size="11" fill="#0f766e">396.0s</text>
+<text x="325.0" y="280.0" text-anchor="middle" font-size="12" fill="#374151">Session 2</text>
+<rect x="418.5" y="171.2" width="59.5" height="88.8" fill="#6b7280" rx="3"/>
+<text x="448.2" y="166.2" text-anchor="middle" font-size="11" fill="#374151">281.0s</text>
+<rect x="486.5" y="77.4" width="59.5" height="182.6" fill="#0f766e" rx="3"/>
+<text x="516.2" y="72.4" text-anchor="middle" font-size="11" fill="#0f766e">578.0s</text>
+<text x="495.0" y="280.0" text-anchor="middle" font-size="12" fill="#374151">Total</text>
+
+</svg>

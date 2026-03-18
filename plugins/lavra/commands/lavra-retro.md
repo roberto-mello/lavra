@@ -387,7 +387,14 @@ After presenting the retrospective report, use the **AskUserQuestion tool**:
 **Question:** "Retro complete for the last {N} days. What would you like to do next?"
 
 **Options:**
-1. **`/lavra-triage`** -- Triage the backlog: review deferred and open beads and decide what to carry forward, dismiss, or reprioritize
+1. **Plan action items** -- Run `/lavra-plan` on the action items identified above to create structured beads with research and sub-tasks
 2. **`/lavra-learn`** -- Curate the raw knowledge comments surfaced this week into structured entries
-3. **Done** -- Close out the session
+3. **`/lavra-triage`** -- Triage the backlog: review deferred and open beads and decide what to carry forward, dismiss, or reprioritize (run this command in a new message)
+4. **Done** -- Close out the session
+
+If the user picks option 1, extract the action items from the `## Action Items` section of the report and pass them as input to `/lavra-plan`. Invoke it as a skill:
+```
+skill: lavra-plan
+args: "{action items summary}"
+```
 </handoff>
