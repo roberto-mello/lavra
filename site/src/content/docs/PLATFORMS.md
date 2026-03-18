@@ -6,7 +6,7 @@ order: 4
 
 # Multi-Platform Support
 
-Lavra supports four AI coding agents. The core memory system (hooks, knowledge capture, auto-recall) works identically across all platforms. Commands, agents, and skills are Claude Code-native and are also available on OpenCode and Cortex Code.
+Lavra supports four AI coding agents. The core memory system (hooks, knowledge capture, auto-recall) works identically across all platforms. Commands, agents, and skills are available on all platforms.
 
 ## What works where
 
@@ -14,10 +14,10 @@ Lavra supports four AI coding agents. The core memory system (hooks, knowledge c
 |---------|-------------|----------|------------|-------------|
 | Memory capture | ✓ | ✓ | ✓ | ✓ |
 | Auto-recall | ✓ | ✓ | ✓ | ✓ |
-| Commands | ✓ | ✓ | — | ✓ |
-| Agents | ✓ | ✓ | — | ✓ |
-| Skills | ✓ | ✓ | — | ✓ |
-| Context7 MCP | ✓ | ✓ | — | manual |
+| Commands | ✓ | ✓ | ✓ | ✓ |
+| Agents | ✓ | ✓ | ✓ | ✓ |
+| Skills | ✓ | ✓ | ✓ | ✓ |
+| Context7 MCP | ✓ | ✓ | ✓ | manual |
 
 ## Claude Code
 
@@ -55,7 +55,7 @@ Check plugin is loading (look for these in OpenCode output):
 npx lavra@latest --gemini       # local project
 ```
 
-The installer copies hooks to `.gemini/hooks/` (local) or `~/.config/gemini/hooks/` (global). Memory capture and auto-recall work via the same stdin/stdout JSON protocol as Claude Code.
+The installer converts commands to `.toml` format and copies commands, agents, skills, and hooks to `.gemini/` (local) or `~/.config/gemini/` (global). Memory capture and auto-recall work via the same stdin/stdout JSON protocol as Claude Code. Context7 MCP is configured automatically in `~/.config/gemini/settings.json`.
 
 **Verify:**
 ```bash

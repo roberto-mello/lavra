@@ -16,7 +16,7 @@ When using Lavra's workflow commands, agents are instructed to log things worth 
 bd comments add beads-abc "LEARNED: OAuth redirect URI must match exactly, including trailing slash"
 ```
 
-The `memory-capture` hook detects this, parses it, and stores it in `.beads/memory/knowledge.jsonl`. At the start of every future session, the `auto-recall` hook searches that file based on your current work and injects the most relevant entries into Claude's context automatically.
+The `memory-capture` hook detects this, parses it, and stores it in `.beads/memory/knowledge.jsonl`. At the start of every future session, the `auto-recall` hook searches that file based on your current work and injects the most relevant entries into the agent's context automatically.
 
 You can add your own knowledge entries manually using `bd comments add` and they will be retrieved by agents via a hook at session start, or by using the Lavra workflow commands. See also [Searching manually](#searching-manually) and [Curating knowledge](#curating-knowledge).
 
@@ -88,4 +88,4 @@ Raw knowledge comments logged during work are functional but often terse. `/lavr
 /lavra-learn beads-abc beads-xyz
 ```
 
-`/lavra-work` calls `/lavra-learn` automatically at the end of each bead. `/lavra-checkpoint` prompts you to run it if it detects captured knowledge. If you've been coding outside the pipeline — direct edits, quick fixes, exploratory work — run `/lavra-learn` manually before ending the session to curate whatever you captured.
+`/lavra-work` calls `/lavra-learn` automatically at the end of each bead. `/lavra-checkpoint` prompts you to run it if it detects captured knowledge. If you've been coding outside the pipeline — direct edits, quick fixes, exploratory work, run `/lavra-checkpoint` (to file beads for what was fixed/changed, which will prompt to run `/lavra-learn`) or run `/lavra-learn` directly, before ending the session to curate whatever you captured.

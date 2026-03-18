@@ -18,6 +18,11 @@
   --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Offset anchor targets so sticky nav doesn't cover them (nav = 64px) */
+:target {
+  scroll-margin-top: 80px;
+}
+
 /* Doc prose code blocks — Shiki sets background via inline style, so we wrap
    with a border/radius shell and use the Shiki background as-is. */
 .prose pre.astro-code {
