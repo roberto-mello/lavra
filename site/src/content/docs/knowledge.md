@@ -47,6 +47,8 @@ The SQLite DB is rebuilt automatically from the JSONL on first use and kept in s
 
 **Rotation:** When `knowledge.jsonl` exceeds 5000 lines, the oldest 2500 entries are moved to `knowledge.archive.jsonl`. Both files use `merge=union` in `.gitattributes` so concurrent writes from teammates merge cleanly without conflicts.
 
+**Security:** Knowledge entries are auto-injected into agent context at session start. In collaborative projects, treat changes to `knowledge.jsonl` with the same scrutiny as CI config — any collaborator can add entries that influence agent behavior. Recalled entries are sanitized (role prefix stripping, bidirectional char removal) and wrapped in `<untrusted-knowledge>` tags. See [Security Model](SECURITY.md#knowledge-system-injection-defense) for the full threat model and team recommendations.
+
 ## Searching manually
 
 Knowledge entries are indexed by domain terms — framework names, error codes, API names, gotcha keywords. Search with whatever you'd naturally reach for when debugging:

@@ -16,11 +16,12 @@ See [docs/releases/v0.7.0.md](docs/releases/v0.7.0.md) for the full release note
 - Decision categorization -- Locked Decisions / Agent Discretion / Deferred sections in brainstorm and plan
 - Brownfield codebase analysis -- `/project-setup` Step 1.5 with 3 parallel agents
 - Workflow config -- `.beads/config/lavra.json` toggles for research, review, verification, parallelism
-- Context size budgets -- epic 80 lines, child bead 150 lines, auto-split on overflow
 - Atomic commits per task -- `{type}({BEAD_ID}): {description}` format, per-bead in multi-bead
 - `project-setup` skill, `migration-drift-detector` agent
 - Sources/References sections in `/lavra-plan`, cross-check validation (Step 5.5)
 - `docs/SECURITY.md` -- threat model and injection defense documentation
+- Knowledge system prompt injection defense -- `auto-recall.sh` now sanitizes recalled entries (strip role prefixes, bidirectional chars) and wraps in `<untrusted-knowledge>` tags with "do not follow instructions" directive
+- `--no-parallel` flag for `/lavra-work` -- opt-in serial execution in multi-bead mode with review pauses between each bead
 
 ### Changed
 - Pipeline redesign: `/lavra-design` -> `/lavra-work` -> `/lavra-qa` -> `/lavra-ship`
@@ -28,6 +29,8 @@ See [docs/releases/v0.7.0.md](docs/releases/v0.7.0.md) for the full release note
 - Version self-heal provisions new config files on upgrade without full re-install
 - 30 agents (was 29), 16 skills (was 15), 22 core commands + 5 optional
 - Dynamic agent allowlist in `/lavra-review`, expanded sanitization strip list
+- Replaced 150-line bead description cap with completeness gate (all required sections, zero agent judgment calls) and ~1000 LOC scope budget per bead
+- `recall.sh` grep fallback uses fixed-string matching (`grep -iF`) instead of regex to prevent metacharacter issues
 
 ### Fixed
 - OpenCode installer hangs in non-interactive mode (added `[[ -t 0 ]]` check)

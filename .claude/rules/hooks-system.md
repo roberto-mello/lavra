@@ -36,8 +36,9 @@ Knowledge stored in `.beads/memory/knowledge.jsonl`:
 ```
 
 - **Auto-tagging**: Keywords detected in content are added as tags
-- **Rotation**: After 1000 lines, first 500 archived to `knowledge.archive.jsonl`
+- **Rotation**: After 5000 lines, oldest 2500 archived to `knowledge.archive.jsonl`
 - **Search**: `.beads/memory/recall.sh` (use `--all` to include archive)
+- **Security**: Recalled entries are sanitized (strip role prefixes, bidirectional chars) and wrapped in `<untrusted-knowledge>` tags before injection into system messages
 
 ## Memory Capture Detection
 
