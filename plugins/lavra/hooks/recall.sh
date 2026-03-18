@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Search the knowledge base (.beads/memory/knowledge.jsonl)
+# Search the knowledge base (.lavra/memory/knowledge.jsonl)
 #
 # Usage:
 #   recall.sh "keyword"                    # Search by keyword
@@ -11,7 +11,7 @@
 #   recall.sh --topic BD-005               # Filter by epic parent
 #
 
-MEMORY_DIR="${CLAUDE_PROJECT_DIR:-.}/.beads/memory"
+MEMORY_DIR="${CLAUDE_PROJECT_DIR:-.}/.lavra/memory"
 KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 ARCHIVE_FILE="$MEMORY_DIR/knowledge.archive.jsonl"
 

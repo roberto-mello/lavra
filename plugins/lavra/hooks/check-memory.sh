@@ -34,8 +34,8 @@ case "$PLATFORM" in
     ;;
 esac
 
-# Only relevant if this project has .beads/ initialized
-if [ ! -d ".beads" ]; then
+# Only relevant if this project has .beads/ or .lavra/ initialized
+if [ ! -d ".beads" ] && [ ! -d ".lavra" ]; then
   exit 0
 fi
 
@@ -94,7 +94,7 @@ if [ -f "$PROVISION_SCRIPT" ]; then
   provision_memory_dir "." "$HOOKS_SOURCE_DIR"
 else
   # Fallback: minimal setup if provision script missing
-  MEMORY_DIR=".beads/memory"
+  MEMORY_DIR=".lavra/memory"
   mkdir -p "$MEMORY_DIR"
   [ ! -f "$MEMORY_DIR/knowledge.jsonl" ] && touch "$MEMORY_DIR/knowledge.jsonl"
 fi

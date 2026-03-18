@@ -4,7 +4,7 @@
 #
 # Detects: bd comments add {BEAD_ID} "INVESTIGATION: ..." / "LEARNED: ..." /
 #          "DECISION: ..." / "FACT: ..." / "PATTERN: ..." / "DEVIATION: ..."
-# Extracts knowledge entries into .beads/memory/knowledge.jsonl
+# Extracts knowledge entries into .lavra/memory/knowledge.jsonl
 #
 
 INPUT=$(cat)
@@ -17,6 +17,16 @@ COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 
 echo "$COMMAND" | grep -qE 'bd\s+comments?\s+add\s+' || exit 0
 echo "$COMMAND" | grep -qE '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:)' || exit 0
+
+# Validate CLAUDE_PROJECT_DIR to prevent redirect attacks
+# Placed AFTER early-exit guards (PostToolUse fires very frequently; this runs on ~1% of calls)
+if [[ -n "$CLAUDE_PROJECT_DIR" ]]; then
+  CANONICAL=$(realpath -m "$CLAUDE_PROJECT_DIR" 2>/dev/null || echo "")
+  if [[ -z "$CANONICAL" ]] || [[ "$CANONICAL" != /* ]] || \
+     [[ "$CANONICAL" != "$HOME"/* && "$CANONICAL" != /tmp/* ]]; then
+    CLAUDE_PROJECT_DIR=""  # fall through to CWD
+  fi
+fi
 
 # Extract BEAD_ID
 BEAD_ID=$(echo "$COMMAND" | sed -E 's/.*bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+([A-Za-z0-9._-]+)[[:space:]]+.*/\1/')
@@ -86,7 +96,7 @@ ENTRY=$(jq -cn \
 [[ -z "$ENTRY" ]] && exit 0
 echo "$ENTRY" | jq . >/dev/null 2>&1 || exit 0
 
-MEMORY_DIR="${CLAUDE_PROJECT_DIR:-${CWD:-.}}/.beads/memory"
+MEMORY_DIR="${CLAUDE_PROJECT_DIR:-${CWD:-.}}/.lavra/memory"
 mkdir -p "$MEMORY_DIR"
 KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 
