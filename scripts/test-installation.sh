@@ -415,10 +415,84 @@ else
 fi
 
 # ==============================================================================
-# Test 6: Uninstallation (Optional - requires user confirmation)
+# Test 6: Migration (upgrade from .beads/ to .lavra/)
 # ==============================================================================
 echo
-echo "  Test 6: Uninstallation (skipped - requires interactive confirmation)"
+echo " Test 6: Migration (.beads/ → .lavra/)"
+
+MIGRATE_TEST="$TEST_ROOT/migrate-test"
+mkdir -p "$MIGRATE_TEST"
+cd "$MIGRATE_TEST"
+git init -q
+bd init -q 2>/dev/null || true
+
+# Simulate existing 0.7.0 Lavra data in .beads/
+mkdir -p .beads/memory .beads/config .beads/retros
+echo '{"key":"test-key","type":"learned","content":"Test migration knowledge","tags":["test"],"ts":1000000}' > .beads/memory/knowledge.jsonl
+echo '{"workflow":{"research":true,"plan_review":true}}' > .beads/config/lavra.json
+echo '{"date":"2026-01-01","items":[]}' > .beads/retros/2026-01-01.json
+# Add a SQLite file that must NOT be migrated
+touch .beads/memory/knowledge.db
+
+LINES_BEFORE=$(wc -l < .beads/memory/knowledge.jsonl | tr -d ' ')
+
+bash "$PROJECT_ROOT/install.sh" "$MIGRATE_TEST" >/dev/null 2>&1
+
+# M1: knowledge.jsonl migrated with correct content
+if [[ -f ".lavra/memory/knowledge.jsonl" ]]; then
+  LINES_AFTER=$(wc -l < .lavra/memory/knowledge.jsonl | tr -d ' ')
+  if [[ "$LINES_AFTER" -ge "$LINES_BEFORE" ]] && grep -q "test-key" .lavra/memory/knowledge.jsonl; then
+    pass "Migration: knowledge.jsonl copied with data intact"
+  else
+    fail "Migration: knowledge.jsonl content" "Line count mismatch or key not found (before=$LINES_BEFORE after=$LINES_AFTER)"
+  fi
+else
+  fail "Migration: knowledge.jsonl" ".lavra/memory/knowledge.jsonl not created"
+fi
+
+# M2: config migrated
+if [[ -f ".lavra/config/lavra.json" ]] && grep -q '"plan_review"' .lavra/config/lavra.json; then
+  pass "Migration: lavra.json config copied"
+else
+  fail "Migration: config" ".lavra/config/lavra.json missing or wrong content"
+fi
+
+# M3: retros migrated
+if [[ -f ".lavra/retros/2026-01-01.json" ]]; then
+  pass "Migration: retros copied"
+else
+  fail "Migration: retros" ".lavra/retros/2026-01-01.json not found"
+fi
+
+# M4: .beads/ originals preserved (not deleted)
+if [[ -f ".beads/memory/knowledge.jsonl" ]]; then
+  pass "Migration: .beads/ originals preserved"
+else
+  fail "Migration: .beads/ preservation" ".beads/memory/knowledge.jsonl was deleted"
+fi
+
+# M5: SQLite cache NOT migrated
+if [[ ! -f ".lavra/memory/knowledge.db" ]]; then
+  pass "Migration: SQLite cache not copied"
+else
+  fail "Migration: SQLite exclusion" "knowledge.db was copied to .lavra/memory/"
+fi
+
+# M6: idempotency — second install skips migration, data unchanged
+LINES_BEFORE_SECOND=$(wc -l < .lavra/memory/knowledge.jsonl | tr -d ' ')
+bash "$PROJECT_ROOT/install.sh" "$MIGRATE_TEST" >/dev/null 2>&1
+LINES_AFTER_SECOND=$(wc -l < .lavra/memory/knowledge.jsonl | tr -d ' ')
+if [[ "$LINES_BEFORE_SECOND" -eq "$LINES_AFTER_SECOND" ]]; then
+  pass "Migration: idempotent (second install does not overwrite)"
+else
+  fail "Migration: idempotency" "knowledge.jsonl changed on second install (before=$LINES_BEFORE_SECOND after=$LINES_AFTER_SECOND)"
+fi
+
+# ==============================================================================
+# Test 7: Uninstallation (Optional - requires user confirmation)
+# ==============================================================================
+echo
+echo "  Test 7: Uninstallation (skipped - requires interactive confirmation)"
 echo "  [WARN]  Uninstallers require confirmation prompt - test manually if needed"
 
 # ==============================================================================
