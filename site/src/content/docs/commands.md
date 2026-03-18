@@ -6,7 +6,7 @@ order: 5
 
 # Command Reference
 
-See the [Command Map](/command-map) for a visual overview of how all commands, agents, and skills connect.
+See the [Command Catalog](/docs/catalog) for a quick-reference table of all commands, or the [Command Map](/command-map) for a visual overview of how commands, agents, and skills connect.
 
 ## Workflow
 
