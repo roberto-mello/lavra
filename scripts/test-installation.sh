@@ -367,10 +367,10 @@ echo " Test 5: New Feature Provisioning"
 cd "$CLAUDE_TEST"
 
 # F6: lavra.json provisioned by installer
-if [[ -f ".beads/config/lavra.json" ]]; then
-  if grep -q '"goal_verification"' ".beads/config/lavra.json" && \
-     grep -q '"max_parallel_agents"' ".beads/config/lavra.json" && \
-     grep -q '"commit_granularity"' ".beads/config/lavra.json"; then
+if [[ -f ".lavra/config/lavra.json" ]]; then
+  if grep -q '"goal_verification"' ".lavra/config/lavra.json" && \
+     grep -q '"max_parallel_agents"' ".lavra/config/lavra.json" && \
+     grep -q '"commit_granularity"' ".lavra/config/lavra.json"; then
     pass "lavra.json provisioned with all expected keys"
   else
     fail "lavra.json content" "Missing expected configuration keys"
@@ -379,15 +379,15 @@ else
   fail "lavra.json" "Not created by installer"
 fi
 
-# F3: session-state.md in .gitignore
-if [[ -f ".beads/memory/.gitignore" ]]; then
-  if grep -q "session-state.md" ".beads/memory/.gitignore"; then
-    pass "session-state.md in .beads/memory/.gitignore"
+# F3: session-state.md in .lavra/.gitignore (folder-level, with memory/ prefix)
+if [[ -f ".lavra/.gitignore" ]]; then
+  if grep -q "memory/session-state.md" ".lavra/.gitignore"; then
+    pass "session-state.md in .lavra/.gitignore"
   else
-    fail "session-state gitignore" "session-state.md not in .beads/memory/.gitignore"
+    fail "session-state gitignore" "memory/session-state.md not in .lavra/.gitignore"
   fi
 else
-  fail "memory .gitignore" ".beads/memory/.gitignore not found"
+  fail "memory .gitignore" ".lavra/.gitignore not found"
 fi
 
 # F1: goal-verifier agent exists
@@ -398,16 +398,16 @@ else
 fi
 
 # F6: lavra.json is valid JSON
-if jq . ".beads/config/lavra.json" >/dev/null 2>&1; then
+if jq . ".lavra/config/lavra.json" >/dev/null 2>&1; then
   pass "lavra.json is valid JSON"
 else
   fail "lavra.json validation" "File is not valid JSON"
 fi
 
 # F6: lavra.json idempotent (re-run installer, should not overwrite)
-ORIGINAL_CONTENT=$(cat ".beads/config/lavra.json")
+ORIGINAL_CONTENT=$(cat ".lavra/config/lavra.json")
 bash "$PROJECT_ROOT/install.sh" "$CLAUDE_TEST" >/dev/null 2>&1
-AFTER_CONTENT=$(cat ".beads/config/lavra.json")
+AFTER_CONTENT=$(cat ".lavra/config/lavra.json")
 if [[ "$ORIGINAL_CONTENT" == "$AFTER_CONTENT" ]]; then
   pass "lavra.json idempotent on re-install"
 else

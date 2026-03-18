@@ -14,7 +14,7 @@ The plugin provides:
 - 1 MCP server (Context7 for framework documentation)
 - Automatic knowledge capture from beads comments (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION/DEVIATION)
 - Automatic knowledge recall at session start based on current beads
-- Workflow configuration via `.beads/config/lavra.json` (toggle research, review, goal verification, parallelism)
+- Workflow configuration via `.lavra/config/lavra.json` (toggle research, review, goal verification, parallelism)
 
 ## Multi-Platform Support
 

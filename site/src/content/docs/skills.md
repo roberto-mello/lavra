@@ -44,7 +44,7 @@ Captures solved problems as structured knowledge entries for fast future recall.
 
 ### project-setup
 
-Detects your tech stack, lets you toggle review agents, and saves config to `.beads/config/project-setup.md`.
+Detects your tech stack, lets you toggle review agents, and saves config to `.lavra/config/project-setup.md`.
 
 ## Optional skills
 

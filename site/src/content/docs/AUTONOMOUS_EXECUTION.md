@@ -28,7 +28,7 @@ Add an `allow` list to your project's `.claude/settings.json`:
     "allow": [
       "Bash(git *)",
       "Bash(bd *)",
-      "Bash(.beads/memory/*)",
+      "Bash(.lavra/memory/*)",
       "Bash(npm test)",
       "Bash(bun test)",
       "Read",

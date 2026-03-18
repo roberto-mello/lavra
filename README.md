@@ -44,7 +44,7 @@ A plugin for coding agents that orchestrates the full development lifecycle -- f
 - **Structured planning.** Brainstorm with scope sharpening, research with domain-matched agents, adversarial plan review -- all before a single line of code is written.
 - **Disciplined execution.** Agents follow deviation rules (what to auto-fix vs. escalate), commit per task with traceable bead IDs, and verify every success criterion before marking work done.
 - **Built-in quality gates.** Every implementation runs through a review-fix-learn loop. Knowledge capture is mandatory, not optional.
-- **Team-shareable knowledge.** Memory lives in `.beads/memory/knowledge.jsonl`, tracked by git. Your team compounds knowledge together.
+- **Team-shareable knowledge.** Memory lives in `.lavra/memory/knowledge.jsonl`, tracked by git. Your team compounds knowledge together.
 
 </td>
 <td width="35%" align="center">
@@ -130,12 +130,12 @@ review      --LEARNED-->  issues become future recall
 retro       synthesizes patterns, surfaces gaps
 ```
 
-Six knowledge types (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION, DEVIATION) are captured inline during work and stored in `.beads/memory/knowledge.jsonl`. At session start, relevant entries are recalled automatically based on your current beads and git branch. The system gets smarter over time -- not just for you, but for your whole team.
+Six knowledge types (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION, DEVIATION) are captured inline during work and stored in `.lavra/memory/knowledge.jsonl`. At session start, relevant entries are recalled automatically based on your current beads and git branch. The system gets smarter over time -- not just for you, but for your whole team.
 
 <details>
 <summary><strong>Configuration</strong></summary>
 
-**`.beads/config/lavra.json`** (created automatically) -- toggle workflow phases and execution behavior:
+**`.lavra/config/lavra.json`** (created automatically) -- toggle workflow phases and execution behavior:
 
 ```json
 {

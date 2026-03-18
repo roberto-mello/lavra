@@ -39,14 +39,14 @@ cd /path/to/your-project
 # Check that files were created
 ls -la .claude/hooks/        # Should see auto-recall.sh, memory-capture.sh
 ls -la .claude/commands/     # Should see lavra-*.md files
-ls -la .beads/memory/        # Should see knowledge.jsonl, recall.sh
+ls -la .lavra/memory/        # Should see knowledge.jsonl, recall.sh
 ```
 
 ## Configuration
 
 ### Workflow config (automatic)
 
-The installer creates `.beads/config/Lavra.json` automatically. Edit to tune the workflow:
+The installer creates `.lavra/config/Lavra.json` automatically. Edit to tune the workflow:
 
 ```json
 {
@@ -73,7 +73,7 @@ If you're installing Lavra into an existing project, run `/project-setup` to gen
 /project-setup
 ```
 
-When prompted "Run codebase analysis?", choose Y. This dispatches 3 parallel agents to analyze your stack, architecture, and conventions, saving the results to `.beads/config/codebase-profile.md`. This file is used by `/lavra-design` and `/lavra-work` as planning context.
+When prompted "Run codebase analysis?", choose Y. This dispatches 3 parallel agents to analyze your stack, architecture, and conventions, saving the results to `.lavra/config/codebase-profile.md`. This file is used by `/lavra-design` and `/lavra-work` as planning context.
 
 ## Your First Workflow
 
@@ -163,16 +163,16 @@ Or search directly from the shell:
 
 ```bash
 # Search by keyword
-.beads/memory/recall.sh "authentication"
+.lavra/memory/recall.sh "authentication"
 
 # Filter by type
-.beads/memory/recall.sh "jwt" --type learned
+.lavra/memory/recall.sh "jwt" --type learned
 
 # Show recent entries
-.beads/memory/recall.sh --recent 10
+.lavra/memory/recall.sh --recent 10
 
 # Show stats
-.beads/memory/recall.sh --stats
+.lavra/memory/recall.sh --stats
 ```
 
 ## Example: Full Feature Flow
@@ -228,7 +228,7 @@ Or search directly from the shell:
 
 ```bash
 # Check if knowledge exists
-.beads/memory/recall.sh --stats
+.lavra/memory/recall.sh --stats
 
 # Check if hook is installed
 ls -la .claude/hooks/auto-recall.sh

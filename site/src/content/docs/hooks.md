@@ -19,11 +19,11 @@ Runs when Claude Code starts. Searches your knowledge base for entries relevant 
 4. Searches `knowledge.jsonl` and returns the top 10 matches
 5. Falls back to the 10 most recent entries if no keywords are found
 
-If a `session-state.md` file exists in `.beads/memory/` (written by `/lavra-work` or `/lavra-checkpoint` at milestones), its content is injected once then deleted. This lets you resume exactly where you left off after context compaction.
+If a `session-state.md` file exists in `.lavra/memory/` (written by `/lavra-work` or `/lavra-checkpoint` at milestones), its content is injected once then deleted. This lets you resume exactly where you left off after context compaction.
 
 ## memory-capture (PostToolUse on Bash)
 
-Runs after every Bash tool call. Watches for `bd comments add` commands that include a knowledge prefix, then parses and stores the entry in `.beads/memory/knowledge.jsonl`.
+Runs after every Bash tool call. Watches for `bd comments add` commands that include a knowledge prefix, then parses and stores the entry in `.lavra/memory/knowledge.jsonl`.
 
 **Recognized prefixes:**
 

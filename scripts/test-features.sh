@@ -38,12 +38,12 @@ echo
 # ==============================================================================
 # Setup: Create a minimal test project
 # ==============================================================================
-mkdir -p "$TEST_ROOT/project/.beads/memory"
-touch "$TEST_ROOT/project/.beads/memory/knowledge.jsonl"
-echo "0.6.7" > "$TEST_ROOT/project/.beads/memory/.lavra-version"
+mkdir -p "$TEST_ROOT/project/.lavra/memory"
+touch "$TEST_ROOT/project/.lavra/memory/knowledge.jsonl"
+echo "0.6.7" > "$TEST_ROOT/project/.lavra/memory/.lavra-version"
 
 # Create minimal gitignore (pre-existing, missing session-state.md)
-cat > "$TEST_ROOT/project/.beads/memory/.gitignore" << 'EOF'
+cat > "$TEST_ROOT/project/.lavra/memory/.gitignore" << 'EOF'
 knowledge.db
 knowledge.db-journal
 knowledge.db-wal
@@ -77,8 +77,8 @@ fi
 MOCK_INPUT='{"tool_name":"Bash","tool_input":{"command":"bd comments add test-001 \"DEVIATION: Fixed missing import to unblock auth\""},"cwd":"'"$TEST_ROOT/project"'"}'
 echo "$MOCK_INPUT" | bash "$HOOKS_DIR/memory-capture.sh" 2>/dev/null || true
 
-if [[ -f "$TEST_ROOT/project/.beads/memory/knowledge.jsonl" ]] && \
-   grep -q '"type":"deviation"' "$TEST_ROOT/project/.beads/memory/knowledge.jsonl" 2>/dev/null; then
+if [[ -f "$TEST_ROOT/project/.lavra/memory/knowledge.jsonl" ]] && \
+   grep -q '"type":"deviation"' "$TEST_ROOT/project/.lavra/memory/knowledge.jsonl" 2>/dev/null; then
   pass "DEVIATION: comment captured to knowledge.jsonl"
 else
   fail "DEVIATION capture" "Entry not written to knowledge.jsonl (bd may not be installed)"
@@ -91,25 +91,25 @@ echo
 echo "Test 2: provision-memory.sh creates lavra.json"
 
 # Remove lavra.json if it exists from a prior run
-rm -f "$TEST_ROOT/project/.beads/config/lavra.json"
+rm -f "$TEST_ROOT/project/.lavra/config/lavra.json"
 
 source "$HOOKS_DIR/provision-memory.sh"
 provision_memory_dir "$TEST_ROOT/project" "$HOOKS_DIR"
 
-if [[ -f "$TEST_ROOT/project/.beads/config/lavra.json" ]]; then
+if [[ -f "$TEST_ROOT/project/.lavra/config/lavra.json" ]]; then
   pass "lavra.json created by provision_memory_dir"
 else
   fail "lavra.json creation" "File not created"
 fi
 
 # Verify it's valid JSON with expected keys
-if jq -e '.workflow.goal_verification' "$TEST_ROOT/project/.beads/config/lavra.json" >/dev/null 2>&1; then
+if jq -e '.workflow.goal_verification' "$TEST_ROOT/project/.lavra/config/lavra.json" >/dev/null 2>&1; then
   pass "lavra.json has workflow.goal_verification key"
 else
   fail "lavra.json structure" "Missing workflow.goal_verification"
 fi
 
-if jq -e '.execution.commit_granularity' "$TEST_ROOT/project/.beads/config/lavra.json" >/dev/null 2>&1; then
+if jq -e '.execution.commit_granularity' "$TEST_ROOT/project/.lavra/config/lavra.json" >/dev/null 2>&1; then
   pass "lavra.json has execution.commit_granularity key"
 else
   fail "lavra.json structure" "Missing execution.commit_granularity"
@@ -121,7 +121,7 @@ fi
 echo
 echo "Test 3: session-state.md gitignore append"
 
-if grep -q "session-state.md" "$TEST_ROOT/project/.beads/memory/.gitignore"; then
+if grep -q "session-state.md" "$TEST_ROOT/project/.lavra/memory/.gitignore"; then
   pass "session-state.md appended to existing .gitignore"
 else
   fail "session-state gitignore" "Not appended to .gitignore"
@@ -133,14 +133,14 @@ fi
 echo
 echo "Test 4: provision-memory.sh idempotency"
 
-BEFORE_GITIGNORE=$(cat "$TEST_ROOT/project/.beads/memory/.gitignore")
-BEFORE_LAVRA=$(cat "$TEST_ROOT/project/.beads/config/lavra.json")
+BEFORE_GITIGNORE=$(cat "$TEST_ROOT/project/.lavra/memory/.gitignore")
+BEFORE_LAVRA=$(cat "$TEST_ROOT/project/.lavra/config/lavra.json")
 
 # Run again
 provision_memory_dir "$TEST_ROOT/project" "$HOOKS_DIR"
 
-AFTER_GITIGNORE=$(cat "$TEST_ROOT/project/.beads/memory/.gitignore")
-AFTER_LAVRA=$(cat "$TEST_ROOT/project/.beads/config/lavra.json")
+AFTER_GITIGNORE=$(cat "$TEST_ROOT/project/.lavra/memory/.gitignore")
+AFTER_LAVRA=$(cat "$TEST_ROOT/project/.lavra/config/lavra.json")
 
 if [[ "$BEFORE_GITIGNORE" == "$AFTER_GITIGNORE" ]]; then
   pass ".gitignore unchanged on second provision"
@@ -161,7 +161,7 @@ echo
 echo "Test 5: Session state lifecycle"
 
 # Write a session state file
-cat > "$TEST_ROOT/project/.beads/memory/session-state.md" << 'EOF'
+cat > "$TEST_ROOT/project/.lavra/memory/session-state.md" << 'EOF'
 # Session State
 ## Current Position
 - Bead(s): test-001
@@ -173,7 +173,7 @@ cat > "$TEST_ROOT/project/.beads/memory/session-state.md" << 'EOF'
 - Route guards (task 3)
 EOF
 
-if [[ -f "$TEST_ROOT/project/.beads/memory/session-state.md" ]]; then
+if [[ -f "$TEST_ROOT/project/.lavra/memory/session-state.md" ]]; then
   pass "Session state file written"
 else
   fail "Session state write" "File not created"
@@ -181,7 +181,7 @@ fi
 
 # Verify session-state.md is gitignored
 cd "$TEST_ROOT/project"
-if git check-ignore -q ".beads/memory/session-state.md" 2>/dev/null; then
+if git check-ignore -q ".lavra/memory/session-state.md" 2>/dev/null; then
   pass "session-state.md is gitignored"
 else
   fail "session-state gitignore" "File is NOT gitignored"

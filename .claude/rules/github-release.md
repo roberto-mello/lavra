@@ -85,26 +85,41 @@ git init -q && bd init --quiet 2>/dev/null
 bash ~/Documents/projects/lavra/install.sh /tmp/test-beads-install
 ```
 
-Verify the memory directory:
+Verify the .lavra/ structure:
 
 ```bash
-ls /tmp/test-beads-install/.beads/memory/
-# Must contain: knowledge.jsonl, recall.sh, knowledge-db.sh, .gitattributes, .gitignore
+ls /tmp/test-beads-install/.lavra/
+# Must contain: .gitignore, .gitattributes, .lavra-version, memory/, config/, retros/
 
-cat /tmp/test-beads-install/.beads/memory/.gitignore
-# Must contain: knowledge.db (and journal/wal/shm variants)
+cat /tmp/test-beads-install/.lavra/.gitignore
+# Must contain: memory/knowledge.db (paths use memory/ prefix)
 
-cat /tmp/test-beads-install/.beads/memory/.gitattributes
-# Must contain: knowledge.jsonl merge=union
+cat /tmp/test-beads-install/.lavra/.gitattributes
+# Must contain: memory/knowledge.jsonl merge=union
+
+cat /tmp/test-beads-install/.lavra/.lavra-version
+# Must contain: 0.8.0
+
+ls /tmp/test-beads-install/.lavra/memory/
+# Must contain: knowledge.jsonl, recall.sh, knowledge-db.sh
+# Must NOT contain: .db, .db-wal files (gitignored)
 
 cat /tmp/test-beads-install/.gitignore 2>/dev/null || echo "(no project .gitignore -- correct)"
-# Must NOT contain .beads/
+# Must NOT contain .lavra/
 ```
 
-Verify the .beads/ warning prompt fires when .gitignore already has .beads/:
+Verify git merge=union attribute is registered:
 
 ```bash
-echo ".beads/" >> /tmp/test-beads-install/.gitignore
+cd /tmp/test-beads-install
+git check-attr merge .lavra/memory/knowledge.jsonl
+# Expected: .lavra/memory/knowledge.jsonl: merge: union
+```
+
+Verify the .lavra/ warning prompt fires when .gitignore already has .lavra/:
+
+```bash
+echo ".lavra/" >> /tmp/test-beads-install/.gitignore
 bash ~/Documents/projects/lavra/install.sh /tmp/test-beads-install 2>&1 | grep -A5 '\[!\] Warning'
 # Must show the data loss warning and [non-interactive] message
 ```
@@ -125,8 +140,11 @@ Verify:
 ls /tmp/test-opencode-install/.opencode/hooks/
 # Must contain: auto-recall.sh, memory-capture.sh, subagent-wrapup.sh
 
-ls /tmp/test-opencode-install/.beads/memory/
-# Must contain: knowledge.jsonl, recall.sh, knowledge-db.sh, .gitattributes, .gitignore
+ls /tmp/test-opencode-install/.lavra/memory/
+# Must contain: knowledge.jsonl, recall.sh, knowledge-db.sh
+
+ls /tmp/test-opencode-install/.lavra/
+# Must contain: .gitignore, .gitattributes, .lavra-version
 ```
 
 ### Gemini installer
@@ -145,8 +163,11 @@ Verify:
 ls /tmp/test-gemini-install/hooks/
 # Must contain: auto-recall.sh, memory-capture.sh, subagent-wrapup.sh
 
-ls /tmp/test-gemini-install/.beads/memory/
-# Must contain: knowledge.jsonl, recall.sh, knowledge-db.sh, .gitattributes, .gitignore
+ls /tmp/test-gemini-install/.lavra/memory/
+# Must contain: knowledge.jsonl, recall.sh, knowledge-db.sh
+
+ls /tmp/test-gemini-install/.lavra/
+# Must contain: .gitignore, .gitattributes, .lavra-version
 ```
 
 ### Clean up

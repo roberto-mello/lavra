@@ -16,7 +16,7 @@ When using Lavra's workflow commands, agents are instructed to log things worth 
 bd comments add beads-abc "LEARNED: OAuth redirect URI must match exactly, including trailing slash"
 ```
 
-The `memory-capture` hook detects this, parses it, and stores it in `.beads/memory/knowledge.jsonl`. At the start of every future session, the `auto-recall` hook searches that file based on your current work and injects the most relevant entries into the agent's context automatically.
+The `memory-capture` hook detects this, parses it, and stores it in `.lavra/memory/knowledge.jsonl`. At the start of every future session, the `auto-recall` hook searches that file based on your current work and injects the most relevant entries into the agent's context automatically.
 
 You can add your own knowledge entries manually using `bd comments add` and they will be retrieved by agents via a hook at session start, or by using the Lavra workflow commands. See also [Searching manually](#searching-manually) and [Curating knowledge](#curating-knowledge).
 
@@ -35,13 +35,13 @@ You can add your own knowledge entries manually using `bd comments add` and they
 
 Knowledge is stored in two places that stay in sync:
 
-**`.beads/memory/knowledge.jsonl`** — the source of truth, committed to git so knowledge is shared across your team and persists across machines:
+**`.lavra/memory/knowledge.jsonl`** — the source of truth, committed to git so knowledge is shared across your team and persists across machines:
 
 ```json
 {"key": "learned-oauth-redirect", "type": "learned", "content": "OAuth redirect URI must match exactly", "tags": ["oauth", "auth"], "ts": 1706918400, "bead": "beads-abc"}
 ```
 
-**`.beads/memory/knowledge.db`** — a local SQLite database (gitignored) built from the JSONL file, used for fast search. It has an FTS5 virtual table with a Porter stemmer, so searching "authenticate" also matches "authentication" and "authenticated". Results are ranked by BM25 relevance — entries that match more of your search terms, and in more important fields (content over tags), rank higher.
+**`.lavra/memory/knowledge.db`** — a local SQLite database (gitignored) built from the JSONL file, used for fast search. It has an FTS5 virtual table with a Porter stemmer, so searching "authenticate" also matches "authentication" and "authenticated". Results are ranked by BM25 relevance — entries that match more of your search terms, and in more important fields (content over tags), rank higher.
 
 The SQLite DB is rebuilt automatically from the JSONL on first use and kept in sync as new entries are added.
 
@@ -65,19 +65,19 @@ Or search directly from the shell:
 
 ```bash
 # Keyword search (SQLite FTS5 + BM25 ranking, Porter stemming)
-.beads/memory/recall.sh "authentication"
+.lavra/memory/recall.sh "authentication"
 
 # Filter by knowledge type
-.beads/memory/recall.sh "postgres" --type investigation
+.lavra/memory/recall.sh "postgres" --type investigation
 
 # Include archived entries (older than 5000 lines)
-.beads/memory/recall.sh "pydantic" --all
+.lavra/memory/recall.sh "pydantic" --all
 
 # Show recent entries
-.beads/memory/recall.sh --recent 10
+.lavra/memory/recall.sh --recent 10
 
 # Show stats
-.beads/memory/recall.sh --stats
+.lavra/memory/recall.sh --stats
 ```
 
 ## Curating knowledge

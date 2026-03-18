@@ -30,7 +30,7 @@ How Lavra assigns its 30 agents to model tiers for optimal cost/performance bala
 
 ## Configuring Model Quality
 
-Set `model_profile` in `.beads/config/lavra.json` to `"quality"` to route critical agents (`security-sentinel`, `architecture-strategist`, `goal-verifier`, `performance-oracle`) to opus automatically. All other agents stay at their default tier. This affects `/lavra-review`, `/lavra-eng-review`, `/lavra-work`, and `/lavra-ship`.
+Set `model_profile` in `.lavra/config/lavra.json` to `"quality"` to route critical agents (`security-sentinel`, `architecture-strategist`, `goal-verifier`, `performance-oracle`) to opus automatically. All other agents stay at their default tier. This affects `/lavra-review`, `/lavra-eng-review`, `/lavra-work`, and `/lavra-ship`.
 
 ```json
 { "model_profile": "quality" }

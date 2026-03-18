@@ -24,14 +24,14 @@ ls -la .claude/hooks/
 cat .claude/settings.json | jq '.hooks'
 
 # Check memory directory
-ls -la .beads/memory/
+ls -la .lavra/memory/
 
 # Test knowledge capture manually
 bd comments add <BEAD_ID> "LEARNED: Testing memory capture"
-tail -1 .beads/memory/knowledge.jsonl
+tail -1 .lavra/memory/knowledge.jsonl
 
 # Test recall manually
-bash .beads/memory/recall.sh
+bash .lavra/memory/recall.sh
 ```
 
 **Expected hooks in settings.json:**
@@ -61,11 +61,11 @@ ls -la .opencode/hooks/
 # Expected: "[lavra] session.created hook triggered"
 
 # Check memory directory
-ls -la .beads/memory/
+ls -la .lavra/memory/
 
 # Test knowledge capture manually
 bd comments add <BEAD_ID> "LEARNED: Testing memory capture"
-tail -1 .beads/memory/knowledge.jsonl
+tail -1 .lavra/memory/knowledge.jsonl
 
 # Check plugin dependencies are installed
 ls -la .opencode/plugins/lavra/node_modules/
@@ -85,11 +85,11 @@ ls -la ~/.config/gemini/hooks/
 cat gemini-extension.json | jq '.hooks'
 
 # Check memory directory
-ls -la .beads/memory/
+ls -la .lavra/memory/
 
 # Test knowledge capture manually
 bd comments add <BEAD_ID> "LEARNED: Testing memory capture"
-tail -1 .beads/memory/knowledge.jsonl
+tail -1 .lavra/memory/knowledge.jsonl
 ```
 
 ### Cortex Code
@@ -109,25 +109,25 @@ tail -1 .beads/memory/knowledge.jsonl
 **No knowledge entries being saved:**
 - Ensure you're using `bd comments add <BEAD_ID> "LEARNED: ..."` format (not `bd comment`)
 - Check that the hook is configured in settings.json with correct matcher (e.g., `"Bash"` for PostToolUse)
-- Verify `.beads/memory/` directory exists
+- Verify `.lavra/memory/` directory exists
 - Test the hook manually using the platform-specific commands above
 
 **Knowledge recall not showing context:**
 - Check that `auto-recall.sh` is in SessionStart hooks
 - Verify you have open or in_progress beads: `bd list --status=open`
-- Run manual recall to test: `bash .beads/memory/recall.sh`
-- Check if `knowledge.jsonl` has entries: `wc -l .beads/memory/knowledge.jsonl`
+- Run manual recall to test: `bash .lavra/memory/recall.sh`
+- Check if `knowledge.jsonl` has entries: `wc -l .lavra/memory/knowledge.jsonl`
 
 **SQLite search not working:**
 - Verify `sqlite3` is installed: `which sqlite3`
-- Check database exists: `ls -la .beads/memory/knowledge.db`
+- Check database exists: `ls -la .lavra/memory/knowledge.db`
 - System automatically falls back to grep if SQLite unavailable
 
 **Duplicate entries in knowledge.jsonl:**
 - This was fixed in v0.6.0+. Update to latest version.
 - To clean up existing duplicates:
   ```bash
-  cd .beads/memory
+  cd .lavra/memory
   cp knowledge.jsonl knowledge.jsonl.backup
   jq -s 'group_by(.key) | map(max_by(.ts)) | .[] | @json' knowledge.jsonl > knowledge.jsonl.tmp
   mv knowledge.jsonl.tmp knowledge.jsonl
