@@ -5,7 +5,7 @@ argument-hint: "[bead IDs to process, or omit for all closed-today beads]"
 ---
 
 <objective>
-Turn raw LEARNED/DECISION/FACT/PATTERN/INVESTIGATION comments captured during work sessions into structured, deduplicated, well-tagged knowledge entries in `.beads/memory/knowledge.jsonl`. This is the step that converts inline observations into searchable, recallable knowledge that makes future work easier.
+Turn raw LEARNED/DECISION/FACT/PATTERN/INVESTIGATION comments captured during work sessions into structured, deduplicated, well-tagged knowledge entries in `.lavra/memory/knowledge.jsonl`. This is the step that converts inline observations into searchable, recallable knowledge that makes future work easier.
 </objective>
 
 <context>
@@ -64,7 +64,7 @@ Review all gathered entries together and identify:
 
 Load existing knowledge for deduplication:
 ```bash
-.beads/memory/recall.sh "{keywords from gathered entries}" --all
+.lavra/memory/recall.sh "{keywords from gathered entries}" --all
 ```
 
 ### Step 3: Structure Each Entry
@@ -165,7 +165,7 @@ Tags exist so auto-recall can surface entries when working on related problems. 
 
 <handoff>
 What's next?
-1. View knowledge entries: `.beads/memory/recall.sh "{keyword}"`
+1. View knowledge entries: `.lavra/memory/recall.sh "{keyword}"`
 2. Continue working on another bead
 3. Run `/lavra-checkpoint` to save session progress
 

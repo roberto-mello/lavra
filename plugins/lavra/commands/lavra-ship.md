@@ -117,7 +117,7 @@ Run a lightweight review focused on ship-blockers only. This is NOT a full /lavr
 
 Read workflow config:
 ```bash
-[ -f .beads/config/lavra.json ] && cat .beads/config/lavra.json
+[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
 ```
 
 Parse `model_profile` from the config (default: `"balanced"`). For each bead being shipped that has a `## Validation` section, dispatch the `goal-verifier` agent. Add `model: opus` when `model_profile` is `"quality"`:

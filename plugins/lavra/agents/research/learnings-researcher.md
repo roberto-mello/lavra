@@ -1,12 +1,12 @@
 ---
 name: learnings-researcher
-description: "Searches institutional learnings in .beads/memory/knowledge.jsonl for relevant past solutions. Finds applicable patterns, gotchas, and lessons learned to prevent repeated mistakes."
+description: "Searches institutional learnings in .lavra/memory/knowledge.jsonl for relevant past solutions. Finds applicable patterns, gotchas, and lessons learned to prevent repeated mistakes."
 model: haiku
 ---
 <examples>
 <example>Context: User is about to implement a feature involving email processing.
 user: "I need to add email threading to the brief system"
-assistant: "I'll use the learnings-researcher agent to check .beads/memory/knowledge.jsonl for any relevant learnings about email processing or brief system implementations."
+assistant: "I'll use the learnings-researcher agent to check .lavra/memory/knowledge.jsonl for any relevant learnings about email processing or brief system implementations."
 <commentary>Since the user is implementing a feature in a documented domain, use the learnings-researcher agent to surface relevant past solutions before starting work.</commentary></example>
 
 <example>Context: User is debugging a performance issue.
@@ -28,7 +28,7 @@ You are an expert institutional knowledge researcher specializing in efficiently
 
 ## Knowledge Store Format
 
-The knowledge base is stored in `.beads/memory/knowledge.jsonl`, where each line is a JSON object with this structure:
+The knowledge base is stored in `.lavra/memory/knowledge.jsonl`, where each line is a JSON object with this structure:
 
 ```json
 {
@@ -79,21 +79,21 @@ If the feature type is clear, narrow the search by knowledge type:
 
 ```bash
 # Using the recall script (recommended - handles dedup and ranking)
-.beads/memory/recall.sh "email"
-.beads/memory/recall.sh "authentication"
-.beads/memory/recall.sh "payments"
+.lavra/memory/recall.sh "email"
+.lavra/memory/recall.sh "authentication"
+.lavra/memory/recall.sh "payments"
 
 # Or using grep for more targeted searches (run in PARALLEL, case-insensitive)
-grep -i "email" .beads/memory/knowledge.jsonl
-grep -i "authentication\|auth\|oauth" .beads/memory/knowledge.jsonl
-grep -i "payment\|billing\|stripe" .beads/memory/knowledge.jsonl
+grep -i "email" .lavra/memory/knowledge.jsonl
+grep -i "authentication\|auth\|oauth" .lavra/memory/knowledge.jsonl
+grep -i "payment\|billing\|stripe" .lavra/memory/knowledge.jsonl
 ```
 
 **Pattern construction tips:**
-- Use `\|` for synonyms in grep: `grep -i "payment\|billing\|stripe" .beads/memory/knowledge.jsonl`
-- Search content field: `grep -i '"content".*email' .beads/memory/knowledge.jsonl`
-- Search tags: `grep -i '"tags".*auth' .beads/memory/knowledge.jsonl`
-- Search by type: `grep -i '"type":"learned"' .beads/memory/knowledge.jsonl | grep -i "email"`
+- Use `\|` for synonyms in grep: `grep -i "payment\|billing\|stripe" .lavra/memory/knowledge.jsonl`
+- Search content field: `grep -i '"content".*email' .lavra/memory/knowledge.jsonl`
+- Search tags: `grep -i '"tags".*auth' .lavra/memory/knowledge.jsonl`
+- Search by type: `grep -i '"type":"learned"' .lavra/memory/knowledge.jsonl | grep -i "email"`
 - Include related terms the user might not have mentioned
 
 **Why this works:** grep scans file contents without loading everything into context. Only matching lines are returned, dramatically reducing the set of entries to examine.
@@ -103,9 +103,9 @@ grep -i "payment\|billing\|stripe" .beads/memory/knowledge.jsonl
 **If grep returns <3 candidates:** Do a broader search as fallback:
 ```bash
 # Search all content broadly
-grep -i "email" .beads/memory/knowledge.jsonl
+grep -i "email" .lavra/memory/knowledge.jsonl
 # Or search the archive too
-grep -i "email" .beads/memory/knowledge.archive.jsonl
+grep -i "email" .lavra/memory/knowledge.archive.jsonl
 ```
 
 ### Step 3b: Check for Recent High-Value Entries
@@ -114,7 +114,7 @@ grep -i "email" .beads/memory/knowledge.archive.jsonl
 
 ```bash
 # Get the 10 most recent entries
-tail -10 .beads/memory/knowledge.jsonl
+tail -10 .lavra/memory/knowledge.jsonl
 ```
 
 Scan for entries relevant to the current feature/task, especially those with type `pattern` or `decision`.
@@ -230,7 +230,7 @@ Structure your findings as:
 - Use `-i` for case-insensitive matching
 - Filter by type when the feature category is clear
 - Always check recent entries (tail -10)
-- Search the archive file too if <3 candidates found: `.beads/memory/knowledge.archive.jsonl`
+- Search the archive file too if <3 candidates found: `.lavra/memory/knowledge.archive.jsonl`
 - Filter aggressively - only include truly relevant entries
 - Prioritize `pattern` and `decision` type entries (highest value)
 - Extract actionable insights, not just summaries

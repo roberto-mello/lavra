@@ -40,7 +40,7 @@ Run a retrospective that analyzes what shipped, how the team performed, and what
 
    ```bash
    # Find the most recent previous retro
-   ls -1 .beads/retros/*.json 2>/dev/null | sort | tail -1
+   ls -1 .lavra/retros/*.json 2>/dev/null | sort | tail -1
    ```
 
    If a previous snapshot exists, load it. This enables velocity trend comparison and topic drift analysis in later phases.
@@ -197,7 +197,7 @@ This is the lavra differentiator. Read and analyze the knowledge base.
 
    ```bash
    # Read knowledge.jsonl and filter by timestamp
-   cat .beads/memory/knowledge.jsonl | while IFS= read -r line; do
+   cat .lavra/memory/knowledge.jsonl | while IFS= read -r line; do
      ts=$(echo "$line" | jq -r '.ts')
      if [ "$ts" -ge "$(date -j -f '%Y-%m-%d' "$since_date" +%s 2>/dev/null || date -d "$since_date" +%s)" ]; then
        echo "$line"
@@ -231,7 +231,7 @@ This is the lavra differentiator. Read and analyze the knowledge base.
    If no relevant bead exists, log it directly:
 
    ```bash
-   echo '{"key":"pattern-retro-{slug}","type":"pattern","content":"{description}","source":"retro","tags":[{tags}],"ts":'$(date +%s)'}' >> .beads/memory/knowledge.jsonl
+   echo '{"key":"pattern-retro-{slug}","type":"pattern","content":"{description}","source":"retro","tags":[{tags}],"ts":'$(date +%s)'}' >> .lavra/memory/knowledge.jsonl
    ```
 
 5. **Knowledge gaps**
@@ -297,10 +297,10 @@ This is the lavra differentiator. Read and analyze the knowledge base.
 2. **Save snapshot**
 
    ```bash
-   mkdir -p .beads/retros
+   mkdir -p .lavra/retros
    ```
 
-   Save a JSON snapshot to `.beads/retros/{until_date}.json` containing:
+   Save a JSON snapshot to `.lavra/retros/{until_date}.json` containing:
 
    ```json
    {
@@ -337,7 +337,7 @@ This is the lavra differentiator. Read and analyze the knowledge base.
 
 3. **Final summary**
 
-   Print a one-line summary: "Retro saved to .beads/retros/{until_date}.json. {N} action items identified."
+   Print a one-line summary: "Retro saved to .lavra/retros/{until_date}.json. {N} action items identified."
 
 </process>
 
@@ -349,7 +349,7 @@ This is the lavra differentiator. Read and analyze the knowledge base.
 - [ ] Team breakdown shows specific, anchored observations (or skipped for solo projects)
 - [ ] Knowledge.jsonl entries analyzed for tag frequency and recurring themes
 - [ ] Knowledge gaps identified (active areas with no captured knowledge)
-- [ ] Snapshot saved to .beads/retros/ for future trend comparison
+- [ ] Snapshot saved to .lavra/retros/ for future trend comparison
 - [ ] Markdown report output with all sections
 </success_criteria>
 

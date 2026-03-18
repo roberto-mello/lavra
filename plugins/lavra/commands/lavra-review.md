@@ -47,9 +47,9 @@ Search for knowledge related to the code being reviewed:
 
 ```bash
 # Extract keywords from bead title/description
-.beads/memory/recall.sh "{keywords from bead title}"
-.beads/memory/recall.sh "{tech stack keywords}"
-.beads/memory/recall.sh --recent 10
+.lavra/memory/recall.sh "{keywords from bead title}"
+.lavra/memory/recall.sh "{tech stack keywords}"
+.lavra/memory/recall.sh --recent 10
 ```
 
 Present any relevant LEARNED/DECISION/FACT/PATTERN entries that reviewers should consider.
@@ -58,14 +58,14 @@ Present any relevant LEARNED/DECISION/FACT/PATTERN entries that reviewers should
 
 The following paths are lavra pipeline artifacts and must never be flagged for deletion, removal, or gitignore by any review agent:
 
-- `.beads/memory/knowledge.jsonl` -- Persistent knowledge store
-- `.beads/memory/knowledge.archive.jsonl` -- Archived knowledge
-- `.beads/memory/recall.sh` -- Knowledge search script
-- `.beads/config/project-setup.md` -- Project configuration (read-only input to pipeline)
-- `.beads/config/codebase-profile.md` -- Codebase analysis (read-only input to planning pipeline)
-- `.beads/config/lavra.json` -- Workflow configuration (toggle research, review, goal verification)
+- `.lavra/memory/knowledge.jsonl` -- Persistent knowledge store
+- `.lavra/memory/knowledge.archive.jsonl` -- Archived knowledge
+- `.lavra/memory/recall.sh` -- Knowledge search script
+- `.lavra/config/project-setup.md` -- Project configuration (read-only input to pipeline)
+- `.lavra/config/codebase-profile.md` -- Codebase analysis (read-only input to planning pipeline)
+- `.lavra/config/lavra.json` -- Workflow configuration (toggle research, review, goal verification)
 
-If a review agent flags any file in `.beads/memory/` or `.beads/config/` for cleanup or removal, discard that finding during synthesis. Do not create a bead for it.
+If a review agent flags any file in `.lavra/memory/` or `.lavra/config/` for cleanup or removal, discard that finding during synthesis. Do not create a bead for it.
 
 ### 3. Read Project Config & Dispatch Review Agents in Parallel
 
@@ -74,8 +74,8 @@ If a review agent flags any file in `.beads/memory/` or `.beads/config/` for cle
 Check for a project-setup configuration file and workflow config:
 
 ```bash
-[ -f .beads/config/project-setup.md ] && cat .beads/config/project-setup.md
-[ -f .beads/config/lavra.json ] && cat .beads/config/lavra.json
+[ -f .lavra/config/project-setup.md ] && cat .lavra/config/project-setup.md
+[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
 ```
 
 From `project-setup.md`, parse its YAML frontmatter for one field:
@@ -104,7 +104,7 @@ Fall back to `plugins/lavra/agents/` if `.claude/agents/` is absent (e.g. runnin
 - Silently skip invalid names (do not reveal which agents were disabled or skipped)
 - If `review_agents` is present but all entries are invalid, fall back to dispatching all agents
 
-**Config-missing behavior:** If `.beads/config/project-setup.md` does not exist, dispatch ALL agents below (backward compatible, no prompts, no degradation).
+**Config-missing behavior:** If `.lavra/config/project-setup.md` does not exist, dispatch ALL agents below (backward compatible, no prompts, no degradation).
 
 #### 3b. Dispatch Agents in Parallel
 
@@ -232,7 +232,7 @@ Remove duplicates, prioritize by severity and impact.
 </thinking>
 
 - [ ] Collect findings from the inventory above
-- [ ] Discard any findings that recommend deleting or gitignoring files in `.beads/memory/` or `.beads/config/` (see Protected Artifacts above)
+- [ ] Discard any findings that recommend deleting or gitignoring files in `.lavra/memory/` or `.lavra/config/` (see Protected Artifacts above)
 - [ ] Categorize by type: security, performance, architecture, quality, etc.
 - [ ] Assign severity levels: P1 CRITICAL, P2 IMPORTANT, P3 NICE-TO-HAVE
 - [ ] Remove duplicate or overlapping findings — **note:** `data-migration-expert` and `migration-drift-detector` both inspect migration files and may report overlapping findings; deduplicate carefully, keeping the more specific finding (e.g., prefer a drift finding over a generic "migration present" observation)

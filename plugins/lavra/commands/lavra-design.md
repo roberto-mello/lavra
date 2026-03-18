@@ -89,7 +89,7 @@ If "Stop here": jump to the Output Summary with only Phase 1 marked complete.
 **Read workflow config (no-op if missing):**
 
 ```bash
-[ -f .beads/config/lavra.json ] && cat .beads/config/lavra.json
+[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
 ```
 
 If the file exists, parse it and store settings for later phases. If it does not exist, use defaults: `research: true`, `plan_review: true`, `goal_verification: true`, `max_parallel_agents: 3`, `commit_granularity: "task"`.
@@ -164,7 +164,7 @@ If "Stop here": jump to the Output Summary.
 **Read codebase profile (no-op if missing):**
 
 ```bash
-[ -f .beads/config/codebase-profile.md ] && cat .beads/config/codebase-profile.md
+[ -f .lavra/config/codebase-profile.md ] && cat .lavra/config/codebase-profile.md
 ```
 
 If the file exists, sanitize it before injecting as planning context:
@@ -488,10 +488,10 @@ bd swarm validate {EPIC_ID}
 
 **6.6 Write session state:**
 
-Write `.beads/memory/session-state.md` to preserve position awareness across context compaction:
+Write `.lavra/memory/session-state.md` to preserve position awareness across context compaction:
 
 ```bash
-cat > .beads/memory/session-state.md << EOF
+cat > .lavra/memory/session-state.md << EOF
 # Session State
 ## Current Position
 - Epic: {EPIC_ID}
@@ -574,7 +574,7 @@ bd list --parent {EPIC_ID} --json
 bd show {EPIC_ID} --json | jq '[.[] | .comments[]? | select(.body | startswith("DECISION:"))] | length'
 
 # Knowledge entries captured during this session
-wc -l < .beads/memory/knowledge.jsonl
+wc -l < .lavra/memory/knowledge.jsonl
 ```
 
 </process>

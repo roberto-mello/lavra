@@ -1,6 +1,6 @@
 # Knowledge JSONL Schema
 
-**Storage location:** `.beads/memory/knowledge.jsonl`
+**Storage location:** `.lavra/memory/knowledge.jsonl`
 
 Each line in the JSONL file is a complete, valid JSON object representing one knowledge entry.
 
@@ -86,7 +86,7 @@ When logging to both knowledge.jsonl AND bead comments:
 
 ```bash
 # JSONL entry
-echo '{"key":"learned-example","type":"learned","content":"...","source":"agent","tags":["tag"],"ts":1706918400,"bead":"BD-001"}' >> .beads/memory/knowledge.jsonl
+echo '{"key":"learned-example","type":"learned","content":"...","source":"agent","tags":["tag"],"ts":1706918400,"bead":"BD-001"}' >> .lavra/memory/knowledge.jsonl
 
 # Corresponding bead comment
 bd comments add BD-001 "LEARNED: [content from entry]"

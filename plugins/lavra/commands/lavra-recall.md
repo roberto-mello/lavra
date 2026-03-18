@@ -6,7 +6,7 @@ disable-model-invocation: true
 ---
 
 <objective>
-Search the knowledge base (`.beads/memory/knowledge.jsonl`) mid-session and inject relevant context without restarting Claude Code.
+Search the knowledge base (`.lavra/memory/knowledge.jsonl`) mid-session and inject relevant context without restarting Claude Code.
 </objective>
 
 <execution_context>
@@ -32,7 +32,7 @@ Search the knowledge base (`.beads/memory/knowledge.jsonl`) mid-session and inje
 ### Mode 1: Statistics (--stats)
 
 ```bash
-bash .beads/memory/recall.sh --stats
+bash .lavra/memory/recall.sh --stats
 ```
 
 Display the output directly as a code block:
@@ -46,7 +46,7 @@ Display the output directly as a code block:
 ### Mode 2: Recent Entries (--recent N)
 
 ```bash
-bash .beads/memory/recall.sh --recent {N}
+bash .lavra/memory/recall.sh --recent {N}
 ```
 
 Format output:
@@ -60,7 +60,7 @@ Format output:
 ### Mode 3: Topic/Epic (--topic BEAD_ID)
 
 ```bash
-bash .beads/memory/recall.sh --topic {BEAD_ID}
+bash .lavra/memory/recall.sh --topic {BEAD_ID}
 ```
 
 Format output:
@@ -107,12 +107,12 @@ When argument matches bead ID pattern:
 
 4. **Search using bead title as keywords:**
    ```bash
-   bash .beads/memory/recall.sh "$TITLE"
+   bash .lavra/memory/recall.sh "$TITLE"
    ```
 
 5. **Also search by bead ID directly:**
    ```bash
-   grep "\"bead\":\"#$ARGUMENTS\"" .beads/memory/knowledge.jsonl | jq -r '"\(.type | ascii_upcase): \(.content)"'
+   grep "\"bead\":\"#$ARGUMENTS\"" .lavra/memory/knowledge.jsonl | jq -r '"\(.type | ascii_upcase): \(.content)"'
    ```
 
 6. **Format output:**
@@ -151,12 +151,12 @@ When argument is plain text (not a flag or bead ID):
 
 1. **Search with recall.sh:**
    ```bash
-   bash .beads/memory/recall.sh "#$ARGUMENTS"
+   bash .lavra/memory/recall.sh "#$ARGUMENTS"
    ```
 
 2. **Check for --type filter:**
    - If `#$ARGUMENTS` contains `--type learned|decision|fact|pattern|investigation`
-   - Pass to recall.sh: `bash .beads/memory/recall.sh "query" --type TYPE`
+   - Pass to recall.sh: `bash .lavra/memory/recall.sh "query" --type TYPE`
 
 3. **Format output:**
 
@@ -235,7 +235,7 @@ Or try:
 
 **Error handling:**
 
-**If .beads/memory/ doesn't exist:**
+**If .lavra/memory/ doesn't exist:**
 ```
 ## Memory Not Initialized
 

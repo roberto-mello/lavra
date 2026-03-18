@@ -142,12 +142,12 @@ Search for relevant past learnings before dispatching agents. These inform what 
 
 ```bash
 # Search knowledge for each key topic in the plan
-.beads/memory/recall.sh "{topic 1}"
-.beads/memory/recall.sh "{topic 2}"
-.beads/memory/recall.sh "{technology}"
+.lavra/memory/recall.sh "{topic 1}"
+.lavra/memory/recall.sh "{topic 2}"
+.lavra/memory/recall.sh "{technology}"
 
 # Search with --all to include archived knowledge
-.beads/memory/recall.sh --all "{broad topic}"
+.lavra/memory/recall.sh --all "{broad topic}"
 ```
 
 Collect all relevant entries. These will be provided to agents as context.

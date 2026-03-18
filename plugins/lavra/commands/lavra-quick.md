@@ -52,7 +52,7 @@ Run in parallel:
 
 ```bash
 # Recall relevant knowledge
-.beads/memory/recall.sh "{keywords from task}"
+.lavra/memory/recall.sh "{keywords from task}"
 ```
 
 ```bash

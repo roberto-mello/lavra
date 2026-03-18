@@ -81,7 +81,7 @@ Focus on: similar features, established patterns, CLAUDE.md or AGENTS.md guidanc
 Search for relevant knowledge from past sessions:
 
 ```bash
-.beads/memory/recall.sh "{keywords from feature description}"
+.lavra/memory/recall.sh "{keywords from feature description}"
 ```
 
 Present any relevant entries that might inform the brainstorm.

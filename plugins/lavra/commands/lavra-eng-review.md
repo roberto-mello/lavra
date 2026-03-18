@@ -55,8 +55,8 @@ If prior commits suggest a previous review cycle on this branch (e.g., "address 
 
 ```bash
 # Search for knowledge related to the plan's topic
-.beads/memory/recall.sh "{keywords from epic title}"
-.beads/memory/recall.sh "{tech stack keywords}"
+.lavra/memory/recall.sh "{keywords from epic title}"
+.lavra/memory/recall.sh "{tech stack keywords}"
 ```
 
 Include any relevant LEARNED/DECISION/FACT/PATTERN entries as context for reviewers.
@@ -64,7 +64,7 @@ Include any relevant LEARNED/DECISION/FACT/PATTERN entries as context for review
 Read workflow config for model profile:
 
 ```bash
-[ -f .beads/config/lavra.json ] && cat .beads/config/lavra.json
+[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
 ```
 
 Parse `model_profile` (default: `"balanced"`). When `model_profile` is `"quality"`, dispatch `architecture-strategist`, `security-sentinel`, and `performance-oracle` with `model: opus`.

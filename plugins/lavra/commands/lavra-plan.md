@@ -81,8 +81,8 @@ Search for brainstorm-related knowledge and beads using keywords from the featur
 
 ```bash
 # Search for brainstorm-related knowledge
-.beads/memory/recall.sh "brainstorm"
-.beads/memory/recall.sh "{keywords from feature description}"
+.lavra/memory/recall.sh "brainstorm"
+.lavra/memory/recall.sh "{keywords from feature description}"
 
 # Check for recent brainstorm beads (title-based)
 bd list --status=open --json 2>/dev/null | jq -r '.[] | select(.title | test("brainstorm|explore|investigate"; "i")) | "\(.id): \(.title) (\(.updated_at // .created_at))"'

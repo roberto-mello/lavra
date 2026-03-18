@@ -12,12 +12,12 @@ disable-model-invocation: true
 
 # lavra-knowledge Skill
 
-**Purpose:** Capture solved problems as structured JSONL entries in `.beads/memory/knowledge.jsonl` and as bead comments, building a searchable knowledge base that auto-recall injects into future sessions.
+**Purpose:** Capture solved problems as structured JSONL entries in `.lavra/memory/knowledge.jsonl` and as bead comments, building a searchable knowledge base that auto-recall injects into future sessions.
 
 ## Overview
 
 This skill captures problem solutions immediately after confirmation, creating structured knowledge entries that:
-- Are stored in `.beads/memory/knowledge.jsonl` for auto-recall search
+- Are stored in `.lavra/memory/knowledge.jsonl` for auto-recall search
 - Are logged as bead comments for traceability back to specific work items
 - Use the five knowledge prefixes: LEARNED, DECISION, FACT, PATTERN, INVESTIGATION
 
@@ -90,10 +90,10 @@ Search knowledge.jsonl for similar issues:
 
 ```bash
 # Search by error message keywords
-grep "exact error phrase" .beads/memory/knowledge.jsonl
+grep "exact error phrase" .lavra/memory/knowledge.jsonl
 
 # Search using recall script if available
-.beads/memory/recall.sh "keyword1 keyword2"
+.lavra/memory/recall.sh "keyword1 keyword2"
 ```
 
 **IF similar knowledge found:**
@@ -204,7 +204,7 @@ Please provide corrected values.
 
 ```bash
 # Append each validated entry as a single JSON line
-echo '{"key":"learned-oauth-redirect-must-match","type":"learned","content":"OAuth redirect URI must match exactly including trailing slash","source":"agent","tags":["auth","oauth","security"],"ts":1706918400,"bead":"BD-001"}' >> .beads/memory/knowledge.jsonl
+echo '{"key":"learned-oauth-redirect-must-match","type":"learned","content":"OAuth redirect URI must match exactly including trailing slash","source":"agent","tags":["auth","oauth","security"],"ts":1706918400,"bead":"BD-001"}' >> .lavra/memory/knowledge.jsonl
 ```
 
 **Log as bead comments (if bead ID available):**
@@ -221,11 +221,11 @@ bd comments add BD-001 "PATTERN: Always verify OAuth redirect URIs match exactly
 2. Keep remaining lines as new `knowledge.jsonl`
 
 ```bash
-LINE_COUNT=$(wc -l < .beads/memory/knowledge.jsonl)
+LINE_COUNT=$(wc -l < .lavra/memory/knowledge.jsonl)
 if [ "$LINE_COUNT" -gt 1000 ]; then
-  head -500 .beads/memory/knowledge.jsonl >> .beads/memory/knowledge.archive.jsonl
-  tail -n +501 .beads/memory/knowledge.jsonl > .beads/memory/knowledge.jsonl.tmp
-  mv .beads/memory/knowledge.jsonl.tmp .beads/memory/knowledge.jsonl
+  head -500 .lavra/memory/knowledge.jsonl >> .lavra/memory/knowledge.archive.jsonl
+  tail -n +501 .lavra/memory/knowledge.jsonl > .lavra/memory/knowledge.jsonl.tmp
+  mv .lavra/memory/knowledge.jsonl.tmp .lavra/memory/knowledge.jsonl
 fi
 ```
 </step>
@@ -321,7 +321,7 @@ What's next?
 - `recall.sh` script provides manual search
 
 **Data flow:**
-1. This skill writes structured entries to `.beads/memory/knowledge.jsonl`
+1. This skill writes structured entries to `.lavra/memory/knowledge.jsonl`
 2. This skill also logs comments via `bd comments add` (which triggers `memory-capture.sh`)
 3. At next session start, `auto-recall.sh` searches knowledge.jsonl and injects relevant entries
 
@@ -336,7 +336,7 @@ What's next?
 Knowledge capture is successful when ALL of the following are true:
 
 - All JSONL entries have valid schema (required fields, correct types)
-- Entries appended to `.beads/memory/knowledge.jsonl`
+- Entries appended to `.lavra/memory/knowledge.jsonl`
 - Bead comments logged via `bd comments add` (if bead ID available)
 - Content is specific and searchable (not vague)
 - Tags are appropriate for future recall
@@ -367,7 +367,7 @@ Knowledge capture is successful when ALL of the following are true:
 
 **Knowledge.jsonl doesn't exist:**
 
-- Create it: `touch .beads/memory/knowledge.jsonl`
+- Create it: `touch .lavra/memory/knowledge.jsonl`
 - Continue normally
 
 ---
@@ -432,7 +432,7 @@ Knowledge capture is successful when ALL of the following are true:
    ```
    Valid.
 6. **Write entries:**
-   - Appended to `.beads/memory/knowledge.jsonl`
+   - Appended to `.lavra/memory/knowledge.jsonl`
    - Logged bead comments:
      ```bash
      bd comments add BD-042 "LEARNED: Order listing N+1 query fixed by adding .includes(:items). Missing eager loading caused separate DB query per order item."

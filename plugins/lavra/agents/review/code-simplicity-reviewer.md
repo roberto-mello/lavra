@@ -46,7 +46,7 @@ When reviewing code, you will:
    - Eliminate extensibility points without clear use cases
    - Question generic solutions for specific problems
    - Remove "just in case" code
-   - Never flag `.beads/memory/` or `.beads/config/` files for removal -- these are lavra pipeline artifacts used as living knowledge documents and project configuration
+   - Never flag `.lavra/memory/` or `.lavra/config/` files for removal -- these are lavra pipeline artifacts used as living knowledge documents and project configuration
 
 6. **Optimize for Readability**:
    - Prefer self-documenting code over comments

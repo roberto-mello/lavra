@@ -69,10 +69,10 @@ If there are uncommitted changes:
 
 ### Step 5: Write Session State
 
-Write `.beads/memory/session-state.md` to preserve position awareness across context compaction:
+Write `.lavra/memory/session-state.md` to preserve position awareness across context compaction:
 
 ```bash
-cat > .beads/memory/session-state.md << EOF
+cat > .lavra/memory/session-state.md << EOF
 # Session State
 ## Current Position
 - Bead(s): {active bead IDs}

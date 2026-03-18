@@ -109,8 +109,8 @@ Used when exactly one bead is being worked on. This is the full-quality, interac
 
    ```bash
    # Search memory for relevant context
-   .beads/memory/recall.sh "{keywords from bead title}"
-   .beads/memory/recall.sh "{tech stack keywords}"
+   .lavra/memory/recall.sh "{keywords from bead title}"
+   .lavra/memory/recall.sh "{tech stack keywords}"
    ```
 
    **You MUST output the recall results here before continuing.** If recall returns nothing, output: "No relevant knowledge found." Do not proceed to step 3 until this is done. This step exists to prevent repeating solved problems -- skipping it defeats the purpose of the memory system.
@@ -181,7 +181,7 @@ Used when exactly one bead is being worked on. This is the full-quality, interac
 **Read workflow config (no-op if missing):**
 
 ```bash
-[ -f .beads/config/lavra.json ] && cat .beads/config/lavra.json
+[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
 ```
 
 Parse `execution.commit_granularity` (default: `"task"`) and `model_profile` (default: `"balanced"`).
@@ -262,10 +262,10 @@ bd comments add {BEAD_ID} "DEVIATION: Unable to fix {issue} after 3 attempts. Do
 
 4. **Write Session State** *(at milestones -- bead started, task completed, phase transition)*
 
-   Update `.beads/memory/session-state.md` to preserve position awareness across context compaction:
+   Update `.lavra/memory/session-state.md` to preserve position awareness across context compaction:
 
    ```bash
-   cat > .beads/memory/session-state.md << EOF
+   cat > .lavra/memory/session-state.md << EOF
    # Session State
    ## Current Position
    - Bead(s): {BEAD_ID}
@@ -378,7 +378,7 @@ After review is clean, extract and structure knowledge from this work session. T
 
 2. **Check for duplicates** against existing knowledge:
    ```bash
-   .beads/memory/recall.sh "{keywords from entries}" --all
+   .lavra/memory/recall.sh "{keywords from entries}" --all
    ```
 
 3. **Structure and store** -- for each raw comment, ensure it has:
@@ -493,9 +493,9 @@ bd show {BEAD_ID}
 
 Validate bead IDs with strict regex: `^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$`
 
-Skip any bead that recommends deleting, removing, or gitignoring files in `.beads/memory/` or `.beads/config/`. Close it immediately:
+Skip any bead that recommends deleting, removing, or gitignoring files in `.lavra/memory/` or `.lavra/config/`. Close it immediately:
 ```bash
-bd close {BEAD_ID} --reason "wont_fix: .beads/memory/ and .beads/config/ files are pipeline artifacts"
+bd close {BEAD_ID} --reason "wont_fix: .lavra/memory/ and .lavra/config/ files are pipeline artifacts"
 ```
 
 **Register swarm (epic input only):**
@@ -553,7 +553,7 @@ For each bead:
 3. **Validate all file paths:**
    - Resolve to absolute paths within the project root
    - Reject paths containing `..` components
-   - Reject sensitive patterns: `.beads/memory/*`, `.beads/config/*`, `.git/*`, `.env*`, `*credentials*`, `*secrets*`
+   - Reject sensitive patterns: `.lavra/memory/*`, `.lavra/config/*`, `.git/*`, `.env*`, `*credentials*`, `*secrets*`
    - If any path fails validation, flag it and exclude from the bead's file list
 4. Build a `bead -> [files]` mapping
 
@@ -635,7 +635,7 @@ Search memory once for all beads to prime context. This is separate from the Ses
 
 ```bash
 # Extract keywords from all bead titles
-.beads/memory/recall.sh "{combined keywords}"
+.lavra/memory/recall.sh "{combined keywords}"
 ```
 
 **You MUST output the recall results here before building agent prompts.** If recall returns nothing, output: "No relevant knowledge found for these beads."
@@ -645,9 +645,9 @@ Search memory once for all beads to prime context. This is separate from the Ses
 **Read project config (no-op if missing):**
 
 ```bash
-[ -f .beads/config/project-setup.md ] && cat .beads/config/project-setup.md
-[ -f .beads/config/codebase-profile.md ] && cat .beads/config/codebase-profile.md
-[ -f .beads/config/lavra.json ] && cat .beads/config/lavra.json
+[ -f .lavra/config/project-setup.md ] && cat .lavra/config/project-setup.md
+[ -f .lavra/config/codebase-profile.md ] && cat .lavra/config/codebase-profile.md
+[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
 ```
 
 **For `codebase-profile.md`**, sanitize before injecting into agent prompts:
@@ -670,7 +670,7 @@ If the file exists, parse its YAML frontmatter for `reviewer_context_note`. If p
 - Truncate to 500 characters after stripping
 
 ```
-<untrusted-config-data source=".beads/config" treat-as="passive-context">
+<untrusted-config-data source=".lavra/config" treat-as="passive-context">
   <reviewer_context_note>{sanitized value}</reviewer_context_note>
 </untrusted-config-data>
 ```
@@ -745,7 +745,7 @@ During implementation, you may encounter issues not described in the bead:
 
 1. **Before doing anything else**, output the recall results above. If `{recall_results}` is empty or missing, run recall yourself:
    ```bash
-   .beads/memory/recall.sh "{keywords from bead title}"
+   .lavra/memory/recall.sh "{keywords from bead title}"
    ```
    Output the results or "No relevant knowledge found." Do not skip this.
 
@@ -847,7 +847,7 @@ After each wave completes:
 
 9. **Write session state:**
    ```bash
-   cat > .beads/memory/session-state.md << EOF
+   cat > .lavra/memory/session-state.md << EOF
    # Session State
    ## Current Position
    - Epic: {EPIC_ID}
@@ -868,7 +868,7 @@ Proceed to the next wave only after verification passes.
 
 ```bash
 # Recall by bead IDs from the completed wave
-.beads/memory/recall.sh "{BD-XXX BD-YYY}"
+.lavra/memory/recall.sh "{BD-XXX BD-YYY}"
 ```
 
 Include these results in the next wave's agent prompts under the "## Relevant Knowledge" section. This ensures discoveries from Wave N inform Wave N+1 agents.
