@@ -17,7 +17,20 @@ These four locations must all have the target version:
 - `LAVRA_VERSION` constant in `plugins/lavra/hooks/auto-recall.sh`
 - Version string in `plugins/lavra/hooks/provision-memory.sh` (the `echo "X.Y.Z"` line)
 
-Also verify that `site/public/command-map.html` reflects current nodes/connections (new commands, agents, or skills should be added).
+Also verify that `site/public/command-map.html` reflects current nodes/connections (new commands, agents, or skills should have nodes; updated handoff flows should have edges). To spot missing nodes:
+
+```bash
+# Nodes in the map
+grep -oE "id:'[a-z][a-z0-9-]+'" site/public/command-map.html | sort -u
+
+# Commands on disk
+ls plugins/lavra/commands/*.md plugins/lavra/commands/optional/*.md | xargs -I{} basename {} .md | sort
+
+# Agents on disk
+find plugins/lavra/agents -name "*.md" | xargs -I{} basename {} .md | sort
+```
+
+Compare the outputs — any command or agent on disk but absent from the map needs a node added. Edges (command → command suggestions) must be updated manually when handoff sections change.
 
 Verify that the five reference docs match current plugin contents:
 
