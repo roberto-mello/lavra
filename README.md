@@ -152,8 +152,4 @@ Six knowledge types (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION, DEVIATION)
 
 Built by [Roberto Mello](https://github.com/roberto-mello), extending [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin) by [Every](https://every.to). Task tracking by [Beads](https://github.com/steveyegge/beads).
 
-Inspired by Every's writing on [compound engineering](https://every.to/chain-of-thought/compound-engineering-how-every-codes-with-agents), [gstack](https://github.com/garrytan/gstack) by Garry Tan (role-based skills for autonomous workflows), and [Get Shit Done](https://github.com/gsd-build/get-shit-done) (spec-driven development with context engineering).
-
-## License
-
-MIT
+Inspired by Every's writing on [compound engineering](https://every.to/chain-of-thought/compound-engineering-how-every-codes-with-agents), with ideas from [Mario Zechner](https://x.com/badlogicgames/), [Simon Willison](https://https://simonwillison.net/), [Get Shit Done](https://github.com/gsd-build/get-shit-done), [gstach by Garry Tan](https://github.com/garrytan/gstack) and many others. Thanks to my friend Dan for rubber-ducking Lavra.
