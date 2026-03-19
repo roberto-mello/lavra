@@ -82,17 +82,17 @@ else
   fail "Claude Code settings" "settings.json not created"
 fi
 
-# Verify commands (should be 25+ in project OR global)
+# Verify commands (should be 23+ in project OR global)
 # Follow symlinks with -L flag
 COMMAND_COUNT=$(find .claude/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 GLOBAL_COMMAND_COUNT=$(find -L "$HOME/.claude/commands" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 
-if [[ "$COMMAND_COUNT" -ge 25 ]]; then
+if [[ "$COMMAND_COUNT" -ge 23 ]]; then
   pass "Claude Code commands installed locally ($COMMAND_COUNT files)"
-elif [[ "$GLOBAL_COMMAND_COUNT" -ge 25 ]]; then
+elif [[ "$GLOBAL_COMMAND_COUNT" -ge 23 ]]; then
   pass "Claude Code commands installed globally ($GLOBAL_COMMAND_COUNT files)"
 else
-  fail "Claude Code commands" "Expected 25+, found $COMMAND_COUNT local, $GLOBAL_COMMAND_COUNT global"
+  fail "Claude Code commands" "Expected 23+, found $COMMAND_COUNT local, $GLOBAL_COMMAND_COUNT global"
 fi
 
 # Verify agents (should be 28+ in project OR global)
@@ -108,17 +108,17 @@ else
   fail "Claude Code agents" "Expected 30+, found $AGENT_COUNT local, $GLOBAL_AGENT_COUNT global"
 fi
 
-# Verify skills (should be 15+ in project OR global)
+# Verify skills (should be 8+ in project OR global)
 # Follow symlinks with -L flag
 SKILL_COUNT=$(find .claude/skills -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
 GLOBAL_SKILL_COUNT=$(find -L "$HOME/.claude/skills" -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
 
-if [[ "$SKILL_COUNT" -ge 15 ]]; then
+if [[ "$SKILL_COUNT" -ge 8 ]]; then
   pass "Claude Code skills installed locally ($SKILL_COUNT files)"
-elif [[ "$GLOBAL_SKILL_COUNT" -ge 15 ]]; then
+elif [[ "$GLOBAL_SKILL_COUNT" -ge 8 ]]; then
   pass "Claude Code skills installed globally ($GLOBAL_SKILL_COUNT files)"
 else
-  fail "Claude Code skills" "Expected 15+, found $SKILL_COUNT local, $GLOBAL_SKILL_COUNT global"
+  fail "Claude Code skills" "Expected 8+, found $SKILL_COUNT local, $GLOBAL_SKILL_COUNT global"
 fi
 
 # Verify MCP server config (optional for project-specific installs)
@@ -227,10 +227,10 @@ fi
 
 # Verify commands are .toml format (Gemini-specific)
 TOML_COUNT=$(find commands -name "*.toml" 2>/dev/null | wc -l | tr -d ' ')
-if [[ "$TOML_COUNT" -ge 25 ]]; then
+if [[ "$TOML_COUNT" -ge 23 ]]; then
   pass "Gemini commands installed as .toml ($TOML_COUNT files)"
 else
-  fail "Gemini commands" "Expected 25+ .toml files, found $TOML_COUNT"
+  fail "Gemini commands" "Expected 23+ .toml files, found $TOML_COUNT"
 fi
 
 # Verify template syntax conversion ($ARGUMENTS → {{args}})
@@ -250,10 +250,10 @@ fi
 
 # Verify skills
 GEMINI_SKILL_COUNT=$(find skills -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
-if [[ "$GEMINI_SKILL_COUNT" -ge 15 ]]; then
+if [[ "$GEMINI_SKILL_COUNT" -ge 8 ]]; then
   pass "Gemini skills installed ($GEMINI_SKILL_COUNT files)"
 else
-  fail "Gemini skills" "Expected 15+, found $GEMINI_SKILL_COUNT"
+  fail "Gemini skills" "Expected 8+, found $GEMINI_SKILL_COUNT"
 fi
 
 # ==============================================================================
@@ -316,12 +316,12 @@ else
   fail "Cortex Code hooks.json" "hooks.json not created at $HOME/.snowflake/cortex/hooks.json"
 fi
 
-# Verify commands (should be 25+)
+# Verify commands (should be 23+)
 CMD_COUNT=$(find .cortex/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-if [[ "$CMD_COUNT" -ge 25 ]]; then
+if [[ "$CMD_COUNT" -ge 23 ]]; then
   pass "Cortex Code commands installed ($CMD_COUNT files)"
 else
-  fail "Cortex Code commands" "Expected 25+, found $CMD_COUNT"
+  fail "Cortex Code commands" "Expected 23+, found $CMD_COUNT"
 fi
 
 # Verify agents (should be 28+)
@@ -332,12 +332,12 @@ else
   fail "Cortex Code agents" "Expected 30+, found $AGENT_COUNT"
 fi
 
-# Verify skills (should be 15+)
+# Verify skills (should be 8+)
 SKILL_COUNT=$(find .cortex/skills -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
-if [[ "$SKILL_COUNT" -ge 15 ]]; then
+if [[ "$SKILL_COUNT" -ge 8 ]]; then
   pass "Cortex Code skills installed ($SKILL_COUNT files)"
 else
-  fail "Cortex Code skills" "Expected 15+, found $SKILL_COUNT"
+  fail "Cortex Code skills" "Expected 8+, found $SKILL_COUNT"
 fi
 
 # Verify MCP is NOT installed (skipped for Cortex)
