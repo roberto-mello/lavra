@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# beads-compound plugin installer router
+# lavra plugin installer router
 #
 # Routes to platform-specific installers based on flags.
 # Defaults to Claude Code for backwards compatibility.
@@ -20,7 +20,7 @@ PLATFORM=""
 # Display help
 show_help() {
   cat <<EOF
-beads-compound Plugin Installer
+lavra Plugin Installer
 
 Usage:
   ./install.sh [PLATFORM] [TARGET] [OPTIONS]
@@ -130,7 +130,7 @@ fi
 # Export SCRIPT_DIR so sourced installer can use it
 export BEADS_MARKETPLACE_ROOT="$SCRIPT_DIR"
 
-echo "Installing beads-compound for $PLATFORM..."
+echo "Installing lavra for $PLATFORM..."
 echo ""
 
 source "$INSTALLER" "$@"

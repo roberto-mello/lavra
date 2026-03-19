@@ -1,0 +1,279 @@
+---
+name: lavra-recall
+description: Search knowledge base mid-session and inject relevant context
+argument-hint: "[keywords, bead ID, or --flag]"
+disable-model-invocation: true
+---
+
+<objective>
+Search the knowledge base (`.lavra/memory/knowledge.jsonl`) mid-session and inject relevant context without restarting Claude Code.
+</objective>
+
+<execution_context>
+<input_document> #$ARGUMENTS </input_document>
+
+**Parse the arguments to determine mode:**
+
+1. **Check for flags first:**
+   - `--stats` -> Statistics mode
+   - `--recent N` -> Recent entries mode
+   - `--topic BEAD_ID` -> Topic/epic mode
+
+2. **Check if argument matches bead ID pattern:**
+   - Pattern: lowercase alphanumeric segments separated by hyphens
+   - Regex: `^[a-z0-9]+-[a-z0-9]+(-[a-z0-9]+)*$`
+   - Examples: `bd-001`, `oauth-bug`, `beads-feature-123`
+
+3. **Otherwise treat as keyword search**
+</execution_context>
+
+<process>
+
+### Mode 1: Statistics (--stats)
+
+```bash
+bash .lavra/memory/recall.sh --stats
+```
+
+Display the output directly as a code block:
+
+```
+## Knowledge Base Statistics
+
+{statistics output from recall.sh}
+```
+
+### Mode 2: Recent Entries (--recent N)
+
+```bash
+bash .lavra/memory/recall.sh --recent {N}
+```
+
+Format output:
+
+```
+## Recent Knowledge ({N} entries)
+
+{formatted entries from recall.sh}
+```
+
+### Mode 3: Topic/Epic (--topic BEAD_ID)
+
+```bash
+bash .lavra/memory/recall.sh --topic {BEAD_ID}
+```
+
+Format output:
+
+```
+## Knowledge for Topic: {BEAD_ID}
+
+{formatted entries from recall.sh}
+```
+
+If no results:
+```
+No knowledge found for topic {BEAD_ID}.
+
+The topic may not have child beads with captured knowledge yet.
+```
+
+### Mode 4: Bead ID Recall
+
+When argument matches bead ID pattern:
+
+1. **Load the bead:**
+   ```bash
+   bd show "#$ARGUMENTS" --json
+   ```
+
+2. **If bead doesn't exist:**
+   ```
+   ## Bead Not Found
+
+   Bead ID '#$ARGUMENTS' not found. Check the ID with:
+
+   ```bash
+   bd list --status=open
+   ```
+
+   Stop execution.
+
+3. **If bead exists, extract context:**
+   ```bash
+   TITLE=$(bd show "#$ARGUMENTS" --json | jq -r '.[0].title')
+   TYPE=$(bd show "#$ARGUMENTS" --json | jq -r '.[0].type')
+   ```
+
+4. **Search using bead title as keywords:**
+   ```bash
+   bash .lavra/memory/recall.sh "$TITLE"
+   ```
+
+5. **Also search by bead ID directly:**
+   ```bash
+   grep "\"bead\":\"#$ARGUMENTS\"" .lavra/memory/knowledge.jsonl | jq -r '"\(.type | ascii_upcase): \(.content)"'
+   ```
+
+6. **Format output:**
+
+   ```
+   ## Knowledge Recall: {BEAD_ID}
+
+   **Bead:** {TITLE} ({TYPE})
+
+   ### Direct Knowledge (logged to this bead):
+
+   {entries where bead field matches}
+
+   ### Related Knowledge (matching "{TITLE}"):
+
+   {entries from keyword search}
+   ```
+
+   If no results:
+   ```
+   ## No Knowledge Found
+
+   No knowledge entries found for bead {BEAD_ID} or matching keywords from its title.
+
+   To capture knowledge for this bead:
+   ```bash
+   bd comments add {BEAD_ID} "LEARNED: ..."
+   ```
+
+   Use `/lavra-learn` to curate findings into structured knowledge.
+   ```
+
+### Mode 5: Keyword Search
+
+When argument is plain text (not a flag or bead ID):
+
+1. **Search with recall.sh:**
+   ```bash
+   bash .lavra/memory/recall.sh "#$ARGUMENTS"
+   ```
+
+2. **Check for --type filter:**
+   - If `#$ARGUMENTS` contains `--type learned|decision|fact|pattern|investigation`
+   - Pass to recall.sh: `bash .lavra/memory/recall.sh "query" --type TYPE`
+
+3. **Format output:**
+
+   ```
+   ## Knowledge Recall: "{query}"
+
+   Found {count} entries:
+
+   {formatted output from recall.sh}
+   ```
+
+   If no results:
+   ```
+   ## No Matches Found
+
+   No knowledge entries match "{query}".
+
+   Try:
+   - Different keywords (e.g., "auth" instead of "authentication")
+   - Broader search terms
+   - `/lavra-recall --recent 20` to see latest entries
+   - `/lavra-recall --stats` to see all topics and tags
+   ```
+
+### Mode 6: Empty Arguments
+
+If `#$ARGUMENTS` is empty:
+
+```
+## Knowledge Recall
+
+Usage:
+```bash
+/lavra-recall "keywords"           # Search by keywords
+/lavra-recall BD-001               # Recall for specific bead
+/lavra-recall --recent 10          # Show recent entries
+/lavra-recall --stats              # Database statistics
+/lavra-recall --topic BD-005       # Epic's knowledge
+```
+
+Or try:
+```bash
+/lavra-recall --recent 10          # See what's been captured lately
+```
+```
+
+## Output Format Standards
+
+**Entry format from recall.sh:**
+```
+[TYPE] content
+  bead: BD-XXX | tag1, tag2, tag3
+```
+
+**Always wrap in code blocks for readability.**
+
+**Count results when possible:**
+- Parse output line count (entries have 2 lines each)
+- Report: "Found {count} entries" or "No matches found"
+
+</process>
+
+<success_criteria>
+- Correct mode detected from arguments
+- Knowledge search executed with appropriate parameters
+- Results formatted clearly with entry counts
+- Empty/no-result cases handled with helpful suggestions
+</success_criteria>
+
+<guardrails>
+- Recall uses FTS5 full-text search (if sqlite3 available) with BM25 ranking
+- Falls back to grep search if sqlite3 not installed
+- Search is case-insensitive and supports fuzzy matching
+- Archive can be included with `--all` flag (not exposed in this command for simplicity)
+- Knowledge is git-tracked, so pulling updates automatically rebuilds the search index
+
+**Error handling:**
+
+**If .lavra/memory/ doesn't exist:**
+```
+## Memory Not Initialized
+
+This project doesn't have knowledge capture set up yet.
+
+Run the lavra installer to enable memory features:
+```bash
+bash /path/to/lavra/install.sh
+```
+```
+
+**If knowledge.jsonl doesn't exist:**
+```
+## No Knowledge Captured Yet
+
+Knowledge base is empty. Start capturing knowledge:
+```bash
+bd comments add <BEAD_ID> "LEARNED: ..."
+bd comments add <BEAD_ID> "DECISION: ..."
+```
+
+The memory-capture hook will automatically extract and store these.
+```
+
+**If bd command fails:**
+```
+Beads CLI not found. Install from: https://github.com/steveyegge/beads
+```
+</guardrails>
+
+<handoff>
+**If results found:**
+- Use this knowledge to inform your current work
+- Add new learnings: `bd comments add <BEAD_ID> "LEARNED: ..."`
+- Curate knowledge entries: `/lavra-learn`
+
+**If implementing related work:**
+```bash
+bd create --title="..." --type=feature --priority=2
+```
+</handoff>

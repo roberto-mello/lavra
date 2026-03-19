@@ -1,0 +1,87 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-bg: #09090b;
+  --color-surface: #18181b;
+  --color-border: #27272a;
+  --color-border-light: #3f3f46;
+  --color-text: #fafafa;
+  --color-text-muted: #a1a1aa;
+  --color-text-dim: #71717a;
+  --color-accent: #10b981;
+  --color-accent-dim: #065f46;
+
+  --font-sans: "Geist Sans", sans-serif;
+  --font-mono: "Geist Mono", monospace;
+
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Offset anchor targets so sticky nav doesn't cover them (nav = 64px) */
+:target {
+  scroll-margin-top: 80px;
+}
+
+/* Doc prose code blocks — Shiki sets background via inline style, so we wrap
+   with a border/radius shell and use the Shiki background as-is. */
+.prose pre.astro-code {
+  border: 1px solid var(--color-border-light);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  padding: 0 !important;
+  margin: 1.5rem 0;
+}
+
+.prose pre.astro-code code {
+  display: block;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  background: transparent !important;
+}
+
+/* Language badge */
+.prose pre.astro-code[data-language]::before {
+  content: attr(data-language);
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-dim);
+  background: rgb(255 255 255 / 0.04);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.4rem 1.5rem;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #09090b 0%, #0c1a14 50%, #09090b 100%);
+}
+
+/* Scroll reveal system */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s var(--ease-spring), transform 0.6s var(--ease-spring);
+  }
+
+  [data-reveal].revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Stagger delays via --index custom property (used on Pipeline cards only) */
+  [data-reveal][style*="--index"] {
+    transition-delay: calc(var(--index, 0) * 100ms);
+  }
+}
+
+/* Reduced motion: elements visible immediately */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}

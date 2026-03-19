@@ -1,0 +1,101 @@
+---
+import Base from './Base.astro';
+import { getCollection } from 'astro:content';
+
+interface Props {
+  title: string;
+  description?: string;
+  currentSlug: string;
+}
+
+const { title, description, currentSlug } = Astro.props;
+
+const allDocs = await getCollection('docs');
+
+// Sidebar structure
+const sections = [
+  {
+    label: 'Getting Started',
+    slugs: ['quickstart', 'platforms'],
+  },
+  {
+    label: 'Reference',
+    slugs: ['catalog', 'commands', 'agents', 'skills', 'hooks', 'knowledge', 'architecture', 'security', 'troubleshooting'],
+  },
+  {
+    label: 'Configuration',
+    slugs: ['autonomous_execution', 'model_selection', 'cost'],
+  },
+  {
+    label: 'Development',
+    slugs: ['xml-tag-standard'],
+  },
+  {
+    label: 'Releases',
+    slugs: ['releases/v070'],
+  },
+];
+
+// Astro 5 glob loader uses `id` (filename without extension) instead of `slug`
+const docsBySlug = Object.fromEntries(allDocs.map(d => [d.id.replace(/\.md$/, ''), d]));
+
+function label(slug: string) {
+  return docsBySlug[slug]?.data.title ?? slug;
+}
+---
+
+<Base title={title} description={description}>
+  <div class="max-w-7xl mx-auto px-6 py-12 flex gap-12 min-h-[calc(100dvh-64px)]">
+
+    <!-- Sidebar -->
+    <aside class="w-56 shrink-0 hidden lg:block">
+      <nav class="sticky top-24 space-y-6">
+        {sections.map(section => (
+          <div>
+            <p class="text-xs font-mono uppercase tracking-wider text-text-dim mb-2">{section.label}</p>
+            <ul class="space-y-1">
+              {section.slugs.filter(s => docsBySlug[s]).map(slug => (
+                <li>
+                  <a
+                    href={`/docs/${slug.toLowerCase().replace(/_/g, '-').replace(/\./g, '')}`}
+                    class={`block text-sm px-2 py-1 rounded transition-colors duration-150 ${
+                      currentSlug === slug
+                        ? 'text-accent bg-accent-dim/20 font-medium'
+                        : 'text-text-muted hover:text-text hover:bg-surface'
+                    }`}
+                  >
+                    {label(slug)}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
+    </aside>
+
+    <!-- Content -->
+    <main class="min-w-0 flex-1">
+      <article class="prose prose-lg prose-invert prose-zinc max-w-3xl
+        prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-text
+        prose-h1:text-4xl prose-h1:mb-8
+        prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h2:border-b prose-h2:border-border prose-h2:pb-2
+        prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-h3:text-text
+        prose-p:text-text-muted prose-p:leading-relaxed
+        prose-a:text-accent prose-a:no-underline hover:prose-a:underline
+        prose-strong:text-text prose-strong:font-semibold
+        prose-code:text-accent prose-code:bg-surface prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
+        prose-pre:!bg-transparent prose-pre:border prose-pre:border-border prose-pre:rounded-xl prose-pre:text-sm prose-pre:p-0
+        [&_pre]:overflow-x-auto [&_pre>code]:bg-transparent [&_pre>code]:text-inherit [&_pre>code]:p-5 [&_pre>code]:block
+        prose-blockquote:border-l-accent prose-blockquote:text-text-muted
+        prose-ul:text-text-muted prose-ol:text-text-muted
+        prose-li:marker:text-text-dim
+        prose-thead:border-border prose-tr:border-border
+        prose-th:text-text prose-th:font-semibold prose-td:text-text-muted
+        prose-hr:border-border">
+        <slot />
+      </article>
+    </main>
+
+  </div>
+</Base>

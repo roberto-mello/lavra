@@ -1,0 +1,83 @@
+---
+import Base from '../layouts/Base.astro';
+import Footer from '../components/Footer.astro';
+---
+<Base title="/lavra-qa" description="Browser-based QA verification from the user's perspective. Headless Chromium via agent-browser.">
+
+  {/* Hero */}
+  <section class="hero-gradient min-h-[60dvh] flex items-center">
+    <div class="max-w-7xl mx-auto px-6 py-24 w-full">
+      <p class="font-mono text-text-muted text-sm uppercase tracking-wider mb-4">Quality Assurance</p>
+      <h1 class="text-4xl lg:text-6xl font-black tracking-tight text-text leading-[1.1]">
+        <span class="text-accent">/</span>lavra-qa
+      </h1>
+      <p class="text-lg lg:text-xl text-text-muted mt-6 max-w-xl">
+        Browser-based verification from the user's perspective. Catches what unit tests miss -- broken layouts, console errors, dead interactions.
+      </p>
+
+      <div class="mt-8 inline-flex items-center gap-3 px-6 py-3 bg-surface border border-amber-500/30 rounded-xl">
+        <span class="font-mono text-amber-500 text-sm">Headless Chromium via agent-browser</span>
+      </div>
+    </div>
+  </section>
+
+  {/* QA Steps */}
+  <section class="py-32 bg-bg" data-reveal>
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-3xl lg:text-4xl font-bold text-text tracking-tight mb-16">Four verification passes</h2>
+
+      <div class="space-y-8 max-w-3xl">
+        {[
+          { step: 1, label: 'Load affected pages', sub: 'Detect changed routes from git diff', detail: 'Only tests pages that were actually modified. No wasted cycles on unchanged routes.' },
+          { step: 2, label: 'Check console errors', sub: 'Flag warnings, errors, unhandled exceptions', detail: 'Catches runtime errors that pass type checking -- missing API responses, broken event handlers, failed network requests.' },
+          { step: 3, label: 'Test interactions', sub: 'Forms, clicks, navigation flows', detail: 'Fills forms, clicks buttons, follows navigation paths. Verifies that the page responds correctly to user actions.' },
+          { step: 4, label: 'Screenshot diffs', sub: 'Visual regression against baseline', detail: 'Captures screenshots and compares against stored baselines. Catches CSS regressions, layout shifts, missing elements.' },
+        ].map((step) => (
+          <div class="flex items-start gap-6">
+            <div class="w-16 h-16 rounded-2xl bg-surface border-2 border-amber-500 flex items-center justify-center font-mono text-xl font-bold text-amber-500 shrink-0">
+              {step.step}
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-text">{step.label}</h3>
+              <p class="text-accent text-sm font-semibold mt-1">{step.sub}</p>
+              <p class="text-text-muted text-sm mt-2">{step.detail}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* When to use */}
+  <section class="py-32 bg-bg border-t border-border" data-reveal>
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-3xl lg:text-4xl font-bold text-text tracking-tight mb-8">When to use it</h2>
+      <p class="text-lg text-text-muted mb-12 max-w-2xl">
+        /lavra-qa is optional in the pipeline -- use it when visual correctness matters.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+        <div class="bg-surface border border-border rounded-2xl p-8">
+          <h3 class="text-lg font-bold text-accent mb-3">Good fit</h3>
+          <ul class="space-y-2 text-text-muted text-sm">
+            <li>Frontend changes (CSS, layout, components)</li>
+            <li>Form validation or interactive UI</li>
+            <li>Multi-page flows (checkout, onboarding)</li>
+            <li>After dependency upgrades</li>
+          </ul>
+        </div>
+        <div class="bg-surface border border-border rounded-2xl p-8">
+          <h3 class="text-lg font-bold text-text-dim mb-3">Skip when</h3>
+          <ul class="space-y-2 text-text-muted text-sm">
+            <li>Backend-only changes (APIs, services)</li>
+            <li>Config or infrastructure changes</li>
+            <li>Documentation updates</li>
+            <li>No browser-facing code modified</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

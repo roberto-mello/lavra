@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# Install beads-compound plugin for Gemini CLI
+# Install lavra plugin for Gemini CLI
 #
 # What this installs:
 #   - Extension manifest (gemini-extension.json)
 #   - Memory capture and auto-recall hooks
-#   - Knowledge store (.beads/memory/knowledge.jsonl)
+#   - Knowledge store (.lavra/memory/knowledge.jsonl)
 #   - Converted commands (.toml format), agents, and skills
 #   - MCP server configuration documentation
 #
@@ -25,7 +25,7 @@ else
   SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
-PLUGIN_DIR="$SCRIPT_DIR/plugins/beads-compound"
+PLUGIN_DIR="$SCRIPT_DIR/plugins/lavra"
 
 # Source shared functions
 # Use BASH_SOURCE to get the correct path when sourced
@@ -55,13 +55,12 @@ fi
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
 
-echo "beads-compound Gemini CLI Installer"
-echo ""
-echo "Target: $TARGET"
+print_banner "Gemini CLI" "0.7.0"
+echo "  Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
-  echo "Type: Global installation"
+  echo "  Type: Global installation"
 else
-  echo "Type: Project-specific installation"
+  echo "  Type: Project-specific installation"
 fi
 echo ""
 
@@ -167,6 +166,7 @@ else
   echo "[4/4] Provisioning memory system..."
 
   source "$PLUGIN_DIR/hooks/provision-memory.sh"
+  migrate_beads_to_lavra "$TARGET"
   provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
 
   echo "  - Memory system ready"
@@ -206,7 +206,7 @@ echo ""
 echo "2. Context7 MCP server configured (framework documentation lookup)"
 echo ""
 echo "3. Commands are available as slash commands:"
-echo "   - /beads-plan, /beads-work, /beads-review, etc."
+echo "   - /lavra-plan, /lavra-work, /lavra-review, etc."
 echo ""
 
 if [ "$GLOBAL_INSTALL" = true ]; then

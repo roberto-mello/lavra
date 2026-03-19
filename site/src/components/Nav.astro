@@ -1,0 +1,33 @@
+---
+// Nav.astro -- Sticky site navigation
+import { Image } from 'astro:assets';
+import logo from '../assets/lavra-icon2.png';
+---
+<nav class="sticky top-0 z-40 bg-bg/80 backdrop-blur-md border-b border-border h-16">
+  <div class="grid grid-cols-[auto_1fr_auto] items-center px-6 max-w-7xl mx-auto h-full">
+    <a href="/" class="flex items-center gap-2 font-mono font-bold text-accent hover:text-accent/80 transition-colors duration-200">
+      <Image src={logo} alt="Lavra" width={24} height={24} />
+      Lavra
+    </a>
+    <div></div>
+    <div class="flex gap-6 items-center">
+      <a href="/docs" class="text-sm text-text-muted hover:text-text transition-colors duration-200">
+        Docs
+      </a>
+      <a href="/command-map" class="text-sm text-text-muted hover:text-text transition-colors duration-200">
+        Command Map
+      </a>
+      <a href="/benchmark" class="text-sm text-text-muted hover:text-text transition-colors duration-200">
+        Benchmark
+      </a>
+      <a
+        href="https://github.com/roberto-mello/lavra"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-sm text-text-muted hover:text-text transition-colors duration-200"
+      >
+        GitHub
+      </a>
+    </div>
+  </div>
+</nav>

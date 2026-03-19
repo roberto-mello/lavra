@@ -1,0 +1,53 @@
+---
+import TerminalMockup from './TerminalMockup.astro';
+import { Image } from 'astro:assets';
+import agentWithMemory from '../assets/agent-with-memory.jpg';
+---
+
+<section class="py-32 bg-bg" data-reveal>
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-12 items-center mb-16">
+      <div>
+        <h2 class="text-4xl lg:text-5xl font-bold text-text tracking-tight mb-4">Compounding memory</h2>
+        <p class="text-lg text-text-muted max-w-2xl">Your agents learn from every session. Knowledge captured today is automatically recalled when relevant.</p>
+      </div>
+      <div class="hidden lg:block">
+        <Image src={agentWithMemory} alt="An AI agent with persistent memory across sessions" width={320} class="rounded-2xl border border-border-light" loading="lazy" decoding="async" />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+      {/* Left: Capture -- matches Remotion LavraV3 KnowledgeSystemScene */}
+      <TerminalMockup title="March 2025">
+        <div>
+          <p><span class="text-accent">$</span> <span class="text-text">/lavra-work BD-042</span></p>
+          <p><span class="text-text-muted">Implementing OAuth integration...</span></p>
+          <p><span class="text-accent">Review passed.</span></p>
+          <p>&nbsp;</p>
+          <p><span class="text-accent">[auto-captured]</span></p>
+          <p><span class="text-text-muted">  LEARNED: Redirect URI must match exactly</span></p>
+          <p><span class="text-text-muted">  PATTERN: Validate callbacks server-side</span></p>
+          <p><span class="text-text-muted">  DECISION: Use PKCE for public clients</span></p>
+        </div>
+      </TerminalMockup>
+
+      {/* Right: Recall -- matches Remotion LavraV3 KnowledgeSystemScene */}
+      <TerminalMockup title="Three weeks later">
+        <div>
+          <p><span class="text-accent">$</span> <span class="text-text">/lavra-work BD-089</span></p>
+          <p>&nbsp;</p>
+          <p><span class="text-accent">[auto-recall]</span> <span class="text-text-muted">3 entries matched</span></p>
+          <p><span class="text-text-muted">  LEARNED: Redirect URI must match exactly</span></p>
+          <p><span class="text-text-muted">  PATTERN: Validate callbacks server-side</span></p>
+          <p><span class="text-text-muted">  DECISION: Use PKCE for public clients</span></p>
+          <p>&nbsp;</p>
+          <p><span class="text-text-dim">Starting with context...</span></p>
+        </div>
+      </TerminalMockup>
+
+    </div>
+
+    <p class="text-center text-lg lg:text-xl text-text-muted mt-16">Hit the same problem next month? Your agent already knows the fix.</p>
+  </div>
+</section>

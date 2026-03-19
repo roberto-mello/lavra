@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from typing import Dict, Tuple
 
-BASE = Path("/Users/rbm/Documents/projects/beads-compound-plugin/plugins/beads-compound")
+BASE = Path("/Users/rbm/Documents/projects/lavra/plugins/lavra")
 
 # Phase 1: Agent descriptions (based on compound-engineering patterns)
 AGENT_DESCRIPTIONS = {
@@ -33,7 +33,7 @@ AGENT_DESCRIPTIONS = {
     "best-practices-researcher": "Researches external best practices, documentation, and examples for any technology, framework, or development practice. Checks available skills first, then official docs and community standards.",
     "framework-docs-researcher": "Gathers comprehensive documentation and best practices for frameworks, libraries, or project dependencies. Fetches official docs via Context7, explores source code, checks for API deprecations.",
     "git-history-analyzer": "Analyzes git history to understand code evolution, trace origins of specific code patterns, identify key contributors and their expertise areas, and extract development patterns from commit history.",
-    "learnings-researcher": "Searches institutional learnings in .beads/memory/knowledge.jsonl for relevant past solutions. Finds applicable patterns, gotchas, and lessons learned to prevent repeated mistakes.",
+    "learnings-researcher": "Searches institutional learnings in .lavra/memory/knowledge.jsonl for relevant past solutions. Finds applicable patterns, gotchas, and lessons learned to prevent repeated mistakes.",
     "repo-research-analyst": "Conducts thorough research on repository structure, documentation, and patterns. Analyzes architecture files, examines GitHub issues, reviews contribution guidelines, discovers templates.",
 
     # Design agents (3)
@@ -56,11 +56,11 @@ AGENT_DESCRIPTIONS = {
 # (Manual commands with side effects that shouldn't be auto-suggested)
 DISABLE_COMMANDS = [
     "lfg",
-    "beads-checkpoint",
+    "lavra-checkpoint",
     "deploy-docs",
     "release-docs",
     "changelog",
-    "beads-triage",
+    "lavra-triage",
     "test-browser",
     "xcode-test",
     "report-bug",
@@ -82,7 +82,7 @@ DISABLE_COMMANDS = [
 
 # Phase 3: Skills that should have disable-model-invocation: true
 DISABLE_SKILLS = [
-    "beads-knowledge",      # compound-docs equivalent
+    "lavra-knowledge",      # compound-docs equivalent
     "create-agent-skills",  # matches their pattern
     "file-todos",           # matches their pattern
     "skill-creator",        # matches their pattern

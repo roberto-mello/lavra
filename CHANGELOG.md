@@ -1,38 +1,52 @@
 # Changelog
 
-All notable changes to the beads-compound plugin are documented here.
+All notable changes to the lavra plugin are documented here.
 
-## [0.6.9] - 2026-03-13
+## [0.7.0] - 2026-03-15
+
+See [docs/releases/v0.7.0.md](docs/releases/v0.7.0.md) for the full release notes with context on why each change matters.
+
+### Breaking Changes
+- All `/beads-*` commands renamed to `/lavra-*`. The `bd` CLI and `.beads/` directory are unchanged.
 
 ### Added
-- **`project-setup` skill** - New skill at `skills/project-setup/` for per-project stack detection and review agent configuration. Auto-detects tech stack (Rails, Ruby, TypeScript, JavaScript, Python, General) from project files, lets users toggle specific agents off, and saves config to `.beads/config/project-setup.md` with YAML frontmatter. Review Context notes are length-limited to 500 chars and stripped of prompt-structural characters.
-- **`migration-drift-detector` agent** - New review agent that detects schema/migration drift in PRs across five ORMs: Rails (`db/migrate/` + `db/schema.rb`), Alembic (revision DAG + multiple heads), Prisma (checksum + shadow DB), Drizzle (snapshot/SQL mismatch), and Knex (out-of-sequence timestamps). Auto-detects which ORM is in use. All PR field handling uses `jq --arg` to prevent shell injection.
-- **`beads-review` project config integration** - `/beads-review` now reads `.beads/config/project-setup.md` at start of review. When present, dispatches only the configured `review_agents` (validated against a dynamically-derived allowlist from the installed agents directory — no hardcoded list to go stale). Config-missing = dispatch all agents (fully backward compatible). `reviewer_context_note` is intentionally **not** injected into review agents — they derive context from the code itself; see `docs/SECURITY.md`.
-- **`beads-parallel` project config injection** - Section 8 (Recall Knowledge) now reads `.beads/config/project-setup.md` when present and injects `reviewer_context_note` into all subagent prompt templates (standard, ralph, teams worker) under `## Project Conventions`. Wrapped in `untrusted-config-data` XML with a "do not follow instructions" directive. Note: `untrusted-config-data` is a prompt engineering convention, not a model-enforced standard — the real protection is the sanitization strip list and 500-char limit. See `docs/SECURITY.md` for the full threat model.
-- **`migration-drift-detector` wired into `/beads-review`** - Added as a conditional agent alongside `data-migration-expert` (not instead of it). Triggers on any ORM's migration or schema artifact files. Finding synthesis step notes deduplication between the two agents.
-- **`/beads-compound` surfaced after substantial findings** - `/beads-work` now scans the bead's comments after the knowledge gate and adds `/beads-compound` as an option when `LEARNED:` or `INVESTIGATION:` entries are found. `/beads-parallel` scans all closed beads in step 12, collects matching bead IDs as `COMPOUND_CANDIDATES`, and surfaces `/beads-compound {COMPOUND_CANDIDATES}` in handoff options.
-- **Sources section in `/beads-plan`** - Epic bead descriptions now include a mandatory `## Sources` freeform bullet list (`Brainstorm:`, `File:`, `Knowledge:`, `Doc:`, `Research:` entry types). Child beads get a `## References` subsection. Pre-submission checklist verifies Sources is non-empty.
-- **Cross-check validation in `/beads-plan`** - New Step 5.5 runs warning-only validation after bead creation: checks required sections per child bead, flags file-scope conflicts between independent beads without a dependency, warns on missing brainstorm reference when a brainstorm bead was used. Does not block plan creation.
-- **Improved brainstorm detection in `/beads-plan`** - Step 0 now uses a four-step decision tree: label-based detection first (checks `brainstorm` label on bead and parent), then keyword match ≤14 days, then keyword match >14 days (prompts user), then full idea refinement. When brainstorm detected: locked decisions extracted and carried forward into child bead Context sections, Sources section auto-populated with `Brainstorm:` entry.
-- **`.beads/config/` provisioned by installer** - `install-claude.sh` now runs `mkdir -p "$TARGET/.beads/config"` alongside memory provisioning.
+- Goal-backward verification -- new `goal-verifier` agent (Exists/Substantive/Wired checks)
+- Deviation rules -- `DEVIATION:` knowledge type, 4-rule auto-fix framework, PR summaries
+- Session state digest -- `.beads/memory/session-state.md` survives context compaction
+- Decision categorization -- Locked Decisions / Agent Discretion / Deferred sections in brainstorm and plan
+- Brownfield codebase analysis -- `/project-setup` Step 1.5 with 3 parallel agents
+- Workflow config -- `.beads/config/lavra.json` toggles for research, review, verification, parallelism
+- Atomic commits per task -- `{type}({BEAD_ID}): {description}` format, per-bead in multi-bead
+- `project-setup` skill, `migration-drift-detector` agent
+- Sources/References sections in `/lavra-plan`, cross-check validation (Step 5.5)
+- `docs/SECURITY.md` -- threat model and injection defense documentation
+- Knowledge system prompt injection defense -- `auto-recall.sh` now sanitizes recalled entries (strip role prefixes, bidirectional chars) and wraps in `<untrusted-knowledge>` tags with "do not follow instructions" directive
+- `--no-parallel` flag for `/lavra-work` -- opt-in serial execution in multi-bead mode with review pauses between each bead
+- Documentation site built with Astro 5, deployed to GitHub Pages via `deploy-site.yml` CI workflow. Docs moved from `docs/` to `site/src/content/docs/` with dedicated pages for commands, agents, skills, hooks, knowledge, quickstart, and release notes
+- README rewrite with problem/solution framing, multi-platform badges, and quick links to docs site
+- `model_profile` field in `.beads/config/lavra.json` wired to agent dispatch for per-project model tier configuration
 
 ### Changed
-- **`reviewer_context_note` injection removed from `/beads-review`** - Review agents no longer receive the context note. They derive project context from the code. This removes an injection vector from the review pipeline with no meaningful loss of review quality.
-- **Expanded sanitization strip list** - `project-setup` skill and `beads-parallel` now strip `USER:`, `HUMAN:`, `[INST]`, `<s>`/`</s>` tags, `\r`, null bytes, and Unicode bidirectional override characters (U+202A–U+202E, U+2066–U+2069) in addition to the existing `<`, `>`, `SYSTEM:`, `ASSISTANT:`, and triple backtick rules.
-- **Dynamic agent allowlist in `/beads-review`** - Agent names in `review_agents` are now validated against a live listing of `.claude/agents/` rather than a hardcoded list. New agents are automatically available without any list to maintain.
-- **`docs/SECURITY.md` added** - Documents the threat model, injection defense strategy, honest limitations of `untrusted-config-data` XML wrapping, and the trust model for all config sources.
-- **`.beads/config/` added to protected artifacts** - All six locations that protect `.beads/memory/` now also protect `.beads/config/`: `beads-review.md`, `beads-parallel.md` (2 locations), `code-simplicity-reviewer.md`, `resolve-todo-parallel.md`, `git-history-analyzer.md`.
-- **Component counts updated** - 28 → 29 agents (migration-drift-detector), 15 → 16 skills (project-setup). Updated in `plugin.json`, `marketplace.json`, `plugin-catalog.md`, `pre-release-check.sh`, `CLAUDE.md`, and `install-claude.sh`.
+- Pipeline redesign: `/lavra-design` -> `/lavra-work` -> `/lavra-qa` -> `/lavra-ship`
+- `/lavra-compound` -> `/lavra-learn`, `/lavra-deepen` -> `/lavra-research`
+- Version self-heal provisions new config files on upgrade without full re-install
+- 30 agents (was 29), 15 skills (was 15), 23 core commands + 5 optional
+- Dynamic agent allowlist in `/lavra-review`, expanded sanitization strip list
+- Replaced 150-line bead description cap with completeness gate (all required sections, zero agent judgment calls) and ~1000 LOC scope budget per bead
+- `recall.sh` grep fallback uses fixed-string matching (`grep -iF`) instead of regex to prevent metacharacter issues
+
+### Fixed
+- OpenCode installer hangs in non-interactive mode (added `[[ -t 0 ]]` check)
 
 ## [0.6.8] - 2026-03-05
 
 ### Added
-- **Installed version tracking** - `provision-memory.sh` now writes `.beads/memory/.beads-compound-version` on every install. `auto-recall.sh` embeds its own version constant and emits a session warning when the installed hooks are out of date, telling the user exactly which command to run to upgrade.
+- **Installed version tracking** - `provision-memory.sh` now writes `.beads/memory/.lavra-version` on every install. `auto-recall.sh` embeds its own version constant and emits a session warning when the installed hooks are out of date, telling the user exactly which command to run to upgrade.
 - **`.beads/memory/.gitignore`** - The installer now creates a scoped `.gitignore` inside `.beads/memory/` to exclude the SQLite FTS cache (`knowledge.db` and variants). This is our directory — we own its ignore rules rather than relying on beads' `.beads/.gitignore` which can be overwritten by `bd init` or `bd doctor --fix`.
 - **Session warning for gitignored beads data** - `auto-recall.sh` now detects when `.beads/` is listed in the project `.gitignore` without negation rules and emits a prominent session warning explaining the data loss risk and how to fix it. Fires every session until resolved.
 - **Installer prompt for gitignored beads data** - `provision-memory.sh` detects the same condition and interactively offers to remove the `.beads/` line from `.gitignore`. Non-interactive contexts (hooks, `--yes` flag) warn but don't modify.
 - **OpenCode and Gemini installers now use `provision_memory_dir`** - Both platform installers previously duplicated inline memory setup. They now call the shared `provision_memory_dir` function and get all memory fixes automatically.
-- **Hook version check in pre-release checks** - `scripts/pre-release-check.sh` now verifies that the `BEADS_COMPOUND_VERSION` constant in `auto-recall.sh` and the version string in `provision-memory.sh` both match `plugin.json`. Prevents shipping hooks that advertise the wrong version.
+- **Hook version check in pre-release checks** - `scripts/pre-release-check.sh` now verifies that the `LAVRA_VERSION` constant in `auto-recall.sh` and the version string in `provision-memory.sh` both match `plugin.json`. Prevents shipping hooks that advertise the wrong version.
 - **Installer smoke tests in release checklist** - `.claude/rules/github-release.md` now documents required smoke tests for all three platforms (Claude, OpenCode, Gemini) that must pass before tagging a release.
 - **Cortex Code support** -- New `--cortex` flag for install/uninstall. Installs commands, agents, skills, and hooks to native Cortex Code paths (`~/.snowflake/cortex/` global, `.cortex/` project). Hooks configured via `~/.snowflake/cortex/hooks.json`. MCP installation skipped (not needed for Cortex). TeammateIdle hook not installed (unsupported event). Includes `convert-cortex.ts` conversion script, installation tests, and pre-release checks.
 - **Hook cwd fallback** -- `auto-recall.sh` and `memory-capture.sh` now read `cwd` from stdin JSON as fallback when `CLAUDE_PROJECT_DIR` is not set, enabling Cortex Code compatibility while maintaining backward compatibility with Claude Code, OpenCode, and Gemini CLI.
@@ -46,25 +60,25 @@ All notable changes to the beads-compound plugin are documented here.
 
 ### Changed
 - **`.beads/` no longer added to project `.gitignore`** - The installer previously added `.beads/` as "ephemeral task data". This was incorrect: beads JSONL files (issues, comments) should be committed. The installer now leaves `.gitignore` alone. Use `bd init --stealth` if you want `.beads/` invisible to collaborators (it uses `.git/info/exclude` which keeps data safe).
-- **Memory provisioning consolidated** - The four locations that must be kept in sync on a version bump are now documented: `plugin.json`, `marketplace.json`, `auto-recall.sh` (`BEADS_COMPOUND_VERSION`), and `provision-memory.sh` (version string).
-- **`bd sync` replaced with `bd backup`** - `bd sync` was removed in beads v0.56.0 (superseded by Dolt-native push/pull). All plugin commands (`beads-checkpoint`, `beads-parallel`) and project CLAUDE.md files now use `bd backup` for local JSONL export. Stale beads workflow sections removed from project CLAUDE.md files since `bd prime` injects this context automatically at session start.
+- **Memory provisioning consolidated** - The four locations that must be kept in sync on a version bump are now documented: `plugin.json`, `marketplace.json`, `auto-recall.sh` (`LAVRA_VERSION`), and `provision-memory.sh` (version string).
+- **`bd sync` replaced with `bd backup`** - `bd sync` was removed in beads v0.56.0 (superseded by Dolt-native push/pull). All plugin commands (`lavra-checkpoint`, `lavra-parallel`) and project CLAUDE.md files now use `bd backup` for local JSONL export. Stale beads workflow sections removed from project CLAUDE.md files since `bd prime` injects this context automatically at session start.
 
 ## [0.6.7] - 2026-03-04
 
 ### Fixed
-- **`/beads-review` agent findings inventory** - Added explicit inventory step before synthesis to prevent silently dropping agent output when building final review
-- **`/beads-plan-review` apply-feedback protocol** - Replaced vague "Apply feedback" option with explicit Steps A-D: build numbered checklist of all recommendations, apply each one-by-one marking done or skipped with reason, completeness verification pass, then log a DECISION comment summarizing what changed
-- **`/beads-deepen` completeness verification** - Now builds per-bead inventory of agent findings before finalizing, preventing missed recommendations during synthesis
-- **`/beads-work` knowledge logging requirements** - Added trigger table showing exactly when to log (surprises, choices, errors, patterns, constraints); logging is now mandatory per task with explicit gate before marking task complete
-- **`/beads-parallel` knowledge logging framing** - Fixed ralph prompt which said "only on final success or failure", actively encouraging batching; aligned teams worker prompt with inline-first framing
-- **Branching strategy** - `beads-work` now asks user about branching strategy instead of always creating a feature branch
+- **`/lavra-review` agent findings inventory** - Added explicit inventory step before synthesis to prevent silently dropping agent output when building final review
+- **`/lavra-eng-review` apply-feedback protocol** - Replaced vague "Apply feedback" option with explicit Steps A-D: build numbered checklist of all recommendations, apply each one-by-one marking done or skipped with reason, completeness verification pass, then log a DECISION comment summarizing what changed
+- **`/lavra-deepen` completeness verification** - Now builds per-bead inventory of agent findings before finalizing, preventing missed recommendations during synthesis
+- **`/lavra-work` knowledge logging requirements** - Added trigger table showing exactly when to log (surprises, choices, errors, patterns, constraints); logging is now mandatory per task with explicit gate before marking task complete
+- **`/lavra-parallel` knowledge logging framing** - Fixed ralph prompt which said "only on final success or failure", actively encouraging batching; aligned teams worker prompt with inline-first framing
+- **Branching strategy** - `lavra-work` now asks user about branching strategy instead of always creating a feature branch
 
 ## [0.6.4] - 2026-02-20
 
 ### Added
-- **`--teams` mode for `/beads-parallel`** - Persistent worker teammates that stay active across waves, with swarm registration and idle-check hook. Includes `TeammateIdle` hook that blocks idle when ready beads remain.
-- **`--ralph` mode for `/beads-parallel`** - Autonomous iterative execution with completion promise instead of test-only loop.
-- **Bead context injection** - `relates_to` bead context now injected into subagent and beads-work prompts via `bd swarm/graph` for wave building and relate links.
+- **`--teams` mode for `/lavra-parallel`** - Persistent worker teammates that stay active across waves, with swarm registration and idle-check hook. Includes `TeammateIdle` hook that blocks idle when ready beads remain.
+- **`--ralph` mode for `/lavra-parallel`** - Autonomous iterative execution with completion promise instead of test-only loop.
+- **Bead context injection** - `relates_to` bead context now injected into subagent and lavra-work prompts via `bd swarm/graph` for wave building and relate links.
 - **MIT LICENSE file** for GitHub badge detection.
 - **Modular CLAUDE.md rules** - Split type-specific content into `.claude/rules/` (shell-scripting, hooks-system, plugin-catalog, conversion-scripts) with glob-based activation. CLAUDE.md reduced from 430 to 157 lines.
 
@@ -80,10 +94,10 @@ All notable changes to the beads-compound plugin are documented here.
 ## [0.6.2] - 2026-02-16
 
 ### Added
-- **`/beads-recall` command** - Mid-session knowledge lookup without restarting. Six search modes: keywords, bead ID, `--recent N`, `--stats`, `--topic`, `--type`. Smart argument parsing detects bead IDs and extracts keywords from titles.
+- **`/lavra-recall` command** - Mid-session knowledge lookup without restarting. Six search modes: keywords, bead ID, `--recent N`, `--stats`, `--topic`, `--type`. Smart argument parsing detects bead IDs and extracts keywords from titles.
 - **Interactive OpenCode model selection** - During OpenCode installation, users can customize which Claude model to use for each performance tier (haiku/sonnet/opus). Standalone script available at `scripts/select-opencode-models.sh`. Configuration persists in `scripts/shared/model-config.json`.
-- **File-scope conflict prevention for parallel work** - `beads-plan` now includes a `## Files` section in child bead templates so each bead declares which files it will touch. `beads-parallel` adds a conflict detection phase that analyzes file scopes, detects overlaps, and forces sequential ordering via `bd dep add`.
-- **File ownership in subagent prompts** - `beads-parallel` now passes file scope to subagents so they know which files they may modify, with post-wave ownership violation checks and inter-wave knowledge recall.
+- **File-scope conflict prevention for parallel work** - `lavra-plan` now includes a `## Files` section in child bead templates so each bead declares which files it will touch. `lavra-parallel` adds a conflict detection phase that analyzes file scopes, detects overlaps, and forces sequential ordering via `bd dep add`.
+- **File ownership in subagent prompts** - `lavra-parallel` now passes file scope to subagents so they know which files they may modify, with post-wave ownership violation checks and inter-wave knowledge recall.
 
 ### Changed
 - **DSPy.rb skill updated to v0.34.3 API** - Complete rewrite of SKILL.md and all reference/asset files. New API patterns: `.call()`, `result.field`, `T::Enum`, `Tools::Base`. New references: `toolsets.md` and `observability.md`. Covers 10+ new features: events, lifecycle callbacks, fiber-local LM, GEPA optimization, evaluation framework, BAML/TOON schema formats, storage system, score API, and RubyLLM unified adapter.
@@ -113,7 +127,7 @@ All notable changes to the beads-compound plugin are documented here.
 ## [0.6.0] - 2026-02-13
 
 ### Added
-- **OpenCode support** via native TypeScript plugin (`plugins/beads-compound/opencode/plugin.ts`)
+- **OpenCode support** via native TypeScript plugin (`plugins/lavra/opencode/plugin.ts`)
   - Auto-recall: inject relevant knowledge at session start
   - Memory capture: extract knowledge from `bd comments add`
   - Subagent wrapup: warn when subagents complete without logging knowledge
@@ -124,7 +138,7 @@ All notable changes to the beads-compound plugin are documented here.
   - AfterTool (bash) → memory-capture.sh
   - AfterAgent → subagent-wrapup.sh
   - Uses same stdin/stdout JSON protocol as Claude Code
-  - Install: `gemini extensions install https://github.com/roberto-mello/beads-compound-plugin`
+  - Install: `gemini extensions install https://github.com/roberto-mello/lavra`
 - **AGENTS.md references** in 10 files (6 commands, 4 agents) where it aids user discovery
   - AGENTS.md is the emerging cross-tool standard (OpenCode, etc.)
   - Recommended: symlink CLAUDE.md → AGENTS.md for dual-tool projects
@@ -157,12 +171,12 @@ All notable changes to the beads-compound plugin are documented here.
 ## [0.4.2] - 2026-02-10
 
 ### Added
-- `/beads-parallel` command for working on multiple beads in parallel via subagents
+- `/lavra-parallel` command for working on multiple beads in parallel via subagents
 - Memory recall hook (`recall.sh`) deployed to `.beads/memory/` during install
 
 ### Changed
-- Renamed `/resolve-parallel` to `/beads-parallel` for naming consistency
-- Updated install.sh and uninstall.sh to handle beads-parallel
+- Renamed `/resolve-parallel` to `/lavra-parallel` for naming consistency
+- Updated install.sh and uninstall.sh to handle lavra-parallel
 
 ## [0.4.1] - 2026-02-09
 
@@ -221,13 +235,17 @@ Initial public release. Fork of [compound-engineering-plugin](https://github.com
 - All workflows create and update beads instead of markdown files
 - Rewrote `learnings-researcher` to search `knowledge.jsonl` instead of markdown docs
 - Adapted `code-simplicity-reviewer` to protect `.beads/memory/` files
-- Renamed `compound-docs` skill to `beads-knowledge`
+- Renamed `compound-docs` skill to `lavra-knowledge`
 
-[0.6.2]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.6.1...v0.6.2
-[0.6.1]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.6.0...v0.6.1
-[0.6.0]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.5.0...v0.6.0
-[0.5.0]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.4.2...v0.5.0
-[0.4.2]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.4.0...v0.4.2
-[0.4.1]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.4.0...v0.4.2
-[0.4.0]: https://github.com/roberto-mello/beads-compound-plugin/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/roberto-mello/beads-compound-plugin/releases/tag/v0.3.0
+[0.7.0]: https://github.com/roberto-mello/lavra/compare/v0.6.8...v0.7.0
+[0.6.8]: https://github.com/roberto-mello/lavra/compare/v0.6.7...v0.6.8
+[0.6.7]: https://github.com/roberto-mello/lavra/compare/v0.6.4...v0.6.7
+[0.6.4]: https://github.com/roberto-mello/lavra/compare/v0.6.2...v0.6.4
+[0.6.2]: https://github.com/roberto-mello/lavra/compare/v0.6.1...v0.6.2
+[0.6.1]: https://github.com/roberto-mello/lavra/compare/v0.6.0...v0.6.1
+[0.6.0]: https://github.com/roberto-mello/lavra/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/roberto-mello/lavra/compare/v0.4.2...v0.5.0
+[0.4.2]: https://github.com/roberto-mello/lavra/compare/v0.4.0...v0.4.2
+[0.4.1]: https://github.com/roberto-mello/lavra/compare/v0.4.0...v0.4.2
+[0.4.0]: https://github.com/roberto-mello/lavra/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/roberto-mello/lavra/releases/tag/v0.3.0

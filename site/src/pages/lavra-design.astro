@@ -1,0 +1,181 @@
+---
+import Base from '../layouts/Base.astro';
+import TerminalMockup from '../components/TerminalMockup.astro';
+import Footer from '../components/Footer.astro';
+---
+<Base title="/lavra-design" description="From idea to implementation-ready plan. Brainstorm, research, review, and lock -- all in one command.">
+
+  {/* Hero */}
+  <section class="hero-gradient min-h-[60dvh] flex items-center">
+    <div class="max-w-7xl mx-auto px-6 py-24 w-full grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
+      <div>
+        <p class="font-mono text-accent text-sm uppercase tracking-wider mb-4">Planning Pipeline</p>
+        <h1 class="text-4xl lg:text-6xl font-black tracking-tight text-text leading-[1.1]">
+          <span class="text-accent">/lavra-design</span>
+        </h1>
+        <p class="text-lg lg:text-xl text-text-muted mt-6 max-w-lg">
+          From idea to implementation-ready plan. One command runs brainstorm, research, adversarial review, and locks every bead with file paths, test cases, and acceptance criteria.
+        </p>
+        <p class="text-base text-text-dim mt-4 max-w-lg">
+          Works for non-technical founders too. Describe a feature in plain English -- the pipeline handles planning, research, review, and structuring.
+        </p>
+      </div>
+      <div class="hidden lg:block" style="transform: perspective(1200px) rotateY(-6deg) rotateX(2deg);">
+        <TerminalMockup title="lavra-design">
+          <p><span class="text-accent">$</span> <span class="text-text">/lavra-design "Photo upload for listings"</span></p>
+          <p><span class="text-text-muted">[brainstorm] 3 approaches, 2 edge cases</span></p>
+          <p><span class="text-text-muted">[research]   5 agents dispatched</span></p>
+          <p><span class="text-text-muted">[review]     4 reviewers, 1 revision</span></p>
+          <p><span class="text-accent">[locked]     4 beads created</span></p>
+        </TerminalMockup>
+      </div>
+    </div>
+  </section>
+
+  {/* Brainstorm Phase */}
+  <section class="py-32 bg-bg" data-reveal>
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex items-baseline gap-4 mb-4">
+        <span class="font-mono text-amber-500 text-sm tracking-wider uppercase">Act 1</span>
+        <h2 class="text-3xl lg:text-4xl font-bold text-text tracking-tight">Brainstorm</h2>
+      </div>
+      <p class="text-lg text-text-muted mb-12 max-w-2xl">
+        Interactive dialogue that sharpens scope before any code is planned. Six structured steps force hard questions upfront.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { step: 1, label: 'What to build', sub: 'Vision & success criteria', detail: 'Define what success looks like. Who is this for? What triggered the idea?', border: 'border-amber-500' },
+          { step: 2, label: 'User interview', sub: 'One question at a time', detail: 'Deep questioning: vision, constraints, scope, success criteria. No rushing.', border: 'border-accent' },
+          { step: 3, label: 'Gray areas', sub: 'Resolve ambiguity upfront', detail: 'Sync or async? API layer or client? Decide now, not during implementation.', border: 'border-zinc-500' },
+          { step: 4, label: 'CEO Review', sub: 'Scope expansion or reduction?', detail: 'Find the 10-star product, challenge premises. What\'s the smallest version that proves this works?', border: 'border-red-500' },
+          { step: 5, label: 'Approach selection', sub: '2-3 options, pros & cons', detail: 'Concrete approaches with trade-offs. Lead with recommendation. Apply YAGNI (You Aren\'t Gonna Need It).', border: 'border-amber-500' },
+          { step: 6, label: 'Phase breakdown', sub: 'Filed as child beads', detail: 'Logical implementation phases with scope, goals, and locked decisions per phase.', border: 'border-accent' },
+        ].map((card) => (
+          <div class={`bg-surface border border-border rounded-2xl p-8 border-l-4 ${card.border}`}>
+            <span class="font-mono text-text-dim text-xs tracking-wider">STEP {card.step}</span>
+            <h3 class="text-xl font-bold text-text mt-2">{card.label}</h3>
+            <p class="text-accent text-sm font-semibold mt-1">{card.sub}</p>
+            <p class="text-text-muted text-sm mt-3">{card.detail}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* Plan Phase */}
+  <section class="py-32 bg-bg border-t border-border" data-reveal>
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-3xl lg:text-4xl font-bold text-text tracking-tight mb-4">The full pipeline</h2>
+      <p class="text-lg text-text-muted mb-16 max-w-2xl">
+        Six phases transform an idea into beads so detailed that subagents can implement without asking questions.
+      </p>
+
+      {/* Full pipeline timeline */}
+      <div class="relative pl-8 border-l border-border-light max-w-3xl">
+        {[
+          { name: 'Brainstorm', desc: 'Scope, edge cases, approaches', color: 'border-amber-500', highlight: '' },
+          { name: 'Plan', desc: 'Structure into actionable beads', color: 'border-zinc-500', highlight: '' },
+          { name: 'Research', desc: 'domain-matched agents in parallel', color: 'border-accent', highlight: '5' },
+          { name: 'Revise', desc: 'Integrate research findings', color: 'border-zinc-600', highlight: '' },
+          { name: 'Review', desc: 'adversarial reviewers challenge the plan', color: 'border-red-500', highlight: '4' },
+          { name: 'Lock', desc: 'Frozen. Implementation-ready.', color: 'border-accent', highlight: '' },
+        ].map((phase) => (
+          <div class={`pl-6 pb-8 border-l-2 ${phase.color} -ml-px flex items-baseline gap-4`}>
+            <span class="font-bold text-text text-lg min-w-[120px]">{phase.name}</span>
+            <span class="text-text-muted">
+              {phase.highlight ? <><span class="text-accent font-bold">{phase.highlight}</span> {phase.desc}</> : phase.desc}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* Research Agents */}
+  <section class="py-32 bg-bg border-t border-border" data-reveal>
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+
+        {/* Research */}
+        <div>
+          <h2 class="text-3xl lg:text-4xl font-bold text-text tracking-tight mb-4">Research</h2>
+          <p class="text-lg text-text-muted mb-4">5 domain-matched agents dispatched in parallel</p>
+          <p class="text-sm text-text-dim mb-8">Each agent gathers evidence -- docs, prior art, best practices, edge cases -- and logs findings as comments on the relevant beads.</p>
+
+          <div class="space-y-4">
+            {[
+              { name: 'Best Practices', color: 'bg-accent' },
+              { name: 'Framework Docs', color: 'bg-amber-500' },
+              { name: 'Git History', color: 'bg-zinc-400' },
+              { name: 'Past Learnings', color: 'bg-violet-500' },
+              { name: 'Repo Structure', color: 'bg-red-500' },
+            ].map((agent) => (
+              <div class="flex items-center gap-4 bg-surface border border-border rounded-xl px-6 py-4">
+                <span class={`w-3 h-3 rounded-full ${agent.color} shrink-0`}></span>
+                <span class="text-text font-semibold">{agent.name}</span>
+                <span class="ml-auto font-mono text-xs text-text-dim tracking-wider">PARALLEL</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Review */}
+        <div>
+          <h2 class="text-3xl lg:text-4xl font-bold text-text tracking-tight mb-4">Review</h2>
+          <p class="text-lg text-text-muted mb-4">4 adversarial reviewers challenge the plan</p>
+          <p class="text-sm text-text-dim mb-8">Each reviewer runs in parallel, looking for blind spots from a different angle. Findings are categorized as safe-to-auto-apply or requiring user judgment.</p>
+
+          <div class="space-y-4">
+            {[
+              { name: 'Architecture', color: 'bg-accent' },
+              { name: 'Security', color: 'bg-red-500' },
+              { name: 'Performance', color: 'bg-amber-500' },
+              { name: 'Simplicity', color: 'bg-zinc-400' },
+            ].map((agent) => (
+              <div class="flex items-center gap-4 bg-surface border border-border rounded-xl px-6 py-4">
+                <span class={`w-3 h-3 rounded-full ${agent.color} shrink-0`}></span>
+                <span class="text-text font-semibold">{agent.name}</span>
+                <span class="ml-auto font-mono text-xs text-text-dim tracking-wider">PARALLEL</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  {/* Revise, Cross-reference, Lock */}
+  <section class="py-32 hero-gradient" data-reveal>
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl">
+        <div class="bg-surface border border-border rounded-2xl p-8 border-l-4 border-l-zinc-500">
+          <span class="font-mono text-text-dim text-xs tracking-wider">PHASE 4</span>
+          <h3 class="text-2xl font-bold text-text mt-2">Revise</h3>
+          <p class="text-zinc-400 font-semibold text-sm mt-1">Integrate research findings</p>
+          <p class="text-text-muted text-sm mt-3">Research findings are merged into bead descriptions. Conflicts between research and plan assumptions are resolved.</p>
+        </div>
+        <div class="bg-surface border border-border rounded-2xl p-8 border-l-4 border-l-amber-500">
+          <span class="font-mono text-amber-500 text-xs tracking-wider">PHASE 5</span>
+          <h3 class="text-2xl font-bold text-text mt-2">Cross-reference</h3>
+          <p class="text-amber-500 font-semibold text-sm mt-1">File-scope conflict prevention</p>
+          <p class="text-text-muted text-sm mt-3">No two tasks touch the same file without a dependency. Parallel-safe.</p>
+        </div>
+        <div class="bg-surface border border-border rounded-2xl p-8 border-l-4 border-l-accent">
+          <span class="font-mono text-accent text-xs tracking-wider">PHASE 6</span>
+          <h3 class="text-2xl font-bold text-text mt-2">Lock</h3>
+          <p class="text-accent font-semibold text-sm mt-1">Every bead implementation-ready</p>
+          <p class="text-text-muted text-sm mt-3">File paths, test cases, acceptance criteria, locked decisions. No questions left.</p>
+        </div>
+      </div>
+
+      <div class="mt-16 text-center">
+        <p class="text-3xl lg:text-4xl font-bold text-text">Structure into <span class="text-accent">actionable beads</span></p>
+        <p class="text-text-muted mt-4">File paths. Test cases. Dependencies. No questions left.</p>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

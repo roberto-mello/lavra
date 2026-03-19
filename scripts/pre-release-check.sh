@@ -35,8 +35,8 @@ fail() {
 echo ""
 echo "=== Version consistency ==="
 
-PLUGIN_VERSION=$(jq -r '.version' plugins/beads-compound/.claude-plugin/plugin.json)
-MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name == "beads-compound") | .version' .claude-plugin/marketplace.json)
+PLUGIN_VERSION=$(jq -r '.version' plugins/lavra/.claude-plugin/plugin.json)
+MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name == "lavra") | .version' .claude-plugin/marketplace.json)
 
 echo "  plugin.json:      $PLUGIN_VERSION"
 echo "  marketplace.json: $MARKETPLACE_VERSION"
@@ -51,8 +51,8 @@ fi
 echo ""
 echo "=== Hook version constants ==="
 
-HOOK_VERSION=$(grep 'BEADS_COMPOUND_VERSION=' plugins/beads-compound/hooks/auto-recall.sh | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-PROVISION_VERSION=$(grep 'echo "' plugins/beads-compound/hooks/provision-memory.sh | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+HOOK_VERSION=$(grep 'LAVRA_VERSION=' plugins/lavra/hooks/auto-recall.sh | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+PROVISION_VERSION=$(grep 'echo "' plugins/lavra/hooks/provision-memory.sh | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
 
 echo "  auto-recall.sh:       $HOOK_VERSION"
 echo "  provision-memory.sh:  $PROVISION_VERSION"
@@ -70,44 +70,93 @@ echo "  Generating OpenCode and Gemini outputs..."
 echo ""
 echo "=== Component counts ==="
 
-COMMANDS=$(find plugins/beads-compound/commands -name "*.md" | wc -l | tr -d ' ')
-AGENTS=$(find plugins/beads-compound/agents -name "*.md" | wc -l | tr -d ' ')
-SKILLS=$(find plugins/beads-compound/skills -name "SKILL.md" | wc -l | tr -d ' ')
+COMMANDS=$(find plugins/lavra/commands -maxdepth 1 -name "*.md" | wc -l | tr -d ' ')
+OPTIONAL_COMMANDS=$(find plugins/lavra/commands/optional -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+AGENTS=$(find plugins/lavra/agents -name "*.md" | wc -l | tr -d ' ')
+SKILLS=$(find plugins/lavra/skills -name "SKILL.md" | wc -l | tr -d ' ')
 
-echo "  Commands: $COMMANDS (need 29+)"
-echo "  Agents:   $AGENTS (need 29+)"
-echo "  Skills:   $SKILLS (need 16+)"
+echo "  Commands: $COMMANDS (need 23+) + $OPTIONAL_COMMANDS optional"
+echo "  Agents:   $AGENTS (need 30+)"
+echo "  Skills:   $SKILLS (need 15+)"
 
-[[ "$COMMANDS" -ge 29 ]] && { echo "  PASS  Commands"; ((PASS++)) || true; } || fail "Commands" "$COMMANDS < 29"
-[[ "$AGENTS"   -ge 29 ]] && { echo "  PASS  Agents";   ((PASS++)) || true; } || fail "Agents"   "$AGENTS < 29"
-[[ "$SKILLS"   -ge 16 ]] && { echo "  PASS  Skills";   ((PASS++)) || true; } || fail "Skills"   "$SKILLS < 16"
+[[ "$COMMANDS" -ge 23 ]] && { echo "  PASS  Commands"; ((PASS++)) || true; } || fail "Commands" "$COMMANDS < 23"
+[[ "$AGENTS"   -ge 30 ]] && { echo "  PASS  Agents";   ((PASS++)) || true; } || fail "Agents"   "$AGENTS < 30"
+[[ "$SKILLS"   -ge 15 ]] && { echo "  PASS  Skills";   ((PASS++)) || true; } || fail "Skills"   "$SKILLS < 15"
 
 echo ""
 echo "=== Source files ==="
 
-check "opencode-src/plugin.ts"    test -f plugins/beads-compound/opencode-src/plugin.ts
-check "opencode-src/package.json" test -f plugins/beads-compound/opencode-src/package.json
-check "gemini-src/settings.json"  test -f plugins/beads-compound/gemini-src/settings.json
+check "opencode-src/plugin.ts"    test -f plugins/lavra/opencode-src/plugin.ts
+check "opencode-src/package.json" test -f plugins/lavra/opencode-src/package.json
+check "gemini-src/settings.json"  test -f plugins/lavra/gemini-src/settings.json
 
 echo ""
 echo "=== Conversion output files ==="
 
-check "opencode/ directory" test -d plugins/beads-compound/opencode
-check "gemini/ directory"   test -d plugins/beads-compound/gemini
-check "cortex/ directory"   test -d plugins/beads-compound/cortex
+check "opencode/ directory" test -d plugins/lavra/opencode
+check "gemini/ directory"   test -d plugins/lavra/gemini
+check "cortex/ directory"   test -d plugins/lavra/cortex
 
-OPENCODE_COMMANDS=$(find plugins/beads-compound/opencode/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-GEMINI_TOML=$(find plugins/beads-compound/gemini/commands -name "*.toml" 2>/dev/null | wc -l | tr -d ' ')
+OPENCODE_COMMANDS=$(find plugins/lavra/opencode/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+GEMINI_TOML=$(find plugins/lavra/gemini/commands -name "*.toml" 2>/dev/null | wc -l | tr -d ' ')
 
-echo "  OpenCode .md commands: $OPENCODE_COMMANDS (need 29+)"
-echo "  Gemini .toml commands: $GEMINI_TOML (need 29+)"
+echo "  OpenCode .md commands: $OPENCODE_COMMANDS (need 23+)"
+echo "  Gemini .toml commands: $GEMINI_TOML (need 23+)"
 
-[[ "$OPENCODE_COMMANDS" -ge 29 ]] && { echo "  PASS  OpenCode commands"; ((PASS++)) || true; } || fail "OpenCode commands" "$OPENCODE_COMMANDS < 29"
-[[ "$GEMINI_TOML"       -ge 29 ]] && { echo "  PASS  Gemini commands";   ((PASS++)) || true; } || fail "Gemini commands"   "$GEMINI_TOML < 29"
+[[ "$OPENCODE_COMMANDS" -ge 23 ]] && { echo "  PASS  OpenCode commands"; ((PASS++)) || true; } || fail "OpenCode commands" "$OPENCODE_COMMANDS < 23"
+[[ "$GEMINI_TOML"       -ge 23 ]] && { echo "  PASS  Gemini commands";   ((PASS++)) || true; } || fail "Gemini commands"   "$GEMINI_TOML < 23"
 
-CORTEX_COMMANDS=$(find plugins/beads-compound/cortex/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-echo "  Cortex .md commands:   $CORTEX_COMMANDS (need 25+)"
-[[ "$CORTEX_COMMANDS" -ge 25 ]] && { echo "  PASS  Cortex commands"; ((PASS++)) || true; } || fail "Cortex commands" "$CORTEX_COMMANDS < 25"
+CORTEX_COMMANDS=$(find plugins/lavra/cortex/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+echo "  Cortex .md commands:   $CORTEX_COMMANDS (need 20+)"
+[[ "$CORTEX_COMMANDS" -ge 20 ]] && { echo "  PASS  Cortex commands"; ((PASS++)) || true; } || fail "Cortex commands" "$CORTEX_COMMANDS < 20"
+
+echo ""
+echo "=== Command map ==="
+
+check "site/public/command-map.html exists" test -f site/public/command-map.html
+
+# Verify command map references current node counts (spot check: NODES array has entries)
+MAP_NODES=$(grep -c "id:'" site/public/command-map.html || echo 0)
+echo "  Command map nodes: $MAP_NODES (need 40+)"
+[[ "$MAP_NODES" -ge 40 ]] && { echo "  PASS  Command map nodes"; ((PASS++)) || true; } || fail "Command map nodes" "$MAP_NODES < 40"
+
+echo ""
+echo "=== Catalog accuracy ==="
+# SYNC: This section must stay in sync with the verify-docs step in .github/workflows/test-installation.yml.
+# When modifying either, update the other.
+
+# Extract command names from CATALOG.md table rows only (lines starting with |)
+# to avoid matching prose mentions like "Included in `/lavra-design`"
+CATALOG_COMMANDS=$(grep -E '^\|' site/src/content/docs/CATALOG.md | \
+  grep -oE '`/[a-z][a-z0-9-]+`' | tr -d '`' | sed 's|^/||' | sort -u)
+
+# Actual command files (core + optional, recurse into subdirs)
+ACTUAL_COMMANDS=$(find plugins/lavra/commands -name "*.md" | \
+  xargs -I{} basename {} .md 2>/dev/null | sort -u)
+
+GHOST_COUNT=0
+MISSING_COUNT=0
+
+# Check for ghost commands (in catalog, no file exists)
+while IFS= read -r cmd; do
+  if ! echo "$ACTUAL_COMMANDS" | grep -qx "$cmd"; then
+    fail "Catalog ghost" "/${cmd} listed in CATALOG.md but no ${cmd}.md file found"
+    ((GHOST_COUNT++)) || true
+  fi
+done <<< "$CATALOG_COMMANDS"
+
+# Check for missing catalog entries (file exists, not in catalog)
+while IFS= read -r cmd; do
+  if ! echo "$CATALOG_COMMANDS" | grep -qx "$cmd"; then
+    fail "Missing from catalog" "${cmd}.md exists but /${cmd} not in CATALOG.md"
+    ((MISSING_COUNT++)) || true
+  fi
+done <<< "$ACTUAL_COMMANDS"
+
+if [[ "$GHOST_COUNT" -eq 0 && "$MISSING_COUNT" -eq 0 ]]; then
+  echo "  PASS  Catalog accuracy (no ghosts, no missing entries)"
+  ((PASS++)) || true
+fi
 
 echo ""
 echo "=== Compatibility tests ==="

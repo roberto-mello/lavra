@@ -28,7 +28,7 @@ jobs:
       - name: Validate version consistency
         run: |
           PKG_VERSION=$(jq -r '.version' package.json)
-          PLUGIN_VERSION=$(jq -r '.version' plugins/beads-compound/.claude-plugin/plugin.json)
+          PLUGIN_VERSION=$(jq -r '.version' plugins/lavra/.claude-plugin/plugin.json)
           TAG_VERSION="${GITHUB_REF_NAME#v}"
 
           echo "package.json: $PKG_VERSION"

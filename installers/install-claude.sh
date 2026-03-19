@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-# Install beads-compound plugin into a project
+# Install lavra plugin into a project
 #
 # What this installs:
 #   - Memory capture and auto-recall hooks
-#   - Knowledge store (.beads/memory/knowledge.jsonl)
-#   - Recall script (.beads/memory/recall.sh)
-#   - Beads-aware workflow commands (25 commands)
+#   - Knowledge store (.lavra/memory/knowledge.jsonl)
+#   - Recall script (.lavra/memory/recall.sh)
+#   - Beads-aware workflow commands (24 core commands)
 #   - Specialized agents (29 agent definitions)
 #   - Skills (16 skills including git-worktree, brainstorming, etc.)
 #   - MCP server configuration (Context7)
@@ -19,8 +19,8 @@
 #     ./install.sh /path/to/your-project
 #
 #   From anywhere:
-#     bash /path/to/beads-compound-plugin/install.sh
-#     bash /path/to/beads-compound-plugin/install.sh /path/to/your-project
+#     bash /path/to/lavra/install.sh
+#     bash /path/to/lavra/install.sh /path/to/your-project
 #
 
 set -euo pipefail
@@ -32,7 +32,7 @@ else
   SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
-PLUGIN_DIR="$SCRIPT_DIR/plugins/beads-compound"
+PLUGIN_DIR="$SCRIPT_DIR/plugins/lavra"
 
 # Source shared functions
 # Use BASH_SOURCE to get the correct path when sourced
@@ -79,16 +79,16 @@ fi
 # Verify plugin directory exists
 if [ ! -d "$PLUGIN_DIR" ]; then
   echo "[!] Error: Plugin directory not found at $PLUGIN_DIR"
-  echo "    Expected marketplace structure with plugins/beads-compound/"
+  echo "    Expected marketplace structure with plugins/lavra/"
   exit 1
 fi
 
-echo "beads-compound plugin installer"
-echo "Plugin: $PLUGIN_DIR"
+print_banner "Claude Code" "0.7.0"
+echo "  Plugin: $PLUGIN_DIR"
 if [ "$GLOBAL_INSTALL" = true ]; then
-  echo "Target: $TARGET (global)"
+  echo "  Target: $TARGET (global)"
 else
-  echo "Target: $TARGET (project-specific)"
+  echo "  Target: $TARGET (project-specific)"
 fi
 echo ""
 
@@ -145,15 +145,10 @@ else
 
   if [ -f "$PROVISION_SCRIPT" ]; then
     source "$PROVISION_SCRIPT"
+    migrate_beads_to_lavra "$TARGET"
     provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
     echo "  - Memory system configured"
   fi
-
-  # Provision config directory for project-setup and other config files.
-  # Separate from .beads/memory/ because memory uses merge=union gitattributes
-  # which would corrupt YAML frontmatter — config needs normal git merge behavior.
-  mkdir -p "$TARGET/.beads/config"
-  echo "  - Config directory provisioned (.beads/config/)"
 fi
 
 # Install hooks (only for project-specific installs)
@@ -175,7 +170,7 @@ fi
 # Detect if commands/agents/skills are already installed globally
 GLOBALLY_INSTALLED=false
 
-if [ "$GLOBAL_INSTALL" = false ] && [ -f "$HOME/.claude/commands/beads-plan.md" ]; then
+if [ "$GLOBAL_INSTALL" = false ] && [ -f "$HOME/.claude/commands/lavra-plan.md" ]; then
   GLOBALLY_INSTALLED=true
 fi
 
@@ -267,7 +262,7 @@ else
           ((SKILL_SKIPPED++))
           continue
         elif [ -d "$SKILLS_DIR/$skill_name" ]; then
-          if [ -f "$SKILLS_DIR/$skill_name/.beads-compound" ]; then
+          if [ -f "$SKILLS_DIR/$skill_name/.lavra" ]; then
             # Our plugin installed this -- safe to overwrite
             rm -rf "$SKILLS_DIR/$skill_name"
           else
@@ -280,7 +275,7 @@ else
 
         # Copy entire skill directory (may contain references/, templates/, etc.)
         cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
-        touch "$SKILLS_DIR/$skill_name/.beads-compound"
+        touch "$SKILLS_DIR/$skill_name/.lavra"
         ((SKILL_COUNT++))
       fi
     done
@@ -446,28 +441,32 @@ echo ""
 echo "Done. Installed:"
 echo ""
 echo "  Commands ($CMD_COUNT):"
-echo "    Workflow: /beads-plan, /beads-brainstorm, /beads-work, /beads-parallel, /beads-review, /beads-compound, /beads-checkpoint"
-echo "    Planning: /beads-deepen, /beads-plan-review, /beads-triage"
-echo "    Utility:  /lfg, /changelog, /create-agent-skill, /generate-command, /heal-skill"
-echo "    Testing:  /test-browser, /xcode-test, /reproduce-bug, /report-bug"
-echo "    Docs:     /deploy-docs, /release-docs, /feature-video, /agent-native-audit"
+echo "    Workflow: /lavra-plan, /lavra-brainstorm, /lavra-work, /lavra-work-ralph, /lavra-work-teams, /lavra-review, /lavra-compound, /lavra-checkpoint"
+echo "    Planning: /lavra-research, /lavra-eng-review, /lavra-triage"
+echo "    Utility:  /lfg, /changelog, /create-agent-skill, /heal-skill"
+echo "    Testing:  /test-browser, /report-bug"
+echo "    Docs:     /deploy-docs, /release-docs"
 echo "    Parallel: /resolve-pr-parallel, /resolve-todo-parallel"
 echo ""
 echo "  Agents ($AGENT_COUNT):"
 echo "    Review, research, design, workflow, and docs agents"
 echo ""
-echo "  Skills ($SKILL_COUNT):"
-echo "    git-worktree, brainstorming, create-agent-skills, agent-native-architecture, beads-knowledge,"
-echo "    agent-browser, andrew-kane-gem-writer, dhh-rails-style, dspy-ruby, every-style-editor,"
-echo "    file-todos, frontend-design, gemini-imagegen, rclone, skill-creator"
+echo "  Core Skills ($SKILL_COUNT):"
+echo "    git-worktree, brainstorming, create-agent-skills, agent-native-architecture, lavra-knowledge,"
+echo "    agent-browser, file-todos, project-setup,"
+echo ""
+echo "  Optional Skills (7, not installed by default):"
+echo "    andrew-kane-gem-writer, dhh-rails-style, dspy-ruby, every-style-editor,"
+echo "    frontend-design, gemini-imagegen, rclone"
+echo "    Install with: cp -r plugins/lavra/skills/optional/<name> .claude/skills/"
 echo ""
 
 if [ "$GLOBAL_INSTALL" = false ]; then
   echo "  Memory System:"
   echo "    - Auto-recall at session start (based on current beads)"
   echo "    - Auto-capture from bd comment (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION)"
-  echo "    - Knowledge stored at .beads/memory/knowledge.jsonl"
-  echo "    - Search: .beads/memory/recall.sh \"keyword\""
+  echo "    - Knowledge stored at .lavra/memory/knowledge.jsonl"
+  echo "    - Search: .lavra/memory/recall.sh \"keyword\""
   echo ""
 fi
 
@@ -484,16 +483,16 @@ if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  bash $SCRIPT_DIR/install.sh /path/to/your-project"
   echo ""
   echo "[!] IMPORTANT: If you have existing projects with a previous version of"
-  echo "    beads-compound installed, re-run the installer on each to update hooks:"
+  echo "    lavra installed, re-run the installer on each to update hooks:"
   echo "    bash $SCRIPT_DIR/install.sh /path/to/your-project"
   echo "    (Auto-provisioning only installs hooks for the first time, not updates.)"
   echo ""
 else
   echo "Usage:"
   echo "  1. Create or work on beads normally with bd commands"
-  echo "  2. Use /beads-plan for complex features requiring research"
-  echo "  3. Use /beads-brainstorm to explore ideas before planning"
-  echo "  4. Use /beads-review before closing beads to catch issues"
+  echo "  2. Use /lavra-plan for complex features requiring research"
+  echo "  3. Use /lavra-brainstorm to explore ideas before planning"
+  echo "  4. Use /lavra-review before closing beads to catch issues"
   echo "  5. Log learnings with: bd comment add ID \"LEARNED: ...\""
   echo "  6. Knowledge will be recalled automatically next session"
   echo ""

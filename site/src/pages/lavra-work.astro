@@ -1,0 +1,152 @@
+---
+import Base from '../layouts/Base.astro';
+import TerminalMockup from '../components/TerminalMockup.astro';
+import Footer from '../components/Footer.astro';
+---
+<Base title="/lavra-work" description="Execute, review, learn, ship. One command orchestrates parallel subagents through the full implementation cycle.">
+
+  {/* Hero */}
+  <section class="hero-gradient min-h-[60dvh] flex items-center">
+    <div class="max-w-7xl mx-auto px-6 py-24 w-full grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
+      <div>
+        <p class="font-mono text-text-muted text-sm uppercase tracking-wider mb-4">Execution Engine</p>
+        <h1 class="text-4xl lg:text-6xl font-black tracking-tight text-text leading-[1.1]">
+          <span class="text-accent">/</span>lavra-work
+        </h1>
+        <p class="text-lg lg:text-xl text-text-muted mt-6 max-w-lg">
+          Execute, review, learn, ship. One command orchestrates parallel subagents through the full implementation cycle with automatic knowledge capture.
+        </p>
+      </div>
+      <div class="hidden lg:block">
+        <div class="bg-surface border-2 border-accent rounded-2xl p-10">
+          <p class="font-mono text-4xl font-bold text-accent mb-4">Main Agent</p>
+          <p class="text-text-muted text-lg">Orchestrates and dispatches subagents</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Pipeline Steps */}
+  <section class="py-32 bg-bg" data-reveal>
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex items-baseline gap-4 mb-4">
+        <span class="font-mono text-text-dim text-sm tracking-wider uppercase">Parallel Agents</span>
+      </div>
+      <h2 class="text-3xl lg:text-4xl font-bold text-text tracking-tight mb-4">Six-step execution loop</h2>
+      <p class="text-lg text-text-muted mb-16 max-w-2xl">
+        Each subagent follows this pipeline independently. The main agent orchestrates, dispatches, and verifies.
+      </p>
+
+      <div class="max-w-4xl relative">
+        {/* Vertical connector line */}
+        <div class="absolute left-10 top-10 bottom-10 w-px bg-border-light"></div>
+
+        <div class="space-y-6">
+          {/* Step 1: Recall */}
+          <div class="flex items-center gap-6 relative">
+            <div class="w-20 h-20 rounded-2xl bg-surface border-2 border-accent flex items-center justify-center font-mono text-2xl font-bold text-accent shrink-0 z-10">&#9670;</div>
+            <div>
+              <h3 class="text-xl lg:text-2xl font-bold text-text">Recall Knowledge</h3>
+              <p class="text-text-muted mt-1">Inject relevant knowledge from previous work</p>
+            </div>
+          </div>
+
+          {/* Step 2: Implement */}
+          <div class="flex items-center gap-6 relative">
+            <div class="w-20 h-20 rounded-2xl bg-surface border-2 border-zinc-500 flex items-center justify-center font-mono text-2xl font-bold text-text shrink-0 z-10">&#9654;</div>
+            <div>
+              <h3 class="text-xl lg:text-2xl font-bold text-text">Implement</h3>
+              <p class="text-text-muted mt-1">Follow well-planned tickets in beads</p>
+            </div>
+          </div>
+
+          {/* Steps 3-4: Review <-> Fix loop */}
+          <div class="relative">
+            {/* Loop bracket -- tight to the right of the text */}
+            <div class="absolute left-[680px] top-2 bottom-2 w-6 border-2 border-dashed border-amber-500 rounded-r-xl border-l-0 opacity-50"></div>
+            <div class="absolute left-[720px] top-1/2 -translate-y-1/2">
+              <p class="font-mono text-amber-500 text-xs font-semibold whitespace-nowrap">fix loop</p>
+              <p class="font-mono text-amber-500/50 text-xs">(max 3x)</p>
+            </div>
+
+            <div class="space-y-6">
+              {/* Step 3: Review */}
+              <div class="flex items-center gap-6 relative">
+                <div class="w-20 h-20 rounded-2xl bg-surface border-2 border-amber-500 flex items-center justify-center font-mono text-2xl font-bold text-amber-500 shrink-0 z-10">&#9673;</div>
+                <div>
+                  <h3 class="text-xl lg:text-2xl font-bold text-text">Review</h3>
+                  <p class="text-text-muted mt-1">Architecture, security, performance, debug leftovers</p>
+                </div>
+              </div>
+
+              {/* Step 4: Fix */}
+              <div class="flex items-center gap-6 relative">
+                <div class="w-20 h-20 rounded-2xl bg-surface border-2 border-red-500 flex items-center justify-center font-mono text-2xl font-bold text-red-500 shrink-0 z-10">&#8635;</div>
+                <div>
+                  <h3 class="text-xl lg:text-2xl font-bold text-text">Fix</h3>
+                  <p class="text-text-muted mt-1">Fix issues found in review, then re-review</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 5: Learn */}
+          <div class="flex items-center gap-6 relative">
+            <div class="w-20 h-20 rounded-2xl bg-surface border-2 border-accent flex items-center justify-center font-mono text-2xl font-bold text-accent shrink-0 z-10">&#10022;</div>
+            <div>
+              <h3 class="text-xl lg:text-2xl font-bold text-text">Learn</h3>
+              <p class="text-text-muted mt-1">Log knowledge learned during session</p>
+            </div>
+          </div>
+
+          {/* Step 6: Validate */}
+          <div class="flex items-center gap-6 relative">
+            <div class="w-20 h-20 rounded-2xl bg-surface border-2 border-accent flex items-center justify-center font-mono text-2xl font-bold text-accent shrink-0 z-10">&#11041;</div>
+            <div>
+              <h3 class="text-xl lg:text-2xl font-bold text-text">Validate</h3>
+              <p class="text-text-muted mt-1">Run tests, lint, close beads ticket</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Multi-bead mode */}
+  <section class="py-32 bg-bg border-t border-border" data-reveal>
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-3xl lg:text-4xl font-bold text-text tracking-tight mb-4">Multi-bead mode</h2>
+      <p class="text-lg text-text-muted mb-12 max-w-2xl">
+        Pass an epic ID and Lavra auto-routes to parallel execution. Beads are organized into dependency waves -- each wave runs concurrently, respecting file ownership boundaries.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl">
+        <div class="bg-surface border border-border rounded-2xl p-6">
+          <p class="font-mono text-accent text-sm font-bold">Wave 1</p>
+          <p class="text-text mt-2 font-semibold">Infrastructure</p>
+          <p class="text-text-dim text-sm mt-1">No dependencies. Runs first.</p>
+        </div>
+        <div class="bg-surface border border-border rounded-2xl p-6">
+          <p class="font-mono text-accent text-sm font-bold">Wave 2</p>
+          <p class="text-text mt-2 font-semibold">4 components in parallel</p>
+          <p class="text-text-dim text-sm mt-1">File ownership prevents conflicts.</p>
+        </div>
+        <div class="bg-surface border border-border rounded-2xl p-6">
+          <p class="font-mono text-accent text-sm font-bold">Wave 3</p>
+          <p class="text-text mt-2 font-semibold">Assembly + polish</p>
+          <p class="text-text-dim text-sm mt-1">Depends on all Wave 2 beads.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Finale */}
+  <section class="py-32 hero-gradient" data-reveal>
+    <div class="max-w-7xl mx-auto px-6 text-center">
+      <p class="text-3xl lg:text-5xl font-bold text-text">One command.<br><span class="text-accent">Entire feature shipped.</span></p>
+      <p class="text-text-muted text-xl mt-6">Recall. Implement. Review. Learn. In parallel when possible.</p>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

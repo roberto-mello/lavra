@@ -1,0 +1,13 @@
+{
+  "name": "lavra-opencode",
+  "version": "0.6.0",
+  "description": "lavra plugin for OpenCode - persistent memory and knowledge tracking",
+  "type": "module",
+  "main": "plugin.ts",
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.1.65"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}

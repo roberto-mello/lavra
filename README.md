@@ -1,162 +1,159 @@
-# Beads Compound
+# lavra
 
-[![License](https://img.shields.io/github/license/roberto-mello/beads-compound-plugin)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/roberto-mello/beads-compound-plugin)](https://github.com/roberto-mello/beads-compound-plugin/releases)
+[![License](https://img.shields.io/github/license/roberto-mello/lavra)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/roberto-mello/lavra)](https://github.com/roberto-mello/lavra/releases)
 [![Beads CLI](https://img.shields.io/badge/requires-beads%20CLI-blue)](https://github.com/steveyegge/beads)
 
-> This README reflects latest developments. [Download a release](https://github.com/roberto-mello/beads-compound-plugin/releases) for stable versions.
+**lavra turns your AI coding agent into a development team that gets smarter with every task.**
 
-**AI agents that actually learn from their work.**
+A plugin for coding agents that orchestrates the full development lifecycle -- from brainstorming to shipping -- while automatically capturing and recalling knowledge so each unit of work makes the next one easier.
 
-Agents forget everything between sessions. You fix the same OAuth bug twice. You re-explain architecture patterns every day. This plugin gives agents persistent memory -- they capture lessons during work, recall them automatically in future sessions, and compound knowledge over time.
+[![Claude Code](https://img.shields.io/badge/Claude_Code-cc785c?logo=anthropic&logoColor=white)](https://docs.anthropic.com/en/docs/claude-code)
+[![OpenCode](https://img.shields.io/badge/OpenCode-000000?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwb2x5bGluZSBwb2ludHM9IjE2IDE4IDIyIDEyIDE2IDYiLz48cG9seWxpbmUgcG9pbnRzPSI4IDYgMiAxMiA4IDE4Ii8+PC9zdmc+&logoColor=white)](https://opencode.ai/)
+[![Gemini CLI](https://img.shields.io/badge/Gemini_CLI-4285F4?logo=google&logoColor=white)](https://github.com/google-gemini/gemini-cli)
+[![Cortex Code](https://img.shields.io/badge/Cortex_Code-29B5E8?logo=snowflake&logoColor=white)](https://www.snowflake.com/en/product/features/cortex-code/)
 
-<div align="center">
-  <img src="images/beads-compound.jpg" alt="Beads Compound Engineering Infographic" />
-</div>
+**[Quick Start](https://lavra.dev/docs/quickstart)** | **[Full Catalog](https://lavra.dev/docs/catalog)** | **[Architecture](https://lavra.dev/docs/architecture)** | **[Security](https://lavra.dev/docs/security)** | **[Command Map](https://lavra.dev/command-map)** | **[v0.7.0 Release Notes](https://lavra.dev/docs/releases/v0.7.0)**
 
-## Getting Started
+<table>
+<tr>
+<td width="65%">
 
-**Prerequisites:** [beads CLI](https://github.com/steveyegge/beads) (`bd`), `jq`, `sqlite3`
+### Without lavra
 
-```bash
-npx beads-compound@latest
+- The agent forgets everything between sessions -- you re-explain context every time
+- Planning is shallow: it jumps to code before thinking through the problem
+- Review is inconsistent: sometimes thorough, sometimes a rubber stamp
+- Knowledge stays in your head. When a teammate hits the same bug, they start from zero
+- Shipping is manual: you run tests, create the PR, close tickets, push -- every time
+
+</td>
+<td width="35%" align="center">
+<img src="site/src/assets/forgeftul-agent.jpg" alt="Forgetful agent surrounded by scattered documents" width="280">
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="65%">
+
+### With lavra
+
+- **Automatic memory.** Knowledge is captured inline during work and recalled automatically at the start of every session. Hit the same OAuth bug next month? The agent already knows the fix.
+- **Structured planning.** Brainstorm with scope sharpening, research with domain-matched agents, adversarial plan review -- all before a single line of code is written.
+- **Disciplined execution.** Agents follow deviation rules (what to auto-fix vs. escalate), commit per task with traceable bead IDs, and verify every success criterion before marking work done.
+- **Built-in quality gates.** Every implementation runs through a review-fix-learn loop. Knowledge capture is mandatory, not optional.
+- **Team-shareable knowledge.** Memory lives in `.lavra/memory/knowledge.jsonl`, tracked by git. Your team compounds knowledge together.
+
+</td>
+<td width="35%" align="center">
+<img src="site/src/assets/agent-with-memory.jpg" alt="Agent with memory climbing stairs of compounding knowledge" width="280">
+</td>
+</tr>
+</table>
+
+## The workflow
+
+Most of the time, you type three commands:
+
+```
+/lavra-design "I want users to upload photos for listings"
 ```
 
-Or manual install:
+This runs the full planning pipeline as a single command: interactive brainstorm with scope sharpening, structured plan with phased beads, domain-matched research agents, plan revision, and adversarial review. The output is detailed enough that implementation is mechanical.
+
+```
+/lavra-work
+```
+
+Picks up the approved plan and implements it. Auto-routes between single and multi-bead parallel execution. Includes mandatory review, fix loop, and knowledge curation -- all automatic.
+
+```
+/lavra-ship
+```
+
+Rebases on main, runs tests, scans for secrets and debug leftovers, creates the PR, closes beads, and pushes the backup. One command to land the plane.
+
+Add `/lavra-qa` between work and ship when building web apps -- it maps changed files to routes and runs browser-based verification with screenshots.
+
+## Who this is for
+
+Anyone using coding agents who wants consistent, high-quality output instead of hoping the agent gets it right this time.
+
+- **Non-technical users:** `/lavra-design "build me X"` handles the brainstorming, planning, and research. `/lavra-work` handles the implementation with built-in quality gates. You get working software without needing to know how to code.
+- **Solo developers:** The memory system acts as a second brain. Past decisions, patterns, and gotchas surface automatically when they're relevant.
+- **Teams:** Knowledge compounds across contributors. One person's hard-won insight becomes everyone's starting context.
+
+## Install
+
+**Requires:** [beads CLI](https://github.com/steveyegge/beads), `jq`, `sqlite3`
 
 ```bash
-git clone https://github.com/roberto-mello/beads-compound-plugin.git
-cd beads-compound-plugin
+npx @lavralabs/lavra@latest
+```
+
+Or manual:
+
+```bash
+git clone https://github.com/roberto-mello/lavra.git
+cd lavra
 ./install.sh               # Claude Code (default)
 ./install.sh --opencode    # OpenCode
 ./install.sh --gemini      # Gemini CLI
 ./install.sh --cortex      # Cortex Code
 ```
 
-Use `--yes` to skip confirmation prompts. See [docs/PLATFORMS.md](docs/PLATFORMS.md) for platform-specific setup details.
+<details>
+<summary><strong>All commands</strong></summary>
 
-## The Problem
+**Pipeline (4):** `/lavra-design`, `/lavra-work`, `/lavra-qa`, `/lavra-ship`
 
-**Without plugin:**
-```bash
-# Monday - you fix OAuth redirect bug
-Agent: "How should I handle OAuth redirects?"
-You: "They must match exactly, including trailing slash"
-Agent: *implements fix*
+**Supporting (9):** `/lavra-quick` (fast path with escalation), `/lavra-learn` (knowledge curation), `/lavra-recall` (mid-session search), `/lavra-checkpoint` (save progress), `/lavra-retro` (weekly analytics), `/lavra-import`, `/lavra-triage`, `/changelog`, `/test-browser`
 
-# Wednesday - similar GitHub OAuth feature
-Agent: "How should I handle OAuth redirects?"
-You: *explains the same thing again*
-```
+**Power-user (6):** `/lavra-plan`, `/lavra-research`, `/lavra-eng-review`, `/lavra-review` (15 specialized review agents), `/lavra-work-ralph` (autonomous retry), `/lavra-work-teams` (persistent workers)
 
-**With plugin:**
-```bash
-# Monday
-Agent: *implements OAuth fix*
-Agent: `LEARNED: OAuth redirect_uri must match exactly, including trailing slash`
+**30 specialized agents** across review, research, design, workflow, and docs. Each runs at the right model tier to keep costs 60-70% lower than running everything on Opus.
 
-# Wednesday
-Agent: *automatically recalls: "OAuth redirect_uri must match exactly..."*
-Agent: *implements correctly without asking*
-```
+See [docs/CATALOG.md](docs/CATALOG.md) for the full listing.
 
-## Three-Phase Workflow
+</details>
 
-For features that need thorough planning, `/beads-design` orchestrates the full pipeline as a single command:
+## How knowledge compounds
 
 ```
-/beads-design "oauth authentication"
+brainstorm  --DECISION-->  design
+design      <--LEARNED/PATTERN--  auto-recall from prior work
+research    --FACT/INVESTIGATION-->  plan revision
+work        --LEARNED (inline)-->  mandatory knowledge gate
+review      --LEARNED-->  issues become future recall
+retro       synthesizes patterns, surfaces gaps
 ```
 
-### Phase 1: Brainstorm (`/beads-brainstorm`)
+Six knowledge types (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION, DEVIATION) are captured inline during work and stored in `.lavra/memory/knowledge.jsonl`. At session start, relevant entries are recalled automatically based on your current beads and git branch. The system gets smarter over time -- not just for you, but for your whole team.
 
-Interactive dialogue to explore requirements. Identifies gray areas, captures decisions, surfaces trade-offs before any code is written.
+<details>
+<summary><strong>Configuration</strong></summary>
 
-### Phase 2: Design (`/beads-design` orchestrates automatically)
+**`.lavra/config/lavra.json`** (created automatically) -- toggle workflow phases and execution behavior:
 
-Runs the full planning pipeline -- plan, deepen with parallel research agents, and multi-agent plan review -- for each phase. Single command, zero manual sequencing.
-
-```
-  Brainstorm (interactive)
-        |
-  Plan (/beads-plan) -----> Creates epic with phased child beads
-        |
-  Deepen (/beads-deepen) -> 20-40 research agents enrich each phase
-        |
-  Review (/beads-plan-review) -> 4 agents validate the plan
-        |
-  Ready for implementation
+```json
+{
+  "workflow": { "research": true, "plan_review": true, "goal_verification": true },
+  "execution": { "max_parallel_agents": 3, "commit_granularity": "task" }
+}
 ```
 
-### Phase 3: Execute (`/beads-work` or `/beads-parallel`)
+**`/project-setup`** -- for brownfield projects, run this to generate a codebase profile (stack, architecture, conventions) that informs planning.
 
-Implement phase by phase with full lifecycle tracking, knowledge capture, and quality checks.
-
-```bash
-/beads-work BD-001          # One bead at a time
-/beads-parallel BD-001      # Multiple beads in parallel
-/beads-parallel BD-001 --ralph   # Autonomous with self-correction
-/beads-parallel BD-001 --teams   # Persistent worker teammates
-```
-
-## Quick Mode
-
-For small tasks that don't need the full pipeline:
-
-```bash
-/beads-plan "fix the login bug"    # Creates epic with child beads
-/beads-work BD-001                 # Implement, capture knowledge, close
-```
-
-## What's Included
-
-- **28 specialized agents** -- review, research, design, workflow, docs
-- **29 commands** -- brainstorm, plan, design, execute, review, recall
-- **15 skills** -- worktrees, Rails style, DSPy, browser automation
-- **Automatic knowledge capture and recall** -- dual SQLite FTS5 + JSONL
-- **Multi-platform** -- Claude Code, OpenCode, Gemini CLI, Cortex Code
-
-See [docs/CATALOG.md](docs/CATALOG.md) for the full listing of all agents, commands, and skills.
-
-## How Memory Works
-
-Knowledge is captured automatically from `bd comments add` with typed prefixes (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION) and stored in both SQLite FTS5 (for fast BM25-ranked search) and JSONL (for git-tracked team sharing). At session start, relevant knowledge is recalled based on your current beads and git branch context.
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full memory system design.
-
-## Multi-Platform Support
-
-Works with Claude Code (primary), OpenCode, Gemini CLI, and Cortex Code. Each platform gets the memory system; commands, agents, and skills availability varies by platform.
-
-See [docs/PLATFORMS.md](docs/PLATFORMS.md) for setup instructions and platform-specific details.
-
-## Cost Optimization
-
-Agents use tiered models (Haiku/Sonnet/Opus) based on reasoning complexity -- 60-70% cheaper than running all agents on Opus. High-frequency agents like `learnings-researcher` run on Haiku; deep reasoning agents like `architecture-strategist` run on Opus.
-
-See [docs/COST.md](docs/COST.md) for the full tier breakdown.
-
-## Troubleshooting
-
-See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for common issues and debugging steps.
-
-## Uninstall
-
-```bash
-./uninstall.sh                     # Global uninstall
-./uninstall.sh /path/to/project    # Project-specific
-```
-
-Removes plugin components but preserves `.beads/` data and accumulated knowledge.
+</details>
 
 ## Acknowledgments
 
-[Every](https://every.to)'s [writing on compound engineering](https://every.to/chain-of-thought/compound-engineering-how-every-codes-with-agents) is well worth reading.
+Built by [Roberto Mello](https://github.com/roberto-mello), extending [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin) by [Every](https://every.to). Task tracking by [Beads](https://github.com/steveyegge/beads).
 
-Task tracking is powered by Steve Yegge's [Beads](https://github.com/steveyegge/beads).
-
-Built by Roberto Mello based on [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin) by the team at [Every](https://every.to), extending their philosophy with persistent memory and performance optimizations.
+Inspired by Every's writing on [compound engineering](https://every.to/chain-of-thought/compound-engineering-how-every-codes-with-agents), [gstack](https://github.com/garrytan/gstack) by Garry Tan (role-based skills for autonomous workflows), and [Get Shit Done](https://github.com/gsd-build/get-shit-done) (spec-driven development with context engineering).
 
 ## License
 
-MIT (same as compound-engineering-plugin)
+MIT

@@ -248,7 +248,7 @@ Body`;
 
 async function main() {
   console.log("🛡️  Security Controls Test Suite\n");
-  console.log("Testing beads-compound conversion script security...\n");
+  console.log("Testing lavra conversion script security...\n");
 
   await testPathTraversal();
   await testFilenameSanitization();

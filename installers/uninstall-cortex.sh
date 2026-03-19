@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Uninstall beads-compound plugin from Cortex Code
+# Uninstall lavra plugin from Cortex Code
 #
 # What this removes:
 #   - Hooks from .cortex/hooks/ (or ~/.snowflake/cortex/hooks/)
@@ -11,7 +11,7 @@
 #
 # What this PRESERVES:
 #   - .beads/ directory and all data
-#   - .beads/memory/ and knowledge.jsonl (your accumulated knowledge)
+#   - .lavra/ directory and knowledge.jsonl (your accumulated knowledge)
 #   - Any beads you created
 #
 # Usage:
@@ -22,8 +22,8 @@
 #     ./uninstall-cortex.sh /path/to/your-project
 #
 #   From anywhere:
-#     bash /path/to/beads-compound-plugin/installers/uninstall-cortex.sh
-#     bash /path/to/beads-compound-plugin/installers/uninstall-cortex.sh /path/to/your-project
+#     bash /path/to/lavra/installers/uninstall-cortex.sh
+#     bash /path/to/lavra/installers/uninstall-cortex.sh /path/to/your-project
 #
 
 set -euo pipefail
@@ -41,7 +41,7 @@ fi
 
 TARGET="$(cd "$TARGET" && pwd)"
 
-echo "beads-compound plugin uninstaller (Cortex Code)"
+echo "lavra plugin uninstaller (Cortex Code)"
 if [ "$GLOBAL_UNINSTALL" = true ]; then
   echo "Target: $TARGET (global)"
 else
@@ -73,8 +73,8 @@ else
 fi
 
 # Remove global source path sentinel
-if [ "$GLOBAL_UNINSTALL" = true ] && [ -f "$TARGET/.beads-compound-source" ]; then
-  rm "$TARGET/.beads-compound-source"
+if [ "$GLOBAL_UNINSTALL" = true ] && [ -f "$TARGET/.lavra-source" ]; then
+  rm "$TARGET/.lavra-source"
   echo "  - Removed plugin source path"
   ((REMOVED_COUNT++))
 fi
@@ -90,14 +90,14 @@ fi
 
 if [ -d "$COMMANDS_DIR" ]; then
   PLUGIN_COMMANDS=(
-    beads-plan.md beads-work.md beads-parallel.md beads-review.md beads-checkpoint.md
-    beads-brainstorm.md beads-compound.md
-    beads-deepen.md beads-plan-review.md beads-triage.md
-    agent-native-audit.md changelog.md create-agent-skill.md deploy-docs.md
-    feature-video.md generate-command.md heal-skill.md lfg.md
-    release-docs.md report-bug.md reproduce-bug.md
+    lavra-plan.md lavra-work.md lavra-work-ralph.md lavra-work-teams.md lavra-parallel.md lavra-review.md lavra-checkpoint.md
+    lavra-brainstorm.md lavra-compound.md
+    lavra-research.md lavra-eng-review.md lavra-triage.md
+    changelog.md create-agent-skill.md deploy-docs.md
+    heal-skill.md lfg.md
+    release-docs.md report-bug.md
     resolve-pr-parallel.md resolve-todo-parallel.md
-    test-browser.md xcode-test.md
+    test-browser.md
   )
 
   for cmd in "${PLUGIN_COMMANDS[@]}"; do
@@ -151,13 +151,13 @@ else
 fi
 
 if [ -d "$SKILLS_DIR" ]; then
-  PLUGIN_SKILLS=(git-worktree brainstorming create-agent-skills agent-native-architecture beads-knowledge agent-browser andrew-kane-gem-writer dhh-rails-style dspy-ruby every-style-editor file-todos frontend-design gemini-imagegen rclone skill-creator)
+  PLUGIN_SKILLS=(git-worktree brainstorming create-agent-skills agent-native-architecture lavra-knowledge agent-browser andrew-kane-gem-writer dhh-rails-style dspy-ruby every-style-editor file-todos frontend-design gemini-imagegen rclone)
 
   for skill in "${PLUGIN_SKILLS[@]}"; do
     if [ -L "$SKILLS_DIR/$skill" ]; then
       echo "  - Kept $skill (symlink, not ours)"
     elif [ -d "$SKILLS_DIR/$skill" ]; then
-      if [ -f "$SKILLS_DIR/$skill/.beads-compound" ]; then
+      if [ -f "$SKILLS_DIR/$skill/.lavra" ]; then
         rm -rf "$SKILLS_DIR/$skill"
         echo "  - Removed $skill skill"
         ((REMOVED_COUNT++))
@@ -218,13 +218,14 @@ if [ $REMOVED_COUNT -gt 0 ]; then
   echo ""
   echo "PRESERVED:"
   echo "  - .beads/ directory with all your data"
-  echo "  - .beads/memory/knowledge.jsonl with accumulated knowledge"
+  echo "  - .lavra/ directory with accumulated knowledge and config"
+  echo "  - .beads/ directory with all your beads data"
   echo "  - All beads you created"
   echo ""
-  echo "To completely remove beads data:"
-  echo "  rm -rf $TARGET/.beads/"
+  echo "To fully remove Lavra data:"
+  echo "  rm -rf $TARGET/.lavra/"
   echo ""
   echo "Restart Cortex Code to complete uninstallation."
 else
-  echo "Nothing to uninstall. beads-compound may not be installed here."
+  echo "Nothing to uninstall. lavra may not be installed here."
 fi

@@ -1,0 +1,176 @@
+---
+name: lavra-learn
+description: Curate raw knowledge comments into structured, well-tagged entries for future auto-recall
+argument-hint: "[bead IDs to process, or omit for all closed-today beads]"
+---
+
+<objective>
+Turn raw LEARNED/DECISION/FACT/PATTERN/INVESTIGATION comments captured during work sessions into structured, deduplicated, well-tagged knowledge entries in `.lavra/memory/knowledge.jsonl`. This is the step that converts inline observations into searchable, recallable knowledge that makes future work easier.
+</objective>
+
+<context>
+**When to use:**
+- After `/lavra-work` completes (auto-suggested when LEARNED/INVESTIGATION comments exist)
+- Manually after any work session to consolidate what was captured
+- Periodically to clean up and connect knowledge across beads
+
+**Knowledge flow:**
+```
+Work session -> inline bd comments (raw) -> /lavra-learn (structured) -> auto-recall (future sessions)
+```
+
+Raw comments logged during work are often terse, context-dependent, and untagged beyond auto-detection. This command reviews them with full context, produces well-titled entries with accurate tags, deduplicates against existing knowledge, and synthesizes higher-level patterns when multiple entries connect.
+
+**Usage:**
+```bash
+/lavra-learn                       # Process all beads closed today
+/lavra-learn BD-042                # Process specific bead
+/lavra-learn BD-042 BD-043 BD-044  # Process multiple beads
+```
+</context>
+
+<process>
+
+### Step 1: Gather Raw Entries
+
+Collect all knowledge comments from the target beads.
+
+**If bead IDs were provided:**
+```bash
+bd show {BEAD_ID} --json
+# Extract comments matching LEARNED:|DECISION:|FACT:|PATTERN:|INVESTIGATION: prefixes
+```
+
+**If no bead IDs provided, find beads closed today:**
+```bash
+bd list --status=closed --json | jq '[.[] | select(.updated_at >= "'$(date +%Y-%m-%d)'")]'
+```
+
+For each bead, collect:
+- All comments with knowledge prefixes
+- Bead title and description (for context)
+- Related bead IDs from dependencies
+
+If no knowledge comments are found in the target beads, report that and exit -- there is nothing to curate.
+
+### Step 2: Analyze and Cross-Reference
+
+Review all gathered entries together and identify:
+
+1. **Recurring themes** -- multiple entries touching the same concept, API, or component
+2. **Related decisions** -- choices that reinforce or depend on each other
+3. **Complementary facts** -- constraints that together define a boundary
+4. **Gaps** -- work that clearly produced insights but no comment was logged (flag these but do not fabricate entries)
+
+Load existing knowledge for deduplication:
+```bash
+.lavra/memory/recall.sh "{keywords from gathered entries}" --all
+```
+
+### Step 3: Structure Each Entry
+
+For each raw comment, produce a structured knowledge entry:
+
+| Field | Guideline |
+|-------|-----------|
+| **key** | Lowercase, hyphenated, searchable title. Include the domain and the insight. Example: `learned-oauth-redirect-uri-must-match-exactly` |
+| **type** | Preserve the original prefix (learned/decision/fact/pattern/investigation) |
+| **content** | Rewrite for clarity and future recall. Remove session-specific references ("the bug we just fixed"). Keep it concise -- one to three sentences. Include code snippets only when they are the insight. |
+| **tags** | 3-6 tags covering: technology, domain area, and concept. Prefer existing tags from knowledge.jsonl for consistency. |
+| **source** | `user` |
+| **bead** | Source bead ID |
+
+### Step 4: Deduplicate
+
+For each structured entry, check knowledge.jsonl for near-duplicates:
+
+- **Exact key match**: Update the existing entry content and tags rather than creating a new one
+- **Similar content, different key**: Merge into the existing entry if the insight is the same, or keep both if they capture genuinely different aspects
+- **Superseded entry**: If the new entry corrects or supersedes an older one, update the old entry rather than creating a conflicting duplicate
+
+Report what was deduplicated and why.
+
+### Step 5: Synthesize Patterns
+
+If three or more entries share a theme, create a higher-level PATTERN entry that connects them:
+
+```bash
+bd comments add {BEAD_ID} "PATTERN: {synthesized insight connecting multiple observations}"
+```
+
+Synthesized patterns should:
+- Reference the underlying entries by concept (not by key, since keys may change)
+- Capture the higher-level principle, not just repeat the individual facts
+- Be actionable -- a future developer reading this should know what to do differently
+
+Only synthesize when the pattern is genuine. Do not force connections.
+
+### Step 6: Store
+
+Write all structured entries via `bd comments add` with appropriate prefixes so the memory-capture hook processes them into knowledge.jsonl:
+
+```bash
+bd comments add {BEAD_ID} "LEARNED: {structured content}"
+bd comments add {BEAD_ID} "DECISION: {structured content}"
+bd comments add {BEAD_ID} "FACT: {structured content}"
+bd comments add {BEAD_ID} "PATTERN: {structured content}"
+bd comments add {BEAD_ID} "INVESTIGATION: {structured content}"
+```
+
+The memory-capture hook will auto-tag and store each entry. The structured content from Step 3 ensures the auto-tagger has clear keywords to work with.
+
+</process>
+
+<success_criteria>
+- All knowledge comments from target beads reviewed and structured
+- Each entry has a clear, searchable key and 3-6 accurate tags
+- Near-duplicates identified and handled (updated or merged, not duplicated)
+- Cross-bead patterns synthesized where genuine connections exist
+- All entries stored via `bd comments add` for hook processing
+
+```
+Knowledge curation complete.
+
+Beads processed: {list of bead IDs}
+Entries structured: {N} (from {M} raw comments)
+Duplicates resolved: {N} updated, {N} merged
+Patterns synthesized: {N}
+Tag coverage: {list of top tags used}
+
+Entries created:
+  - {TYPE}: {key} (bead: {BEAD_ID})
+  - ...
+```
+</success_criteria>
+
+<guardrails>
+
+### This is curation, not research
+
+Do not launch subagents to investigate code or analyze architecture. The raw material is the knowledge comments already captured during work. Your job is to structure, deduplicate, and connect -- not to generate new findings.
+
+### Preserve the original author's intent
+
+When rewriting content for clarity, do not change the technical meaning. If an entry says "Enum comparison fails unless you cast to string first," do not generalize it to "Type coercion is important" -- the specific detail is the value.
+
+### Quality over quantity
+
+Five well-structured, accurately tagged entries are more valuable than fifteen vague ones. If a raw comment is too terse to understand without the original session context, flag it as needing clarification rather than guessing.
+
+### Tags must be useful for recall
+
+Tags exist so auto-recall can surface entries when working on related problems. Use concrete terms (oauth, postgres, rate-limiting) not abstract ones (important, tricky, gotcha).
+
+</guardrails>
+
+<handoff>
+What's next?
+1. View knowledge entries: `.lavra/memory/recall.sh "{keyword}"`
+2. Continue working on another bead
+3. Run `/lavra-checkpoint` to save session progress
+
+**Related Commands:**
+- `/lavra-work` - Execute work on a bead (captures raw knowledge inline)
+- `/lavra-checkpoint` - Save progress and sync state
+- `/lavra-recall` - Search knowledge base mid-session
+</handoff>

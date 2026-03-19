@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# beads-compound plugin uninstaller router
+# lavra plugin uninstaller router
 #
 # Routes to platform-specific uninstallers based on flags.
 # Defaults to Claude Code for backwards compatibility.
@@ -20,7 +20,7 @@ PLATFORM=""
 # Display help
 show_help() {
   cat <<EOF
-beads-compound Plugin Uninstaller
+lavra Plugin Uninstaller
 
 Usage:
   ./uninstall.sh [PLATFORM] [TARGET]
@@ -127,7 +127,7 @@ fi
 
 # Execute platform-specific uninstaller
 # Use source instead of exec to allow better error handling
-echo "🔄 Uninstalling beads-compound for $PLATFORM..."
+echo "🔄 Uninstalling lavra for $PLATFORM..."
 echo ""
 
 source "$UNINSTALLER" "$@"

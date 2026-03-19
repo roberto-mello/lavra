@@ -1,0 +1,18 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title } = Astro.props;
+---
+<div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+  <div class="flex items-center gap-2 px-4 py-3 border-b border-zinc-800">
+    <span class="w-3 h-3 rounded-full bg-[#ef4444]"></span>
+    <span class="w-3 h-3 rounded-full bg-[#eab308]"></span>
+    <span class="w-3 h-3 rounded-full bg-[#22c55e]"></span>
+    {title && <span class="ml-2 text-xs text-text-muted font-mono">{title}</span>}
+  </div>
+  <div class="p-4 font-mono text-sm text-zinc-300 leading-relaxed overflow-x-auto">
+    <slot />
+  </div>
+</div>

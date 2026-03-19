@@ -1,0 +1,267 @@
+---
+name: lavra-research
+description: Gather evidence and best practices for a plan using domain-matched research agents
+argument-hint: "[epic bead ID]"
+---
+
+<objective>
+Take an existing plan (from `/lavra-plan` or `/lavra-design`) and GATHER evidence for each section using domain-matched research agents. Each agent is selected because its expertise matches the plan's technologies and concerns. Research GATHERS findings (docs, prior art, best practices, edge cases, knowledge recall) -- it does NOT revise the plan or apply changes. That is `/lavra-design`'s job. The output is organized research findings ready for `/lavra-design` to integrate.
+</objective>
+
+<execution_context>
+<epic_bead_id> #$ARGUMENTS </epic_bead_id>
+
+**If the epic bead ID above is empty:**
+1. Check for recent epic beads: `bd list --type epic --status=open --json`
+2. Ask the user: "Which epic would you like to research? Please provide the bead ID (e.g., `BD-001`)."
+
+Do not proceed until you have a valid epic bead ID.
+</execution_context>
+
+<context>
+**Note: The current year is 2026.** Use this when searching for recent documentation and best practices.
+</context>
+
+<process>
+
+### 1. Parse Plan and Extract Domain Indicators
+
+<thinking>
+Read the epic and its children to understand what the plan is about. Extract domain indicators that will drive agent selection.
+</thinking>
+
+**Read the epic and its children:**
+
+```bash
+bd show {EPIC_ID}
+bd list --parent {EPIC_ID} --json
+```
+
+**For each child bead, read its description:**
+
+```bash
+bd show {CHILD_ID}
+```
+
+**Extract domain indicators from the plan content:**
+
+Scan all bead titles, descriptions, acceptance criteria, and code references for:
+- **Languages**: Ruby, Python, TypeScript, JavaScript, Go, Rust, etc.
+- **Frameworks**: Rails, Django, React, Next.js, FastAPI, etc.
+- **Concerns**: security, auth, performance, migrations, data integrity, deployment, frontend/CSS/JS, design/UI/UX
+- **File types**: `.rb`, `.py`, `.ts`, `.tsx`, `.sql`, `.css`, etc.
+- **Infrastructure**: databases, APIs, CI/CD, Docker, cloud services
+
+**Build a domain profile:**
+```
+Languages: [detected languages]
+Frameworks: [detected frameworks]
+Concerns: [detected concerns]
+File types: [detected file types]
+Infrastructure: [detected infrastructure]
+```
+
+### 2. Select Research Agents by Domain Match
+
+<thinking>
+Match agents to the plan's domain profile. Only dispatch agents whose expertise is relevant. This avoids wasting tokens on agents that have nothing to contribute.
+</thinking>
+
+**Always include these agents (universal relevance):**
+- `architecture-strategist` -- structural concerns apply to every plan
+- `code-simplicity-reviewer` -- complexity is always worth checking
+- `best-practices-researcher` -- general best practices research
+- `framework-docs-researcher` -- documentation lookup for detected frameworks
+- `learnings-researcher` -- search knowledge.jsonl for past solutions
+
+**Conditionally include based on domain indicators:**
+
+| Domain indicator | Agent(s) to include |
+|-----------------|---------------------|
+| Database, migrations, schema, SQL, models | `data-migration-expert`, `data-integrity-guardian`, `migration-drift-detector` |
+| Frontend, CSS, JS, React, UI components | `julik-frontend-races-reviewer`, `design-implementation-reviewer` |
+| Rails, Ruby, `.rb` files | `dhh-rails-reviewer`, `kieran-rails-reviewer` |
+| Python, Django, FastAPI, `.py` files | `kieran-python-reviewer` |
+| TypeScript, `.ts`/`.tsx` files | `kieran-typescript-reviewer` |
+| Security, auth, OAuth, tokens, encryption | `security-sentinel` |
+| Performance, caching, N+1, latency | `performance-oracle` |
+| Deployment, CI/CD, Docker, infrastructure | `deployment-verification-agent` |
+| Design, UI/UX, Figma, layout | `design-iterator`, `figma-design-sync` |
+| Patterns, architecture, abstractions | `pattern-recognition-specialist` |
+| Agent-native, AI workflows, LLM | `agent-native-reviewer` |
+| Git history, blame, refactor archeology | `git-history-analyzer` |
+| Repository structure, codebase analysis | `repo-research-analyst` |
+
+**Build the agent roster with justifications:**
+```
+SELECTED AGENTS:
+- architecture-strategist (always included)
+- code-simplicity-reviewer (always included)
+- best-practices-researcher (always included)
+- framework-docs-researcher (always included)
+- learnings-researcher (always included)
+- dhh-rails-reviewer (plan mentions Rails controllers and models)
+- security-sentinel (plan includes OAuth token handling)
+- data-migration-expert (plan adds new database columns)
+...
+```
+
+Present this roster to the user before dispatching. No confirmation needed -- just show it so they know what is running.
+
+### 3. Discover Relevant Skills
+
+<thinking>
+Scan available skills and note which ones are relevant. Don't spawn a sub-agent per skill -- just search and list.
+</thinking>
+
+```bash
+# Project-local skills
+ls .claude/skills/ 2>/dev/null
+
+# User's global skills
+ls ~/.claude/skills/ 2>/dev/null
+```
+
+For each skill directory found, read its `SKILL.md` and check if it matches the plan's domain. Build a list:
+
+```
+RELEVANT SKILLS:
+- dhh-rails-style: Plan uses Rails conventions (matched: Rails framework)
+- frontend-design: Plan includes UI components (matched: frontend concern)
+```
+
+Note these for agents to reference, but do NOT spawn separate skill sub-agents.
+
+### 4. Search Knowledge Base
+
+<thinking>
+Search for relevant past learnings before dispatching agents. These inform what we already know.
+</thinking>
+
+**Search for relevant learnings:**
+
+```bash
+# Search knowledge for each key topic in the plan
+.lavra/memory/recall.sh "{topic 1}"
+.lavra/memory/recall.sh "{topic 2}"
+.lavra/memory/recall.sh "{technology}"
+
+# Search with --all to include archived knowledge
+.lavra/memory/recall.sh --all "{broad topic}"
+```
+
+Collect all relevant entries. These will be provided to agents as context.
+
+### 5. Dispatch Selected Agents in Parallel
+
+<thinking>
+Launch ONLY the selected agents from Step 2. Each agent gets the full plan content plus relevant knowledge entries. Agents GATHER findings -- they do not revise the plan.
+</thinking>
+
+**For each selected agent, launch in parallel:**
+
+```
+Task [agent-name]: "Research this plan using your expertise. GATHER evidence only -- do not revise the plan.
+
+DOMAIN MATCH REASON: [why this agent was selected]
+
+PLAN CONTENT:
+[full plan content from epic + children]
+
+RELEVANT KNOWLEDGE ENTRIES:
+[any matching entries from Step 4]
+
+RELEVANT SKILLS:
+[any matching skills from Step 3]
+
+YOUR JOB:
+1. Apply your expertise to identify: best practices, risks, edge cases, patterns, anti-patterns, performance considerations
+2. Cite sources where possible (docs, prior art, knowledge entries)
+3. Return CONCRETE findings organized by child bead
+4. Flag any concerns or risks with severity (high/medium/low)
+
+DO NOT rewrite the plan. Just report what you found."
+```
+
+**Launch ALL selected agents in a SINGLE message with multiple Task calls.**
+
+### 6. Collect and Organize Findings
+
+<thinking>
+Wait for all agents to complete. Organize findings by child bead, not by agent.
+</thinking>
+
+**Collect outputs from all agents and organize by child bead:**
+
+```
+BEAD {CHILD_ID}: {title}
+
+  architecture-strategist:
+    - [finding 1]
+    - [finding 2]
+
+  security-sentinel:
+    - [finding 1 - severity: high]
+
+  best-practices-researcher:
+    - [finding 1 with source URL]
+```
+
+**Deduplicate:** Merge identical recommendations from multiple agents.
+**Flag conflicts:** If two agents disagree, note both perspectives.
+**Prioritize:** Mark high-impact findings.
+
+### 7. Log Research Findings as Knowledge Comments
+
+<thinking>
+Capture key findings as knowledge comments on the relevant beads. This is the primary output -- structured evidence for /lavra-design to consume.
+</thinking>
+
+**For each child bead with findings:**
+
+```bash
+bd comments add {CHILD_ID} "INVESTIGATION: [key research finding with source]"
+bd comments add {CHILD_ID} "FACT: [constraint or gotcha discovered]"
+bd comments add {CHILD_ID} "PATTERN: [recommended pattern with rationale]"
+```
+
+**Add a research summary to the epic:**
+
+```bash
+bd comments add {EPIC_ID} "INVESTIGATION: Research completed with [count] domain-matched agents ([agent names]). Key findings: [top 3 findings]. Ready for /lavra-design to integrate."
+```
+
+</process>
+
+<success_criteria>
+- [ ] Domain indicators correctly extracted from plan content
+- [ ] Only domain-relevant agents dispatched (with justification for each)
+- [ ] All agent findings organized by child bead
+- [ ] Key findings logged as INVESTIGATION/FACT/PATTERN comments
+- [ ] Research summary added to epic bead
+- [ ] NO plan modifications made -- findings only
+</success_criteria>
+
+<guardrails>
+- NEVER modify child bead descriptions. Research GATHERS evidence. `/lavra-design` APPLIES it.
+- NEVER write code. Just research and report findings.
+- NEVER dispatch agents that have no domain match. Each agent must have a stated reason for inclusion.
+</guardrails>
+
+<handoff>
+After logging all findings, use the **AskUserQuestion tool** to present these options:
+
+**Question:** "Research complete for epic `{EPIC_ID}`. [count] agents gathered findings across [count] child beads. What would you like to do next?"
+
+**Options:**
+1. **Run `/lavra-design`** - Integrate research findings into the plan
+2. **Run `/lavra-eng-review`** - Get feedback from reviewers on the plan
+3. **Research deeper** - Run another round on specific sections with additional agents
+4. **View findings** - Show all research findings organized by child bead
+
+Based on selection:
+- **`/lavra-design`** -> Call the /lavra-design command with the epic bead ID
+- **`/lavra-eng-review`** -> Call the /lavra-eng-review command with the epic bead ID
+- **Research deeper** -> Ask which sections need more research, add targeted agents
+- **View findings** -> Show findings grouped by child bead with agent attribution
+</handoff>

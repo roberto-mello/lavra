@@ -33,6 +33,35 @@ jobs:
       - name: Run compatibility tests
         run: cd scripts && bun run test-compatibility.ts
 
+      - name: Verify catalog accuracy
+        # SYNC: This step must stay in sync with the "Catalog accuracy" section
+        # in scripts/pre-release-check.sh. When modifying either, update the other.
+        run: |
+          CATALOG_COMMANDS=$(grep -E '^\|' site/src/content/docs/CATALOG.md | \
+            grep -oE '`/[a-z][a-z0-9-]+`' | tr -d '`' | sed 's|^/||' | sort -u)
+
+          ACTUAL_COMMANDS=$(find plugins/lavra/commands -name "*.md" | \
+            xargs -I{} basename {} .md 2>/dev/null | sort -u)
+
+          FAIL=0
+
+          while IFS= read -r cmd; do
+            if ! echo "$ACTUAL_COMMANDS" | grep -qx "$cmd"; then
+              echo "❌ Catalog ghost: /${cmd} listed in CATALOG.md but no ${cmd}.md file found"
+              FAIL=1
+            fi
+          done <<< "$CATALOG_COMMANDS"
+
+          while IFS= read -r cmd; do
+            if ! echo "$CATALOG_COMMANDS" | grep -qx "$cmd"; then
+              echo "❌ Missing from catalog: ${cmd}.md exists but /${cmd} not in CATALOG.md"
+              FAIL=1
+            fi
+          done <<< "$ACTUAL_COMMANDS"
+
+          [[ "$FAIL" -eq 0 ]] || exit 1
+          echo "✅ Catalog accurate (no ghosts, no missing entries)"
+
   test-installation:
     name: Multi-Platform Installation Tests
     runs-on: macos-latest
@@ -120,8 +149,8 @@ jobs:
 
       - name: Verify version consistency
         run: |
-          PLUGIN_VERSION=$(jq -r '.version' plugins/beads-compound/.claude-plugin/plugin.json)
-          MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name == "beads-compound") | .version' .claude-plugin/marketplace.json)
+          PLUGIN_VERSION=$(jq -r '.version' plugins/lavra/.claude-plugin/plugin.json)
+          MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name == "lavra") | .version' .claude-plugin/marketplace.json)
 
           if [[ "$PLUGIN_VERSION" != "$MARKETPLACE_VERSION" ]]; then
             echo "❌ Version mismatch: plugin.json=$PLUGIN_VERSION, marketplace.json=$MARKETPLACE_VERSION"
@@ -132,16 +161,16 @@ jobs:
 
       - name: Verify component counts
         run: |
-          COMMANDS=$(find plugins/beads-compound/commands -name "*.md" | wc -l)
-          AGENTS=$(find plugins/beads-compound/agents -name "*.md" | wc -l)
-          SKILLS=$(find plugins/beads-compound/skills -name "SKILL.md" | wc -l)
+          COMMANDS=$(find plugins/lavra/commands -maxdepth 1 -name "*.md" | wc -l)
+          AGENTS=$(find plugins/lavra/agents -name "*.md" | wc -l)
+          SKILLS=$(find plugins/lavra/skills -name "SKILL.md" | wc -l)
 
-          echo "Commands: $COMMANDS (expected 29+)"
-          echo "Agents: $AGENTS (expected 28+)"
+          echo "Commands: $COMMANDS (expected 23+)"
+          echo "Agents: $AGENTS (expected 30+)"
           echo "Skills: $SKILLS (expected 15+)"
 
-          [[ "$COMMANDS" -ge 29 ]] || exit 1
-          [[ "$AGENTS" -ge 28 ]] || exit 1
+          [[ "$COMMANDS" -ge 23 ]] || exit 1
+          [[ "$AGENTS" -ge 30 ]] || exit 1
           [[ "$SKILLS" -ge 15 ]] || exit 1
 
           echo "✅ Component counts verified"
@@ -149,21 +178,50 @@ jobs:
       - name: Verify source files and conversion outputs
         run: |
           # Verify source files exist
-          [[ -f "plugins/beads-compound/opencode-src/plugin.ts" ]] || { echo "❌ OpenCode plugin.ts source missing"; exit 1; }
-          [[ -f "plugins/beads-compound/opencode-src/package.json" ]] || { echo "❌ OpenCode package.json source missing"; exit 1; }
-          [[ -f "plugins/beads-compound/gemini-src/settings.json" ]] || { echo "❌ Gemini settings.json source missing"; exit 1; }
+          [[ -f "plugins/lavra/opencode-src/plugin.ts" ]] || { echo "❌ OpenCode plugin.ts source missing"; exit 1; }
+          [[ -f "plugins/lavra/opencode-src/package.json" ]] || { echo "❌ OpenCode package.json source missing"; exit 1; }
+          [[ -f "plugins/lavra/gemini-src/settings.json" ]] || { echo "❌ Gemini settings.json source missing"; exit 1; }
 
           # Verify generated outputs exist (from previous step)
-          [[ -d "plugins/beads-compound/opencode" ]] || { echo "❌ OpenCode conversion outputs missing"; exit 1; }
-          [[ -d "plugins/beads-compound/gemini" ]] || { echo "❌ Gemini conversion outputs missing"; exit 1; }
+          [[ -d "plugins/lavra/opencode" ]] || { echo "❌ OpenCode conversion outputs missing"; exit 1; }
+          [[ -d "plugins/lavra/gemini" ]] || { echo "❌ Gemini conversion outputs missing"; exit 1; }
 
-          OPENCODE_COMMANDS=$(find plugins/beads-compound/opencode/commands -name "*.md" 2>/dev/null | wc -l)
-          [[ "$OPENCODE_COMMANDS" -ge 29 ]] || { echo "❌ OpenCode .md commands missing"; exit 1; }
+          OPENCODE_COMMANDS=$(find plugins/lavra/opencode/commands -name "*.md" 2>/dev/null | wc -l)
+          [[ "$OPENCODE_COMMANDS" -ge 23 ]] || { echo "❌ OpenCode .md commands missing"; exit 1; }
 
-          GEMINI_TOML=$(find plugins/beads-compound/gemini/commands -name "*.toml" 2>/dev/null | wc -l)
-          [[ "$GEMINI_TOML" -ge 29 ]] || { echo "❌ Gemini .toml commands missing"; exit 1; }
+          GEMINI_TOML=$(find plugins/lavra/gemini/commands -name "*.toml" 2>/dev/null | wc -l)
+          [[ "$GEMINI_TOML" -ge 23 ]] || { echo "❌ Gemini .toml commands missing"; exit 1; }
 
-          CORTEX_COMMANDS=$(find plugins/beads-compound/cortex/commands -name "*.md" 2>/dev/null | wc -l)
-          [[ "$CORTEX_COMMANDS" -ge 29 ]] || { echo "❌ Cortex .md commands missing"; exit 1; }
+          CORTEX_COMMANDS=$(find plugins/lavra/cortex/commands -name "*.md" 2>/dev/null | wc -l)
+          [[ "$CORTEX_COMMANDS" -ge 20 ]] || { echo "❌ Cortex .md commands missing"; exit 1; }
 
           echo "✅ All source files and conversion outputs verified"
+
+      - name: Verify catalog accuracy
+        # SYNC: This step must stay in sync with the "Catalog accuracy" section
+        # in scripts/pre-release-check.sh. When modifying either, update the other.
+        run: |
+          CATALOG_COMMANDS=$(grep -E '^\|' site/src/content/docs/CATALOG.md | \
+            grep -oE '`/[a-z][a-z0-9-]+`' | tr -d '`' | sed 's|^/||' | sort -u)
+
+          ACTUAL_COMMANDS=$(find plugins/lavra/commands -name "*.md" | \
+            xargs -I{} basename {} .md 2>/dev/null | sort -u)
+
+          FAIL=0
+
+          while IFS= read -r cmd; do
+            if ! echo "$ACTUAL_COMMANDS" | grep -qx "$cmd"; then
+              echo "❌ Catalog ghost: /${cmd} listed in CATALOG.md but no ${cmd}.md file found"
+              FAIL=1
+            fi
+          done <<< "$CATALOG_COMMANDS"
+
+          while IFS= read -r cmd; do
+            if ! echo "$CATALOG_COMMANDS" | grep -qx "$cmd"; then
+              echo "❌ Missing from catalog: ${cmd}.md exists but /${cmd} not in CATALOG.md"
+              FAIL=1
+            fi
+          done <<< "$ACTUAL_COMMANDS"
+
+          [[ "$FAIL" -eq 0 ]] || exit 1
+          echo "✅ Catalog accurate (no ghosts, no missing entries)"

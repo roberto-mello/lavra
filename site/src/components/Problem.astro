@@ -1,0 +1,62 @@
+---
+import { Image } from 'astro:assets';
+import forgetfulAgent from '../assets/forgeftul-agent.jpg';
+
+const painPoints = [
+  { text: "Agents forget what they learned last session.", border: 'border-red-500' },
+  { text: "They are overeager to jump to implementation with basic plans that leave a lot of leeway for agents to come up with wrong or suboptimal implementations.", border: 'border-amber-500', ref: 3 },
+  { text: "Basic or no research into patterns or current best practices, going off their usually outdated training data.", border: 'border-zinc-500' },
+  { text: "Code reviews are done only when asked, with no consistency.", border: 'border-red-500' },
+  { text: "They tend to repeat (wrong) code many times over, for lack of guardrails.", border: 'border-amber-500', ref: 1 },
+  { text: "Working with only the main agent (the one you chat with) is less optimal than with subagents given well-defined tasks.", border: 'border-zinc-500', ref: 2 },
+  { text: "Shipping is five manual steps.", border: 'border-red-500' },
+];
+---
+
+<section class="py-32 bg-bg" data-reveal>
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-16 items-center">
+
+      {/* Left: Content */}
+      <div>
+        <h2 class="text-4xl lg:text-5xl font-bold text-text tracking-tight mb-10">
+          AI agents have no consistent memory.
+        </h2>
+        <ol class="space-y-0">
+          {painPoints.map((point, i) => (
+            <li class={`pl-4 py-3 border-l-2 ${point.border}`}>
+              <span class="text-text-muted text-base lg:text-lg">{point.text}</span>
+              {point.ref && <a href={`#ref-${point.ref}`} class="text-accent text-xs align-super ml-1 hover:underline">[{point.ref}]</a>}
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      {/* Right: Image */}
+      <div class="order-first lg:order-last flex items-center justify-center">
+        <Image src={forgetfulAgent} alt="An AI agent with no memory, starting from scratch every session" width={350} class="rounded-2xl border border-border-light" loading="lazy" decoding="async" />
+      </div>
+
+    </div>
+
+    {/* References */}
+    <div class="mt-16 pt-8 border-t border-border max-w-2xl">
+      <p class="text-xs text-text-dim uppercase tracking-wider font-bold mb-3">References</p>
+      <ol class="space-y-2 text-sm text-text-muted">
+        <li id="ref-1" class="flex gap-2">
+          <span class="text-text-dim shrink-0">[1]</span>
+          <a href="https://x.com/badlogicgames/status/2033798602372288947" target="_blank" rel="noopener noreferrer" class="hover:text-text transition-colors break-all">Mario Zechner on AI agent memory loss</a>
+        </li>
+        <li id="ref-2" class="flex gap-2">
+          <span class="text-text-dim shrink-0">[2]</span>
+          <a href="https://simonwillison.net/guides/agentic-engineering-patterns/subagents/" target="_blank" rel="noopener noreferrer" class="hover:text-text transition-colors break-all">Simon Willison -- Agentic Engineering Patterns: Subagents</a>
+        </li>
+        <li id="ref-2" class="flex gap-2">
+          <span class="text-text-dim shrink-0">[2]</span>
+          <a href="https://haskellforall.com/2026/03/a-sufficiently-detailed-spec-is-code" target="_blank" rel="noopener noreferrer" class="hover:text-text transition-colors break-all">Gabriella Gonzales -- A sufficiently detailed spec is code</a>
+        </li>
+      </ol>
+      
+    </div>
+  </div>
+</section>

@@ -1,0 +1,491 @@
+---
+import Base from '../layouts/Base.astro';
+import Footer from '../components/Footer.astro';
+import { Image } from 'astro:assets';
+import wallTime from '../assets/benchmark/wall-time.svg';
+import cost from '../assets/benchmark/cost.svg';
+import outputTokens from '../assets/benchmark/output-tokens.svg';
+import testsPassing from '../assets/benchmark/tests-passing.svg';
+import functionalScores from '../assets/benchmark/functional-scores.svg';
+---
+<Base title="Benchmark" description="Head-to-head benchmark: raw Claude Code vs Claude Code + Lavra on a FastAPI REST API implementation task.">
+
+  {/* Hero */}
+  <section class="hero-gradient min-h-[50dvh] flex items-center">
+    <div class="max-w-5xl mx-auto px-6 py-24 w-full text-center">
+      <p class="font-mono text-accent text-sm uppercase tracking-wider mb-4">Benchmark Report</p>
+      <h1 class="text-4xl lg:text-6xl font-black tracking-tight text-text leading-[1.1]">
+        Lavra <span class="text-accent">Benchmark</span> Results
+      </h1>
+      <p class="text-lg text-text-muted mt-6 max-w-xl mx-auto">
+        <strong class="text-text">Claude Code</strong> vs <strong class="text-text">Claude Code + Lavra</strong> &middot; Sonnet 4.6 &middot; March 2026
+      </p>
+    </div>
+  </section>
+
+  {/* Key Metrics */}
+  <section class="py-20 border-b border-border" data-reveal>
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl font-bold tracking-tight mb-2">Key Metrics</h2>
+      <p class="text-text-muted mb-10">Head-to-head comparison across 2 sessions, 40 tests total</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <div class="bg-surface border border-border rounded-2xl p-6 border-t-2 border-t-accent">
+          <p class="text-xs font-semibold uppercase tracking-wider text-text-dim mb-4">Tests Passed</p>
+          <div class="flex items-baseline justify-between gap-2">
+            <div class="text-center flex-1">
+              <p class="text-[0.6875rem] font-medium uppercase tracking-wider text-text-dim">Control</p>
+              <p class="font-mono text-2xl font-bold text-accent">40/40</p>
+            </div>
+            <span class="text-text-dim text-xs">vs</span>
+            <div class="text-center flex-1">
+              <p class="text-[0.6875rem] font-medium uppercase tracking-wider text-accent">Lavra</p>
+              <p class="font-mono text-2xl font-bold text-accent">40/40</p>
+            </div>
+          </div>
+          <p class="text-xs text-text-dim text-center mt-3"><span class="font-semibold text-accent">Tied</span> -- perfect scores</p>
+        </div>
+
+        <div class="bg-surface border border-border rounded-2xl p-6 border-t-2 border-t-text-dim">
+          <p class="text-xs font-semibold uppercase tracking-wider text-text-dim mb-4">Work Time</p>
+          <div class="flex items-baseline justify-between gap-2">
+            <div class="text-center flex-1">
+              <p class="text-[0.6875rem] font-medium uppercase tracking-wider text-text-dim">Control</p>
+              <p class="font-mono text-2xl font-bold text-text">281s</p>
+            </div>
+            <span class="text-text-dim text-xs">vs</span>
+            <div class="text-center flex-1">
+              <p class="text-[0.6875rem] font-medium uppercase tracking-wider text-accent">Lavra</p>
+              <p class="font-mono text-2xl font-bold text-text-muted">578s</p>
+            </div>
+          </div>
+          <p class="text-xs text-text-dim text-center mt-3"><span class="font-semibold text-text-muted">Control</span> -- 2.1x faster</p>
+        </div>
+
+        <div class="bg-surface border border-border rounded-2xl p-6 border-t-2 border-t-text-dim">
+          <p class="text-xs font-semibold uppercase tracking-wider text-text-dim mb-4">Work Cost</p>
+          <div class="flex items-baseline justify-between gap-2">
+            <div class="text-center flex-1">
+              <p class="text-[0.6875rem] font-medium uppercase tracking-wider text-text-dim">Control</p>
+              <p class="font-mono text-2xl font-bold text-text">$0.89</p>
+            </div>
+            <span class="text-text-dim text-xs">vs</span>
+            <div class="text-center flex-1">
+              <p class="text-[0.6875rem] font-medium uppercase tracking-wider text-accent">Lavra</p>
+              <p class="font-mono text-2xl font-bold text-text-muted">$1.93</p>
+            </div>
+          </div>
+          <p class="text-xs text-text-dim text-center mt-3"><span class="font-semibold text-text-muted">Control</span> -- 2.2x cheaper</p>
+        </div>
+
+        <div class="bg-surface border border-border rounded-2xl p-6 border-t-2 border-t-accent">
+          <p class="text-xs font-semibold uppercase tracking-wider text-text-dim mb-4">Knowledge Captured</p>
+          <div class="flex items-baseline justify-between gap-2">
+            <div class="text-center flex-1">
+              <p class="text-[0.6875rem] font-medium uppercase tracking-wider text-text-dim">Control</p>
+              <p class="font-mono text-2xl font-bold text-text-muted">0</p>
+            </div>
+            <span class="text-text-dim text-xs">vs</span>
+            <div class="text-center flex-1">
+              <p class="text-[0.6875rem] font-medium uppercase tracking-wider text-accent">Lavra</p>
+              <p class="font-mono text-2xl font-bold text-accent">9</p>
+            </div>
+          </div>
+          <p class="text-xs text-text-dim text-center mt-3"><span class="font-semibold text-accent">Lavra</span> -- compounding value</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  {/* The Story */}
+  <section class="py-20 border-b border-border" data-reveal>
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl font-bold tracking-tight mb-4">The Story</h2>
+      <div class="w-12 h-0.5 bg-border-light rounded-full mb-8"></div>
+      <p class="text-[1.0625rem] text-text-muted leading-relaxed">
+        I wanted a simple but non-trivial project that would need to be implemented in two sessions to take some
+        measurements of clock time, tokens but mostly quality. In my own use during development of Lavra, I found the
+        quality of my output gradually increasing as I tuned the workflow.</p>
+      <br />
+      <p class="text-[1.0625rem] text-text-muted leading-relaxed">
+        So the test is to prompt with just Claude with Sonnet, and with Claude + Lavra with Sonnet. I needed two
+        separate sessions because part of Lavra's value comes from compounding knowledge for projects that people want
+        to engineer and maintain, as opposed to droves of clickbait people who post "I one-shotted this" on X.
+      </p>
+      <br />
+      <p class="text-[1.0625rem] text-text-muted leading-relaxed">
+      Lavra's main design command <strong class="text-text font-semibold">/lavra-design</strong> is meant to help people work through the problems, gray areas, business
+        value (ceo review) and engineering review with research agents in order to catch oversights and blind spots before
+        implementation. By being heavy on design (more tokens up front), implementation by agents tend to produce <strong class="text-text font-semibold">many fewer
+          problems</strong> that will bite later. Yes, it's more expensive token- and time-wise, just like regular software projects.
+      </p>
+      <br />
+      <p class="text-[1.0625rem] text-text-muted leading-relaxed">
+        So I had the prompts and the tests. Both conditions achieved <strong class="text-text font-semibold">perfect test scores</strong>. The quantitative metrics alone don't tell the full story.
+        Raw Claude Code was faster and cheaper at the narrow task of making tests pass. But the real value of Lavra emerges
+        in the <span class="text-accent font-medium">qualitative analysis</span> like security practices, architectural decisions, and compounded knowledge.
+        The treatment produced code that was <strong class="text-text font-semibold">more secure</strong>, <strong class="text-text font-semibold">better structured</strong>, and left behind
+        <span class="text-accent font-medium">9 knowledge entries</span> that reduce the cost of every future session.
+      </p>
+    </div>
+  </section>
+
+  {/* Charts */}
+  <section class="py-20 border-b border-border" data-reveal>
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl font-bold tracking-tight mb-2">Performance Breakdown</h2>
+      <p class="text-text-muted mb-10">Session-by-session comparison of time, cost, and token usage, if this was being paid by API calls. For subscription plans, this is almost never a concern.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-surface border border-border rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-1">Wall Time</h3>
+          <p class="text-sm text-text-dim mb-4">Seconds per session</p>
+          <Image src={wallTime} alt="Wall time comparison chart" class="w-full" />
+        </div>
+        <div class="bg-surface border border-border rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-1">Cost</h3>
+          <p class="text-sm text-text-dim mb-4">USD per session (work only)</p>
+          <Image src={cost} alt="Cost comparison chart" class="w-full" />
+          <p class="mt-4 text-sm text-text-dim italic py-2 px-3 bg-amber-500/5 border-l-2 border-amber-500 rounded-r-lg">
+          Higher design costs come from thorough research and review in this phase. If this is a concern, my suggestion is to avoid the main /lavra-design command
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-surface border border-border rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-1">Output Tokens</h3>
+          <p class="text-sm text-text-dim mb-4">Tokens generated per session</p>
+          <Image src={outputTokens} alt="Output tokens comparison chart" class="w-full" />
+        </div>
+        <div class="bg-surface border border-border rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-1">Tests Passing</h3>
+          <p class="text-sm text-text-dim mb-4">Out of 20 per session</p>
+          <Image src={testsPassing} alt="Tests passing comparison chart" class="w-full" />
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <div class="bg-surface border border-border rounded-2xl p-6">
+          <h3 class="text-lg font-semibold mb-1">Functional Scores</h3>
+          <p class="text-sm text-text-dim mb-4">Score out of 60 per session</p>
+          <div class="flex justify-center">
+            <Image src={functionalScores} alt="Functional scores comparison" class="max-w-md w-full" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Security Findings */}
+  <section class="py-20 border-b border-border" data-reveal>
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl font-bold tracking-tight mb-2">Security Findings</h2>
+      <p class="text-text-muted mb-10">The qualitative difference. Lavra's design phase produced meaningfully more secure code.</p>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-separate border-spacing-0">
+          <thead>
+            <tr>
+              <th class="text-left p-3 text-xs font-semibold uppercase tracking-wider text-text-dim border-b border-border-light bg-surface rounded-tl-lg">Finding</th>
+              <th class="text-left p-3 text-xs font-semibold uppercase tracking-wider text-text-dim border-b border-border-light bg-surface">Control</th>
+              <th class="text-left p-3 text-xs font-semibold uppercase tracking-wider text-text-dim border-b border-border-light bg-surface rounded-tr-lg">Treatment (Lavra)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              { finding: 'Timing attack on login', control: 'Vulnerable -- short-circuits on null user', lavra: 'Protected -- DUMMY_HASH constant-time comparison' },
+              { finding: 'JWT key separation', control: 'Single shared SECRET_KEY', lavra: 'Separate ACCESS_SECRET_KEY + REFRESH_SECRET_KEY' },
+              { finding: 'JWT library', control: 'python-jose (unmaintained, known CVEs)', lavra: 'PyJWT (actively maintained)' },
+              { finding: 'Token type claims', control: 'Only on refresh tokens', lavra: 'Both access and refresh tokens' },
+              { finding: 'Refresh token rotation', control: 'Returns new access token only', lavra: 'Full rotation -- revokes old, issues new pair' },
+              { finding: 'Active user check', control: 'Missing -- disabled users keep access', lavra: 'Enforced in get_current_user' },
+              { finding: 'UUID path validation', control: 'String type -- any input hits DB', lavra: 'uuid.UUID type -- malformed returns 422' },
+              { finding: 'DB initialization', control: 'No lifespan handler', lavra: 'Proper lifespan with create_all + dispose' },
+            ].map((row, i) => (
+              <tr class={i % 2 === 1 ? 'bg-surface/50' : ''}>
+                <td class="p-3 font-semibold text-text border-b border-border whitespace-nowrap">{row.finding}</td>
+                <td class="p-3 text-text-muted border-b border-border">
+                  <span class="inline-flex items-center gap-1.5">
+                    <span class="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full bg-red-900/40 text-red-500 text-[0.6875rem] font-bold shrink-0">&times;</span>
+                    {row.control}
+                  </span>
+                </td>
+                <td class="p-3 text-accent border-b border-border">
+                  <span class="inline-flex items-center gap-1.5">
+                    <span class="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full bg-accent-dim text-accent text-[0.6875rem] font-bold shrink-0">&check;</span>
+                    {row.lavra}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  {/* Architecture Comparison */}
+  <section class="py-20 border-b border-border" data-reveal>
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl font-bold tracking-tight mb-2">Architecture Comparison</h2>
+      <p class="text-text-muted mb-10">File structure and separation of concerns</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-surface border border-border rounded-2xl p-6">
+          <h3 class="text-[0.9375rem] font-semibold flex items-center gap-2 mb-4">
+            Control
+            <span class="text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-500/15 text-text-dim border border-zinc-500/25">Baseline</span>
+          </h3>
+          <div class="font-mono text-sm leading-loose text-text-muted">
+            <p class="text-text-dim font-semibold">app/</p>
+            <p class="pl-5">main.py, config.py, database.py</p>
+            <p class="pl-5 text-text-dim font-semibold">dependencies/</p>
+            <p class="pl-10">auth.py <span class="text-text-dim italic text-xs">-- roles mixed in</span></p>
+            <p class="pl-5 text-text-dim font-semibold">models/</p>
+            <p class="pl-10">user.py <span class="text-text-dim italic text-xs">-- User + RevokedToken together</span></p>
+            <p class="pl-5 text-text-dim font-semibold">routers/</p>
+            <p class="pl-10">auth.py <span class="text-text-dim italic text-xs">-- security logic mixed with routes</span></p>
+            <p class="pl-5 text-text-dim font-semibold">schemas/</p>
+            <p class="pl-10">auth.py, admin.py, item.py</p>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-accent/20 rounded-2xl p-6">
+          <h3 class="text-[0.9375rem] font-semibold flex items-center gap-2 mb-4">
+            Treatment
+            <span class="text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">Lavra</span>
+          </h3>
+          <div class="font-mono text-sm leading-loose text-text-muted">
+            <p class="text-text-dim font-semibold">app/</p>
+            <p class="pl-5">main.py, config.py, database.py</p>
+            <p class="pl-5 text-accent font-medium">security.py <span class="text-text-dim italic text-xs">-- centralized JWT + password logic</span></p>
+            <p class="pl-5 text-text-dim font-semibold">dependencies/</p>
+            <p class="pl-10 text-accent font-medium">auth.py, roles.py <span class="text-text-dim italic text-xs">-- separated</span></p>
+            <p class="pl-5 text-text-dim font-semibold">models/</p>
+            <p class="pl-10 text-accent font-medium">user.py, revoked_token.py, item.py <span class="text-text-dim italic text-xs">-- one model per file</span></p>
+            <p class="pl-5 text-text-dim font-semibold">routers/</p>
+            <p class="pl-10">auth.py, admin.py, items.py</p>
+            <p class="pl-5 text-text-dim font-semibold">schemas/</p>
+            <p class="pl-10">auth.py</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Knowledge Transfer */}
+  <section class="py-20 border-b border-border" data-reveal>
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl font-bold tracking-tight mb-2">Knowledge Captured</h2>
+      <p class="text-text-muted mb-10">9 entries extracted during Lavra work sessions that will be reused in future sessions. Zero from the control.</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[
+          { type: 'PATTERN', color: 'bg-accent/10 text-emerald-400 border-accent/20', title: 'DUMMY_HASH for timing attack prevention', desc: 'Pre-compute a DUMMY_HASH at module load. When a user is not found, verify against the dummy hash to prevent timing-based user enumeration.' },
+          { type: 'LEARNED', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20', title: 'StaticPool + check_same_thread=False', desc: 'SQLite testing with async requires StaticPool and check_same_thread=False to share a single in-memory database across threads.' },
+          { type: 'LEARNED', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20', title: 'String(36) vs Uuid(as_uuid=True)', desc: "SQLite doesn't support native UUID columns. Use String(36) for portability, not Uuid(as_uuid=True) which fails on SQLite." },
+          { type: 'FACT', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20', title: 'PyJWT encode returns str, not bytes', desc: 'Unlike python-jose, jwt.encode() in PyJWT returns a string directly. No need to call .decode() on the result.' },
+          { type: 'PATTERN', color: 'bg-accent/10 text-emerald-400 border-accent/20', title: 'Response(status_code=204) for no-body endpoints', desc: "FastAPI's status_code=204 on the decorator still sends an empty body. Return Response(status_code=204) explicitly for a proper no-content response." },
+          { type: 'DECISION', color: 'bg-purple-500/10 text-purple-400 border-purple-500/20', title: 'Refresh token rotation + deferred scope', desc: 'Chose full rotation on refresh (revoke old token, issue new pair). Deferred scope-based token claims to a future session to keep the first implementation clean.' },
+          { type: 'LEARNED', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20', title: 'Separate JWT signing keys', desc: 'Access and refresh tokens should use different signing keys so a compromised access token cannot forge a refresh token, and vice versa.' },
+          { type: 'FACT', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20', title: 'Lifespan context manager for DB init', desc: "FastAPI's lifespan parameter replaces deprecated on_startup/on_shutdown. Use an async context manager for clean resource management." },
+          { type: 'PATTERN', color: 'bg-accent/10 text-emerald-400 border-accent/20', title: 'Active user enforcement in dependency', desc: 'Check is_active in the auth dependency, not in individual routes. Ensures deactivated users are immediately locked out across all endpoints.' },
+        ].map((card) => (
+          <div class="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-2.5">
+            <span class={`text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border w-fit ${card.color}`}>{card.type}</span>
+            <h4 class="text-sm font-semibold text-text leading-snug">{card.title}</h4>
+            <p class="text-[0.8125rem] text-text-muted leading-relaxed">{card.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* Methodology */}
+  <section class="py-20 border-b border-border" data-reveal>
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl font-bold tracking-tight mb-2">Methodology</h2>
+      <p class="text-text-muted mb-10">How the benchmark was structured and executed</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-surface border border-border rounded-2xl p-5">
+          <h3 class="text-sm font-semibold mb-2">Test Design</h3>
+          <ul class="text-[0.8125rem] text-text-muted leading-relaxed space-y-1">
+            <li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-border-light before:rounded-full">Same spec and test suite for both conditions</li>
+            <li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-border-light before:rounded-full">20 tests per session, 2 sessions = 40 total</li>
+            <li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-border-light before:rounded-full">Session 2 builds on Session 1 (RBAC extends auth)</li>
+          </ul>
+        </div>
+        <div class="bg-surface border border-border rounded-2xl p-5">
+          <h3 class="text-sm font-semibold mb-2">Control Condition</h3>
+          <ul class="text-[0.8125rem] text-text-muted leading-relaxed space-y-1">
+            <li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-border-light before:rounded-full">Raw <code class="text-accent text-xs bg-white/5 px-1 rounded">claude -p</code> with the spec pasted directly</li>
+            <li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-border-light before:rounded-full">No planning framework or design phase</li>
+            <li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-border-light before:rounded-full">No knowledge accumulation between sessions</li>
+          </ul>
+        </div>
+        <div class="bg-surface border border-border rounded-2xl p-5">
+          <h3 class="text-sm font-semibold mb-2">Treatment Condition</h3>
+          <ul class="text-[0.8125rem] text-text-muted leading-relaxed space-y-1">
+            <li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-border-light before:rounded-full">Pre-designed beads via <code class="text-accent text-xs bg-white/5 px-1 rounded">/lavra-design</code></li>
+            <li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-border-light before:rounded-full">Executed with <code class="text-accent text-xs bg-white/5 px-1 rounded">/lavra-work</code></li>
+            <li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-border-light before:rounded-full">Session 2 designed after Session 1 work (knowledge available)</li>
+          </ul>
+        </div>
+        <div class="bg-surface border border-border rounded-2xl p-5">
+          <h3 class="text-sm font-semibold mb-2">Environment</h3>
+          <ul class="text-[0.8125rem] text-text-muted leading-relaxed space-y-1">
+            <li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-border-light before:rounded-full">Model: Claude Sonnet 4.6 for both conditions</li>
+            <li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-border-light before:rounded-full">Platform: macOS, identical machine</li>
+            <li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-border-light before:rounded-full">Isolated working directories per condition</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Prompts */}
+  <section class="py-20 border-b border-border" data-reveal>
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl font-bold tracking-tight mb-2">Prompts Used</h2>
+      <p class="text-text-muted mb-10">The exact prompts passed to <code class="text-accent text-sm bg-white/5 px-1.5 py-0.5 rounded">claude -p</code> in each condition</p>
+
+      <div class="space-y-8">
+
+        {/* Session 1 Prompts */}
+        <div>
+          <h3 class="text-xl font-bold mb-6">Session 1: Authentication</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div class="bg-surface border border-border rounded-2xl overflow-hidden">
+              <div class="flex items-center gap-2 px-4 py-3 border-b border-border bg-surface">
+                <span class="text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-500/15 text-text-dim border border-zinc-500/25">Control</span>
+                <span class="text-xs text-text-dim">Session 1 prompt</span>
+              </div>
+              <pre class="p-4 text-[0.8125rem] text-text-muted leading-relaxed overflow-x-auto font-mono"><code>You are implementing a FastAPI REST API.
+Read the spec below and implement it completely.
+Do NOT read or modify files in the tests/ directory
+-- those are the automated spec checker and must
+not be changed.
+
+After implementation, run:
+  uv pip install -e '.[dev]' &amp;&amp;
+  pytest tests/test_session1_auth.py -v
+
+If any tests fail, fix the implementation until
+all 20 tests pass. Do NOT modify the tests.
+
+Here is the spec:
+
+$SPEC1</code></pre>
+            </div>
+
+            <div class="bg-surface border border-accent/20 rounded-2xl overflow-hidden">
+              <div class="flex items-center gap-2 px-4 py-3 border-b border-border bg-surface">
+                <span class="text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">Lavra</span>
+                <span class="text-xs text-text-dim">Session 1 prompt</span>
+              </div>
+              <pre class="p-4 text-[0.8125rem] text-text-muted leading-relaxed overflow-x-auto font-mono"><code>/lavra-work
+
+Implement all beads. After implementation, run:
+  uv pip install -e '.[dev]' &amp;&amp;
+  pytest tests/test_session1_auth.py -v
+
+If any tests fail, fix the implementation until
+all 20 tests pass. Do NOT read or modify files
+in the tests/ directory.
+
+CRITICAL: Before closing each bead, you MUST log
+at least one knowledge comment using:
+  bd comments add &lt;BEAD_ID&gt;
+    "LEARNED: &lt;what you discovered&gt;"
+
+Use prefixes:
+  LEARNED:, DECISION:, FACT:, PATTERN:, DEVIATION:
+
+Do NOT close any bead until you have logged at
+least one comment on it.</code></pre>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Session 2 Prompts */}
+        <div>
+          <h3 class="text-xl font-bold mb-6">Session 2: RBAC</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div class="bg-surface border border-border rounded-2xl overflow-hidden">
+              <div class="flex items-center gap-2 px-4 py-3 border-b border-border bg-surface">
+                <span class="text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-500/15 text-text-dim border border-zinc-500/25">Control</span>
+                <span class="text-xs text-text-dim">Session 2 prompt</span>
+              </div>
+              <pre class="p-4 text-[0.8125rem] text-text-muted leading-relaxed overflow-x-auto font-mono"><code>You are extending an existing FastAPI REST API with
+role-based access control. The auth system from
+Session 1 is already implemented in this project.
+Read the existing code first, then implement the
+spec below.
+
+Do NOT read or modify files in the tests/ directory.
+
+After implementation, run:
+  uv pip install -e '.[dev]' &amp;&amp;
+  pytest tests/test_session2_rbac.py -v
+
+If any tests fail, fix the implementation until
+all 20 tests pass. Do NOT modify the tests.
+
+Here is the spec:
+
+$SPEC2</code></pre>
+            </div>
+
+            <div class="bg-surface border border-accent/20 rounded-2xl overflow-hidden">
+              <div class="flex items-center gap-2 px-4 py-3 border-b border-border bg-surface">
+                <span class="text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">Lavra</span>
+                <span class="text-xs text-text-dim">Session 2 prompt</span>
+              </div>
+              <pre class="p-4 text-[0.8125rem] text-text-muted leading-relaxed overflow-x-auto font-mono"><code>/lavra-work
+
+Implement all beads. After implementation, run:
+  uv pip install -e '.[dev]' &amp;&amp;
+  pytest tests/test_session2_rbac.py -v
+
+If any tests fail, fix the implementation until
+all 20 tests pass. Do NOT read or modify files
+in the tests/ directory.
+
+CRITICAL: Before closing each bead, you MUST log
+at least one knowledge comment using:
+  bd comments add &lt;BEAD_ID&gt;
+    "LEARNED: &lt;what you discovered&gt;"
+
+Use prefixes:
+  LEARNED:, DECISION:, FACT:, PATTERN:, DEVIATION:
+
+Do NOT close any bead until you have logged at
+least one comment on it.</code></pre>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  {/* Footer meta */}
+  <section class="py-10 text-center" data-reveal>
+    <div class="max-w-5xl mx-auto px-6">
+      <p class="text-xs text-text-dim font-mono">
+        Generated from lavra-test benchmark suite<br />
+        Run ID: control-20260317-220850 vs lavra-20260318-080234
+      </p>
+    </div>
+  </section>
+
+  <Footer />
+</Base>

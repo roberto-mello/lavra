@@ -1,0 +1,92 @@
+---
+import '@fontsource/geist-sans/400.css';
+import '@fontsource/geist-sans/700.css';
+import '@fontsource/geist-sans/900.css';
+import '@fontsource/geist-mono/400.css';
+import '@fontsource/geist-mono/700.css';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Multi-agent workflow engine for Claude Code, OpenCode, Gemini CLI, and Cortex Code' } = Astro.props;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Lavra',
+  description,
+  url: 'https://lavra.dev',
+  applicationCategory: 'DeveloperApplication',
+  applicationSubCategory: 'CommandLineApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  offers: { '@type': 'Offer', price: '0' },
+};
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title} | lavra</title>
+  <meta name="description" content={description}>
+  <link rel="canonical" href="https://lavra.dev">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <!-- Security headers (GitHub Pages cannot set response headers) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-src 'self'; object-src 'none'; base-uri 'self';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={`${title} | lavra`}>
+  <meta property="og:description" content={description}>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://lavra.dev">
+  <meta property="og:site_name" content="Lavra">
+  <meta property="og:image" content="https://lavra.dev/images/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content={`${title} | lavra`}>
+  <meta name="twitter:description" content={description}>
+  <meta name="twitter:image" content="https://lavra.dev/images/og-image.png">
+
+  <!-- Structured data -->
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+  <noscript>
+    <style>
+      [data-reveal] { opacity: 1 !important; transform: none !important; }
+    </style>
+  </noscript>
+</head>
+<body class="bg-bg text-text font-sans antialiased">
+  <Nav />
+  <slot />
+
+  <script>
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('revealed');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0, rootMargin: '0px 0px -80px 0px' }
+      );
+      document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el));
+    } else {
+      document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('revealed'));
+    }
+  </script>
+</body>
+</html>

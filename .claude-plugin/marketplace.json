@@ -1,19 +1,19 @@
 {
-  "name": "beads-compound-marketplace",
+  "name": "lavra-marketplace",
   "owner": {
     "name": "Roberto Mello",
     "email": "roberto.mello@gmail.com"
   },
   "metadata": {
-    "description": "Beads-based persistent memory with multi-agent workflows",
+    "description": "Compound engineering with persistent memory and multi-agent workflows based on beads",
     "version": "1.0.0"
   },
   "plugins": [
     {
-      "name": "beads-compound",
-      "source": "./plugins/beads-compound",
-      "description": "29 specialized agents, 29 commands, 16 skills, persistent memory with auto-recall",
-      "version": "0.6.8",
+      "name": "lavra",
+      "source": "./plugins/lavra",
+      "description": "30 specialized agents, 28 commands, 15 skills, persistent memory with auto-recall",
+      "version": "0.7.0",
       "tags": [
         "beads",
         "memory",

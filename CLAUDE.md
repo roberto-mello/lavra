@@ -4,22 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code plugin marketplace that provides beads-based persistent memory with compound-engineering's multi-agent workflows. The primary plugin is `beads-compound`, located at `plugins/beads-compound/`.
+This is a Claude Code plugin marketplace that provides beads-based persistent memory with compound-engineering's multi-agent workflows. The primary plugin is `lavra`, located at `plugins/lavra/`.
 
 The plugin provides:
-- 29 specialized agents (15 review, 5 research, 3 design, 5 workflow, 1 docs)
-- 29 commands for brainstorming, planning, design, review, testing, and more
-- 16 skills (git-worktree, brainstorming, create-agent-skills, agent-browser, dhh-rails-style, etc.)
-- 3 hooks for automatic knowledge capture, recall, and subagent wrapup
+- Specialized agents across review, research, design, workflow, and docs categories
+- Core commands + optional domain-specific commands (in commands/optional/)
+- Skills (core + optional: git-worktree, brainstorming, create-agent-skills, agent-browser, dhh-rails-style, etc.)
+- 4 hooks (auto-recall, memory-capture, subagent-wrapup, teammate-idle-check)
 - 1 MCP server (Context7 for framework documentation)
-- Automatic knowledge capture from beads comments (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION)
+- Automatic knowledge capture from beads comments (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION/DEVIATION)
 - Automatic knowledge recall at session start based on current beads
+- Workflow configuration via `.lavra/config/lavra.json` (toggle research, review, goal verification, parallelism)
 
 ## Multi-Platform Support
 
-beads-compound supports OpenCode and Gemini CLI in addition to Claude Code:
+lavra supports OpenCode and Gemini CLI in addition to Claude Code:
 
-**OpenCode:** Core memory system via native TypeScript plugin at `plugins/beads-compound/opencode/plugin.ts`. Commands/agents/skills are Claude Code-specific. OpenCode reads `AGENTS.md`.
+**OpenCode:** Core memory system via native TypeScript plugin at `plugins/lavra/opencode/plugin.ts`. Commands/agents/skills are Claude Code-specific. OpenCode reads `AGENTS.md`.
 
 **Gemini CLI:** Full hook compatibility via `gemini-extension.json` manifest. Uses same stdin/stdout JSON protocol as Claude Code.
 
@@ -28,17 +29,17 @@ See README.md for detailed setup instructions.
 ## Repository Structure
 
 ```
-beads-compound-plugin/              # Marketplace root
+lavra/                              # Marketplace root
 ├── .claude-plugin/
 │   └── marketplace.json            # Marketplace catalog
 ├── plugins/
-│   └── beads-compound/             # Plugin root
+│   └── lavra/                      # Plugin root
 │       ├── .claude-plugin/
-│       │   └── plugin.json         # Plugin manifest (v0.6.0)
-│       ├── agents/                 # 29 agents (review/, research/, design/, workflow/, docs/)
-│       ├── commands/               # 29 commands
-│       ├── skills/                 # 16 skills with supporting files
-│       ├── hooks/                  # hooks.json, auto-recall.sh, memory-capture.sh, subagent-wrapup.sh, recall.sh
+│       │   └── plugin.json         # Plugin manifest (v0.7.0)
+│       ├── agents/                 # agents (review/, research/, design/, workflow/, docs/)
+│       ├── commands/               # core commands + optional/
+│       ├── skills/                 # skills (core + optional) with supporting files
+│       ├── hooks/                  # hooks.json, auto-recall.sh, memory-capture.sh, subagent-wrapup.sh, teammate-idle-check.sh, recall.sh
 │       ├── opencode/               # OpenCode TypeScript plugin
 │       ├── gemini/                 # Gemini CLI hook configuration
 │       ├── gemini-extension.json   # Gemini extension manifest
@@ -55,8 +56,8 @@ beads-compound-plugin/              # Marketplace root
 ### Native Plugin System (not done yet)
 
 ```bash
-/plugin marketplace add https://github.com/roberto-mello/beads-compound-plugin
-/plugin install beads-compound
+/plugin marketplace add https://github.com/roberto-mello/lavra
+/plugin install lavra
 ```
 
 ### Manual Install
@@ -66,12 +67,12 @@ beads-compound-plugin/              # Marketplace root
 ./install.sh /path/to/target-project
 
 # Or from target project
-bash /path/to/beads-compound-plugin/install.sh
+bash /path/to/lavra/install.sh
 ```
 
 **IMPORTANT**: The installer will fail if you try to install into the plugin directory itself. Always install into a separate target project.
 
-The installer copies from `plugins/beads-compound/` into the target's `.claude/` directory:
+The installer copies from `plugins/lavra/` into the target's `.claude/` directory:
 - `hooks/` -> `.claude/hooks/`
 - `commands/` -> `.claude/commands/`
 - `agents/` -> `.claude/agents/`
@@ -91,7 +92,7 @@ The installer copies from `plugins/beads-compound/` into the target's `.claude/`
 ```bash
 mkdir -p /tmp/test-project && cd /tmp/test-project
 git init && bd init --no-daemon
-bash ~/Documents/projects/beads-compound-plugin/install.sh
+bash ~/Documents/projects/lavra/install.sh
 
 # Verify
 ls -la .claude/hooks/
@@ -103,7 +104,7 @@ cat .claude/settings.json | jq .
 
 **Test uninstaller:**
 ```bash
-bash ~/Documents/projects/beads-compound-plugin/uninstall.sh /tmp/test-project
+bash ~/Documents/projects/lavra/uninstall.sh /tmp/test-project
 ```
 
 **Test hook format:**

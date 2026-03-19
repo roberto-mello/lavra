@@ -1,7 +1,7 @@
 {
-  "name": "beads-compound-converters",
+  "name": "lavra-converters",
   "version": "0.6.0",
-  "description": "Conversion scripts for beads-compound multi-platform support",
+  "description": "Conversion scripts for lavra multi-platform support",
   "type": "module",
   "scripts": {
     "convert:opencode": "bun run convert-opencode.ts",

@@ -41,6 +41,7 @@ const FLAG = {
   claude: args.includes("--claude"),
   opencode: args.includes("--opencode"),
   gemini: args.includes("--gemini"),
+  cortex: args.includes("--cortex"),
   global: args.includes("--global"),
   local: args.includes("--local"),
   uninstall: args.includes("--uninstall"),
@@ -57,26 +58,24 @@ const TARGET_PATH = _positional ? path.resolve(_positional) : null;
 // ---------------------------------------------------------------------------
 
 function banner() {
-  console.log("");
-  console.log(`  beads-compound v${VERSION}`);
-  console.log("  Persistent memory + multi-agent workflows");
-  console.log("");
+  // ASCII art banner is printed by install.sh via shared-functions.sh print_banner()
 }
 
 function usage() {
   banner();
   console.log("  Usage:");
-  console.log("    npx beads-compound@latest                Interactive installer");
-  console.log("    npx beads-compound@latest --claude       Claude Code (local project)");
-  console.log("    npx beads-compound@latest --opencode     OpenCode (local project)");
-  console.log("    npx beads-compound@latest --gemini       Gemini CLI (local project)");
-  console.log("    npx beads-compound@latest --global       Install globally (~/.claude/)");
-  console.log("    npx beads-compound@latest --uninstall    Uninstall from current project");
-  console.log("    npx beads-compound@latest --yes          Skip confirmation prompts");
+  console.log("    npx @lavralabs/lavra@latest                Interactive installer");
+  console.log("    npx @lavralabs/lavra@latest --claude       Claude Code (local project)");
+  console.log("    npx @lavralabs/lavra@latest --opencode     OpenCode (local project)");
+  console.log("    npx @lavralabs/lavra@latest --gemini       Gemini CLI (local project)");
+  console.log("    npx @lavralabs/lavra@latest --cortex       Cortex Code (local project)");
+  console.log("    npx @lavralabs/lavra@latest --global       Install globally (~/.claude/)");
+  console.log("    npx @lavralabs/lavra@latest --uninstall    Uninstall from current project");
+  console.log("    npx @lavralabs/lavra@latest --yes          Skip confirmation prompts");
   console.log("");
   console.log("  Flags can be combined:");
-  console.log("    npx beads-compound@latest --opencode --yes");
-  console.log("    npx beads-compound@latest --claude --global");
+  console.log("    npx @lavralabs/lavra@latest --opencode --yes");
+  console.log("    npx @lavralabs/lavra@latest --claude --global");
   console.log("");
 }
 
@@ -121,6 +120,7 @@ async function promptRuntime(rl) {
   console.log("  1. Claude Code");
   console.log("  2. OpenCode");
   console.log("  3. Gemini CLI");
+  console.log("  4. Cortex Code");
   console.log("");
 
   while (true) {
@@ -129,8 +129,9 @@ async function promptRuntime(rl) {
       case "1": return "claude";
       case "2": return "opencode";
       case "3": return "gemini";
+      case "4": return "cortex";
       default:
-        console.log("  Please enter 1, 2, or 3.");
+        console.log("  Please enter 1, 2, 3, or 4.");
     }
   }
 }
@@ -201,6 +202,7 @@ function buildInstallArgs(runtime, scope) {
   // Runtime flag
   if (runtime === "opencode") scriptArgs.push("-opencode");
   if (runtime === "gemini") scriptArgs.push("-gemini");
+  if (runtime === "cortex") scriptArgs.push("-cortex");
   // Claude Code is the default — no flag needed
 
   // --yes passthrough
@@ -233,7 +235,7 @@ async function main() {
   if (FLAG.uninstall) {
     ensureScript(UNINSTALL_SH, "uninstall.sh");
     const target = TARGET_PATH || process.cwd();
-    console.log(`  Uninstalling beads-compound from ${target}...\n`);
+    console.log(`  Uninstalling lavra from ${target}...\n`);
     try {
       await runScript(UNINSTALL_SH, [target]);
       console.log("\n  Uninstall complete.\n");
@@ -247,14 +249,15 @@ async function main() {
 
   // Determine runtime
   let runtime;
-  const runtimeFlags = [FLAG.claude, FLAG.opencode, FLAG.gemini].filter(Boolean).length;
+  const runtimeFlags = [FLAG.claude, FLAG.opencode, FLAG.gemini, FLAG.cortex].filter(Boolean).length;
   if (runtimeFlags > 1) {
-    die("Specify only one runtime: --claude, --opencode, or --gemini");
+    die("Specify only one runtime: --claude, --opencode, --gemini, or --cortex");
   }
 
   if (FLAG.claude) runtime = "claude";
   else if (FLAG.opencode) runtime = "opencode";
   else if (FLAG.gemini) runtime = "gemini";
+  else if (FLAG.cortex) runtime = "cortex";
 
   // Determine scope
   let scope;
@@ -289,14 +292,13 @@ async function main() {
     claude: "Claude Code",
     opencode: "OpenCode",
     gemini: "Gemini CLI",
+    cortex: "Cortex Code",
   }[runtime];
   const scopeLabel = scope === "global" ? "globally" : "in current project";
 
-  console.log(`  Installing beads-compound for ${runtimeLabel} ${scopeLabel}...\n`);
-
   try {
     await runScript(INSTALL_SH, scriptArgs);
-    console.log("\n  Done!\n");
+    console.log("");
   } catch (err) {
     die(err.message);
   }

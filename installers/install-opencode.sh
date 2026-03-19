@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# Install beads-compound plugin for OpenCode
+# Install lavra plugin for OpenCode
 #
 # What this installs:
 #   - TypeScript plugin (plugin.ts) for hook integration
 #   - Memory capture and auto-recall hooks
-#   - Knowledge store (.beads/memory/knowledge.jsonl)
+#   - Knowledge store (.lavra/memory/knowledge.jsonl)
 #   - Converted commands, agents, and skills
 #   - MCP server configuration documentation
 #
@@ -25,7 +25,7 @@ else
   SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
-PLUGIN_DIR="$SCRIPT_DIR/plugins/beads-compound"
+PLUGIN_DIR="$SCRIPT_DIR/plugins/lavra"
 
 # Source shared functions
 # Use BASH_SOURCE to get the correct path when sourced
@@ -55,13 +55,12 @@ fi
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
 
-echo "beads-compound OpenCode Installer"
-echo ""
-echo "Target: $TARGET"
+print_banner "OpenCode" "0.7.0"
+echo "  Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
-  echo "Type: Global installation"
+  echo "  Type: Global installation"
 else
-  echo "Type: Project-specific installation"
+  echo "  Type: Project-specific installation"
 fi
 echo ""
 
@@ -81,8 +80,8 @@ if [[ "$TARGET_OWNER" != "$USER" ]]; then
   exit 1
 fi
 
-# Step 1: Model selection (interactive unless --yes)
-if [ "$AUTO_YES" = false ] && command -v opencode &>/dev/null; then
+# Step 1: Model selection (interactive unless --yes or non-interactive)
+if [ "$AUTO_YES" = false ] && [[ -t 0 ]] && command -v opencode &>/dev/null; then
   echo "[1/6] Model selection..."
   echo ""
   echo "Would you like to customize model selections for each tier?"
@@ -126,9 +125,9 @@ echo "[3/6] Installing TypeScript plugin..."
 
 # Determine plugin directory: global uses $TARGET/plugins, project uses $TARGET/.opencode/plugins
 if [ "$GLOBAL_INSTALL" = true ]; then
-  PLUGINS_DIR="$TARGET/plugins/beads-compound"
+  PLUGINS_DIR="$TARGET/plugins/lavra"
 else
-  PLUGINS_DIR="$TARGET/.opencode/plugins/beads-compound"
+  PLUGINS_DIR="$TARGET/.opencode/plugins/lavra"
 fi
 
 create_dir_with_symlink_handling "$PLUGINS_DIR"
@@ -231,6 +230,7 @@ else
   echo "[6/6] Provisioning memory system..."
 
   source "$PLUGIN_DIR/hooks/provision-memory.sh"
+  migrate_beads_to_lavra "$TARGET"
   provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
 
   echo "  - Memory system ready"
@@ -269,7 +269,7 @@ echo ""
 echo "2. The TypeScript plugin will automatically load on next OpenCode session"
 echo ""
 echo "3. Commands are available via Ctrl+K:"
-echo "   - beads-plan, beads-work, beads-review, etc."
+echo "   - lavra-plan, lavra-work, lavra-review, etc."
 echo ""
 
 if [ "$GLOBAL_INSTALL" = true ]; then
