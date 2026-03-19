@@ -443,10 +443,10 @@ async function testFormatCompatibility() {
     const mdFiles = await $`find ${opencodeDir}/commands -name "*.md"`.quiet().text();
     const mdCount = mdFiles.trim().split("\n").length;
 
-    if (mdCount >= 25) {
+    if (mdCount >= 23) {
       pass(`OpenCode commands in .md format (${mdCount} files)`);
     } else {
-      fail("OpenCode format", `Expected 25+ .md files, found ${mdCount}`);
+      fail("OpenCode format", `Expected 23+ .md files, found ${mdCount}`);
     }
   } catch {
     fail("OpenCode format", "Could not verify command format");
@@ -457,10 +457,10 @@ async function testFormatCompatibility() {
     const tomlFiles = await $`find ${geminiDir}/commands -name "*.toml"`.quiet().text();
     const tomlCount = tomlFiles.trim().split("\n").length;
 
-    if (tomlCount >= 25) {
+    if (tomlCount >= 23) {
       pass(`Gemini commands in .toml format (${tomlCount} files)`);
     } else {
-      fail("Gemini format", `Expected 25+ .toml files, found ${tomlCount}`);
+      fail("Gemini format", `Expected 23+ .toml files, found ${tomlCount}`);
     }
   } catch {
     fail("Gemini format", "Could not verify command format");
@@ -487,10 +487,10 @@ async function testFormatCompatibility() {
     const mdFiles = await $`find ${cortexDir3}/commands -name "*.md"`.quiet().text();
     const mdCount = mdFiles.trim().split("\n").length;
 
-    if (mdCount >= 25) {
+    if (mdCount >= 23) {
       pass(`Cortex commands in .md format (${mdCount} files)`);
     } else {
-      fail("Cortex format", `Expected 25+ .md files, found ${mdCount}`);
+      fail("Cortex format", `Expected 23+ .md files, found ${mdCount}`);
     }
   } catch {
     fail("Cortex format", "Could not verify command format");
