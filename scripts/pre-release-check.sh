@@ -159,6 +159,14 @@ if [[ "$GHOST_COUNT" -eq 0 && "$MISSING_COUNT" -eq 0 ]]; then
 fi
 
 echo ""
+echo "=== Sanitizer sync ==="
+# Verify the wrapper in scripts/ delegates to the canonical hooks/ version
+# (no inline fallback that could drift from sanitize-content.sh)
+check "extract-bead-context.sh in hooks/ (canonical)" test -f plugins/lavra/hooks/extract-bead-context.sh
+check "scripts/extract-bead-context.sh is a thin wrapper (no inline fallback)" \
+  bash -c '! grep -q "sanitize_untrusted_content()" scripts/extract-bead-context.sh'
+
+echo ""
 echo "=== Compatibility tests ==="
 (cd scripts && bun run test-compatibility.ts) && { echo "  PASS  Compatibility tests"; ((PASS++)) || true; } || fail "Compatibility tests" "see output above"
 
