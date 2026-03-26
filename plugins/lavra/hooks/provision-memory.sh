@@ -80,7 +80,8 @@ EOF
   "workflow": {
     "research": true,
     "plan_review": true,
-    "goal_verification": true
+    "goal_verification": true,
+    "testing_scope": "full"
   },
   "execution": {
     "max_parallel_agents": 3,

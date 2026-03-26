@@ -32,25 +32,9 @@ PLUGIN_DIR="$SCRIPT_DIR/plugins/lavra"
 INSTALLER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$INSTALLER_DIR/shared-functions.sh"
 
-# Parse --yes/-y flag (skip confirmation prompts)
-AUTO_YES=false
-POSITIONAL_ARGS=()
-
-for arg in "$@"; do
-  case "$arg" in
-    --yes|-y) AUTO_YES=true ;;
-    *) POSITIONAL_ARGS+=("$arg") ;;
-  esac
-done
-
-# Default to ~/.config/opencode if no positional argument provided
-if [ ${#POSITIONAL_ARGS[@]} -eq 0 ]; then
-  TARGET="$HOME/.config/opencode"
-  GLOBAL_INSTALL=true
-else
-  TARGET="${POSITIONAL_ARGS[0]}"
-  GLOBAL_INSTALL=false
-fi
+LAVRA_GLOBAL_DEFAULT="$HOME/.config/opencode"
+LAVRA_HOOKS_ARE_GLOBAL=false
+eval "$(parse_installer_args "$@")"
 
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"

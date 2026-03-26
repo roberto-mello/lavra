@@ -112,6 +112,75 @@ migrate_beads_to_lavra() {
   fi
 }
 
+# Parse common installer flags and resolve TARGET + GLOBAL_INSTALL.
+#
+# Reads from caller's environment:
+#   LAVRA_GLOBAL_DEFAULT  — platform-specific global install path (required)
+#   LAVRA_HOOKS_ARE_GLOBAL — set to "true" for platforms (e.g. Cortex) where
+#                            hooks are always installed globally and per-project
+#                            install is not meaningful. Suppresses the project-
+#                            detection question since the user can't actually
+#                            scope hooks to a single project on those platforms.
+#
+# Sets in caller's scope (use eval):
+#   AUTO_YES, QUIET, GLOBAL_INSTALL, TARGET
+#
+# Usage:
+#   LAVRA_GLOBAL_DEFAULT="$HOME/.claude"
+#   LAVRA_HOOKS_ARE_GLOBAL=false
+#   eval "$(parse_installer_args "$@")"
+parse_installer_args() {
+  local auto_yes=false
+  local quiet=false
+  local positional=()
+
+  for arg in "$@"; do
+    case "$arg" in
+      --yes|-y) auto_yes=true ;;
+      --quiet|-q) quiet=true ;;
+      *) positional+=("$arg") ;;
+    esac
+  done
+
+  local global_install=true
+  local target="${LAVRA_GLOBAL_DEFAULT}"
+
+  if [ ${#positional[@]} -gt 0 ]; then
+    target="${positional[0]}"
+    global_install=false
+  elif [ "${LAVRA_HOOKS_ARE_GLOBAL:-false}" != "true" ] \
+    && [ "$auto_yes" = false ] && [ "$quiet" = false ] && [ -t 0 ]; then
+    # No explicit path given, running interactively, and per-project install
+    # is supported on this platform. Check if the user is standing in a project
+    # directory — if so, global is probably not what they intended.
+    if [ -d "$PWD/.beads" ] || [ -d "$PWD/.git" ]; then
+      echo "  Detected a project in the current directory: $PWD"
+      echo ""
+      echo "  Install for this project only, or globally (all projects)?"
+      echo "    1) This project only  ($PWD)"
+      echo "    2) Globally           (${LAVRA_GLOBAL_DEFAULT}, then run /project-setup per project)"
+      echo ""
+      read -r -p "  Choose [1/2, default: 1]: " scope_choice
+      echo ""
+      case "$scope_choice" in
+        2)
+          # Confirmed global — keep defaults
+          ;;
+        *)
+          target="$PWD"
+          global_install=false
+          ;;
+      esac
+    fi
+  fi
+
+  # Emit variable assignments for eval in caller
+  printf 'AUTO_YES=%s\n' "$auto_yes"
+  printf 'QUIET=%s\n' "$quiet"
+  printf 'GLOBAL_INSTALL=%s\n' "$global_install"
+  printf 'TARGET=%s\n' "$(cd "$target" 2>/dev/null && pwd || echo "$target")"
+}
+
 # Resolve target directory to absolute path with error handling
 resolve_target_dir() {
   local target="$1"

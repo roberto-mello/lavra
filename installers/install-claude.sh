@@ -39,25 +39,9 @@ PLUGIN_DIR="$SCRIPT_DIR/plugins/lavra"
 INSTALLER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$INSTALLER_DIR/shared-functions.sh"
 
-# Parse --yes/-y flag (skip confirmation prompts)
-AUTO_YES=false
-POSITIONAL_ARGS=()
-
-for arg in "$@"; do
-  case "$arg" in
-    --yes|-y) AUTO_YES=true ;;
-    *) POSITIONAL_ARGS+=("$arg") ;;
-  esac
-done
-
-# Default to ~/.claude if no positional argument provided
-if [ ${#POSITIONAL_ARGS[@]} -eq 0 ]; then
-  TARGET="$HOME/.claude"
-  GLOBAL_INSTALL=true
-else
-  TARGET="${POSITIONAL_ARGS[0]}"
-  GLOBAL_INSTALL=false
-fi
+LAVRA_GLOBAL_DEFAULT="$HOME/.claude"
+LAVRA_HOOKS_ARE_GLOBAL=false
+eval "$(parse_installer_args "$@")"
 
 # Resolve target to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
@@ -96,7 +80,8 @@ echo ""
 if [ "$GLOBAL_INSTALL" = true ] && [ "$AUTO_YES" = false ]; then
   echo "[!] Note: Global install provides commands, agents, and skills everywhere,"
   echo "    but memory features (auto-recall, knowledge capture) require per-project"
-  echo "    installation. You'll be prompted automatically in projects that use beads."
+  echo "    setup. Run /project-setup once in each project to configure stack,"
+  echo "    review agents, and workflow settings."
   echo ""
   read -r -p "    Continue? [Y/n] " response
   case "$response" in
@@ -148,6 +133,14 @@ else
     migrate_beads_to_lavra "$TARGET"
     provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
     echo "  - Memory system configured"
+  fi
+
+  # Nudge toward /project-setup (skip if --yes or --quiet)
+  if [ "$AUTO_YES" = false ] && [ "$QUIET" = false ] && [ -t 0 ]; then
+    echo ""
+    echo "  Run /project-setup to configure stack, review agents, and workflow"
+    echo "  settings for this project. Takes about 1 minute."
+    echo ""
   fi
 fi
 

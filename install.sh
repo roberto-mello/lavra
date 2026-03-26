@@ -36,7 +36,8 @@ Target:
   (omit)                  Install globally to ~/.claude or platform equivalent
 
 Options:
-  -y, --yes               Skip confirmation prompts
+  -y, --yes               Skip confirmation prompts (use all defaults)
+  -q, --quiet             Suppress output and skip config walkthrough
   -h, --help              Show this help message
 
 Examples:
