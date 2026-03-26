@@ -416,3 +416,10 @@
 {"actor":"Roberto Mello","comment":null,"created_at":"2026-03-18T12:56:06Z","event_type":"closed","id":441,"issue_id":"bdcompound-63c.6","new_value":"Closed","old_value":""}
 {"actor":"Roberto Mello","comment":null,"created_at":"2026-03-18T12:56:06Z","event_type":"closed","id":442,"issue_id":"bdcompound-63c","new_value":"all steps complete","old_value":""}
 {"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T15:31:23Z","event_type":"created","id":443,"issue_id":"bdcompound-gnb","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T15:31:30Z","event_type":"created","id":444,"issue_id":"bdcompound-1na","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T15:31:36Z","event_type":"created","id":445,"issue_id":"bdcompound-jvw","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T15:31:44Z","event_type":"created","id":446,"issue_id":"bdcompound-8or","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T15:31:50Z","event_type":"created","id":447,"issue_id":"bdcompound-04f","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T15:32:00Z","event_type":"created","id":448,"issue_id":"bdcompound-wlu","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T15:33:38Z","event_type":"created","id":449,"issue_id":"bdcompound-gnb.1","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T15:33:41Z","event_type":"closed","id":450,"issue_id":"bdcompound-gnb.1","new_value":"Implemented: configure_lavra_interactive() in shared-functions.sh, wired into install-claude.sh after step 3, testing_scope added to provision-memory.sh defaults","old_value":""}

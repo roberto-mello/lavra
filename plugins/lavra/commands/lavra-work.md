@@ -77,7 +77,7 @@ Used when exactly one bead is being worked on. This is the full-quality, interac
 
    If a bead ID was provided:
    ```bash
-   bd show {BEAD_ID} --json
+   bd show {BEAD_ID} --long
    ```
 
    Read the bead description completely including:
@@ -87,6 +87,7 @@ Used when exactly one bead is being worked on. This is the full-quality, interac
    - Testing section (test cases to implement)
    - Validation section (acceptance criteria)
    - Dependencies section (blockers)
+   - Comments (INVESTIGATION/FACT/PATTERN/DECISION/LEARNED from research phase — treat as implementation constraints with the same weight as Locked Decisions)
 
    **If the bead has a parent epic**, also read the epic's decision sections:
    ```bash
@@ -642,6 +643,14 @@ Search memory once for all beads to prime context. This is separate from the Ses
 
 **The `{recall_results}` placeholder in every agent prompt template below is a required fill.** Leaving it empty or with a comment like "none" without actually running recall is a protocol violation. Subagents have no access to session-start recall -- this step is their only source of prior knowledge.
 
+**Pre-process bead context for agent prompts:**
+
+For each bead in the wave, run:
+```bash
+bash scripts/extract-bead-context.sh {BEAD_ID}
+```
+Store the output as `{BEAD_CONTEXT}` for that bead. This replaces any inline `bd show --json | jq` calls for building agent context — the script produces a clean markdown block including description and a `## Research Findings` section with knowledge-prefixed comments.
+
 **Read project config (no-op if missing):**
 
 ```bash
@@ -713,7 +722,7 @@ Filter for `relates_to` type entries. For each related bead, fetch its title and
 Work on bead {BEAD_ID}: {title}
 
 ## Bead Details
-{full bd show output}
+{BEAD_CONTEXT}
 
 ## File Ownership
 You own these files for this task. Only modify files in this list:
@@ -751,7 +760,7 @@ During implementation, you may encounter issues not described in the bead:
 
 2. Mark in progress: `bd update {BEAD_ID} --status in_progress`
 
-3. Read the bead description completely. If referencing existing code or patterns, read those files first. Follow existing conventions. Check the Decisions section: Locked = must honor, Discretion = your flexibility budget, Deferred = do NOT implement.
+3. Read the bead description completely. If referencing existing code or patterns, read those files first. Follow existing conventions. Check the Decisions section: Locked = must honor, Discretion = your flexibility budget, Deferred = do NOT implement. The `## Research Findings` section above contains INVESTIGATION/FACT/PATTERN/DECISION/LEARNED entries from the planning and research phases. Treat these as implementation constraints with the same weight as Locked Decisions.
 
 4. Implement the changes:
    - Follow existing patterns in the codebase
@@ -813,7 +822,30 @@ After each wave completes:
    ```
 4. **Run linting** if applicable
 5. **Resolve conflicts** if multiple agents touched the same files
-6. **Create per-bead atomic commits** (default) or per-wave commit (if `commit_granularity: "wave"` in lavra.json):
+6. **Goal verification** *(if `workflow.goal_verification` is true in lavra.json — skip this step entirely if false)*:
+
+   The orchestrator already has bead details in memory from Phase M1 — no extra `bd show` needed.
+
+   For each bead completed in this wave that has a `## Validation` section, dispatch goal-verifier in parallel. Add `model: opus` when `model_profile` is `"quality"`. Silently skip beads with no Validation section. Only verify beads from this wave — do not re-verify beads from previous waves.
+
+   ```
+   Task(goal-verifier, "Verify goal completion for {BEAD_ID}.
+   Validation criteria: {validation section content}.
+   What section: {what section content}.
+   Check at three levels: Exists (code artifact present),
+   Substantive (not a stub), Wired (connected to the system).")
+   -- run in parallel for all qualifying beads in the wave
+   -- add model: opus if profile=quality
+   ```
+
+   Interpret results:
+   - **CRITICAL failures** (Exists or Substantive level) → reopen the bead (`bd update {BEAD_ID} --status open`), log the failure, do NOT include that bead's changes in the commits below. Flag for re-implementation in the next wave.
+   - **WARNING** (Wired level or anti-patterns) → proceed but note in the wave summary and include in PR description.
+   - **All pass** → proceed to commits.
+
+7. **Create per-bead atomic commits** (default) or per-wave commit (if `commit_granularity: "wave"` in lavra.json):
+
+   Only commit changes for beads that passed goal verification (or had no Validation section). Do not commit changes for beads reopened due to CRITICAL failures.
 
    **Per-bead (default):** For each completed bead, stage only its files and commit:
    ```bash
@@ -829,16 +861,6 @@ After each wave completes:
    git add <changed files>
    git commit -m "feat: resolve wave N beads (BD-XXX, BD-YYY)"
    ```
-
-7. **Goal verification** *(if `workflow.goal_verification` is true in lavra.json)*:
-
-   For each completed bead that has a `## Validation` section, dispatch goal-verifier. Add `model: opus` when `model_profile` is `"quality"`:
-   ```
-   Task(goal-verifier, "Verify goal completion for {BEAD_ID}...")
-   -- add model: opus if profile=quality
-   ```
-   - CRITICAL failures → reopen the bead and queue for the next wave
-   - WARNING failures → note in the summary but proceed
 
 8. **Close completed beads:**
    ```bash

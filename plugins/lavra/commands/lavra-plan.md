@@ -165,6 +165,14 @@ When any of steps 0a–0c identifies a brainstorm bead, execute this block:
 **If multiple brainstorms could match (step 0b/0c):**
 Use **AskUserQuestion tool** to ask which brainstorm to use, or whether to proceed without one.
 
+### 0.5. Read Workflow Config
+
+```bash
+[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
+```
+
+If the file exists, parse and store settings for use during planning. If it does not exist, use defaults: `research: true`, `plan_review: true`, `goal_verification: true`, `max_parallel_agents: 3`, `commit_granularity: "task"`, `testing_scope: "full"`.
+
 ### 1. Local Research (Always Runs - Parallel)
 
 <thinking>
@@ -338,10 +346,13 @@ Each child bead description MUST follow this structure. **Completeness over brev
 
 ## Testing
 
+When `testing_scope` is `"full"` (default):
 - [ ] [Specific test case 1]
 - [ ] [Specific test case 2]
 - [ ] [Edge case tests]
 - [ ] [Integration tests if needed]
+
+When `testing_scope` is `"targeted"`: Specify tests only for: hooks, API routes, external service calls, complex state logic. Skip component render tests, static pages, and layout components.
 
 ## Validation
 

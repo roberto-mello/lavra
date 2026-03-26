@@ -92,7 +92,7 @@ If "Stop here": jump to the Output Summary with only Phase 1 marked complete.
 [ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
 ```
 
-If the file exists, parse it and store settings for later phases. If it does not exist, use defaults: `research: true`, `plan_review: true`, `goal_verification: true`, `max_parallel_agents: 3`, `commit_granularity: "task"`.
+If the file exists, parse it and store settings for later phases. If it does not exist, use defaults: `research: true`, `plan_review: true`, `goal_verification: true`, `max_parallel_agents: 3`, `commit_granularity: "task"`, `testing_scope: "full"`.
 
 Run the plan command with the brainstorm bead ID. The plan command will auto-detect the brainstorm context and skip its own idea refinement phase:
 
@@ -371,7 +371,7 @@ This dispatches 4 agents in parallel:
 After `/lavra-eng-review` completes, present its findings summary and categorize them:
 
 **Safe to auto-apply** (do these without asking):
-- Missing test cases -- add to child bead Testing section
+- Missing test cases -- add to child bead Testing section (only when `testing_scope` is `"full"`; when `"targeted"`, do not auto-add test cases for structural/render code)
 - Documentation gaps -- add to child bead descriptions
 - Typos or unclear wording -- fix in place
 - Missing edge cases -- add to Validation section
@@ -433,7 +433,7 @@ Read each child bead and verify it contains all of:
 - **Decisions** (Locked/Discretion): Locked decisions from brainstorm and research that apply to this bead -- implementation must not re-debate locked items. Discretion items define the agent's flexibility budget.
 - **Known risks with mitigations decided**: Risks from research/review with chosen mitigations
 - **Anti-patterns to avoid**: From knowledge recall and review findings
-- **Testing**: Specific test cases, edge cases, integration tests
+- **Testing**: When `testing_scope` is `"full"` (default): Specific test cases, edge cases, integration tests. When `testing_scope` is `"targeted"`: Risky paths only — hooks, API routes, complex business logic. Skip structural/render-only tests (Layout, EmptyState, static pages).
 - **Validation**: Acceptance criteria
 
 If any section is missing or thin, fill it from the accumulated context (brainstorm decisions, research findings, review feedback).
