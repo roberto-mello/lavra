@@ -90,7 +90,7 @@ echo "[2/4] Installing hooks..."
 HOOKS_DIR="$TARGET/hooks"
 create_dir_with_symlink_handling "$HOOKS_DIR"
 
-for hook in auto-recall.sh memory-capture.sh subagent-wrapup.sh; do
+for hook in sanitize-content.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh; do
   cp "$PLUGIN_DIR/hooks/$hook" "$HOOKS_DIR/"
   chmod 755 "$HOOKS_DIR/$hook"
   echo "  - $hook"
