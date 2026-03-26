@@ -1,5 +1,7 @@
 # Security: Injecting Untrusted Content into Prompts
 
+> **Source of truth:** `site/src/content/docs/SECURITY.md` is the canonical security documentation. This rules file reflects those standards as agent-facing instructions. If the two diverge, SECURITY.md wins — update this file to match.
+
 Any time user-contributed or externally sourced content is injected into agent prompts, system messages, or command templates, it MUST be sanitized and wrapped in untrusted XML tags.
 
 ## What counts as untrusted content
