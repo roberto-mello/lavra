@@ -435,3 +435,34 @@
 {"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:10:41Z","event_type":"closed","id":460,"issue_id":"bdcompound-8or","new_value":"Closed","old_value":""}
 {"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:10:41Z","event_type":"closed","id":461,"issue_id":"bdcompound-gnb","new_value":"all steps complete","old_value":""}
 {"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:11:02Z","event_type":"closed","id":462,"issue_id":"bdcompound-gnb","new_value":"All 5 child beads complete: bd show --long, extract-bead-context.sh, multi-bead prompt injection, per-bead goal verification, testing_scope config","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:25:08Z","event_type":"created","id":463,"issue_id":"bdcompound-4xy","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:25:25Z","event_type":"created","id":464,"issue_id":"bdcompound-4xy.1","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:25:35Z","event_type":"created","id":465,"issue_id":"bdcompound-4xy.2","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:25:45Z","event_type":"created","id":466,"issue_id":"bdcompound-4xy.3","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:25:55Z","event_type":"created","id":467,"issue_id":"bdcompound-4xy.4","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:26:09Z","event_type":"created","id":468,"issue_id":"bdcompound-4xy.5","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:26:19Z","event_type":"created","id":469,"issue_id":"bdcompound-4xy.6","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:26:30Z","event_type":"created","id":470,"issue_id":"bdcompound-4xy.7","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:26:40Z","event_type":"created","id":471,"issue_id":"bdcompound-4xy.8","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:26:56Z","event_type":"created","id":472,"issue_id":"bdcompound-4xy.9","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:27:07Z","event_type":"created","id":473,"issue_id":"bdcompound-4xy.10","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:27:13Z","event_type":"created","id":474,"issue_id":"bdcompound-4xy.11","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:27:21Z","event_type":"created","id":475,"issue_id":"bdcompound-4xy.12","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:27:34Z","event_type":"created","id":476,"issue_id":"bdcompound-4xy.13","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:27:41Z","event_type":"created","id":477,"issue_id":"bdcompound-4xy.14","new_value":"","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:30:12Z","event_type":"status_changed","id":478,"issue_id":"bdcompound-4xy","new_value":"{\"status\":\"in_progress\"}","old_value":"{\"id\":\"bdcompound-4xy\",\"title\":\"Code review: sanitize-content + extract-bead-context changes\",\"description\":\"Review tracking bead for recent security and workflow changes: sanitize-content.sh shared library extraction, extract-bead-context.sh new script, goal-verification-before-commits refactor, testing_scope config key.\",\"status\":\"open\",\"priority\":2,\"issue_type\":\"task\",\"owner\":\"roberto.mello@gmail.com\",\"created_at\":\"2026-03-26T22:25:09Z\",\"created_by\":\"Roberto Mello\",\"updated_at\":\"2026-03-26T22:25:09Z\"}"}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:08Z","event_type":"closed","id":479,"issue_id":"bdcompound-4xy.1","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:08Z","event_type":"closed","id":480,"issue_id":"bdcompound-4xy.2","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:08Z","event_type":"closed","id":481,"issue_id":"bdcompound-4xy.3","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:08Z","event_type":"closed","id":482,"issue_id":"bdcompound-4xy.4","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:08Z","event_type":"closed","id":483,"issue_id":"bdcompound-4xy.5","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:08Z","event_type":"closed","id":484,"issue_id":"bdcompound-4xy.6","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:08Z","event_type":"closed","id":485,"issue_id":"bdcompound-4xy.7","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:08Z","event_type":"closed","id":486,"issue_id":"bdcompound-4xy.8","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:08Z","event_type":"closed","id":487,"issue_id":"bdcompound-4xy.9","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:09Z","event_type":"closed","id":488,"issue_id":"bdcompound-4xy.10","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:09Z","event_type":"closed","id":489,"issue_id":"bdcompound-4xy.11","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:09Z","event_type":"closed","id":490,"issue_id":"bdcompound-4xy.12","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:09Z","event_type":"closed","id":491,"issue_id":"bdcompound-4xy.13","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:09Z","event_type":"closed","id":492,"issue_id":"bdcompound-4xy.14","new_value":"Closed","old_value":""}
+{"actor":"Roberto Mello","comment":null,"created_at":"2026-03-26T16:37:12Z","event_type":"closed","id":493,"issue_id":"bdcompound-4xy","new_value":"Closed","old_value":""}
