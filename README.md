@@ -132,21 +132,28 @@ retro       synthesizes patterns, surfaces gaps
 
 Six knowledge types (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION, DEVIATION) are captured inline during work and stored in `.lavra/memory/knowledge.jsonl`. At session start, relevant entries are recalled automatically based on your current beads and git branch. The system gets smarter over time -- not just for you, but for your whole team.
 
-<details>
-<summary><strong>Configuration</strong></summary>
+### Configuration
 
-**`.lavra/config/lavra.json`** (created automatically) -- toggle workflow phases and execution behavior:
+**`.lavra/config/lavra.json`** can be created manually or by the `/project-setup` command.
+It allows users to toggle workflow phases, planning and execution behavior:
 
-```json
+```jsonc
 {
-  "workflow": { "research": true, "plan_review": true, "goal_verification": true },
-  "execution": { "max_parallel_agents": 3, "commit_granularity": "task" }
+  "workflow": {
+    "research": true,             // run research agents in /lavra-design
+    "plan_review": true,          // run plan review phase in /lavra-design
+    "goal_verification": true,    // verify completion criteria in /lavra-work and /lavra-ship
+    "testing_scope": "targeted"   // "targeted" (hooks, API routes, complex logic only) or "full" (all tests)
+  },
+  "execution": {
+    "max_parallel_agents": 3,     // max subagents running at once
+    "commit_granularity": "task"  // "task" (atomic, default) or "wave" (legacy)
+  },
+  "model_profile": "balanced"     // "balanced" (default) or "quality" (opus for review/verification agents)
 }
 ```
 
-**`/project-setup`** -- for brownfield projects, run this to generate a codebase profile (stack, architecture, conventions) that informs planning.
-
-</details>
+**`/project-setup`**: run this to generate a codebase profile (stack, architecture, conventions) that informs planning.
 
 ## Acknowledgments
 
