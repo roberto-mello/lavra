@@ -4,7 +4,8 @@ description: "Configure this project's tech stack and review agents. Auto-detect
 allowed-tools: "- Read # Read project files to detect stack
   - Write # Write config to .lavra/config/project-setup.md
   - Bash # Run mkdir -p, check for config existence
-  - Glob # Detect project files (Gemfile, package.json, etc.)"
+  - Glob # Detect project files (Gemfile, package.json, etc.)
+  - AskUserQuestion # Interactive prompts for stack confirmation, agent selection, context notes"
 disable-model-invocation: true
 ---
 
@@ -37,24 +38,14 @@ Configure which review agents and stack context apply to this project. Results a
 cat .lavra/config/project-setup.md 2>/dev/null
 ```
 
-**If config exists**, present options and WAIT for user response:
+**If config exists**, use **AskUserQuestion tool**:
 
-```
-Project config already exists:
-  Stack: [detected from frontmatter]
-  Review agents: [list]
+**Question:** "Project config already exists (stack: [stack], agents: [list]). What would you like to do?"
+**Options:** "Reconfigure (overwrite)", "View current config", "Cancel"
 
-What would you like to do?
-1. Reconfigure (overwrite existing config)
-2. View current config
-3. Cancel
-
-Choose (1-3): _
-```
-
-- Option 2: Display the full config file contents, then re-present the menu.
-- Option 3: Exit skill immediately.
-- Option 1: Continue to Step 2.
+- "View current config": Display the full config file contents, then ask again.
+- "Cancel": Exit skill immediately.
+- "Reconfigure": Continue to Step 2.
 
 **If no config exists**, proceed directly to Step 2.
 </step>
@@ -62,15 +53,12 @@ Choose (1-3): _
 <step number="1.5" required="false" depends_on="1">
 ### Step 1.5: Codebase Analysis (Optional)
 
-Ask the user whether to run a codebase analysis for brownfield projects:
+Use **AskUserQuestion tool**:
 
-```
-Run codebase analysis? (3 parallel agents, ~30s)
-This helps planning commands understand your existing architecture.
-[Y/n]: _
-```
+**Question:** "Run codebase analysis? (3 parallel agents, ~30s) This helps planning commands understand your existing architecture."
+**Options:** "Yes, analyze codebase", "No, skip"
 
-WAIT for user response. If user declines or presses Enter with 'n', skip to Step 2.
+If user chooses "No, skip", proceed to Step 2.
 
 **If accepted**, dispatch 3 agents in parallel:
 
@@ -161,16 +149,12 @@ requirements.txt
 - `typescript` over `javascript`
 - If rails + typescript both match, report both and let user choose
 
-**Show detection results** and offer override:
+**Show detection results** using **AskUserQuestion tool**:
 
-```
-Detected stack: [stack]
-Files found: [list of matched files]
+**Question:** "Detected stack: [stack] (files found: [list]). Confirm or choose a different stack?"
+**Options:** "[stack] (detected)", "rails", "ruby", "typescript", "javascript", "python", "general"
 
-Use this stack? [Y/n] or enter override (rails/ruby/typescript/javascript/python/general): _
-```
-
-WAIT for user response. Accept Enter or Y to confirm detected stack.
+Use the confirmed stack for all subsequent steps. (Limit to 4 options — show detected stack + the 3 most common alternatives, or use "Other" for less common overrides.)
 </step>
 
 <step number="3" required="true" depends_on="2">
@@ -200,23 +184,15 @@ Show the default agents for the confirmed stack and let the user disable specifi
 | `python` | kieran-python-reviewer, code-simplicity-reviewer |
 | `general` | code-simplicity-reviewer, architecture-strategist |
 
-**Present the agent list** and WAIT for user response:
+Use **AskUserQuestion tool** with `multiSelect: true` to let the user select which agents to **keep**:
 
-```
-Review agents for [stack] stack:
-  1. [agent-1]         [short description]
-  2. [agent-2]         [short description]
-  3. [agent-3]         [short description]
-  4. [agent-4]         [short description]
-  5. [agent-5]         [short description] (if applicable)
+**Question:** "Which review agents would you like to enable for this [stack] project?"
+**Options (multiSelect: true):** One option per default agent for the detected stack, with the short description as the option description. Pre-select all by default (user deselects to disable).
 
-Enter numbers to disable (comma-separated), or press Enter to keep all: _
-```
+**Agent descriptions for options:**
 
-**Agent descriptions for display:**
-
-| Agent | Short Description |
-|-------|------------------|
+| Agent | Description |
+|-------|-------------|
 | kieran-rails-reviewer | Rails patterns, ActiveRecord, test coverage |
 | dhh-rails-reviewer | DHH conventions, simplicity, Rails Way |
 | kieran-typescript-reviewer | TypeScript types, async patterns, safety |
@@ -226,30 +202,39 @@ Enter numbers to disable (comma-separated), or press Enter to keep all: _
 | performance-oracle | N+1 queries, caching, algorithmic complexity |
 | architecture-strategist | System design, coupling, scalability |
 
-Build the final `review_agents` and `plan_review_agents` lists by removing any disabled agents. If an agent is disabled from review_agents and was also in plan_review_agents, remove it from plan_review_agents too.
+Build the final `review_agents` list from the selected agents. Build `plan_review_agents` from the default plan review agents for the stack, minus any that were deselected.
 
-**Minimum agents check:** If disabling would leave fewer than 2 review agents, warn:
+**Minimum agents check:** If the user selected fewer than 2 agents, use **AskUserQuestion tool**:
 
-```
-[!] Warning: Disabling those agents leaves only [N] reviewer(s).
-    Reviews may miss important issues. Continue? [y/N] _
-```
+**Question:** "Only [N] reviewer(s) selected — reviews may miss important issues. Continue anyway?"
+**Options:** "Continue with [N] agent(s)", "Go back and select more"
+</step>
+
+<step number="3.5" required="true" depends_on="3">
+### Step 3.5: Testing Scope
+
+Use **AskUserQuestion tool**:
+
+**Question:** "How much test coverage should planning commands generate? This affects implementation time and tokens needed. Choose 'full' for the greatest coverage"
+**Options:**
+- `targeted` — Risky paths only: hooks, API routes, external calls, complex business logic. Skip component render tests, static pages, and layout components. (Recommended)
+- `full` — All test cases: unit, integration, edge cases, render/structural tests
+
+Store the chosen value as `testing_scope` for Step 5.
 </step>
 
 <step number="4" required="false" depends_on="3">
 ### Step 4: Add Reviewer Context (Optional)
 
-Ask the user if they want to add project-specific context for reviewers:
+Use **AskUserQuestion tool**:
 
-```
-Add reviewer context notes? (optional, max 500 chars)
-Examples: "FastAPI project with SQLAlchemy. All endpoints require auth middleware."
-          "React + Rails API. Frontend uses React Query. No Redux."
+**Question:** "Add reviewer context notes? (optional) These help reviewers understand project-specific conventions."
+**Options:** "Skip", "Add notes"
 
-Enter context (or press Enter to skip): _
-```
+If user chooses "Add notes", use **AskUserQuestion tool** again:
 
-WAIT for user input. If user presses Enter with no content, skip.
+**Question:** "Enter reviewer context (max 500 chars). Example: 'FastAPI project with SQLAlchemy. All endpoints require auth middleware.'"
+**Options:** Use "Other" for free-text input — present 1-2 example strings as selectable options if helpful, but the user will likely type their own via "Other".
 
 **Sanitization rules** (applied before writing):
 - Strip `<` and `>` characters
@@ -297,6 +282,14 @@ disabled_agents: [list of disabled agents, or empty array []]
 
 **Write the complete file to `.lavra/config/project-setup.md`.**
 
+**Update `testing_scope` in `.lavra/config/lavra.json`** if it exists:
+
+```bash
+# Read current lavra.json, update workflow.testing_scope, write back
+```
+
+Use a read-modify-write approach: read the existing JSON, set `workflow.testing_scope` to the chosen value, write it back. If `lavra.json` does not exist yet, it will be created by `provision-memory.sh` on first install with the correct default — skip the update in that case (provision-memory.sh already defaults to `"full"`; only write if the user chose `"targeted"`).
+
 Show confirmation:
 
 ```
@@ -305,9 +298,10 @@ Config saved to .lavra/config/project-setup.md
 Stack:          [stack]
 Review agents:  [count] configured
 Disabled:       [list or "none"]
+Testing scope:  [full|targeted]
 
-Commit this file with your project to share the config with your team:
-  git add .lavra/config/project-setup.md
+Commit these files with your project to share the config with your team:
+  git add .lavra/config/project-setup.md .lavra/config/lavra.json
   git commit -m "chore: add project-setup config"
 ```
 </step>

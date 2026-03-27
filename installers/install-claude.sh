@@ -41,6 +41,7 @@ source "$INSTALLER_DIR/shared-functions.sh"
 
 LAVRA_GLOBAL_DEFAULT="$HOME/.claude"
 LAVRA_HOOKS_ARE_GLOBAL=false
+print_banner "Claude Code" "0.7.0"
 eval "$(parse_installer_args "$@")"
 
 # Resolve target to absolute path
@@ -66,8 +67,6 @@ if [ ! -d "$PLUGIN_DIR" ]; then
   echo "    Expected marketplace structure with plugins/lavra/"
   exit 1
 fi
-
-print_banner "Claude Code" "0.7.0"
 echo "  Plugin: $PLUGIN_DIR"
 if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  Target: $TARGET (global)"

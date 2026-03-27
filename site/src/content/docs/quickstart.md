@@ -46,20 +46,21 @@ ls -la .lavra/memory/        # Should see knowledge.jsonl, recall.sh
 
 ### Workflow config (automatic)
 
-The installer creates `.lavra/config/Lavra.json` automatically. Edit to tune the workflow:
+The installer creates `.lavra/config/lavra.json` automatically. Edit to tune the workflow (the example below is in `jsonc` format, with comments):
 
-```json
+```jsonc
 {
   "workflow": {
-    "research": true,        // run research agents in /lavra-design
-    "plan_review": true,     // run plan review phase in /lavra-design
-    "goal_verification": true // verify completion criteria in /lavra-work and /lavra-ship
+    "research": true,             // run research agents in /lavra-design
+    "plan_review": true,          // run plan review phase in /lavra-design
+    "goal_verification": true,    // verify completion criteria in /lavra-work and /lavra-ship
+    "testing_scope": "targeted"   // "targeted" (hooks, API routes, complex logic only) or "full" (all tests)
   },
   "execution": {
-    "max_parallel_agents": 3, // max subagents running at once
-    "commit_granularity": "task" // "task" (atomic, default) or "wave" (legacy)
+    "max_parallel_agents": 3,     // max subagents running at once
+    "commit_granularity": "task"  // "task" (atomic, default) or "wave" (legacy)
   },
-  "model_profile": "balanced" // "balanced" (default) or "quality" (routes security-sentinel, architecture-strategist, goal-verifier, performance-oracle to opus)
+  "model_profile": "balanced"     // "balanced" (default) or "quality" (opus for review/verification agents)
 }
 ```
 
@@ -73,7 +74,7 @@ If you're installing Lavra into an existing project, run `/project-setup` to gen
 /project-setup
 ```
 
-When prompted "Run codebase analysis?", choose Y. This dispatches 3 parallel agents to analyze your stack, architecture, and conventions, saving the results to `.lavra/config/codebase-profile.md`. This file is used by `/lavra-design` and `/lavra-work` as planning context.
+We recommend that you run codebase analysis when prompted. This dispatches 3 parallel agents to analyze your stack, architecture, and conventions, saving the results to `.lavra/config/codebase-profile.md`. This file is used by `/lavra-design` and `/lavra-work` as planning context.
 
 ## Your First Workflow
 

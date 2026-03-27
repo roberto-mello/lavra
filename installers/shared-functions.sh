@@ -154,14 +154,14 @@ parse_installer_args() {
     # is supported on this platform. Check if the user is standing in a project
     # directory — if so, global is probably not what they intended.
     if [ -d "$PWD/.beads" ] || [ -d "$PWD/.git" ]; then
-      echo "  Detected a project in the current directory: $PWD"
-      echo ""
-      echo "  Install for this project only, or globally (all projects)?"
-      echo "    1) This project only  ($PWD)"
-      echo "    2) Globally           (${LAVRA_GLOBAL_DEFAULT}, then run /project-setup per project)"
-      echo ""
-      read -r -p "  Choose [1/2, default: 1]: " scope_choice
-      echo ""
+      echo "  Detected a project in the current directory: $PWD" >&2
+      echo "" >&2
+      echo "  Install for this project only, or globally (all projects)?" >&2
+      echo "    1) This project only  ($PWD)" >&2
+      echo "    2) Globally           (${LAVRA_GLOBAL_DEFAULT}, then run /project-setup per project)" >&2
+      echo "" >&2
+      read -r -p "  Choose [1/2, default: 1]: " scope_choice </dev/tty
+      echo "" >&2
       case "$scope_choice" in
         2)
           # Confirmed global — keep defaults
