@@ -44,9 +44,9 @@ ls -la .lavra/memory/        # Should see knowledge.jsonl, recall.sh
 
 ## Configuration
 
-### Workflow config (automatic)
+### Workflow config
 
-The installer creates `.lavra/config/lavra.json` automatically. Edit to tune the workflow (the example below is in `jsonc` format, with comments):
+The [/project-setup](#codebase-analysis) command creates `.lavra/config/lavra.json`, among other things. Once generated, you can edit it to tune Lavra (the example below is in `jsonc` format, with comments):
 
 ```jsonc
 {
@@ -64,9 +64,7 @@ The installer creates `.lavra/config/lavra.json` automatically. Edit to tune the
 }
 ```
 
-Existing projects get this file automatically on next session start.
-
-### Codebase analysis (optional, for brownfield projects)
+### Codebase analysis
 
 If you're installing Lavra into an existing project, run `/project-setup` to generate a codebase profile:
 
@@ -75,6 +73,8 @@ If you're installing Lavra into an existing project, run `/project-setup` to gen
 ```
 
 We recommend that you run codebase analysis when prompted. This dispatches 3 parallel agents to analyze your stack, architecture, and conventions, saving the results to `.lavra/config/codebase-profile.md`. This file is used by `/lavra-design` and `/lavra-work` as planning context.
+
+`/project-setup` also asks questions to configure the behavior of Lavra's planning, reviewing and implementation agents. See [Workflow config](#workflow-config).
 
 ## Your First Workflow
 
