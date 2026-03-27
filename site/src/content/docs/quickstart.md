@@ -8,7 +8,7 @@ order: 1
 
 ## Installation
 
-Install into the current project for your AI coding agent:
+Run from inside your project directory:
 
 ```bash
 npx @lavralabs/lavra@latest --claude      # Claude Code
@@ -17,11 +17,7 @@ npx @lavralabs/lavra@latest --gemini      # Gemini CLI
 npx @lavralabs/lavra@latest --cortex      # Cortex Code
 ```
 
-Or install globally so Lavra is available in every project:
-
-```bash
-npx @lavralabs/lavra@latest --global
-```
+If the installer detects a project in the current directory, it will ask whether to install for this project only or globally (`~/.claude`). A global install makes commands available in every project, but you still run [/project-setup](#codebase-analysis) per project to configure the memory system and review agents.
 
 Or with Bun:
 
