@@ -1,6 +1,6 @@
 {
   "name": "lavra",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Compound engineering with persistent memory and multi-agent workflows based on beads. 30 specialized agents, 28 commands, 15 skills, and automatic knowledge capture/recall.",
   "author": {
     "name": "Roberto Mello",

@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Compound engineering with persistent memory and multi-agent workflows based on beads",
-    "version": "1.0.0"
+    "version": "0.7.1"
   },
   "plugins": [
     {
       "name": "lavra",
       "source": "./plugins/lavra",
       "description": "30 specialized agents, 28 commands, 15 skills, persistent memory with auto-recall",
-      "version": "0.7.0",
+      "version": "0.7.1",
       "tags": [
         "beads",
         "memory",

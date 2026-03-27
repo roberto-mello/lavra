@@ -41,7 +41,7 @@ source "$INSTALLER_DIR/shared-functions.sh"
 
 LAVRA_GLOBAL_DEFAULT="$HOME/.claude"
 LAVRA_HOOKS_ARE_GLOBAL=false
-print_banner "Claude Code" "0.7.0"
+print_banner "Claude Code" "0.7.1"
 eval "$(parse_installer_args "$@")"
 
 # Resolve target to absolute path
