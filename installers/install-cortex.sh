@@ -164,14 +164,14 @@ if [ "$GLOBAL_INSTALL" = true ]; then
 
   mkdir -p "$TARGET/hooks"
 
-  for hook in check-memory.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh recall.sh; do
+  for hook in check-memory.sh dispatch-hook.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh recall.sh; do
     if [ -f "$PLUGIN_DIR/hooks/$hook" ]; then
       cp "$PLUGIN_DIR/hooks/$hook" "$TARGET/hooks/$hook"
       chmod +x "$TARGET/hooks/$hook"
     fi
   done
 
-  echo "  - Installed hook scripts (check-memory + memory hooks for auto-install)"
+  echo "  - Installed hook scripts (check-memory + dispatch-hook + memory hooks)"
 else
   echo "[4/8] Installing hooks..."
 
@@ -183,6 +183,17 @@ else
     chmod +x "$HOOKS_DIR/$hook"
     echo "  - Installed $hook"
   done
+
+  # Ensure dispatcher is in global hooks dir (needed even without a global install)
+  GLOBAL_HOOKS="$HOME/.snowflake/cortex/hooks"
+  mkdir -p "$GLOBAL_HOOKS"
+  for hook in dispatch-hook.sh check-memory.sh; do
+    if [ -f "$PLUGIN_DIR/hooks/$hook" ]; then
+      cp "$PLUGIN_DIR/hooks/$hook" "$GLOBAL_HOOKS/$hook"
+      chmod +x "$GLOBAL_HOOKS/$hook"
+    fi
+  done
+  echo "  - Installed dispatcher to $GLOBAL_HOOKS"
 fi
 
 # Detect if commands/agents/skills are already installed globally
@@ -327,19 +338,35 @@ HOOKS_JSON="$HOME/.snowflake/cortex/hooks.json"
 mkdir -p "$(dirname "$HOOKS_JSON")"
 
 if [ "$GLOBAL_INSTALL" = true ]; then
-  # Global install: only check-memory.sh cortex in SessionStart
+  # Global install: check-memory + dispatcher hooks (all absolute paths)
+  DISPATCH="bash ~/.snowflake/cortex/hooks/dispatch-hook.sh .cortex/hooks"
+  CHECK_MEM="bash ~/.snowflake/cortex/hooks/check-memory.sh cortex"
+
   if [ -f "$HOOKS_JSON" ]; then
     if command -v jq &>/dev/null; then
       EXISTING=$(cat "$HOOKS_JSON")
 
-      UPDATED=$(echo "$EXISTING" | jq --arg cmd "bash ~/.snowflake/cortex/hooks/check-memory.sh cortex" '
+      UPDATED=$(echo "$EXISTING" | jq \
+        --arg check_mem "$CHECK_MEM" \
+        --arg recall "$DISPATCH auto-recall.sh" \
+        --arg capture "$DISPATCH memory-capture.sh" \
+        --arg wrapup "$DISPATCH subagent-wrapup.sh" '
         .hooks.SessionStart = (
-          [(.hooks.SessionStart // [])[] | select(.hooks[]?.command | contains("check-memory") | not)] +
-          [{"matcher":"","hooks":[{"type":"command","command":$cmd}]}]
+          [(.hooks.SessionStart // [])[] | select(.hooks[]?.command | (contains("check-memory") or contains("auto-recall")) | not)] +
+          [{"hooks":[{"type":"command","command":$check_mem}]},
+           {"hooks":[{"type":"command","command":$recall,"async":true}]}]
+        ) |
+        .hooks.PostToolUse = (
+          [(.hooks.PostToolUse // [])[] | select(.hooks[]?.command | contains("memory-capture") | not)] +
+          [{"matcher":"bash","hooks":[{"type":"command","command":$capture,"async":true}]}]
+        ) |
+        .hooks.SubagentStop = (
+          [(.hooks.SubagentStop // [])[] | select(.hooks[]?.command | contains("subagent-wrapup") | not)] +
+          [{"hooks":[{"type":"command","command":$wrapup}]}]
         )
       ')
       echo "$UPDATED" > "$HOOKS_JSON"
-      echo "  - Added check-memory hook to hooks.json"
+      echo "  - Updated hooks.json with dispatcher hooks"
     else
       echo "  [!] jq not found -- manual hooks.json setup required"
     fi
@@ -348,62 +375,74 @@ if [ "$GLOBAL_INSTALL" = true ]; then
 {
   "hooks": {
     "SessionStart": [
-      {"matcher": "", "hooks": [{"type": "command", "command": "bash ~/.snowflake/cortex/hooks/check-memory.sh cortex"}]}
+      {"hooks": [{"type": "command", "command": "$CHECK_MEM"}]},
+      {"hooks": [{"type": "command", "command": "$DISPATCH auto-recall.sh", "async": true}]}
+    ],
+    "PostToolUse": [
+      {"matcher": "bash", "hooks": [{"type": "command", "command": "$DISPATCH memory-capture.sh", "async": true}]}
+    ],
+    "SubagentStop": [
+      {"hooks": [{"type": "command", "command": "$DISPATCH subagent-wrapup.sh"}]}
     ]
   }
 }
 HOOKS_EOF
-    echo "  - Created hooks.json with check-memory hook"
+    echo "  - Created hooks.json with dispatcher hooks"
   fi
 else
-  # Project install: all 3 hooks using .cortex/hooks/ paths
+  # Project install: dispatcher hooks (same absolute-path pattern as global)
+  DISPATCH="bash ~/.snowflake/cortex/hooks/dispatch-hook.sh .cortex/hooks"
+
   if [ -f "$HOOKS_JSON" ]; then
     if command -v jq &>/dev/null; then
       EXISTING=$(cat "$HOOKS_JSON")
 
-      UPDATED=$(echo "$EXISTING" | jq '
+      UPDATED=$(echo "$EXISTING" | jq \
+        --arg recall "$DISPATCH auto-recall.sh" \
+        --arg capture "$DISPATCH memory-capture.sh" \
+        --arg wrapup "$DISPATCH subagent-wrapup.sh" '
         # Add/update SessionStart hook
         .hooks.SessionStart = (
           [(.hooks.SessionStart // [])[] | select(.hooks[]?.command | contains("auto-recall") | not)] +
-          [{"hooks":[{"type":"command","command":"bash .cortex/hooks/auto-recall.sh","async":true}]}]
+          [{"hooks":[{"type":"command","command":$recall,"async":true}]}]
         ) |
         # Add/update PostToolUse hook with matcher
         .hooks.PostToolUse = (
           [(.hooks.PostToolUse // [])[] | select(.hooks[]?.command | contains("memory-capture") | not)] +
-          [{"matcher":"bash","hooks":[{"type":"command","command":"bash .cortex/hooks/memory-capture.sh","async":true}]}]
+          [{"matcher":"bash","hooks":[{"type":"command","command":$capture,"async":true}]}]
         ) |
         # Add/update SubagentStop hook for auto-wrapup
         .hooks.SubagentStop = (
           [(.hooks.SubagentStop // [])[] | select(.hooks[]?.command | contains("subagent-wrapup") | not)] +
-          [{"hooks":[{"type":"command","command":"bash .cortex/hooks/subagent-wrapup.sh"}]}]
+          [{"hooks":[{"type":"command","command":$wrapup}]}]
         ) |
         # Remove any null hook arrays
         if .hooks.PreToolUse == null then del(.hooks.PreToolUse) else . end |
         if .hooks.SubagentStop == null then del(.hooks.SubagentStop) else . end
       ')
       echo "$UPDATED" > "$HOOKS_JSON"
-      echo "  - Merged hooks into existing hooks.json"
+      echo "  - Merged dispatcher hooks into existing hooks.json"
     else
       echo "  [!] jq not found -- manual hooks.json setup required"
       echo "      Add SessionStart, PostToolUse, and SubagentStop hooks manually"
     fi
   else
-    cat > "$HOOKS_JSON" << 'HOOKS_EOF'
+    cat > "$HOOKS_JSON" << HOOKS_EOF
 {
   "hooks": {
     "SessionStart": [
-      {"hooks": [{"type": "command", "command": "bash .cortex/hooks/auto-recall.sh", "async": true}]}
+      {"hooks": [{"type": "command", "command": "$DISPATCH auto-recall.sh", "async": true}]}
     ],
     "PostToolUse": [
-      {"matcher": "bash", "hooks": [{"type": "command", "command": "bash .cortex/hooks/memory-capture.sh", "async": true}]}
+      {"matcher": "bash", "hooks": [{"type": "command", "command": "$DISPATCH memory-capture.sh", "async": true}]}
     ],
     "SubagentStop": [
-      {"hooks": [{"type": "command", "command": "bash .cortex/hooks/subagent-wrapup.sh"}]}
+      {"hooks": [{"type": "command", "command": "$DISPATCH subagent-wrapup.sh"}]}
     ]
   }
 }
 HOOKS_EOF
-    echo "  - Created hooks.json with memory hooks"
+    echo "  - Created hooks.json with dispatcher hooks"
   fi
 fi
 

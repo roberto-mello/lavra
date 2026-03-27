@@ -24,7 +24,7 @@ case "$PLATFORM" in
     GLOBAL_HOOKS_DIR="$HOME/.snowflake/cortex/hooks"
     SETTINGS_FILE="$HOME/.snowflake/cortex/hooks.json"
     SOURCE_SENTINEL="$HOME/.snowflake/cortex/.lavra-source"
-    HOOK_CMD_PREFIX="bash .cortex/hooks"
+    HOOK_CMD_PREFIX="bash ~/.snowflake/cortex/hooks/dispatch-hook.sh .cortex/hooks"
     BASH_TOOL_NAME="bash"
     PRODUCT_NAME="Cortex Code"
     ;;
@@ -111,15 +111,28 @@ for hook in memory-capture.sh auto-recall.sh subagent-wrapup.sh knowledge-db.sh 
   fi
 done
 
+# Cortex Code: ensure dispatcher is in the global hooks dir
+if [ "$PLATFORM" = "cortex" ] && [ -f "$HOOKS_SOURCE_DIR/dispatch-hook.sh" ] && [ ! -f "$GLOBAL_HOOKS_DIR/dispatch-hook.sh" ]; then
+  cp "$HOOKS_SOURCE_DIR/dispatch-hook.sh" "$GLOBAL_HOOKS_DIR/dispatch-hook.sh"
+  chmod +x "$GLOBAL_HOOKS_DIR/dispatch-hook.sh"
+fi
+
 # 3. Configure settings.json with hook definitions
 SETTINGS="$SETTINGS_FILE"
 
 if [ -f "$SETTINGS" ] && command -v jq &>/dev/null; then
   EXISTING=$(cat "$SETTINGS")
 
-  RECALL_CMD="$HOOK_CMD_PREFIX/auto-recall.sh"
-  CAPTURE_CMD="$HOOK_CMD_PREFIX/memory-capture.sh"
-  WRAPUP_CMD="$HOOK_CMD_PREFIX/subagent-wrapup.sh"
+  # Cortex uses dispatcher (space-separated args), Claude uses direct paths (slash-separated)
+  if [ "$PLATFORM" = "cortex" ]; then
+    RECALL_CMD="$HOOK_CMD_PREFIX auto-recall.sh"
+    CAPTURE_CMD="$HOOK_CMD_PREFIX memory-capture.sh"
+    WRAPUP_CMD="$HOOK_CMD_PREFIX subagent-wrapup.sh"
+  else
+    RECALL_CMD="$HOOK_CMD_PREFIX/auto-recall.sh"
+    CAPTURE_CMD="$HOOK_CMD_PREFIX/memory-capture.sh"
+    WRAPUP_CMD="$HOOK_CMD_PREFIX/subagent-wrapup.sh"
+  fi
 
   UPDATED=$(echo "$EXISTING" | jq --arg recall "$RECALL_CMD" --arg capture "$CAPTURE_CMD" --arg wrapup "$WRAPUP_CMD" --arg matcher "$BASH_TOOL_NAME" '
     .hooks.SessionStart = (
@@ -140,17 +153,23 @@ if [ -f "$SETTINGS" ] && command -v jq &>/dev/null; then
   echo "$UPDATED" > "$SETTINGS"
 elif [ ! -f "$SETTINGS" ]; then
   mkdir -p "$(dirname "$SETTINGS")"
+  # Reuse the same CMD vars (set above only in jq path); recompute for heredoc
+  if [ "$PLATFORM" = "cortex" ]; then
+    _SEP=" "
+  else
+    _SEP="/"
+  fi
   cat > "$SETTINGS" << SETTINGS_EOF
 {
   "hooks": {
     "SessionStart": [
-      {"hooks": [{"type": "command", "command": "$HOOK_CMD_PREFIX/auto-recall.sh", "async": true}]}
+      {"hooks": [{"type": "command", "command": "${HOOK_CMD_PREFIX}${_SEP}auto-recall.sh", "async": true}]}
     ],
     "PostToolUse": [
-      {"matcher": "$BASH_TOOL_NAME", "hooks": [{"type": "command", "command": "$HOOK_CMD_PREFIX/memory-capture.sh", "async": true}]}
+      {"matcher": "$BASH_TOOL_NAME", "hooks": [{"type": "command", "command": "${HOOK_CMD_PREFIX}${_SEP}memory-capture.sh", "async": true}]}
     ],
     "SubagentStop": [
-      {"hooks": [{"type": "command", "command": "$HOOK_CMD_PREFIX/subagent-wrapup.sh"}]}
+      {"hooks": [{"type": "command", "command": "${HOOK_CMD_PREFIX}${_SEP}subagent-wrapup.sh"}]}
     ]
   }
 }

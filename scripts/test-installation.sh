@@ -316,6 +316,27 @@ else
   fail "Cortex Code hooks.json" "hooks.json not created at $HOME/.snowflake/cortex/hooks.json"
 fi
 
+# Verify dispatch-hook.sh installed to global hooks dir
+if [[ -f "$HOME/.snowflake/cortex/hooks/dispatch-hook.sh" ]]; then
+  pass "Cortex Code dispatch-hook.sh installed globally"
+else
+  fail "Cortex Code dispatcher" "dispatch-hook.sh missing from $HOME/.snowflake/cortex/hooks/"
+fi
+
+# Verify hooks.json uses dispatcher (absolute paths), not direct relative paths
+if grep -q "dispatch-hook.sh" "$HOME/.snowflake/cortex/hooks.json"; then
+  pass "Cortex Code hooks.json uses dispatcher pattern"
+else
+  fail "Cortex Code hooks.json" "hooks.json does not reference dispatch-hook.sh"
+fi
+
+# Negative: hooks.json must NOT contain direct .cortex/hooks/ command targets
+if grep -q '"bash \.cortex/hooks/' "$HOME/.snowflake/cortex/hooks.json" 2>/dev/null; then
+  fail "Cortex Code hooks.json" "Contains direct relative .cortex/hooks/ paths (should use dispatcher)"
+else
+  pass "Cortex Code hooks.json has no direct relative paths"
+fi
+
 # Verify commands (should be 23+)
 CMD_COUNT=$(find .cortex/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 if [[ "$CMD_COUNT" -ge 23 ]]; then
