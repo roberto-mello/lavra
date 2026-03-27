@@ -6,6 +6,8 @@ order: 1
 
 # Quick Start Guide
 
+> **Lavra** (/ˈla.vɾɐ/) — Portuguese for "harvest." Every session plants knowledge that the next one reaps.
+
 ## Installation
 
 Run from inside your project directory:

@@ -1,10 +1,10 @@
-# lavra
+# Lavra (/ˈla.vɾɐ/ — Portuguese for "harvest")
 
 [![License](https://img.shields.io/github/license/roberto-mello/lavra)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/roberto-mello/lavra)](https://github.com/roberto-mello/lavra/releases)
 [![Beads CLI](https://img.shields.io/badge/requires-beads%20CLI-blue)](https://github.com/steveyegge/beads)
 
-**lavra turns your AI coding agent into a development team that gets smarter with every task.**
+**Lavra turns your AI coding agent into a development team that gets smarter with every task.**
 
 A plugin for coding agents that orchestrates the full development lifecycle -- from brainstorming to shipping -- while automatically capturing and recalling knowledge so each unit of work makes the next one easier.
 
@@ -19,7 +19,7 @@ A plugin for coding agents that orchestrates the full development lifecycle -- f
 <tr>
 <td width="65%">
 
-### Without lavra
+### Without Lavra
 
 - The agent forgets everything between sessions -- you re-explain context every time
 - Planning is shallow: it jumps to code before thinking through the problem
@@ -38,7 +38,7 @@ A plugin for coding agents that orchestrates the full development lifecycle -- f
 <tr>
 <td width="65%">
 
-### With lavra
+### With Lavra
 
 - **Automatic memory.** Knowledge is captured inline during work and recalled automatically at the start of every session. Hit the same OAuth bug next month? The agent already knows the fix.
 - **Structured planning.** Brainstorm with scope sharpening, research with domain-matched agents, adversarial plan review -- all before a single line of code is written.
@@ -160,3 +160,7 @@ It allows users to toggle workflow phases, planning and execution behavior:
 Built by [Roberto Mello](https://github.com/roberto-mello), extending [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin) by [Every](https://every.to). Task tracking by [Beads](https://github.com/steveyegge/beads).
 
 Inspired by Every's writing on [compound engineering](https://every.to/chain-of-thought/compound-engineering-how-every-codes-with-agents), with ideas from [Mario Zechner](https://x.com/badlogicgames/), [Simon Willison](https://https://simonwillison.net/), [Get Shit Done](https://github.com/gsd-build/get-shit-done), [gstach by Garry Tan](https://github.com/garrytan/gstack) and many others. Thanks to my friend Dan for rubber-ducking Lavra.
+
+---
+
+_Lavra (/ˈla.vɾɐ/) is the Portuguese word for "harvest" — the idea that every session plants knowledge that the next one reaps. Named by Roberto Mello, who is Brazilian._
