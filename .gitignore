@@ -17,3 +17,8 @@ plugins/lavra/cortex/
 # Dolt database files (added by bd init)
 .dolt/
 *.db
+
+# Lavra runtime data (this project's own .lavra/ install)
+.lavra/
+!.lavra/config/
+!.lavra/config/**
