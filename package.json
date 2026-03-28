@@ -1,6 +1,6 @@
 {
   "name": "@lavralabs/lavra",
-  "version": "0.7.0-1",
+  "version": "0.7.1",
   "description": "Compound engineering with persistent memory and multi-agent workflows based on beads for Claude Code, OpenCode, Gemini CLI, and Cortex Code",
   "bin": {
     "lavra": "bin/install.js",
@@ -17,6 +17,7 @@
     "docs/"
   ],
   "keywords": ["claude-code", "plugin", "ai", "memory", "agents", "opencode", "gemini"],
+  "homepage": "https://lavra.dev",
   "author": "Roberto Mello",
   "license": "MIT",
   "repository": {
