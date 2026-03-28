@@ -74,7 +74,8 @@ if [ ! -d "$PLUGIN_DIR" ]; then
   exit 1
 fi
 
-print_banner "Cortex Code" "0.7.1"
+eval "$(parse_installer_args "$@")"
+[ "$NO_BANNER" = false ] && print_banner "Cortex Code" "0.7.1"
 echo "  Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  Type: Global installation"

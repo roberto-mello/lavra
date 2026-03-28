@@ -134,10 +134,14 @@ parse_installer_args() {
   local quiet=false
   local positional=()
 
+  local force_global=false
+  local no_banner=false
   for arg in "$@"; do
     case "$arg" in
       --yes|-y) auto_yes=true ;;
       --quiet|-q) quiet=true ;;
+      --global) force_global=true ;;
+      --no-banner) no_banner=true ;;
       *) positional+=("$arg") ;;
     esac
   done
@@ -145,7 +149,10 @@ parse_installer_args() {
   local global_install=true
   local target="${LAVRA_GLOBAL_DEFAULT}"
 
-  if [ ${#positional[@]} -gt 0 ]; then
+  if [ "$force_global" = true ]; then
+    global_install=true
+    target="${LAVRA_GLOBAL_DEFAULT}"
+  elif [ ${#positional[@]} -gt 0 ]; then
     target="${positional[0]}"
     global_install=false
   elif [ "${LAVRA_HOOKS_ARE_GLOBAL:-false}" != "true" ] \
@@ -178,6 +185,7 @@ parse_installer_args() {
   printf 'AUTO_YES=%s\n' "$auto_yes"
   printf 'QUIET=%s\n' "$quiet"
   printf 'GLOBAL_INSTALL=%s\n' "$global_install"
+  printf 'NO_BANNER=%s\n' "$no_banner"
   printf 'TARGET=%s\n' "$(cd "$target" 2>/dev/null && pwd || echo "$target")"
 }
 

@@ -58,7 +58,15 @@ const TARGET_PATH = _positional ? path.resolve(_positional) : null;
 // ---------------------------------------------------------------------------
 
 function banner() {
-  // ASCII art banner is printed by install.sh via shared-functions.sh print_banner()
+  console.log("");
+  console.log("  ██╗      █████╗ ██╗   ██╗██████╗  █████╗ ");
+  console.log("  ██║     ██╔══██╗██║   ██║██╔══██╗██╔══██╗");
+  console.log("  ██║     ███████║██║   ██║██████╔╝███████║");
+  console.log("  ██║     ██╔══██║╚██╗ ██╔╝██╔══██╗██╔══██║");
+  console.log("  ███████╗██║  ██║ ╚████╔╝ ██║  ██║██║  ██║");
+  console.log("  ╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝");
+  console.log(`  v${VERSION}`);
+  console.log("");
 }
 
 function usage() {
@@ -208,10 +216,13 @@ function buildInstallArgs(runtime, scope) {
   // --yes passthrough
   if (FLAG.yes) scriptArgs.push("--yes");
 
-  // Target directory
-  // For global: pass no path — install.sh defaults to ~/.claude and sets GLOBAL_INSTALL=true
-  // Passing ~/.claude explicitly would be treated as a local install, breaking bd init skip
-  if (scope !== "global") {
+  // Suppress duplicate banner — bin/install.js already printed it
+  scriptArgs.push("--no-banner");
+
+  // Target directory / scope
+  if (scope === "global") {
+    scriptArgs.push("--global");
+  } else {
     scriptArgs.push(TARGET_PATH || process.cwd());
   }
 

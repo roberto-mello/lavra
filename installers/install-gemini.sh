@@ -35,11 +35,10 @@ source "$INSTALLER_DIR/shared-functions.sh"
 LAVRA_GLOBAL_DEFAULT="$HOME/.config/gemini"
 LAVRA_HOOKS_ARE_GLOBAL=false
 eval "$(parse_installer_args "$@")"
+[ "$NO_BANNER" = false ] && print_banner "Gemini CLI" "0.7.1"
 
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
-
-print_banner "Gemini CLI" "0.7.1"
 echo "  Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  Type: Global installation"
