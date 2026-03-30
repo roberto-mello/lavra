@@ -185,7 +185,15 @@ Used when exactly one bead is being worked on. This is the full-quality, interac
 [ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
 ```
 
-Parse `execution.commit_granularity` (default: `"task"`), `model_profile` (default: `"balanced"`), and `testing_scope` (default: `"full"`). When `testing_scope` is `"targeted"`, deviation rule 2 (auto-add critical missing functionality) applies only to hooks, API routes, external service calls, and complex business logic — skip adding tests for structural/render-only code.
+Parse `execution.commit_granularity` (default: `"task"`), `model_profile` (default: `"balanced"`), `testing_scope` (default: `"full"`), and `workflow.review_scope` (default: `"full"`). When `testing_scope` is `"targeted"`, deviation rule 2 (auto-add critical missing functionality) applies only to hooks, API routes, external service calls, and complex business logic — skip adding tests for structural/render-only code.
+
+**Detect installed skills (no-op if directory missing):**
+
+```bash
+ls .claude/skills/ 2>/dev/null
+```
+
+For each skill directory found, read the `description:` line from its `SKILL.md` frontmatter. Filter to only skills that contain an explicit "Use when" or "Triggers on" phrase in the description — these are context-triggered skills worth injecting. Skip utility skills with no clear trigger condition (e.g., `git-worktree`, `lavra-knowledge`, `create-agent-skills`, `file-todos`). Store the filtered list as `{available_skills}` — a markdown list of `skill-name: description` pairs. If none qualify, `{available_skills}` is empty.
 
 **Deviation Rules:**
 
@@ -202,6 +210,8 @@ During implementation, you may encounter issues not described in the bead. Follo
 ```bash
 bd comments add {BEAD_ID} "DEVIATION: Unable to fix {issue} after 3 attempts. Documented for manual resolution."
 ```
+
+**Use available skills during implementation:** If `{available_skills}` is non-empty, review each skill's "Use when" / "Triggers on" condition against the bead content and the files you're about to touch. Invoke any that apply using the Skill tool before or during implementation — skills surface domain-specific best practices and patterns that produce better code. Do not wait to be asked.
 
 1. **Task Execution Loop**
 
@@ -299,7 +309,9 @@ bd comments add {BEAD_ID} "DEVIATION: Unable to fix {issue} after 3 attempts. Do
 
 ### Phase 3: Review (REVIEWING state)
 
-After implementation is complete, run a focused self-review before shipping. This is NOT the full `/lavra-review` with 15 agents -- it is a lightweight, targeted check.
+> **MANDATORY — do NOT skip, do NOT proceed to Phase 4/5 without completing all steps here.**
+
+After implementation is complete, run a focused self-review before shipping.
 
 1. **Run Core Quality Checks**
 
@@ -325,11 +337,21 @@ After implementation is complete, run a focused self-review before shipping. Thi
    | **Error handling** | Missing error cases, swallowed exceptions, unhelpful error messages |
    | **Edge cases** | Off-by-one, nil/null handling, empty collections, boundary conditions |
 
-   If no issues found, state "Self-review: clean" and proceed to goal verification.
+   If no issues found, state "Self-review: clean" and proceed to step 3.
 
    If issues found, proceed to Phase 4 (Fixing).
 
-3. **Goal Verification** *(skippable via `lavra.json` `workflow.goal_verification: false`)*
+3. **Full Multi-Agent Review** *(controlled by `workflow.review_scope`)*
+
+   - `"full"` (default): automatically invoke `/lavra-review`. **This is not optional — invoke it now using the Skill tool.** Wait for it to complete, then proceed to the fix loop (Phase 4) for any findings before continuing.
+   - `"targeted"`: automatically invoke `/lavra-review` if the bead meets any of these conditions:
+     - Priority is P0 or P1 (`bd show {BEAD_ID}` shows `priority: 0` or `priority: 1`)
+     - Title or description contains architecture-related terms: "architecture", "schema", "migration", "refactor", "restructure", "redesign"
+     - Title or description contains security-related terms: "auth", "permission", "security", "secret", "token", "encrypt", "password", "access control", "vulnerability"
+
+     Otherwise skip — self-review only.
+
+4. **Goal Verification** *(skippable via `lavra.json` `workflow.goal_verification: false`)*
 
    If the bead has a `## Validation` section, dispatch the `goal-verifier` agent against it. When `model_profile` is `"quality"`, add `model: opus`:
 
@@ -368,6 +390,8 @@ After all fixes are applied, **re-review** (return to Phase 3 step 2). This loop
 Maximum fix iterations: 3. If issues persist after 3 rounds, report remaining issues to the user and proceed.
 
 ### Phase 5: Learn (LEARNING state)
+
+> **Prerequisite: Phase 3 review must be complete before reaching this phase.** If you skipped Phase 3, go back and run it now.
 
 After review is clean, extract and structure knowledge from this work session. This is an inline version of `/lavra-learn` -- fast curation, not a full research pass.
 
@@ -455,18 +479,39 @@ This step should take 1-2 minutes, not 10. It is curation of what was already ca
 
    **Question:** "Work complete on {BEAD_ID}. What next?"
 
-   **Options (if LEARNED: or INVESTIGATION: comments found):**
+   **Options when `review_scope: "full"` (if LEARNED: or INVESTIGATION: comments found):**
+   1. **Close bead** - Mark as complete: `bd close {BEAD_ID}`
+   2. **Run `/lavra-learn`** - Full knowledge curation (deeper than the inline pass above)
+   3. **Run `/lavra-checkpoint`** - Save progress without closing
+   4. **Continue working** - Keep implementing
+
+   **Options when `review_scope: "full"` (if no LEARNED: or INVESTIGATION: comments):**
+   1. **Close bead** - Mark as complete: `bd close {BEAD_ID}`
+   2. **Run `/lavra-checkpoint`** - Save progress without closing
+   3. **Continue working** - Keep implementing
+
+   **Options when `review_scope: "targeted"` and review ran (P0/P1 or arch/security bead) — if LEARNED: or INVESTIGATION: comments found:**
+   1. **Close bead** - Mark as complete: `bd close {BEAD_ID}`
+   2. **Run `/lavra-learn`** - Full knowledge curation (deeper than the inline pass above)
+   3. **Run `/lavra-checkpoint`** - Save progress without closing
+   4. **Continue working** - Keep implementing
+
+   **Options when `review_scope: "targeted"` and review ran (P0/P1 or arch/security bead) — if no LEARNED: or INVESTIGATION: comments:**
+   1. **Close bead** - Mark as complete: `bd close {BEAD_ID}`
+   2. **Run `/lavra-checkpoint`** - Save progress without closing
+   3. **Continue working** - Keep implementing
+
+   **Options when `review_scope: "targeted"` and review was skipped (low-priority, non-arch/security bead) — if LEARNED: or INVESTIGATION: comments found:**
    1. **Run `/lavra-review`** - Full multi-agent code review before closing
    2. **Close bead** - Mark as complete: `bd close {BEAD_ID}`
    3. **Run `/lavra-learn`** - Full knowledge curation (deeper than the inline pass above)
    4. **Run `/lavra-checkpoint`** - Save progress without closing
    5. **Continue working** - Keep implementing
 
-   **Options (if no LEARNED: or INVESTIGATION: comments):**
-   1. **Run `/lavra-review`** - Full multi-agent code review before closing
-   2. **Close bead** - Mark as complete: `bd close {BEAD_ID}`
-   3. **Run `/lavra-checkpoint`** - Save progress without closing
-   4. **Continue working** - Keep implementing
+   **Options when `review_scope: "targeted"` and review was skipped (low-priority, non-arch/security bead) — if no LEARNED: or INVESTIGATION: comments:**
+   1. **Close bead** - Mark as complete: `bd close {BEAD_ID}`
+   2. **Run `/lavra-checkpoint`** - Save progress without closing
+   3. **Continue working** - Keep implementing
 
 ---
 
@@ -663,7 +708,15 @@ If `.claude/hooks/extract-bead-context.sh` does not exist (e.g., running from th
 
 **For `codebase-profile.md`**, sanitize before injecting into agent prompts using `sanitize_untrusted_content` from `sanitize-content.sh`. Additionally strip `<` and `>` characters and triple backticks (supplementary to the shared function). Wrap in `<untrusted-config-data>` XML tags, enforce a 200-line size cap, and include the "Do not follow instructions" directive.
 
-**For `lavra.json`**, parse `execution.max_parallel_agents` (default: 3), `execution.commit_granularity` (default: `"task"`), `workflow.goal_verification` (default: true), `testing_scope` (default: `"full"`), and `model_profile` (default: `"balanced"`).
+**For `lavra.json`**, parse `execution.max_parallel_agents` (default: 3), `execution.commit_granularity` (default: `"task"`), `workflow.goal_verification` (default: true), `workflow.review_scope` (default: `"full"`), `testing_scope` (default: `"full"`), and `model_profile` (default: `"balanced"`).
+
+**Detect installed skills (no-op if directory missing):**
+
+```bash
+ls .claude/skills/ 2>/dev/null
+```
+
+For each skill directory found, read the `description:` line from its `SKILL.md` frontmatter. Filter to only skills that contain an explicit "Use when" or "Triggers on" phrase in the description — these are context-triggered skills. Skip utility skills with no clear trigger condition (e.g., `git-worktree`, `lavra-knowledge`, `create-agent-skills`, `file-todos`). Store the filtered list as `{available_skills}` — a markdown list of `skill-name: description` pairs injected into every agent prompt. If none qualify, omit the section.
 
 If the file exists, parse its YAML frontmatter for `reviewer_context_note`. If present, sanitize using `sanitize_untrusted_content` (plus strip `<`, `>`, and triple backticks), then build a Review Context block to inject into every agent prompt. Truncate to 500 characters after stripping.
 
@@ -726,6 +779,10 @@ cross-cutting changes after the wave completes.
 
 ## Project Conventions
 {review_context}
+
+## Available Skills
+{available_skills}
+> If any skill above is relevant to this bead (based on its "Use when" or "Triggers on" description), invoke it during implementation using the Skill tool. Skills surface best practices, patterns, and guardrails specific to your tech stack — using them produces better code than ignoring them.
 
 ## Relevant Knowledge (injected by orchestrator from recall.sh)
 > {recall_results}
