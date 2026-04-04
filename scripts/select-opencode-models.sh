@@ -90,7 +90,6 @@ select_model() {
   echo "---"
   echo ""
   echo "$tier tier: $description"
-  echo "  Current: $current"
   echo ""
 
   # Create numbered list
@@ -100,31 +99,31 @@ select_model() {
     [ -z "$model" ] && continue
     model_array+=("$model")
     if [ "$model" = "$current" ]; then
-      printf "  %2d) %s  (current)\n" "$i" "$model"
+      printf "  %2d) %s  <-- current\n" "$i" "$model"
     else
       printf "  %2d) %s\n" "$i" "$model"
     fi
     ((i++))
   done <<< "$models"
 
-  printf "  %2d) Keep current\n" 0
   echo ""
 
-  # Get user selection
+  # Get user selection (Enter = keep current)
   while true; do
-    read -p "  Select [0-$((i-1))]: " selection
+    read -p "  Pick [1-$((i-1))], or Enter to keep current: " selection
 
-    if [[ "$selection" =~ ^[0-9]+$ ]]; then
-      if [ "$selection" -eq 0 ]; then
-        echo "$current"
-        return
-      elif [ "$selection" -ge 1 ] && [ "$selection" -lt "$i" ]; then
-        echo "${model_array[$((selection-1))]}"
-        return
-      fi
+    # Empty input = keep current
+    if [ -z "$selection" ]; then
+      echo "$current"
+      return
     fi
 
-    echo "  Invalid. Enter a number between 0 and $((i-1))."
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [ "$selection" -ge 1 ] && [ "$selection" -lt "$i" ]; then
+      echo "${model_array[$((selection-1))]}"
+      return
+    fi
+
+    echo "  Invalid. Enter a number between 1 and $((i-1)), or press Enter to keep current."
   done
 }
 
