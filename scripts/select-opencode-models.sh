@@ -87,10 +87,11 @@ select_model() {
   local current="$3"
   local models="$4"
 
-  echo "---"
-  echo ""
-  echo "$tier tier: $description"
-  echo ""
+  # All UI output goes to stderr so command substitution only captures the selection
+  echo "---" >&2
+  echo "" >&2
+  echo "$tier tier: $description" >&2
+  echo "" >&2
 
   # Create numbered list
   local i=1
@@ -99,14 +100,14 @@ select_model() {
     [ -z "$model" ] && continue
     model_array+=("$model")
     if [ "$model" = "$current" ]; then
-      printf "  %2d) %s  <-- current\n" "$i" "$model"
+      printf "  %2d) %s  <-- current\n" "$i" "$model" >&2
     else
-      printf "  %2d) %s\n" "$i" "$model"
+      printf "  %2d) %s\n" "$i" "$model" >&2
     fi
     ((i++))
   done <<< "$models"
 
-  echo ""
+  echo "" >&2
 
   # Get user selection (Enter = keep current)
   while true; do
@@ -123,7 +124,7 @@ select_model() {
       return
     fi
 
-    echo "  Invalid. Enter a number between 1 and $((i-1)), or press Enter to keep current."
+    echo "  Invalid. Enter a number between 1 and $((i-1)), or press Enter to keep current." >&2
   done
 }
 
