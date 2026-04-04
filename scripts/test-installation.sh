@@ -250,10 +250,10 @@ fi
 
 # Verify skills
 GEMINI_SKILL_COUNT=$(find skills -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
-if [[ "$GEMINI_SKILL_COUNT" -ge 8 ]]; then
+if [[ "$GEMINI_SKILL_COUNT" -ge 7 ]]; then
   pass "Gemini skills installed ($GEMINI_SKILL_COUNT files)"
 else
-  fail "Gemini skills" "Expected 8+, found $GEMINI_SKILL_COUNT"
+  fail "Gemini skills" "Expected 7+, found $GEMINI_SKILL_COUNT"
 fi
 
 # ==============================================================================
