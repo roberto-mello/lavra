@@ -176,10 +176,7 @@ async function testModelNameValidation() {
       validateModelName(model);
       fail(`Invalid model: ${model}`, "Should have thrown error");
     } catch (err: any) {
-      if (
-        err.message.includes("Invalid model name format") ||
-        err.message.includes("Unsupported model")
-      ) {
+      if (err.message.includes("Invalid model name format")) {
         pass(`Invalid model rejected: ${model}`);
       } else {
         fail(`Invalid model: ${model}`, `Wrong error: ${err.message}`);

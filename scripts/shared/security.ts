@@ -6,19 +6,9 @@ import { stat, chmod } from "node:fs/promises";
  */
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export const ALLOWED_FILE_PATTERN = /^[a-zA-Z0-9._-]+\.md$/;
-export const ALLOWED_MODEL_NAMES = new Set([
-  "sonnet",
-  "opus",
-  "haiku",
-  "inherit",
-  "anthropic/claude-sonnet-4-20250514",
-  "anthropic/claude-sonnet-4-5-20250929",
-  "anthropic/claude-opus-4-6",
-  "anthropic/claude-haiku-4-5-20251001",
-  "gemini-2.5-pro",
-  "gemini-2.5-flash",
-  "gemini-2.0-flash",
-]);
+// Model name format: alphanumeric + hyphen + slash + dot (e.g. "anthropic/claude-opus-4-6")
+// No allowlist — users can select any model from their provider.
+// The format regex in validateModelName() prevents injection.
 
 /**
  * Validates that a path does not escape the base directory
@@ -77,13 +67,10 @@ export async function writeFileSafe(
  * Prevents injection via model field
  */
 export function validateModelName(modelName: string): string {
-  // Strict alphanumeric + hyphen + slash + dot validation
-  if (!/^[a-z0-9/.-]+$/i.test(modelName)) {
+  // Strict alphanumeric + hyphen + slash + dot + colon validation
+  // Prevents injection — model names go into frontmatter, not shell commands
+  if (!/^[a-z0-9/.:-]+$/i.test(modelName) || modelName.includes("..")) {
     throw new Error(`Invalid model name format: ${modelName}`);
-  }
-
-  if (!ALLOWED_MODEL_NAMES.has(modelName)) {
-    throw new Error(`Unsupported model: ${modelName}`);
   }
 
   return modelName;
