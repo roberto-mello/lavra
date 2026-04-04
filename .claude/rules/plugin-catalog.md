@@ -5,7 +5,7 @@ globs: "**/plugins/**,**/agents/**,**/commands/**,**/skills/**"
 
 # Plugin Catalog
 
-## Commands (23 core + 5 optional)
+## Commands (24 core + 5 optional)
 
 Commands are in `plugins/lavra/commands/`:
 
@@ -38,10 +38,11 @@ Commands are in `plugins/lavra/commands/`:
 | `/lavra-triage` | lavra-triage.md | Prioritize and categorize beads |
 | `/lavra-import` | lavra-import.md | Import markdown plans into beads |
 
-**Utility (4):**
+**Utility (5):**
 
 | Command | File | Description |
 |---------|------|-------------|
+| `/lavra-setup` | lavra-setup.md | Configure project stack, review agents, and workflow |
 | `/changelog` | changelog.md | Create engaging changelogs |
 | `/heal-skill` | heal-skill.md | Fix incorrect SKILL.md files |
 | `/test-browser` | test-browser.md | Browser tests on affected pages |
@@ -80,6 +81,7 @@ Skills are in `plugins/lavra/skills/` (core) and `plugins/lavra/skills/optional/
 - **create-agent-skills**: Create new agents and skills
 - **agent-native-architecture**: Design agent-native system architectures
 - **lavra-knowledge**: Document solved problems as knowledge entries
+- **lavra-work**: Internal references for subagent prompts, single-bead and multi-bead work paths (not user-invokable)
 - **agent-browser**: Browser automation for testing and screenshots
 - **andrew-kane-gem-writer**: Write Ruby gems following Andrew Kane's style
 - **dhh-rails-style**: Rails development following DHH's conventions
@@ -88,7 +90,6 @@ Skills are in `plugins/lavra/skills/` (core) and `plugins/lavra/skills/optional/
 - **file-todos**: Find and manage TODO comments in code
 - **frontend-design**: Frontend design patterns and best practices
 - **gemini-imagegen**: Generate images using Google's Gemini
-- **project-setup**: Project stack detection, review agent config, and optional brownfield codebase analysis
 - **rclone**: Cloud storage file management with rclone
 
 ## Subagent Integration

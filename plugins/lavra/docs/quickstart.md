@@ -36,10 +36,10 @@ Existing projects get this file automatically on next session start (version sel
 
 ### Codebase analysis (optional, for brownfield projects)
 
-If you're installing lavra into an existing project, run `/project-setup` to generate a codebase profile:
+If you're installing lavra into an existing project, run `/lavra-setup` to generate a codebase profile:
 
 ```
-/project-setup
+/lavra-setup
 ```
 
 When prompted "Run codebase analysis?", choose Y. This dispatches 3 parallel agents to analyze your stack, architecture, and conventions, saving the results to `.lavra/config/codebase-profile.md`. This file is used by `/lavra-design` and `/lavra-work` as planning context.

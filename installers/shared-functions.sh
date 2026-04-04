@@ -165,7 +165,7 @@ parse_installer_args() {
       echo "" >&2
       echo "  Install for this project only, or globally (all projects)?" >&2
       echo "    1) This project only  ($PWD)" >&2
-      echo "    2) Globally           (${LAVRA_GLOBAL_DEFAULT}, then run /project-setup per project)" >&2
+      echo "    2) Globally           (${LAVRA_GLOBAL_DEFAULT}, then run /lavra-setup per project)" >&2
       echo "" >&2
       read -r -p "  Choose [1/2, default: 1]: " scope_choice </dev/tty
       echo "" >&2

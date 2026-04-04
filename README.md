@@ -134,7 +134,7 @@ Six knowledge types (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION, DEVIATION)
 
 ### Configuration
 
-**`.lavra/config/lavra.json`** can be created manually or by the `/project-setup` command.
+**`.lavra/config/lavra.json`** can be created manually or by the `/lavra-setup` command.
 It allows users to toggle workflow phases, planning and execution behavior:
 
 ```jsonc
@@ -153,7 +153,7 @@ It allows users to toggle workflow phases, planning and execution behavior:
 }
 ```
 
-**`/project-setup`**: run this to generate a codebase profile (stack, architecture, conventions) that informs planning.
+**`/lavra-setup`**: run this to generate a codebase profile (stack, architecture, conventions) that informs planning.
 
 ## Acknowledgments
 

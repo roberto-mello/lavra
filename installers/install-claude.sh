@@ -79,7 +79,7 @@ echo ""
 if [ "$GLOBAL_INSTALL" = true ] && [ "$AUTO_YES" = false ]; then
   echo "[!] Note: Global install provides commands, agents, and skills everywhere,"
   echo "    but memory features (auto-recall, knowledge capture) require per-project"
-  echo "    setup. Run /project-setup once in each project to configure stack,"
+  echo "    setup. Run /lavra-setup once in each project to configure stack,"
   echo "    review agents, and workflow settings."
   echo ""
   read -r -p "    Continue? [Y/n] " response
@@ -134,10 +134,10 @@ else
     echo "  - Memory system configured"
   fi
 
-  # Nudge toward /project-setup (skip if --yes or --quiet)
+  # Nudge toward /lavra-setup (skip if --yes or --quiet)
   if [ "$AUTO_YES" = false ] && [ "$QUIET" = false ] && [ -t 0 ]; then
     echo ""
-    echo "  Run /project-setup to configure stack, review agents, and workflow"
+    echo "  Run /lavra-setup to configure stack, review agents, and workflow"
     echo "  settings for this project. Takes about 1 minute."
     echo ""
   fi

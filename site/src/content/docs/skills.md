@@ -42,9 +42,11 @@ Manages git worktrees for isolated parallel development — create, switch, list
 
 Captures solved problems as structured knowledge entries for fast future recall.
 
-### project-setup
+### lavra-work (internal)
 
-Detects your tech stack, lets you toggle review agents, and saves config to `.lavra/config/project-setup.md`.
+Internal reference files for subagent prompts, single-bead and multi-bead work paths. Not user-invokable -- used by `/lavra-work`, `/lavra-work-ralph`, and `/lavra-work-teams`.
+
+> **Note:** Project setup is now a command: `/lavra-setup`. See [commands](/docs/commands).
 
 ## Optional skills
 

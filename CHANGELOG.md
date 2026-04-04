@@ -14,7 +14,7 @@ See [docs/releases/v0.7.0.md](docs/releases/v0.7.0.md) for the full release note
 - Deviation rules -- `DEVIATION:` knowledge type, 4-rule auto-fix framework, PR summaries
 - Session state digest -- `.beads/memory/session-state.md` survives context compaction
 - Decision categorization -- Locked Decisions / Agent Discretion / Deferred sections in brainstorm and plan
-- Brownfield codebase analysis -- `/project-setup` Step 1.5 with 3 parallel agents
+- Brownfield codebase analysis -- `/lavra-setup` Step 1.5 with 3 parallel agents
 - Workflow config -- `.beads/config/lavra.json` toggles for research, review, verification, parallelism
 - Atomic commits per task -- `{type}({BEAD_ID}): {description}` format, per-bead in multi-bead
 - `project-setup` skill, `migration-drift-detector` agent

@@ -46,10 +46,11 @@ See the [Command Reference](/docs/commands) for descriptions and direct links, o
 | `/lavra-learn` | Curate raw knowledge comments into structured, well-tagged entries for future auto-recall | After closing beads, clean up terse knowledge captured during work |
 | `/lavra-recall` | Search knowledge base mid-session and inject relevant context | When you need past learnings mid-session without restarting |
 
-### Utility (4)
+### Utility (5)
 
 | Command | Description | When to Use |
 |---------|-------------|-------------|
+| `/lavra-setup` | Configure project stack, review agents, and workflow settings | First time setting up Lavra in a project, or reconfiguring |
 | `/changelog` | Create engaging changelogs for recent merges to main branch | Before a release, summarize what shipped |
 | `/heal-skill` | Fix incorrect SKILL.md files when a skill has wrong instructions or outdated API references | When a skill is misbehaving or referencing stale APIs |
 | `/test-browser` | Run browser tests on pages affected by current PR or branch | After UI changes, verify nothing broke in the browser |
@@ -94,7 +95,7 @@ Domain-specific commands in `commands/optional/`. Not installed by default, copy
 | `file-todos` | Find and manage TODO comments in code |
 | `git-worktree` | Manage git worktrees for parallel bead work |
 | `lavra-knowledge` | Document solved problems as knowledge entries |
-| `project-setup` | Project stack detection, review agent config, and optional codebase analysis |
+| `lavra-work` | Internal references for subagent prompts, single-bead and multi-bead work paths |
 
 ### Optional (7): Copy from `skills/optional/` to use
 

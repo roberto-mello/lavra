@@ -19,7 +19,7 @@ npx @lavralabs/lavra@latest --gemini      # Gemini CLI
 npx @lavralabs/lavra@latest --cortex      # Cortex Code
 ```
 
-If the installer detects a project in the current directory, it will ask whether to install for this project only or globally (`~/.claude`). A global install makes commands available in every project, but you still run [/project-setup](#codebase-analysis) per project to configure the memory system and review agents.
+If the installer detects a project in the current directory, it will ask whether to install for this project only or globally (`~/.claude`). A global install makes commands available in every project, but you still run [/lavra-setup](#codebase-analysis) per project to configure the memory system and review agents.
 
 Or with Bun:
 
@@ -44,7 +44,7 @@ ls -la .lavra/memory/        # Should see knowledge.jsonl, recall.sh
 
 ### Workflow config
 
-The [/project-setup](#codebase-analysis) command creates `.lavra/config/lavra.json`, among other things. Once generated, you can edit it to tune Lavra (the example below is in `jsonc` format, with comments):
+The [/lavra-setup](#codebase-analysis) command creates `.lavra/config/lavra.json`, among other things. Once generated, you can edit it to tune Lavra (the example below is in `jsonc` format, with comments):
 
 ```jsonc
 {
@@ -64,15 +64,15 @@ The [/project-setup](#codebase-analysis) command creates `.lavra/config/lavra.js
 
 ### Codebase analysis
 
-If you're installing Lavra into an existing project, run `/project-setup` to generate a codebase profile:
+If you're installing Lavra into an existing project, run `/lavra-setup` to generate a codebase profile:
 
 ```
-/project-setup
+/lavra-setup
 ```
 
 We recommend that you run codebase analysis when prompted. This dispatches 3 parallel agents to analyze your stack, architecture, and conventions, saving the results to `.lavra/config/codebase-profile.md`. This file is used by `/lavra-design` and `/lavra-work` as planning context.
 
-`/project-setup` also asks questions to configure the behavior of Lavra's planning, reviewing and implementation agents. See [Workflow config](#workflow-config).
+`/lavra-setup` also asks questions to configure the behavior of Lavra's planning, reviewing and implementation agents. See [Workflow config](#workflow-config).
 
 ## Your First Workflow
 
