@@ -2,6 +2,7 @@
 #
 # Interactive model selection for OpenCode installation
 # Queries available models via 'opencode models' and lets user select preferences
+# for each tier (haiku/sonnet/opus)
 #
 # Usage:
 #   ./select-opencode-models.sh [--yes]
@@ -26,26 +27,24 @@ done
 if ! command -v opencode &>/dev/null; then
   echo "[!] Error: 'opencode' command not found"
   echo "    OpenCode must be installed to query available models"
-  echo "    Visit: https://github.com/smallcloudai/refact"
   exit 1
 fi
 
 # Query available models
-echo "🔍 Querying available models from OpenCode..."
+echo "Querying available models from OpenCode..."
 MODELS_OUTPUT=$(opencode models 2>&1 || true)
 
-# Extract Anthropic/Claude models
-CLAUDE_MODELS=$(echo "$MODELS_OUTPUT" | grep -E "anthropic/claude-" | awk '{print $1}' | sort -u || true)
+# Extract all models (not just Anthropic)
+ALL_MODELS=$(echo "$MODELS_OUTPUT" | awk '{print $1}' | grep -E "/" | sort -u || true)
 
-if [ -z "$CLAUDE_MODELS" ]; then
-  echo "[!] Warning: No Anthropic/Claude models found in OpenCode"
+if [ -z "$ALL_MODELS" ]; then
+  echo "[!] Warning: No models found in OpenCode"
   echo "    Using defaults from model-config.json"
   exit 0
 fi
 
 echo ""
-echo "Found $(echo "$CLAUDE_MODELS" | wc -l | tr -d ' ') Claude models:"
-echo "$CLAUDE_MODELS" | sed 's/^/  - /'
+echo "Found $(echo "$ALL_MODELS" | wc -l | tr -d ' ') models"
 echo ""
 
 # Load current config
@@ -68,37 +67,52 @@ if [ "$AUTO_YES" = true ]; then
   exit 0
 fi
 
+# Build tier-appropriate model lists
+# haiku-class: fast, cheap models for lookups and simple tasks
+HAIKU_MODELS=$(echo "$ALL_MODELS" | grep -iE "haiku|flash|mini|small|fast" || true)
+# sonnet-class: balanced models for most coding work
+SONNET_MODELS=$(echo "$ALL_MODELS" | grep -iE "sonnet|pro(?!-preview)|medium|4o[^-]|gpt-4o$" || true)
+# opus-class: most capable models for complex reasoning
+OPUS_MODELS=$(echo "$ALL_MODELS" | grep -iE "opus|pro-preview|ultra|large|o1|o3" || true)
+
+# Fallback: if filtering found nothing, offer all models for that tier
+[ -z "$HAIKU_MODELS" ] && HAIKU_MODELS="$ALL_MODELS"
+[ -z "$SONNET_MODELS" ] && SONNET_MODELS="$ALL_MODELS"
+[ -z "$OPUS_MODELS" ] && OPUS_MODELS="$ALL_MODELS"
+
 # Interactive selection function
 select_model() {
   local tier="$1"
-  local current="$2"
-  local pattern="$3"
+  local description="$2"
+  local current="$3"
+  local models="$4"
 
-  echo "Select model for $tier tier (current: $current):"
+  echo "---"
   echo ""
-
-  # Filter models by pattern
-  local filtered=$(echo "$CLAUDE_MODELS" | grep -i "$pattern" || echo "$CLAUDE_MODELS")
+  echo "$tier tier: $description"
+  echo "  Current: $current"
+  echo ""
 
   # Create numbered list
   local i=1
   local model_array=()
   while IFS= read -r model; do
+    [ -z "$model" ] && continue
     model_array+=("$model")
     if [ "$model" = "$current" ]; then
-      echo "  $i) $model (current)"
+      printf "  %2d) %s  (current)\n" "$i" "$model"
     else
-      echo "  $i) $model"
+      printf "  %2d) %s\n" "$i" "$model"
     fi
     ((i++))
-  done <<< "$filtered"
+  done <<< "$models"
 
-  echo "  0) Keep current ($current)"
+  printf "  %2d) Keep current\n" 0
   echo ""
 
   # Get user selection
   while true; do
-    read -p "Selection (0-$((i-1))): " selection
+    read -p "  Select [0-$((i-1))]: " selection
 
     if [[ "$selection" =~ ^[0-9]+$ ]]; then
       if [ "$selection" -eq 0 ]; then
@@ -110,37 +124,51 @@ select_model() {
       fi
     fi
 
-    echo "Invalid selection. Please enter a number between 0 and $((i-1))."
+    echo "  Invalid. Enter a number between 0 and $((i-1))."
   done
 }
 
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "Model Selection"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "==============="
+echo ""
+echo "Lavra uses three model tiers. Pick the model you want for each."
+echo "You can use models from any provider (Anthropic, Google, OpenAI, etc)."
 echo ""
 
 # Select models for each tier
-HAIKU_MODEL=$(select_model "haiku" "$CURRENT_HAIKU" "haiku")
+HAIKU_MODEL=$(select_model \
+  "Haiku" \
+  "Fast, cheap -- knowledge recall, lookups, simple tasks" \
+  "$CURRENT_HAIKU" \
+  "$HAIKU_MODELS")
 echo ""
 
-SONNET_MODEL=$(select_model "sonnet" "$CURRENT_SONNET" "sonnet")
+SONNET_MODEL=$(select_model \
+  "Sonnet" \
+  "Balanced -- most coding work, reviews, implementation" \
+  "$CURRENT_SONNET" \
+  "$SONNET_MODELS")
 echo ""
 
-OPUS_MODEL=$(select_model "opus" "$CURRENT_OPUS" "opus")
+OPUS_MODEL=$(select_model \
+  "Opus" \
+  "Most capable -- complex reasoning, architecture, planning" \
+  "$CURRENT_OPUS" \
+  "$OPUS_MODELS")
 echo ""
 
 # Confirm selections
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Selected Models:"
-echo "  haiku:  $HAIKU_MODEL"
-echo "  sonnet: $SONNET_MODEL"
-echo "  opus:   $OPUS_MODEL"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "---"
+echo ""
+echo "Selected:"
+echo "  Haiku:  $HAIKU_MODEL"
+echo "  Sonnet: $SONNET_MODEL"
+echo "  Opus:   $OPUS_MODEL"
 echo ""
 
-read -p "Save this configuration? (y/N): " confirm
+read -p "Save? (y/N): " confirm
 if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-  echo "Configuration not saved."
+  echo "Not saved."
   exit 0
 fi
 
@@ -172,7 +200,4 @@ fi
 echo "$CONFIG" | jq . > "$CONFIG_FILE"
 
 echo ""
-echo "✅ Configuration saved to: $CONFIG_FILE"
-echo ""
-echo "Next steps:"
-echo "  Run the OpenCode installer to use these model selections"
+echo "Saved to: $CONFIG_FILE"

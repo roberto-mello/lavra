@@ -63,6 +63,16 @@ if [[ "$TARGET_OWNER" != "$USER" ]]; then
   exit 1
 fi
 
+# Dependency check: jq is required for model selection and MCP config
+if ! command -v jq &>/dev/null; then
+  echo "[!] Error: jq is required for OpenCode installation"
+  echo "    Install jq:"
+  echo "      macOS:  brew install jq"
+  echo "      Ubuntu: sudo apt-get install jq"
+  echo "      Other:  https://jqlang.github.io/jq/download/"
+  exit 1
+fi
+
 # Step 1: Model selection (interactive unless --yes or non-interactive)
 if [ "$AUTO_YES" = false ] && [[ -t 0 ]] && command -v opencode &>/dev/null; then
   echo "[1/6] Model selection..."
@@ -94,8 +104,14 @@ if ! command -v bun &>/dev/null; then
   exit 1
 fi
 
-# Run conversion (with flag to suppress standalone instructions)
+# Install conversion dependencies (js-yaml) if needed
 cd "$SCRIPT_DIR/scripts"
+if [ ! -d "node_modules/js-yaml" ]; then
+  echo "  Installing conversion dependencies..."
+  bun install --frozen-lockfile 2>/dev/null || bun install
+fi
+
+# Run conversion (with flag to suppress standalone instructions)
 if ! BEADS_INSTALLING=1 bun run convert-opencode.ts; then
   echo "[!] Error: Conversion failed"
   exit 1
@@ -224,9 +240,7 @@ fi
 echo "[7/6] Configuring MCP servers..."
 
 OPENCODE_CONFIG="$HOME/.config/opencode/opencode.json"
-if ! command -v jq &>/dev/null; then
-  echo "  [!] jq not found -- skipping MCP config (add context7 to $OPENCODE_CONFIG manually)"
-elif [ -f "$OPENCODE_CONFIG" ] && jq -e '.mcp["context7"]' "$OPENCODE_CONFIG" &>/dev/null; then
+if [ -f "$OPENCODE_CONFIG" ] && jq -e '.mcp["context7"]' "$OPENCODE_CONFIG" &>/dev/null; then
   echo "  - Context7 already in $OPENCODE_CONFIG -- skipping"
 else
   CONTEXT7_ENTRY='{"type":"remote","url":"https://mcp.context7.com/mcp"}'

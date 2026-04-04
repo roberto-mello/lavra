@@ -74,8 +74,14 @@ if ! command -v bun &>/dev/null; then
   exit 1
 fi
 
-# Run conversion
+# Install conversion dependencies (js-yaml) if needed
 cd "$SCRIPT_DIR/scripts"
+if [ ! -d "node_modules/js-yaml" ]; then
+  echo "  Installing conversion dependencies..."
+  bun install --frozen-lockfile 2>/dev/null || bun install
+fi
+
+# Run conversion
 if ! bun run convert-gemini.ts; then
   echo "[!] Error: Conversion failed"
   exit 1
