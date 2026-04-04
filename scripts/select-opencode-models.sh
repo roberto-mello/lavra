@@ -67,18 +67,12 @@ if [ "$AUTO_YES" = true ]; then
   exit 0
 fi
 
-# Build tier-appropriate model lists
-# haiku-class: fast, cheap models for lookups and simple tasks
-HAIKU_MODELS=$(echo "$ALL_MODELS" | grep -iE "haiku|flash|mini|small|fast" || true)
-# sonnet-class: balanced models for most coding work (match "pro" but exclude "pro-preview" which is opus-class)
-SONNET_MODELS=$(echo "$ALL_MODELS" | grep -iE "sonnet|pro|medium|4o|gpt-4o" | grep -iv "preview" || true)
-# opus-class: most capable models for complex reasoning
-OPUS_MODELS=$(echo "$ALL_MODELS" | grep -iE "opus|pro-preview|ultra|large|o1|o3" || true)
-
-# Fallback: if filtering found nothing, offer all models for that tier
-[ -z "$HAIKU_MODELS" ] && HAIKU_MODELS="$ALL_MODELS"
-[ -z "$SONNET_MODELS" ] && SONNET_MODELS="$ALL_MODELS"
-[ -z "$OPUS_MODELS" ] && OPUS_MODELS="$ALL_MODELS"
+# Show all available models for every tier -- the user knows best which model
+# fits each role. Trying to guess tiers from model names is brittle and hides
+# models with unfamiliar names (Zen, Nemotron, Minimax, etc.).
+HAIKU_MODELS="$ALL_MODELS"
+SONNET_MODELS="$ALL_MODELS"
+OPUS_MODELS="$ALL_MODELS"
 
 # Interactive selection function
 select_model() {
