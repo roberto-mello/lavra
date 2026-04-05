@@ -28,12 +28,28 @@ if [[ -n "$CLAUDE_PROJECT_DIR" ]]; then
   fi
 fi
 
-# Extract BEAD_ID
-BEAD_ID=$(echo "$COMMAND" | sed -E 's/.*bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+([A-Za-z0-9._-]+)[[:space:]]+.*/\1/')
-[[ -z "$BEAD_ID" || "$BEAD_ID" == "$COMMAND" ]] && exit 0
+# Scope extraction to the first bd comments add line that contains a knowledge prefix.
+# Running on the full COMMAND causes two bugs when multiple commands are chained (&&, ;, newlines):
+#   1. BEAD_ID: sed passes non-matching lines through unchanged, polluting the value with
+#      subsequent shell commands (e.g. "bd close ... 2>&1 | grep ...").
+#   2. COMMENT_BODY: the greedy .* matches to the *last* bd comments add in the string,
+#      concatenating all comment bodies into one blob with embedded shell operators.
+MATCH_LINE=$(echo "$COMMAND" \
+  | grep -E 'bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+' \
+  | grep -m1 -E '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:)')
+[[ -z "$MATCH_LINE" ]] && exit 0
 
-# Extract comment body
-COMMENT_BODY=$(echo "$COMMAND" | sed -E 's/.*bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+[A-Za-z0-9._-]+[[:space:]]+["'\'']//' | sed -E 's/["'\''][[:space:]]*$//' | head -c 4096)
+# Extract BEAD_ID from that line only
+BEAD_ID=$(echo "$MATCH_LINE" | sed -E 's/.*bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+([A-Za-z0-9._-]+)[[:space:]]+.*/\1/')
+[[ -z "$BEAD_ID" || "$BEAD_ID" == "$MATCH_LINE" ]] && exit 0
+
+# Extract comment body: strip prefix up to opening quote, then strip from the
+# closing quote onward (handles trailing 2>&1, &&, |, ; operators)
+COMMENT_BODY=$(echo "$MATCH_LINE" \
+  | sed -E 's/.*bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+[A-Za-z0-9._-]+[[:space:]]+["'\'']//' \
+  | sed -E 's/["'\''][[:space:]]*(2>&1|&&|\||;).*$//' \
+  | sed -E 's/["'\''][[:space:]]*$//' \
+  | head -c 4096)
 [[ -z "$COMMENT_BODY" ]] && exit 0
 
 # Detect type from prefix
