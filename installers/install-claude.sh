@@ -185,7 +185,7 @@ else
   for cmd in "$PLUGIN_DIR/commands"/*.md; do
     if [ -f "$cmd" ]; then
       cp "$cmd" "$COMMANDS_DIR/$(basename "$cmd")"
-      ((CMD_COUNT++))
+      CMD_COUNT=$((CMD_COUNT + 1))
     fi
   done
 
@@ -217,7 +217,7 @@ else
         for agent in "$category"/*.md; do
           if [ -f "$agent" ]; then
             cp "$agent" "$AGENTS_DIR/$category_name/$(basename "$agent")"
-            ((AGENT_COUNT++))
+            AGENT_COUNT=$((AGENT_COUNT + 1))
           fi
         done
       fi
@@ -268,7 +268,7 @@ else
         # Copy entire skill directory (may contain references/, templates/, etc.)
         cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
         touch "$SKILLS_DIR/$skill_name/.lavra"
-        ((SKILL_COUNT++))
+        SKILL_COUNT=$((SKILL_COUNT + 1))
       fi
     done
   fi
