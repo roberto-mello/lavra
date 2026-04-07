@@ -54,8 +54,7 @@ BEAD_ID=$(echo "$BEAD_ID" | tr -cd 'A-Za-z0-9._-')
 # closing quote onward (handles trailing 2>&1, &&, |, ; operators)
 COMMENT_BODY=$(echo "$MATCH_LINE" \
   | sed -E 's/.*bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+[A-Za-z0-9._-]+[[:space:]]+["'\'']//' \
-  | sed -E 's/["'\''][[:space:]]*(2>&1|&&|\||;).*$//' \
-  | sed -E 's/["'\''][[:space:]]*$//' \
+  | sed -E 's/["'\''][[:space:]]*(2>&1|\|\||&&|\||;).*$|["'\''][[:space:]]*$//' \
   | head -c 4096)
 [[ -z "$COMMENT_BODY" ]] && exit 0
 
