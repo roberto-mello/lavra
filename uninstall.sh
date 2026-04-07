@@ -30,6 +30,7 @@ Platforms:
   -opencode, --opencode   Uninstall from OpenCode
   -gemini, --gemini       Uninstall from Gemini CLI
   -cortex, --cortex       Uninstall from Cortex Code
+  -cursor, --cursor       Uninstall from Cursor IDE
 
 Target:
   [path]                  Uninstall from specific project directory
@@ -44,6 +45,7 @@ Examples:
   ./uninstall.sh -opencode                # Global OpenCode uninstall
   ./uninstall.sh -gemini /path/to/project # Project-specific Gemini uninstall
   ./uninstall.sh -cortex                  # Global Cortex Code uninstall
+  ./uninstall.sh -cursor /path/to/project # Project-specific Cursor uninstall
 
 EOF
   exit 0
@@ -54,12 +56,12 @@ validate_platform() {
   local platform="$1"
 
   case "$platform" in
-    claude|opencode|gemini|cortex)
+    claude|opencode|gemini|cortex|cursor)
       return 0
       ;;
     *)
       echo "[!] Error: Invalid platform '$platform'"
-      echo "    Allowed platforms: claude, opencode, gemini, cortex"
+      echo "    Allowed platforms: claude, opencode, gemini, cortex, cursor"
       echo ""
       echo "Run './uninstall.sh --help' for usage information."
       exit 1
@@ -87,6 +89,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     -cortex|--cortex)
       PLATFORM="cortex"
+      shift
+      ;;
+    -cursor|--cursor)
+      PLATFORM="cursor"
       shift
       ;;
     *)
