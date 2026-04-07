@@ -92,6 +92,41 @@ bd comments add <BEAD_ID> "LEARNED: Testing memory capture"
 tail -1 .lavra/memory/knowledge.jsonl
 ```
 
+### Cursor IDE
+
+```bash
+# Check if hooks are installed
+ls -la .cursor/hooks/
+
+# Check hook configuration
+cat .cursor/hooks.json | jq '.hooks'
+
+# Check memory directory
+ls -la .lavra/memory/
+
+# Test knowledge capture manually
+bd comments add <BEAD_ID> "LEARNED: Testing memory capture"
+tail -1 .lavra/memory/knowledge.jsonl
+
+# Test recall manually
+bash .lavra/memory/recall.sh
+```
+
+**Expected hooks in .cursor/hooks.json:**
+- `sessionStart`: `auto-recall-cursor.sh`
+- `afterShellExecution`: `memory-capture.sh`
+- `subagentStop`: `subagent-wrapup.sh`
+
+**Hooks not firing:**
+- Cursor v2.4+ is required — earlier versions silently ignore `sessionStart`
+- Restart Cursor completely after installing (not just a new window)
+
+**Memory capture not working:**
+- Cursor sends `hook_event_name: "afterShellExecution"` with no `tool_name` field — `memory-capture.sh` v0.7.2+ handles this. Re-run the installer if on an older version.
+
+**Auto-recall returning nothing:**
+- Cursor sends `workspace_roots[]` instead of `cwd`. The `auto-recall-cursor.sh` adapter bridges this. If recall isn't injecting context, check that `.cursor/hooks/auto-recall-cursor.sh` exists (not just `auto-recall.sh`).
+
 ### Cortex Code
 
 **Hooks not loading:**
