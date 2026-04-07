@@ -8,14 +8,17 @@
 #
 
 INPUT=$(cat)
-TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
+# Extract tool_name and hook_event_name in a single jq call (avoids double subprocess on hot path)
+IFS=$'\t' read -r TOOL_NAME HOOK_EVENT < <(echo "$INPUT" | jq -r '[.tool_name // "", .hook_event_name // ""] | @tsv')
+# Pass through: Claude Code Bash tool OR Cursor afterShellExecution (which sends no tool_name)
+[[ "$TOOL_NAME" != "Bash" && "$TOOL_NAME" != "bash" && "$HOOK_EVENT" != "afterShellExecution" ]] && exit 0
 
-[[ "$TOOL_NAME" != "Bash" && "$TOOL_NAME" != "bash" ]] && exit 0
-
-COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
+# Claude Code path: command in .tool_input.command | Cursor path: command in .command
+COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // .command // empty')
 [[ -z "$COMMAND" ]] && exit 0
 
-echo "$COMMAND" | grep -qE 'bd\s+comments?\s+add\s+' || exit 0
+# Anchor to line-start to prevent false positives from grep/cat of files containing bd examples
+echo "$COMMAND" | grep -qE '^[[:space:]]*bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+' || exit 0
 echo "$COMMAND" | grep -qE '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:)' || exit 0
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
