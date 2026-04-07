@@ -10,10 +10,6 @@
 INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
 
-SCRIPT_DIR_EARLY="$(cd "$(dirname "$0")" && pwd)"
-# shellcheck source=sanitize-content.sh
-source "$SCRIPT_DIR_EARLY/sanitize-content.sh"
-
 [[ "$TOOL_NAME" != "Bash" && "$TOOL_NAME" != "bash" ]] && exit 0
 
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
@@ -21,6 +17,10 @@ COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 
 echo "$COMMAND" | grep -qE 'bd\s+comments?\s+add\s+' || exit 0
 echo "$COMMAND" | grep -qE '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:)' || exit 0
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=sanitize-content.sh
+source "$SCRIPT_DIR/sanitize-content.sh"
 
 # Validate CLAUDE_PROJECT_DIR to prevent redirect attacks
 # Placed AFTER early-exit guards (PostToolUse fires very frequently; this runs on ~1% of calls)
@@ -122,7 +122,6 @@ KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 
 # SQLite dual-write (graceful fallback if sqlite3 unavailable)
 if command -v sqlite3 &>/dev/null; then
-  SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
   if [[ -f "$SCRIPT_DIR/knowledge-db.sh" ]]; then
     source "$SCRIPT_DIR/knowledge-db.sh"
     TAGS_TEXT=$(echo "$TAGS_JSON" | jq -r '.[]' 2>/dev/null | tr '\n' ' ')
