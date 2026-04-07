@@ -483,17 +483,23 @@ else
   fail "Cursor IDE memory" ".lavra/memory/knowledge.jsonl not created"
 fi
 
-# Verify commands and skills NOT installed (Cursor doesn't use them)
+# Verify commands NOT installed (Cursor doesn't use slash commands)
 if [[ ! -d ".cursor/commands" ]]; then
   pass "Cursor IDE correctly skips commands"
 else
   fail "Cursor IDE" ".cursor/commands should not exist"
 fi
 
-if [[ ! -d ".cursor/skills" ]]; then
-  pass "Cursor IDE correctly skips skills"
+# Verify skills ARE installed (Cursor supports skills natively)
+if [[ -d ".cursor/skills" ]]; then
+  CURSOR_SKILL_COUNT=$(find ".cursor/skills" -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
+  if [[ "$CURSOR_SKILL_COUNT" -ge 8 ]]; then
+    pass "Cursor IDE skills installed ($CURSOR_SKILL_COUNT skills)"
+  else
+    fail "Cursor IDE skills" "Expected 8+ skills, found $CURSOR_SKILL_COUNT"
+  fi
 else
-  fail "Cursor IDE" ".cursor/skills should not exist"
+  fail "Cursor IDE skills" ".cursor/skills/ not created"
 fi
 
 # Global install: verify no double-nesting (~/.cursor/.cursor/)

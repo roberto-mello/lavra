@@ -16,7 +16,7 @@ Lavra supports five AI coding agents. The core memory system (hooks, knowledge c
 | Auto-recall | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Commands | ✓ | ✓ | ✓ | ✓ | — |
 | Agents | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Skills | ✓ | ✓ | ✓ | ✓ | — |
+| Skills | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Context7 MCP | ✓ | ✓ | ✓ | manual | ✓ |
 
 ## Claude Code
@@ -95,7 +95,7 @@ npx @lavralabs/lavra@latest --cursor --global  # all projects (~/.cursor/)
 
 Requires Cursor v2.4 or later (earlier versions ignore `sessionStart` hooks).
 
-The installer copies hooks to `.cursor/hooks/`, agents to `.cursor/agents/`, and configures `.cursor/hooks.json` and `.cursor/mcp.json`. Commands and skills are not installed — use Cursor's built-in agent features instead.
+The installer copies hooks to `.cursor/hooks/`, agents to `.cursor/agents/`, skills to `.cursor/skills/`, and configures `.cursor/hooks.json` and `.cursor/mcp.json`. Commands are not installed (Cursor does not support slash commands).
 
 **Hook events:**
 - `sessionStart` — auto-recall injects relevant knowledge as `additional_context`
@@ -107,6 +107,7 @@ The installer copies hooks to `.cursor/hooks/`, agents to `.cursor/agents/`, and
 cat .cursor/hooks.json | jq '.hooks'
 ls .cursor/agents/review/
 ls .cursor/hooks/
+ls .cursor/skills/
 ```
 
 **Use agents** by mentioning them in chat: `@architecture-strategist`, `@security-sentinel`, `@performance-oracle`, etc.

@@ -6,6 +6,7 @@
 #   - .cursor/hooks.json
 #   - .cursor/hooks/ (hook scripts)
 #   - .cursor/agents/ (lavra agents)
+#   - .cursor/skills/ (lavra skills)
 #   - .cursor/mcp.json context7 entry (or whole file if context7 was the only entry)
 #
 # Preserves:
@@ -50,6 +51,7 @@ echo "This will remove:"
 echo "  - .cursor/hooks.json (hook manifest)"
 echo "  - .cursor/hooks/ (hook scripts)"
 echo "  - .cursor/agents/ (lavra agents)"
+echo "  - .cursor/skills/ (lavra skills)"
 echo "  - context7 entry from .cursor/mcp.json"
 echo ""
 echo "Note: .lavra/ (knowledge base and config) will be preserved"
@@ -101,6 +103,22 @@ if [ -d "$AGENTS_DIR" ]; then
   if [ -z "$(ls -A "$AGENTS_DIR" 2>/dev/null)" ]; then
     rmdir "$AGENTS_DIR"
     echo "  - Removed .cursor/agents/ (empty)"
+  fi
+fi
+
+# Remove skills (only directories marked with .lavra sentinel)
+SKILLS_DIR="$TARGET/.cursor/skills"
+if [ -d "$SKILLS_DIR" ]; then
+  for skill_dir in "$SKILLS_DIR"/*/; do
+    if [ -d "$skill_dir" ] && [ -f "$skill_dir/.lavra" ]; then
+      skill_name=$(basename "$skill_dir")
+      rm -rf "$skill_dir"
+      echo "  - Removed skills/$skill_name/"
+    fi
+  done
+  if [ -z "$(ls -A "$SKILLS_DIR" 2>/dev/null)" ]; then
+    rmdir "$SKILLS_DIR"
+    echo "  - Removed .cursor/skills/ (empty)"
   fi
 fi
 

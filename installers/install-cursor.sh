@@ -7,6 +7,7 @@
 #     subagent-wrapup.sh, and supporting scripts
 #   - Hook manifest: .cursor/hooks.json
 #   - Agents: .cursor/agents/ (30 agents, 5 categories, direct copy)
+#   - Skills: .cursor/skills/ (core skills)
 #   - Knowledge store: .lavra/memory/knowledge.jsonl
 #   - MCP server: .cursor/mcp.json (Context7)
 #
@@ -141,13 +142,53 @@ AGENT_COUNT=$(find "$AGENTS_DIR" -name "*.md" | wc -l | tr -d ' ')
 echo "  - Installed $AGENT_COUNT agents (.cursor/agents/)"
 echo ""
 
-# Step 4: Provision memory system
+# Step 4: Copy skills (Cursor supports skills natively)
+echo "[4/5] Installing skills..."
+
+SKILLS_DIR="$CURSOR_DIR/skills"
+SKILL_COUNT=0
+SKILL_SKIPPED=0
+mkdir -p "$SKILLS_DIR"
+
+if [ -d "$PLUGIN_DIR/skills" ]; then
+  for skill_dir in "$PLUGIN_DIR/skills"/*/; do
+    if [ -d "$skill_dir" ]; then
+      skill_name=$(basename "$skill_dir")
+
+      if [ -L "$SKILLS_DIR/$skill_name" ]; then
+        echo "  - Skipped $skill_name (symlink, not ours)"
+        SKILL_SKIPPED=$((SKILL_SKIPPED + 1))
+        continue
+      elif [ -d "$SKILLS_DIR/$skill_name" ]; then
+        if [ -f "$SKILLS_DIR/$skill_name/.lavra" ]; then
+          rm -rf "$SKILLS_DIR/$skill_name"
+        else
+          echo "  - Skipped $skill_name (already exists, not ours)"
+          SKILL_SKIPPED=$((SKILL_SKIPPED + 1))
+          continue
+        fi
+      fi
+
+      cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
+      touch "$SKILLS_DIR/$skill_name/.lavra"
+      SKILL_COUNT=$((SKILL_COUNT + 1))
+    fi
+  done
+fi
+
+echo "  - Installed $SKILL_COUNT skills (.cursor/skills/)"
+if [ "$SKILL_SKIPPED" -gt 0 ]; then
+  echo "  - Skipped $SKILL_SKIPPED existing skill(s) not managed by this plugin"
+fi
+echo ""
+
+# Step 5: Provision memory system
 if [ "$GLOBAL_INSTALL" = true ]; then
-  echo "[4/4] Skipping memory system (global install)"
+  echo "[5/6] Skipping memory system (global install)"
   echo "  Memory system will be provisioned per-project on first session"
   echo ""
 else
-  echo "[4/4] Provisioning memory system..."
+  echo "[5/6] Provisioning memory system..."
 
   source "$PLUGIN_DIR/hooks/provision-memory.sh"
   migrate_beads_to_lavra "$TARGET"
@@ -158,7 +199,7 @@ else
 fi
 
 # Configure MCP server (Context7 for framework documentation)
-echo "[5/4] Configuring MCP servers..."
+echo "[6/6] Configuring MCP servers..."
 
 MCP_JSON="$CURSOR_DIR/mcp.json"
 CONTEXT7_ENTRY='{"url":"https://mcp.context7.com/mcp","type":"http"}'
@@ -195,7 +236,9 @@ echo "2. Agents available via @agent-name in Cursor chat:"
 echo "   - @architecture-strategist, @security-sentinel, @performance-oracle, ..."
 echo "   - All $AGENT_COUNT lavra agents installed to .cursor/agents/"
 echo ""
-echo "3. Context7 MCP server configured (framework documentation lookup)"
+echo "3. Skills installed to .cursor/skills/"
+echo ""
+echo "4. Context7 MCP server configured (framework documentation lookup)"
 echo ""
 echo "4. Knowledge base at .lavra/memory/knowledge.jsonl"
 echo "   Use: bd comments add <BEAD_ID> \"LEARNED: ...\" to log insights"
