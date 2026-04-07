@@ -258,11 +258,12 @@ const SOURCE_MAP = {
   'ag-repo':       'agents/research/repo-research-analyst.md',
   'ag-githistory': 'agents/research/git-history-analyzer.md',
   // Skills
-  'sk-project-setup':   'skills/project-setup/SKILL.md',
   'sk-git-worktree':    'skills/git-worktree/SKILL.md',
   'sk-brainstorming':   'skills/brainstorming/SKILL.md',
   'sk-lavra-knowledge': 'skills/lavra-knowledge/SKILL.md',
   'sk-agent-browser':   'skills/agent-browser/SKILL.md',
+  // Commands (setup)
+  'lavra-setup':        'commands/lavra-setup.md',
   // Knowledge (hooks)
   'kn-jsonl':    'hooks/memory-capture.sh',
   'kn-recall':   'hooks/auto-recall.sh',
@@ -271,8 +272,8 @@ const SOURCE_MAP = {
   'kn-session':  'hooks/auto-recall.sh',
   // Config
   'cfg-lavra':   'hooks/auto-recall.sh',
-  'cfg-profile': 'skills/project-setup/SKILL.md',
-  'cfg-setup':   'skills/project-setup/SKILL.md',
+  'cfg-profile': 'hooks/provision-memory.sh',
+  'cfg-setup':   'commands/lavra-setup.md',
 };
 
 // == Documentation descriptions ==
@@ -321,8 +322,8 @@ const DOCS_MAP = {
   'ag-learnings':  'Searches knowledge.jsonl for past solutions and patterns to prevent repeated mistakes.',
   'ag-repo':       'Research on repository structure, documentation, architecture patterns, and contribution guidelines.',
   'ag-githistory': 'Analyzes git history to understand code evolution, trace patterns, and identify contributor expertise.',
-  // Skills
-  'sk-project-setup':   'Configure project tech stack and review agents -- auto-detects stack, toggles agents, saves config.',
+  // Commands (setup)
+  'lavra-setup':        'Configure project tech stack and review agents -- auto-detects stack, toggles agents, saves config.',
   'sk-git-worktree':    'Manage Git worktrees for isolated parallel development with unified create/list/switch/cleanup.',
   'sk-brainstorming':   'Guide exploring user intent, approaches, and design decisions before planning.',
   'sk-lavra-knowledge': 'Capture solved problems as structured JSONL entries for fast recall and auto-injection.',
@@ -369,7 +370,7 @@ const NODES = [
   { id:'changelog',        label:'/changelog',         sub:'Release changelog',          x:760, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
 
   // == SKILLS ==
-  { id:'sk-project-setup',  label:'project-setup',   sub:'Stack detect + config',       x:60,  y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
+  { id:'lavra-setup',        label:'/lavra-setup',    sub:'Stack detect + config',       x:920, y:BY.specialized, w:W.sm, h:RH, layer:'commands', group:'specialized' },
   { id:'sk-git-worktree',   label:'git-worktree',    sub:'Parallel workspaces',         x:220, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
   { id:'sk-brainstorming',  label:'brainstorming',   sub:'Structured exploration',      x:380, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
   { id:'sk-lavra-knowledge',label:'lavra-knowledge', sub:'Knowledge entries',           x:540, y:BY.skills, w:W.sm, h:RH, layer:'skills', group:'skills' },
@@ -516,8 +517,8 @@ const CONNS = [
   { from:'cfg-lavra',        to:'lavra-work',   type:'feeds', label:'parallelism/commits' },
   { from:'cfg-profile',      to:'lavra-design', type:'feeds', label:'planning context' },
   { from:'cfg-profile',      to:'lavra-work',   type:'feeds', label:'agent context' },
-  { from:'sk-project-setup', to:'cfg-profile',  type:'feeds', label:'generates' },
-  { from:'sk-project-setup', to:'cfg-setup',    type:'feeds', label:'generates' },
+  { from:'lavra-setup', to:'cfg-profile',  type:'feeds', label:'generates' },
+  { from:'lavra-setup', to:'cfg-setup',    type:'feeds', label:'generates' },
   { from:'cfg-setup',        to:'lavra-review', type:'feeds', label:'agent selection' },
 ];
 
