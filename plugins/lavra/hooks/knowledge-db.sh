@@ -144,14 +144,16 @@ kb_search() {
   fi
 
   # BM25 weights: content=-10, tags_text=-5, type=-2, key=-1
-  sqlite3 -separator '|' "$DB_PATH" <<SQL
-SELECT k.type, k.content, k.bead, k.tags_text
+  # $FTS_QUERY is passed as a bound parameter (?) to prevent shell injection.
+  # $TOP_N is safe to interpolate directly (validated numeric above).
+  sqlite3 -separator '|' "$DB_PATH" \
+    "SELECT k.type, k.content, k.bead, k.tags_text
 FROM knowledge_fts fts
 JOIN knowledge k ON k.rowid = fts.rowid
-WHERE knowledge_fts MATCH '$FTS_QUERY'
+WHERE knowledge_fts MATCH ?
 ORDER BY bm25(knowledge_fts, -10.0, -5.0, -2.0, -1.0)
-LIMIT $TOP_N;
-SQL
+LIMIT $TOP_N;" \
+    "$FTS_QUERY"
 }
 
 # Incremental sync from JSONL files into SQLite FTS5
