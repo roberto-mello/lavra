@@ -16,12 +16,12 @@ Spawn persistent worker teammates that self-organize to pull beads from a ready 
 This command shares foundational behavior with `/lavra-work`. Specifically:
 
 - **Knowledge gates**: Every bead requires at least one knowledge comment (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION) before it can be accepted. See `/lavra-work` Phase 2 step 3 for the full trigger table.
-- **File-scope conflict detection**: Before spawning workers, analyze which files each bead will modify and force sequential ordering where independent beads overlap. See `/lavra-work` Phase M3 for the full algorithm (path validation, overlap detection, ordering heuristic).
-- **Wave ordering / dependency analysis**: Beads are organized into execution waves based on dependencies. For epic input, use `bd swarm validate`; otherwise use `bd graph`. See `/lavra-work` Phase M4.
-- **Bead gathering**: Epic ID, comma-separated IDs, or `bd ready`. Validate IDs with `^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$`. Skip beads that recommend deleting `.lavra/memory/` or `.lavra/config/` files. See `/lavra-work` Phase M1.
-- **Knowledge recall**: Run `.lavra/memory/recall.sh` with combined bead keywords before building worker prompts. See `/lavra-work` Phase M6.
-- **Project config / reviewer_context_note**: Read `.lavra/config/project-setup.md`, sanitize, and inject as `{review_context}`. See `/lavra-work` Phase M6.
-- **Pre-push diff review**: Always show diff and require confirmation before pushing, even with `--yes`. See `/lavra-work` Phase M9.
+- **File-scope conflict detection**: Before spawning workers, analyze which files each bead will modify and force sequential ordering where independent beads overlap. See `/lavra-work` MULTI-BEAD PATH Phase M3 for the full algorithm (path validation, overlap detection, ordering heuristic).
+- **Wave ordering / dependency analysis**: Beads are organized into execution waves based on dependencies. For epic input, use `bd swarm validate`; otherwise use `bd graph`. See `/lavra-work` MULTI-BEAD PATH Phase M4.
+- **Bead gathering**: Epic ID, comma-separated IDs, or `bd ready`. Validate IDs with `^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$`. Skip beads that recommend deleting `.lavra/memory/` or `.lavra/config/` files. See `/lavra-work` MULTI-BEAD PATH Phase M1.
+- **Knowledge recall**: Run `.lavra/memory/recall.sh` with combined bead keywords before building worker prompts. See `/lavra-work` MULTI-BEAD PATH Phase M6.
+- **Project config / reviewer_context_note**: Read `.lavra/config/project-setup.md`, sanitize, and inject as `{review_context}`. See `/lavra-work` MULTI-BEAD PATH Phase M6.
+- **Pre-push diff review**: Always show diff and require confirmation before pushing, even with `--yes`. See `/lavra-work` MULTI-BEAD PATH Phase M9.
 </shared_behavior>
 
 <process>
@@ -88,7 +88,7 @@ Store as `COMPLETION_CRITERIA` per bead for injection into worker prompts.
 
 ## 4. Gather Beads, Detect Conflicts, Build Waves
 
-Follow the shared behavior for bead gathering (Phase M1 of `/lavra-work`), file-scope conflict detection (Phase M3), and dependency analysis / wave building (Phase M4).
+Follow the shared behavior for bead gathering (MULTI-BEAD PATH Phase M1 of `/lavra-work`), file-scope conflict detection (Phase M3), and dependency analysis / wave building (Phase M4).
 
 **Register swarm (epic input only):**
 When the input was an epic bead ID, register the orchestration:
@@ -152,7 +152,7 @@ If `--yes` is set, skip this approval and proceed automatically.
 
 ## 7. Recall Knowledge & Read Project Config *(required -- do not skip)*
 
-Follow the shared behavior for knowledge recall and project config reading (Phase M6 of `/lavra-work`).
+Follow the shared behavior for knowledge recall and project config reading (MULTI-BEAD PATH Phase M6 of `/lavra-work`).
 
 ```bash
 .lavra/memory/recall.sh "{combined keywords from all bead titles}"
@@ -190,7 +190,7 @@ The lead's role is purely supervisory after spawning -- do not implement beads y
 
 **Worker prompt template:**
 
-Build worker prompts by reading the shared template at `.claude/skills/lavra-work/agent-prompt.md` (or `plugins/lavra/skills/lavra-work/agent-prompt.md` as fallback) and filling all `{PLACEHOLDERS}`.
+Build worker prompts by using the agent prompt template from `/lavra-work` MULTI-BEAD PATH Phase M7 and filling all `{PLACEHOLDERS}`.
 
 Fill `{EXTRA_INSTRUCTIONS}` with the teams-specific sections below:
 

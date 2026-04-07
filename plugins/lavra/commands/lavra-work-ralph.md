@@ -62,7 +62,7 @@ Store as `COMPLETION_CRITERIA` per bead for injection into the subagent prompt.
 
 ## 4. Gather Beads
 
-Follow Phase M1 from `.claude/skills/lavra-work/multi-bead.md` (or `plugins/lavra/skills/lavra-work/multi-bead.md` as fallback): resolve epic/comma-separated/empty input, validate bead IDs, skip `.lavra/` deletion beads, register swarm for epic input.
+Follow Phase M1 from `/lavra-work` (MULTI-BEAD PATH): resolve epic/comma-separated/empty input, validate bead IDs, skip `.lavra/` deletion beads, register swarm for epic input.
 
 ## 5. Branch Check
 
@@ -100,11 +100,11 @@ PRE_BRANCH_SHA=$(git rev-parse HEAD)
 
 ## 6. File-Scope Conflict Detection
 
-Follow Phase M3 from the multi-bead reference: analyze per-bead file scope, validate paths, detect overlaps, force sequential ordering where needed.
+Follow Phase M3 from `/lavra-work` (MULTI-BEAD PATH): analyze per-bead file scope, validate paths, detect overlaps, force sequential ordering where needed.
 
 ## 7. Dependency Analysis & Wave Building
 
-Follow Phase M4 from the multi-bead reference: use `bd swarm validate` for epic input or `bd graph` for other input. Organize into waves. Output mermaid diagram.
+Follow Phase M4 from `/lavra-work` (MULTI-BEAD PATH): use `bd swarm validate` for epic input or `bd graph` for other input. Organize into waves. Output mermaid diagram.
 
 ## 8. User Approval
 
@@ -121,7 +121,7 @@ If `--yes` is set, skip this approval and proceed automatically.
 
 ## 9. Recall Knowledge & Read Project Config *(required -- do not skip)*
 
-Follow Phase M6 from the multi-bead reference: run `recall.sh` with combined keywords, read project config, sanitize `reviewer_context_note`, detect installed skills. Output recall results before building agent prompts.
+Follow Phase M6 from `/lavra-work` (MULTI-BEAD PATH): run `recall.sh` with combined keywords, read project config, sanitize `reviewer_context_note`, detect installed skills. Output recall results before building agent prompts.
 
 ## 10. Execute Waves (Autonomous Retry)
 
@@ -165,7 +165,7 @@ Task(general-purpose, mode="bypassPermissions", "...prompt for BD-003...")
 
 ### Agent Prompt Template
 
-**Build agent prompts** by reading the shared template at `.claude/skills/lavra-work/agent-prompt.md` (or `plugins/lavra/skills/lavra-work/agent-prompt.md` as fallback) and filling all `{PLACEHOLDERS}`.
+**Build agent prompts** by using the agent prompt template from `/lavra-work` Phase M7 (MULTI-BEAD PATH) and filling all `{PLACEHOLDERS}`.
 
 Fill `{EXTRA_INSTRUCTIONS}` with the ralph-specific sections below:
 
