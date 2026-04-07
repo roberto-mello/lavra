@@ -379,10 +379,128 @@ fi
 export HOME="$REAL_HOME"
 
 # ==============================================================================
-# Test 5: New Feature Provisioning (v0.7.0)
+# Test 5: Cursor IDE Installation
 # ==============================================================================
 echo
-echo " Test 5: New Feature Provisioning"
+echo " Test 5: Cursor IDE Installation"
+
+CURSOR_TEST="$TEST_ROOT/cursor-test"
+mkdir -p "$CURSOR_TEST"
+cd "$CURSOR_TEST"
+
+git init -q
+bd init -q 2>/dev/null || true
+
+# Run installer with --cursor flag
+if bash "$PROJECT_ROOT/install.sh" --cursor "$CURSOR_TEST" >/dev/null 2>&1; then
+  pass "Installer completed for Cursor IDE"
+else
+  fail "Cursor IDE install" "Installer failed"
+fi
+
+# Verify hooks directory
+if [[ -d ".cursor/hooks" ]]; then
+  pass "Cursor IDE hooks directory created"
+else
+  fail "Cursor IDE structure" "Missing .cursor/hooks directory"
+fi
+
+# Verify hook files -- including the Cursor-specific adapter
+for hook in auto-recall-cursor.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh sanitize-content.sh; do
+  if [[ -f ".cursor/hooks/$hook" ]]; then
+    pass "Cursor IDE hook installed: $hook"
+  else
+    fail "Cursor IDE hooks" "Missing $hook"
+  fi
+done
+
+# Verify auto-recall-cursor.sh is Cursor-specific (not just a copy of auto-recall.sh)
+if grep -q "workspace_roots" ".cursor/hooks/auto-recall-cursor.sh" 2>/dev/null; then
+  pass "Cursor IDE auto-recall-cursor.sh has workspace_roots adapter"
+else
+  fail "Cursor IDE adapter" "auto-recall-cursor.sh missing workspace_roots logic"
+fi
+
+# Verify hooks.json exists and uses camelCase event names
+if [[ -f ".cursor/hooks.json" ]]; then
+  if grep -q "sessionStart" ".cursor/hooks.json" && \
+     grep -q "afterShellExecution" ".cursor/hooks.json" && \
+     grep -q "subagentStop" ".cursor/hooks.json"; then
+    pass "Cursor IDE hooks.json configured with correct event names"
+  else
+    fail "Cursor IDE hooks.json" "Missing sessionStart, afterShellExecution, or subagentStop"
+  fi
+else
+  fail "Cursor IDE hooks.json" "hooks.json not created"
+fi
+
+# Verify hooks.json version field
+if jq -e '.version == 1' ".cursor/hooks.json" >/dev/null 2>&1; then
+  pass "Cursor IDE hooks.json has version: 1"
+else
+  fail "Cursor IDE hooks.json" "Missing or wrong version field"
+fi
+
+# Verify sessionStart points to adapter, not canonical hook
+if grep -q "auto-recall-cursor.sh" ".cursor/hooks.json"; then
+  pass "Cursor IDE sessionStart uses auto-recall-cursor.sh adapter"
+else
+  fail "Cursor IDE hooks.json" "sessionStart should point to auto-recall-cursor.sh, not auto-recall.sh"
+fi
+
+# Verify agents (30+ across 5 categories)
+CURSOR_AGENT_COUNT=$(find .cursor/agents -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+if [[ "$CURSOR_AGENT_COUNT" -ge 30 ]]; then
+  pass "Cursor IDE agents installed ($CURSOR_AGENT_COUNT files)"
+else
+  fail "Cursor IDE agents" "Expected 30+, found $CURSOR_AGENT_COUNT"
+fi
+
+# Verify agent categories present
+for cat in review research design workflow docs; do
+  if [[ -d ".cursor/agents/$cat" ]]; then
+    pass "Cursor IDE agents/$cat category present"
+  else
+    fail "Cursor IDE agents" "Missing category: $cat"
+  fi
+done
+
+# Verify MCP config
+if [[ -f ".cursor/mcp.json" ]]; then
+  if grep -q "context7" ".cursor/mcp.json"; then
+    pass "Cursor IDE MCP server configured (context7)"
+  else
+    fail "Cursor IDE MCP" "context7 not found in .cursor/mcp.json"
+  fi
+else
+  fail "Cursor IDE MCP" ".cursor/mcp.json not created"
+fi
+
+# Verify memory system provisioned
+if [[ -f ".lavra/memory/knowledge.jsonl" ]]; then
+  pass "Cursor IDE memory system provisioned"
+else
+  fail "Cursor IDE memory" ".lavra/memory/knowledge.jsonl not created"
+fi
+
+# Verify commands and skills NOT installed (Cursor doesn't use them)
+if [[ ! -d ".cursor/commands" ]]; then
+  pass "Cursor IDE correctly skips commands"
+else
+  fail "Cursor IDE" ".cursor/commands should not exist"
+fi
+
+if [[ ! -d ".cursor/skills" ]]; then
+  pass "Cursor IDE correctly skips skills"
+else
+  fail "Cursor IDE" ".cursor/skills should not exist"
+fi
+
+# ==============================================================================
+# Test 6: New Feature Provisioning (v0.7.0)
+# ==============================================================================
+echo
+echo " Test 6: New Feature Provisioning"
 
 # Use the Claude test directory which already has a full install
 cd "$CLAUDE_TEST"
@@ -436,10 +554,10 @@ else
 fi
 
 # ==============================================================================
-# Test 6: Migration (upgrade from .beads/ to .lavra/)
+# Test 7: Migration (upgrade from .beads/ to .lavra/)
 # ==============================================================================
 echo
-echo " Test 6: Migration (.beads/ → .lavra/)"
+echo " Test 7: Migration (.beads/ → .lavra/)"
 
 MIGRATE_TEST="$TEST_ROOT/migrate-test"
 mkdir -p "$MIGRATE_TEST"
@@ -510,10 +628,10 @@ else
 fi
 
 # ==============================================================================
-# Test 7: Uninstallation (Optional - requires user confirmation)
+# Test 8: Uninstallation (Optional - requires user confirmation)
 # ==============================================================================
 echo
-echo "  Test 7: Uninstallation (skipped - requires interactive confirmation)"
+echo "  Test 8: Uninstallation (skipped - requires interactive confirmation)"
 echo "  [WARN]  Uninstallers require confirmation prompt - test manually if needed"
 
 # ==============================================================================
