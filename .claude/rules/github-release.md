@@ -57,6 +57,20 @@ If any command, agent, or skill was added, renamed, or had its description chang
 
 The pre-release check (step 3) will catch any mismatch, but fix them before running it.
 
+## 2b. Release notes
+
+Release notes live at `site/src/content/docs/releases/vX.Y.Z.md`.
+
+**When drafting notes** (as changes land, not at release time):
+- Create the file with `draft: true` in the frontmatter so it's excluded from production builds
+- Load the `/humanizer` skill before writing — run it as the first step, not as a cleanup pass at the end
+- Follow the tone and structure of prior releases in `site/src/content/docs/releases/`
+
+**Before tagging** (step 6 below):
+- Run a final `/humanizer` pass on the release notes file
+- Set the release date in the frontmatter
+- Remove `draft: true`
+
 ## 3. Run pre-release checks (MUST PASS before tagging)
 
 ```bash
@@ -186,6 +200,8 @@ git push
 ```
 
 ## 6. Tag and release
+
+Before tagging: finalize release notes at `site/src/content/docs/releases/vX.Y.Z.md` — run a final `/humanizer` pass, set the release date, and remove `draft: true`.
 
 ```bash
 git tag vX.Y.Z
