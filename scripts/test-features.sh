@@ -121,7 +121,7 @@ fi
 echo
 echo "Test 3: session-state.md gitignore append"
 
-if grep -q "session-state.md" "$TEST_ROOT/project/.lavra/memory/.gitignore"; then
+if grep -q "session-state.md" "$TEST_ROOT/project/.lavra/.gitignore"; then
   pass "session-state.md appended to existing .gitignore"
 else
   fail "session-state gitignore" "Not appended to .gitignore"
