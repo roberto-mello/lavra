@@ -45,6 +45,7 @@
 {"issue_id":"bdcompound-807.27","label":"review"}
 {"issue_id":"bdcompound-807.28","label":"ci"}
 {"issue_id":"bdcompound-807.28","label":"review"}
+{"issue_id":"bdcompound-88t","label":"plan-reviewed"}
 {"issue_id":"bdcompound-eag","label":"enhancement"}
 {"issue_id":"bdcompound-eag","label":"memory-system"}
 {"issue_id":"bdcompound-eag.1","label":"implementation"}
