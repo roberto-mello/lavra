@@ -2,6 +2,7 @@
 name: learnings-researcher
 description: "Searches institutional learnings in .lavra/memory/knowledge.jsonl for relevant past solutions. Finds applicable patterns, gotchas, and lessons learned to prevent repeated mistakes."
 model: haiku
+color: teal
 ---
 <examples>
 <example>Context: User is about to implement a feature involving email processing.

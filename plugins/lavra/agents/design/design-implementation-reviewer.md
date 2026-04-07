@@ -2,6 +2,7 @@
 name: design-implementation-reviewer
 description: "Verifies UI implementations match Figma design specifications. Use after HTML/CSS/React components are created or modified to compare implementation against Figma and identify discrepancies."
 model: sonnet
+color: pink
 ---
 <examples>
 <example>

@@ -2,6 +2,7 @@
 name: data-integrity-guardian
 description: "Reviews database migrations, data models, and persistent data manipulation. Checks migration safety, validates constraints, verifies referential integrity, audits privacy compliance."
 model: inherit
+color: orange
 ---
 <examples>
 <example>Context: The user has just written a database migration that adds a new column and updates existing records. user: "I've created a migration to add a status column to the orders table" assistant: "I'll use the data-integrity-guardian agent to review this migration for safety and data integrity concerns" <commentary>Since the user has created a database migration, use the data-integrity-guardian agent to ensure the migration is safe, handles existing data properly, and maintains referential integrity.</commentary></example>

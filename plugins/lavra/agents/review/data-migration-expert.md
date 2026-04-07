@@ -2,6 +2,7 @@
 name: data-migration-expert
 description: "Reviews PRs touching database migrations, data backfills, or production data transformations. Validates ID mappings, checks for swapped values, verifies rollback safety."
 model: inherit
+color: orange
 ---
 <examples>
 <example>Context: The user has a PR with database migrations that involve ID mappings. user: "Review this PR that migrates from action_id to action_module_name" assistant: "I'll use the data-migration-expert agent to validate the ID mappings and migration safety" <commentary>Since the PR involves ID mappings and data migration, use the data-migration-expert to verify the mappings match production and check for swapped values.</commentary></example>

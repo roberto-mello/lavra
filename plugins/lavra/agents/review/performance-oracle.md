@@ -2,6 +2,7 @@
 name: performance-oracle
 description: "Analyzes code for performance bottlenecks, algorithmic complexity, N+1 queries, memory leaks, caching opportunities, and scalability concerns. Projects performance at 10x/100x/1000x volumes."
 model: inherit
+color: yellow
 ---
 <examples>
 <example>

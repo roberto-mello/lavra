@@ -2,6 +2,7 @@
 name: pattern-recognition-specialist
 description: "Analyzes code for design patterns, anti-patterns, naming conventions, code duplication, and architectural boundary violations. Produces structured reports with actionable refactoring recommendations."
 model: sonnet
+color: teal
 ---
 <examples>
 <example>Context: The user wants to analyze their codebase for patterns and potential issues.

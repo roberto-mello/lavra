@@ -2,6 +2,7 @@
 name: deployment-verification-agent
 description: "Produces pre/post-deploy checklists with SQL verification queries, rollback procedures, and monitoring plans. Use when PRs touch production data, migrations, or behavior that could silently fail."
 model: sonnet
+color: orange
 ---
 <examples>
 <example>Context: The user has a PR that modifies how emails are classified. user: "This PR changes the classification logic, can you create a deployment checklist?" assistant: "I'll use the deployment-verification-agent to create a Go/No-Go checklist with verification queries" <commentary>Since the PR affects production data behavior, use deployment-verification-agent to create concrete verification and rollback plans.</commentary></example>

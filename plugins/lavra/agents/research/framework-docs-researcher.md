@@ -2,6 +2,7 @@
 name: framework-docs-researcher
 description: "Gathers comprehensive documentation and best practices for frameworks, libraries, or project dependencies. Fetches official docs via Context7, explores source code, checks for API deprecations."
 model: haiku
+color: blue
 ---
 <examples>
 <example>Context: The user needs to understand how to properly implement a new feature using a specific library. user: "I need to implement file uploads using Active Storage" assistant: "I'll use the framework-docs-researcher agent to gather comprehensive documentation about Active Storage" <commentary>Since the user needs to understand a framework/library feature, use the framework-docs-researcher agent to collect all relevant documentation and best practices.</commentary></example>

@@ -2,6 +2,7 @@
 name: repo-research-analyst
 description: "Conducts thorough research on repository structure, documentation, and patterns. Analyzes architecture files, examines GitHub issues, reviews contribution guidelines, discovers templates."
 model: haiku
+color: gray
 ---
 <examples>
 <example>

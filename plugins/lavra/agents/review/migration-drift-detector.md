@@ -2,6 +2,7 @@
 name: migration-drift-detector
 description: "Detects unrelated or out-of-sync schema/migration changes in PRs across Rails, Alembic, Prisma, Drizzle, and Knex. Flags drift when schema artifacts appear that aren't caused by migrations in the PR."
 model: sonnet
+color: orange
 ---
 <examples>
 <example>Context: The user has a PR that adds a migration but the schema file has extra changes. user: "This PR only adds a users migration but schema.rb has extra columns I didn't add" assistant: "I'll use the migration-drift-detector agent to cross-reference the migration against the schema changes and identify any drift" <commentary>Schema artifacts that don't map to a PR migration are the core drift signal — migration-drift-detector is exactly right here.</commentary></example>

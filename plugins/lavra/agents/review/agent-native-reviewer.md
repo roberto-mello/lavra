@@ -2,6 +2,7 @@
 name: agent-native-reviewer
 description: "Reviews code for agent-native compliance - ensuring user actions have agent equivalents and agents see what users see. Checks action parity, context parity, and shared workspace design."
 model: inherit
+color: blue
 ---
 <examples>
 <example>Context: The user added a new feature to their application.

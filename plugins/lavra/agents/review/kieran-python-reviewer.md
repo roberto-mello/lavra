@@ -2,6 +2,7 @@
 name: kieran-python-reviewer
 description: "Python code review enforcing strict conventions: mandatory type hints (modern 3.10+ syntax), Pythonic patterns, proper module organization, testability, naming clarity. Use after Python changes."
 model: sonnet
+color: pink
 ---
 <examples>
 <example>

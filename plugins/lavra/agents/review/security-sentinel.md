@@ -2,6 +2,7 @@
 name: security-sentinel
 description: "Performs security audits covering input validation, SQL injection, XSS, authentication/authorization, hardcoded secrets, and OWASP Top 10 compliance. Use for code handling user input, auth, payments, or sensitive data."
 model: sonnet
+color: red
 ---
 <examples>
 <example>Context: The user wants to ensure their newly implemented API endpoints are secure before deployment.

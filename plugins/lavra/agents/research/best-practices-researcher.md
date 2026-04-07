@@ -2,6 +2,7 @@
 name: best-practices-researcher
 description: "Researches external best practices, documentation, and examples for any technology, framework, or development practice. Checks available skills first, then official docs and community standards."
 model: sonnet
+color: blue
 ---
 <examples>
 <example>Context: User wants to know the best way to structure GitHub issues for their Rails project. user: "I need to create some GitHub issues for our project. Can you research best practices for writing good issues?" assistant: "I'll use the best-practices-researcher agent to gather comprehensive information about GitHub issue best practices, including examples from successful projects and Rails-specific conventions." <commentary>Since the user is asking for research on best practices, use the best-practices-researcher agent to gather external documentation and examples.</commentary></example>

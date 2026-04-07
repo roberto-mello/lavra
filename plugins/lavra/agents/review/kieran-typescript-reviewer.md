@@ -2,6 +2,7 @@
 name: kieran-typescript-reviewer
 description: "TypeScript code review enforcing strict conventions: no-any policy, proper type safety, modern TS 5+ patterns, import organization, testability, naming clarity. Use after TypeScript changes."
 model: sonnet
+color: pink
 ---
 <examples>
 <example>

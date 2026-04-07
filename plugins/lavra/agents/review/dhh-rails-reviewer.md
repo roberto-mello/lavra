@@ -2,6 +2,7 @@
 name: dhh-rails-reviewer
 description: "Brutally honest Rails code review from DHH's perspective. Identifies anti-patterns, JavaScript framework contamination, unnecessary abstractions, and Rails convention violations."
 model: sonnet
+color: pink
 ---
 <examples>
 <example>
