@@ -17,6 +17,7 @@ npx @lavralabs/lavra@latest --claude      # Claude Code
 npx @lavralabs/lavra@latest --opencode    # OpenCode
 npx @lavralabs/lavra@latest --gemini      # Gemini CLI
 npx @lavralabs/lavra@latest --cortex      # Cortex Code
+npx @lavralabs/lavra@latest --cursor      # Cursor IDE (v2.4+)
 ```
 
 If the installer detects a project in the current directory, it will ask whether to install for this project only or globally (`~/.claude`). A global install makes commands available in every project, but you still run [/lavra-setup](#codebase-analysis) per project to configure the memory system and review agents.
