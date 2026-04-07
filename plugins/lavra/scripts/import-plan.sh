@@ -93,9 +93,9 @@ PREV_BEAD=""
 STEP_NUM=0
 
 # Find the Implementation Steps section and extract ### headers
-awk '/^## (Implementation|Tasks|Steps|Work)/{flag=1;next}/^## /{flag=0}flag' "$PLAN_FILE" | \
-  grep -E '^### ' | \
-  while IFS= read -r line; do
+# Use process substitution instead of a pipeline so PREV_BEAD assignments
+# in the loop body persist back to the parent shell.
+while IFS= read -r line; do
     STEP_NUM=$((STEP_NUM + 1))
 
     # Extract step title (remove ###)
@@ -126,7 +126,8 @@ awk '/^## (Implementation|Tasks|Steps|Work)/{flag=1;next}/^## /{flag=0}flag' "$P
     else
       echo "  Warning: Failed to create bead for: $STEP_TITLE"
     fi
-  done
+  done < <(awk '/^## (Implementation|Tasks|Steps|Work)/{flag=1;next}/^## /{flag=0}flag' "$PLAN_FILE" \
+           | grep -E '^### ')
 
 echo ""
 echo "Import complete!"
