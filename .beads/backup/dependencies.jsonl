@@ -105,6 +105,7 @@
 {"created_at":"2026-03-11T16:34:30Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-807","issue_id":"bdcompound-807.7","type":"parent-child"}
 {"created_at":"2026-03-11T16:34:39Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-807","issue_id":"bdcompound-807.8","type":"parent-child"}
 {"created_at":"2026-03-11T16:43:37Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-807","issue_id":"bdcompound-807.9","type":"parent-child"}
+{"created_at":"2026-04-06T19:34:35Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-com","issue_id":"bdcompound-88t","type":"blocks"}
 {"created_at":"2026-03-13T19:58:13Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-6vw","issue_id":"bdcompound-8ii","type":"blocks"}
 {"created_at":"2026-03-13T19:58:14Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-9o5","issue_id":"bdcompound-8ii","type":"blocks"}
 {"created_at":"2026-03-13T19:58:14Z","created_by":"Roberto Mello","depends_on_id":"bdcompound-qoe","issue_id":"bdcompound-8ii","type":"blocks"}
