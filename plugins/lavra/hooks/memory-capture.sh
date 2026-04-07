@@ -46,6 +46,9 @@ MATCH_LINE=$(echo "$COMMAND" \
 # Extract BEAD_ID from that line only
 BEAD_ID=$(echo "$MATCH_LINE" | sed -E 's/.*bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+([A-Za-z0-9._-]+)[[:space:]]+.*/\1/')
 [[ -z "$BEAD_ID" || "$BEAD_ID" == "$MATCH_LINE" ]] && exit 0
+# Explicit post-extraction strip: makes sanitization intent visible at the use-site
+BEAD_ID=$(echo "$BEAD_ID" | tr -cd 'A-Za-z0-9._-')
+[[ -z "$BEAD_ID" ]] && exit 0
 
 # Extract comment body: strip prefix up to opening quote, then strip from the
 # closing quote onward (handles trailing 2>&1, &&, |, ; operators)
