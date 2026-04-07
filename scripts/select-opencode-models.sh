@@ -98,7 +98,7 @@ select_model() {
     else
       printf "  %2d) %s\n" "$i" "$model" >&2
     fi
-    ((i++))
+    i=$((i + 1))
   done <<< "$models"
 
   echo "" >&2
