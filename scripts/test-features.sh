@@ -16,12 +16,12 @@ PASSED=0
 FAILED=0
 
 pass() {
-  ((PASSED++))
+  PASSED=$((PASSED + 1))
   echo "[PASS] $1"
 }
 
 fail() {
-  ((FAILED++))
+  FAILED=$((FAILED + 1))
   echo "[FAIL] $1: $2"
 }
 

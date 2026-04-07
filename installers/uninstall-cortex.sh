@@ -65,7 +65,7 @@ if [ -d "$HOOKS_DIR" ]; then
     if [ -f "$HOOKS_DIR/$hook" ]; then
       rm "$HOOKS_DIR/$hook"
       echo "  - Removed $hook"
-      ((REMOVED_COUNT++))
+      REMOVED_COUNT=$((REMOVED_COUNT + 1))
     fi
   done
 else
@@ -76,7 +76,7 @@ fi
 if [ "$GLOBAL_UNINSTALL" = true ] && [ -f "$TARGET/.lavra-source" ]; then
   rm "$TARGET/.lavra-source"
   echo "  - Removed plugin source path"
-  ((REMOVED_COUNT++))
+  REMOVED_COUNT=$((REMOVED_COUNT + 1))
 fi
 
 # Remove commands (all plugin commands)
@@ -104,7 +104,7 @@ if [ -d "$COMMANDS_DIR" ]; then
     if [ -f "$COMMANDS_DIR/$cmd" ]; then
       rm "$COMMANDS_DIR/$cmd"
       echo "  - Removed /${cmd%.md} command"
-      ((REMOVED_COUNT++))
+      REMOVED_COUNT=$((REMOVED_COUNT + 1))
     fi
   done
 else
@@ -128,7 +128,7 @@ if [ -d "$AGENTS_DIR" ]; then
       agent_count=$(find "$AGENTS_DIR/$category" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
       rm -rf "$AGENTS_DIR/$category"
       echo "  - Removed $category/ ($agent_count agents)"
-      ((REMOVED_COUNT++))
+      REMOVED_COUNT=$((REMOVED_COUNT + 1))
     fi
   done
 
@@ -160,7 +160,7 @@ if [ -d "$SKILLS_DIR" ]; then
       if [ -f "$SKILLS_DIR/$skill/.lavra" ]; then
         rm -rf "$SKILLS_DIR/$skill"
         echo "  - Removed $skill skill"
-        ((REMOVED_COUNT++))
+        REMOVED_COUNT=$((REMOVED_COUNT + 1))
       else
         echo "  - Kept $skill (not managed by this plugin)"
       fi
@@ -202,7 +202,7 @@ if [ -f "$HOOKS_JSON" ]; then
 
     echo "$UPDATED" > "$HOOKS_JSON"
     echo "  - Removed hook configuration from hooks.json"
-    ((REMOVED_COUNT++))
+    REMOVED_COUNT=$((REMOVED_COUNT + 1))
   else
     echo "  [!] jq not found -- manual hooks.json cleanup required"
     echo "      Remove SessionStart, PostToolUse, and SubagentStop hooks manually"

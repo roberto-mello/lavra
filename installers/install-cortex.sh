@@ -238,7 +238,7 @@ else
   for cmd in "$PLUGIN_DIR/cortex/commands"/*.md; do
     if [ -f "$cmd" ]; then
       cp "$cmd" "$COMMANDS_DIR/$(basename "$cmd")"
-      ((CMD_COUNT++))
+      CMD_COUNT=$((CMD_COUNT + 1))
     fi
   done
 
@@ -270,7 +270,7 @@ else
         for agent in "$category"/*.md; do
           if [ -f "$agent" ]; then
             cp "$agent" "$AGENTS_DIR/$category_name/$(basename "$agent")"
-            ((AGENT_COUNT++))
+            AGENT_COUNT=$((AGENT_COUNT + 1))
           fi
         done
       fi
@@ -304,7 +304,7 @@ else
         if [ -L "$SKILLS_DIR/$skill_name" ]; then
           # Symlink -- installed by plugin system, don't touch
           echo "  - Skipped $skill_name (symlink, not ours)"
-          ((SKILL_SKIPPED++))
+          SKILL_SKIPPED=$((SKILL_SKIPPED + 1))
           continue
         elif [ -d "$SKILLS_DIR/$skill_name" ]; then
           if [ -f "$SKILLS_DIR/$skill_name/.lavra" ]; then
@@ -313,7 +313,7 @@ else
           else
             # User's own skill -- skip it
             echo "  - Skipped $skill_name (already exists, not ours)"
-            ((SKILL_SKIPPED++))
+            SKILL_SKIPPED=$((SKILL_SKIPPED + 1))
             continue
           fi
         fi
@@ -321,7 +321,7 @@ else
         # Copy entire skill directory
         cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
         touch "$SKILLS_DIR/$skill_name/.lavra"
-        ((SKILL_COUNT++))
+        SKILL_COUNT=$((SKILL_COUNT + 1))
       fi
     done
   fi

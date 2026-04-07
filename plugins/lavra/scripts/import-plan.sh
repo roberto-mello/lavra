@@ -96,7 +96,7 @@ STEP_NUM=0
 awk '/^## (Implementation|Tasks|Steps|Work)/{flag=1;next}/^## /{flag=0}flag' "$PLAN_FILE" | \
   grep -E '^### ' | \
   while IFS= read -r line; do
-    ((STEP_NUM++))
+    STEP_NUM=$((STEP_NUM + 1))
 
     # Extract step title (remove ###)
     STEP_TITLE=$(echo "$line" | sed 's/^### *//')
