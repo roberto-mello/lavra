@@ -10,6 +10,10 @@
 INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty')
 
+SCRIPT_DIR_EARLY="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck source=sanitize-content.sh
+source "$SCRIPT_DIR_EARLY/sanitize-content.sh"
+
 [[ "$TOOL_NAME" != "Bash" && "$TOOL_NAME" != "bash" ]] && exit 0
 
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
@@ -59,7 +63,7 @@ CONTENT=""
 for PREFIX in INVESTIGATION LEARNED DECISION FACT PATTERN DEVIATION; do
   if echo "$COMMENT_BODY" | grep -q "${PREFIX}:"; then
     TYPE=$(echo "$PREFIX" | tr '[:upper:]' '[:lower:]')
-    CONTENT=$(echo "$COMMENT_BODY" | sed "s/.*${PREFIX}:[[:space:]]*//" | head -c 2048)
+    CONTENT=$(echo "$COMMENT_BODY" | sed "s/.*${PREFIX}:[[:space:]]*//" | sanitize_untrusted_content | head -c 2048)
     break
   fi
 done
