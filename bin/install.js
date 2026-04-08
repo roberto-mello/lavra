@@ -144,11 +144,21 @@ async function promptRuntime(rl) {
   }
 }
 
-async function promptScope(rl) {
+function globalPathForRuntime(runtime) {
+  const home = process.env.HOME || "~";
+  switch (runtime) {
+    case "opencode": return `${home}/.config/opencode/`;
+    case "gemini":   return `${home}/.config/gemini/`;
+    case "cortex":   return `${home}/.snowflake/cortex/`;
+    default:         return `${home}/.claude/`;
+  }
+}
+
+async function promptScope(rl, runtime) {
   console.log("");
   console.log("  Install scope:");
   console.log("  1. This project (current directory)");
-  console.log("  2. Global (~/.claude/)");
+  console.log(`  2. Global (${globalPathForRuntime(runtime)})`);
   console.log("");
 
   while (true) {
@@ -289,7 +299,7 @@ async function main() {
         console.log("");
       }
       if (!scope) {
-        scope = await promptScope(rl);
+        scope = await promptScope(rl, runtime);
         console.log("");
       }
     } finally {

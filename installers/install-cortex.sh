@@ -30,24 +30,30 @@ PLUGIN_DIR="$SCRIPT_DIR/plugins/lavra"
 INSTALLER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$INSTALLER_DIR/shared-functions.sh"
 
-# Parse --yes/-y flag (skip confirmation prompts)
+# Parse flags
 AUTO_YES=false
+GLOBAL_INSTALL=false
+NO_BANNER=false
 POSITIONAL_ARGS=()
 
 for arg in "$@"; do
   case "$arg" in
-    --yes|-y) AUTO_YES=true ;;
-    *) POSITIONAL_ARGS+=("$arg") ;;
+    --yes|-y)      AUTO_YES=true ;;
+    --global)      GLOBAL_INSTALL=true ;;
+    --no-banner)   NO_BANNER=true ;;
+    --*)           ;;  # ignore unknown flags
+    *)             POSITIONAL_ARGS+=("$arg") ;;
   esac
 done
 
-# Default to ~/.snowflake/cortex if no positional argument provided
-if [ ${#POSITIONAL_ARGS[@]} -eq 0 ]; then
+# Resolve target
+if [ "$GLOBAL_INSTALL" = true ]; then
+  TARGET="$HOME/.snowflake/cortex"
+elif [ ${#POSITIONAL_ARGS[@]} -gt 0 ]; then
+  TARGET="${POSITIONAL_ARGS[0]}"
+else
   TARGET="$HOME/.snowflake/cortex"
   GLOBAL_INSTALL=true
-else
-  TARGET="${POSITIONAL_ARGS[0]}"
-  GLOBAL_INSTALL=false
 fi
 
 # Resolve target to absolute path
@@ -76,7 +82,6 @@ fi
 
 LAVRA_GLOBAL_DEFAULT="$HOME/.snowflake/cortex"
 LAVRA_HOOKS_ARE_GLOBAL=false
-NO_BANNER=false
 [ "$NO_BANNER" = false ] && print_banner "Cortex Code" "0.7.3"
 echo "  Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
