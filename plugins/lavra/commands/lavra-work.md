@@ -338,6 +338,19 @@ This phase MUST complete before Phase 4 (Learn) or Phase 5 (Ship). Do NOT skip a
 
      When none of these conditions are met under `targeted`, skip `/lavra-review` for this bead only -- self-review (step 2) is the gate.
 
+   **If this bead has a parent epic**, pass the epic's Locked Decisions to the reviewer so it does not flag planned-but-incomplete items as dead code:
+
+   ```
+   Skill("lavra-review", "{BEAD_ID}
+
+   ## Epic Plan (read-only — reviewers must not flag planned-but-incomplete items as dead code)
+   {PARENT_EPIC_DECISIONS}
+
+   Locked Decisions in the epic above are intentional, even if a field or behavior appears unused or partially wired in this bead. Do not create beads recommending removal of items that appear in Locked Decisions.")
+   ```
+
+   Where `{PARENT_EPIC_DECISIONS}` is the `## Locked Decisions` section read from the parent epic in Phase 1 step 1. If the bead has no parent epic, invoke `/lavra-review {BEAD_ID}` normally.
+
    After `/lavra-review` completes, proceed to the Fix Loop for any findings.
    </mandatory>
 
@@ -679,6 +692,21 @@ bash .claude/hooks/extract-bead-context.sh {BEAD_ID}
 ```
 Store the output as `{BEAD_CONTEXT}`. If `.claude/hooks/extract-bead-context.sh` does not exist, fall back to `plugins/lavra/hooks/extract-bead-context.sh`.
 
+**Fetch epic plan (when input is an epic ID):**
+
+If the beads came from an epic, read the full epic description and extract its decision sections:
+
+```bash
+bd show {EPIC_ID} --long
+```
+
+Extract these sections verbatim (empty string if not present):
+- `## Locked Decisions` — must be honored by all child beads
+- `## Agent Discretion` — flexibility budget
+- `## Deferred` — explicitly out of scope; do NOT implement
+
+Store as `{EPIC_PLAN}`. If the input was not an epic (comma-separated IDs or `bd ready`), set `{EPIC_PLAN}` to empty string.
+
 **Read project config (no-op if missing):**
 
 ```bash
@@ -737,6 +765,7 @@ bd dep list {BEAD_ID} --json
 |---|---|
 | `{BEAD_ID}`, `{TITLE}` | From `bd show` |
 | `{BEAD_CONTEXT}` | From `extract-bead-context.sh` output |
+| `{EPIC_PLAN}` | From Phase M6 epic fetch (empty if no epic) |
 | `{FILE_SCOPE_LIST}` | From Phase M3 conflict detection |
 | `{RELATED_BEADS}` | From `bd dep list` -- `relates_to` entries |
 | `{REVIEW_CONTEXT}` | From project config (or empty) |
@@ -750,6 +779,13 @@ Work on bead {BEAD_ID}: {TITLE}
 
 ## Bead Details
 {BEAD_CONTEXT}
+
+## Epic Plan (read-only — governs all beads in this run)
+{EPIC_PLAN}
+
+The fields, structs, behaviors, and data flows defined in "Locked Decisions" above are intentional parts of the design, even if they appear unused or incomplete within your individual bead. Do not remove, stub out, or flag them as dead code. If your bead does not wire them end-to-end, that is by design — a later bead will complete the connection.
+
+If `{EPIC_PLAN}` is empty, no epic-level decisions apply.
 
 ## File Ownership
 You own these files for this task. Only modify files in this list:
@@ -791,7 +827,7 @@ During implementation, you may encounter issues not described in the bead:
 
 2. Mark in progress: `bd update {BEAD_ID} --status in_progress`
 
-3. Read the bead description completely. Check the Decisions section: Locked = must honor, Discretion = your flexibility budget, Deferred = do NOT implement. The `## Research Findings` section contains INVESTIGATION/FACT/PATTERN/DECISION/LEARNED entries -- treat as implementation constraints.
+3. Read the bead description completely. Check the Decisions section: Locked = must honor, Discretion = your flexibility budget, Deferred = do NOT implement. The `## Research Findings` section contains INVESTIGATION/FACT/PATTERN/DECISION/LEARNED entries -- treat as implementation constraints. Also read the "Epic Plan" section above: Locked Decisions there apply to all beads in this run, including yours.
 
 4. Implement the changes:
    - Follow existing patterns in the codebase
@@ -855,6 +891,19 @@ After each wave completes:
 - `review_scope: "targeted"`: Run `/lavra-review` only when at least one bead in the wave is P0/P1 or contains architecture/security terms (see list in single-bead Phase 3).
 
   When no bead in the wave meets those conditions, skip `/lavra-review` for this wave -- the agent self-reviews in step 6 of the agent prompt are the gate.
+
+**Pass epic plan context to the reviewer** by prepending it to the `lavra-review` invocation arguments:
+
+```
+Skill("lavra-review", "{bead IDs for this wave}
+
+## Epic Plan (read-only — reviewers must not flag planned-but-incomplete items as dead code)
+{EPIC_PLAN}
+
+Locked Decisions in the epic above are intentional, even if a field or behavior appears unused or partially wired in this wave. Do not create beads recommending removal of items that appear in Locked Decisions. If {EPIC_PLAN} is empty, no epic-level decisions apply.")
+```
+
+If `{EPIC_PLAN}` is empty, invoke `/lavra-review` normally without the epic plan block.
 
 Wait for `/lavra-review` to complete before proceeding to step 3.
 </mandatory>

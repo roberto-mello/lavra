@@ -106,7 +106,13 @@ Fall back to `plugins/lavra/agents/` if `.claude/agents/` is absent (e.g. runnin
 
 **Config-missing behavior:** If `.lavra/config/project-setup.md` does not exist, dispatch ALL agents below (backward compatible, no prompts, no degradation).
 
-#### 3b. Dispatch Agents in Parallel
+#### 3b. Read Epic Plan (if provided)
+
+If the invocation arguments include an `## Epic Plan` block (injected by `/lavra-work`), extract the Locked Decisions from it and store as `{EPIC_LOCKED_DECISIONS}`. This context is **not** passed to review agents (it would bias them toward the plan rather than the code). Instead, use it only in the synthesis step (step 6) as a discard filter: before creating a bead for any finding, check whether the flagged item — field, struct, behavior, data flow — appears in Locked Decisions. If it does, discard the finding and note: "Discarded: planned item per epic Locked Decisions."
+
+If no `## Epic Plan` block is present, `{EPIC_LOCKED_DECISIONS}` is empty and the discard filter is a no-op.
+
+#### 3c. Dispatch Agents in Parallel
 
 Dispatch the validated agent list (from config) or ALL agents below.
 
@@ -233,6 +239,7 @@ Remove duplicates, prioritize by severity and impact.
 
 - [ ] Collect findings from the inventory above
 - [ ] Discard any findings that recommend deleting or gitignoring files in `.lavra/memory/` or `.lavra/config/` (see Protected Artifacts above)
+- [ ] If `{EPIC_LOCKED_DECISIONS}` is non-empty: for each finding that flags a field, struct, behavior, or data flow as unused, dead, or unnecessary — check whether it appears in Locked Decisions. If it does, discard it with note: "Discarded: planned item per epic Locked Decisions (`{item name}`)." These are intentional placeholders for later beads; reviewers cannot see that context.
 - [ ] Categorize by type: security, performance, architecture, quality, etc.
 - [ ] Assign severity levels: P1 CRITICAL, P2 IMPORTANT, P3 NICE-TO-HAVE
 - [ ] Remove duplicate or overlapping findings — **note:** `data-migration-expert` and `migration-drift-detector` both inspect migration files and may report overlapping findings; deduplicate carefully, keeping the more specific finding (e.g., prefer a drift finding over a generic "migration present" observation)
