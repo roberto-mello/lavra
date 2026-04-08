@@ -10,8 +10,9 @@ git pull --rebase
 
 ## 2. Verify versions are set correctly
 
-These four locations must all have the target version:
+These five locations must all have the target version:
 
+- `package.json` — npm package version (required for `bunx lavra@latest`)
 - `plugins/lavra/.claude-plugin/plugin.json`
 - `.claude-plugin/marketplace.json` — must match `plugin.json` exactly
 - `LAVRA_VERSION` constant in `plugins/lavra/hooks/auto-recall.sh`

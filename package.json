@@ -1,6 +1,6 @@
 {
   "name": "@lavralabs/lavra",
-  "version": "0.7.1",
+  "version": "0.7.3",
   "description": "Compound engineering with persistent memory and multi-agent workflows based on beads for Claude Code, OpenCode, Gemini CLI, and Cortex Code",
   "bin": {
     "lavra": "bin/install.js",
