@@ -353,12 +353,12 @@ else
   fail "Cortex Code agents" "Expected 30+, found $AGENT_COUNT"
 fi
 
-# Verify skills (should be 8+)
+# Verify skills (should be 7+ — lavra-work has no SKILL.md, it's internal-only)
 SKILL_COUNT=$(find .cortex/skills -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
-if [[ "$SKILL_COUNT" -ge 8 ]]; then
+if [[ "$SKILL_COUNT" -ge 7 ]]; then
   pass "Cortex Code skills installed ($SKILL_COUNT files)"
 else
-  fail "Cortex Code skills" "Expected 8+, found $SKILL_COUNT"
+  fail "Cortex Code skills" "Expected 7+, found $SKILL_COUNT"
 fi
 
 # Verify MCP is NOT installed (skipped for Cortex)
