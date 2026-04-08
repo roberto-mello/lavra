@@ -81,7 +81,6 @@ Skills are in `plugins/lavra/skills/` (core) and `plugins/lavra/skills/optional/
 - **create-agent-skills**: Create new agents and skills
 - **agent-native-architecture**: Design agent-native system architectures
 - **lavra-knowledge**: Document solved problems as knowledge entries
-- **lavra-work**: Internal references for subagent prompts, single-bead and multi-bead work paths (not user-invokable)
 - **agent-browser**: Browser automation for testing and screenshots
 - **andrew-kane-gem-writer**: Write Ruby gems following Andrew Kane's style
 - **dhh-rails-style**: Rails development following DHH's conventions

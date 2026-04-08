@@ -95,7 +95,6 @@ Domain-specific commands in `commands/optional/`. Not installed by default, copy
 | `file-todos` | Find and manage TODO comments in code |
 | `git-worktree` | Manage git worktrees for parallel bead work |
 | `lavra-knowledge` | Document solved problems as knowledge entries |
-| `lavra-work` | Internal references for subagent prompts, single-bead and multi-bead work paths |
 
 ### Optional (7): Copy from `skills/optional/` to use
 
