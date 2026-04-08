@@ -185,10 +185,40 @@ ls /tmp/test-gemini-install/.lavra/
 # Must contain: .gitignore, .gitattributes, .lavra-version
 ```
 
+### npx/bunx installer smoke test
+
+This tests the exact code path users hit with `npx @lavralabs/lavra@latest` — the `bin/install.js` entrypoint. Run this for each platform before tagging.
+
+```bash
+mkdir -p /tmp/test-npx-install && cd /tmp/test-npx-install
+git init -q && bd init -q 2>/dev/null || true
+
+# Claude
+node ~/Documents/projects/lavra/bin/install.js --claude --yes /tmp/test-npx-install
+# Verify
+ls .claude/commands/ | wc -l   # expect 24+
+ls .claude/agents/review/      # expect agent files
+
+# Cortex
+node ~/Documents/projects/lavra/bin/install.js --cortex --yes /tmp/test-npx-install
+# Verify
+ls .cortex/commands/ | wc -l   # expect 24+
+ls .cortex/hooks/              # expect hook scripts
+```
+
+Verify the output ends with the workflow block (not "0 commands, 0 agents"):
+```
+Main workflow:
+  /lavra-design <feature description>   ...
+  /lavra-work <bead id>                 ...
+  /lavra-qa                             ...
+  /lavra-ship                           ...
+```
+
 ### Clean up
 
 ```bash
-rm -rf /tmp/test-beads-install /tmp/test-opencode-install /tmp/test-gemini-install
+rm -rf /tmp/test-beads-install /tmp/test-opencode-install /tmp/test-gemini-install /tmp/test-npx-install
 cd ~/Documents/projects/lavra
 ```
 
