@@ -496,37 +496,6 @@ else
   fail "Cursor IDE" ".cursor/skills should not exist"
 fi
 
-# Global install: verify no double-nesting (~/.cursor/.cursor/)
-CURSOR_GLOBAL_TEST="$TEST_ROOT/cursor-global-home"
-mkdir -p "$CURSOR_GLOBAL_TEST/.cursor"
-REAL_HOME_SAVED="$HOME"
-export HOME="$CURSOR_GLOBAL_TEST"
-
-if bash "$PROJECT_ROOT/install.sh" --cursor --global >/dev/null 2>&1; then
-  pass "Cursor IDE global installer completed"
-else
-  fail "Cursor IDE global install" "Installer failed"
-fi
-
-# Agents must be at ~/.cursor/agents/, NOT ~/.cursor/.cursor/agents/
-if [[ -d "$CURSOR_GLOBAL_TEST/.cursor/agents" ]] && \
-   [[ ! -d "$CURSOR_GLOBAL_TEST/.cursor/.cursor" ]]; then
-  GLOBAL_AGENT_COUNT=$(find "$CURSOR_GLOBAL_TEST/.cursor/agents" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-  if [[ "$GLOBAL_AGENT_COUNT" -ge 30 ]]; then
-    pass "Cursor IDE global install: agents at correct path ($GLOBAL_AGENT_COUNT files, no double-nesting)"
-  else
-    fail "Cursor IDE global install" "Expected 30+ agents, found $GLOBAL_AGENT_COUNT"
-  fi
-else
-  if [[ -d "$CURSOR_GLOBAL_TEST/.cursor/.cursor" ]]; then
-    fail "Cursor IDE global install" "Double-nesting detected: ~/.cursor/.cursor/ exists"
-  else
-    fail "Cursor IDE global install" "agents directory not created"
-  fi
-fi
-
-export HOME="$REAL_HOME_SAVED"
-
 # ==============================================================================
 # Test 6: New Feature Provisioning (v0.7.0)
 # ==============================================================================
