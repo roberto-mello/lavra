@@ -11,7 +11,19 @@
 #   recall.sh --topic BD-005               # Filter by epic parent
 #
 
-MEMORY_DIR="${CLAUDE_PROJECT_DIR:-.}/.lavra/memory"
+# Resolve project root: prefer CLAUDE_PROJECT_DIR, then walk up from CWD to find .lavra/
+if [[ -n "$CLAUDE_PROJECT_DIR" ]]; then
+  PROJECT_ROOT="$CLAUDE_PROJECT_DIR"
+else
+  PROJECT_ROOT="$PWD"
+  while [[ "$PROJECT_ROOT" != "/" ]] && [[ ! -d "$PROJECT_ROOT/.lavra" ]]; do
+    PROJECT_ROOT="$(dirname "$PROJECT_ROOT")"
+  done
+  if [[ ! -d "$PROJECT_ROOT/.lavra" ]]; then
+    PROJECT_ROOT="$PWD"  # fallback: no .lavra found, use CWD
+  fi
+fi
+MEMORY_DIR="$PROJECT_ROOT/.lavra/memory"
 KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 ARCHIVE_FILE="$MEMORY_DIR/knowledge.archive.jsonl"
 
