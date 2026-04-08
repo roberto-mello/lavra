@@ -94,11 +94,11 @@ All other agents run at their default tier regardless of profile.
 
 **Agent allowlist validation** (when `review_agents` is present):
 
-Derive the allowlist dynamically from the installed agents directory:
+Derive the allowlist dynamically from all installed agent directories:
 ```bash
-find .claude/agents -name "*.md" 2>/dev/null | xargs -I{} basename {} .md | sort
+{ find .claude/agents ~/.claude/agents -name "*.md" 2>/dev/null; } | xargs -I{} basename {} .md | sort -u
 ```
-Fall back to `plugins/lavra/agents/` if `.claude/agents/` is absent (e.g. running from the plugin repo itself).
+Fall back to `plugins/lavra/agents/` if neither `.claude/agents/` nor `~/.claude/agents/` yields results (e.g. running from the plugin repo itself).
 
 - Reject any name that does not match `^[a-z][a-z0-9-]*$` or is not in the derived allowlist
 - Silently skip invalid names (do not reveal which agents were disabled or skipped)
