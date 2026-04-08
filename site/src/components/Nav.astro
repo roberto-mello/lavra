@@ -1,7 +1,17 @@
 ---
 // Nav.astro -- Sticky site navigation
 import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
 import logo from '../assets/lavra-icon2.png';
+
+const allDocs = await getCollection('docs');
+const latestRelease = allDocs
+  .filter(d => d.id.startsWith('releases/') && !d.data.draft)
+  .sort((a, b) => b.id.localeCompare(a.id, undefined, { numeric: true }))[0];
+
+function urlSlug(id: string) {
+  return id.toLowerCase().replace(/_/g, '-').replace(/\./g, '');
+}
 ---
 <nav class="sticky top-0 z-40 bg-bg/80 backdrop-blur-md border-b border-border h-16">
   <div class="grid grid-cols-[auto_1fr_auto] items-center px-6 max-w-7xl mx-auto h-full">
@@ -11,6 +21,15 @@ import logo from '../assets/lavra-icon2.png';
     </a>
     <div></div>
     <div class="flex gap-6 items-center">
+      {latestRelease && (
+        <a
+          href={`/docs/${urlSlug(latestRelease.id.replace(/\.md$/, ''))}`}
+          class="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono text-text-dim hover:text-accent transition-colors duration-200"
+        >
+          <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
+          {latestRelease.data.title.replace(' Release Notes', '')}
+        </a>
+      )}
       <a href="/docs" class="text-sm text-text-muted hover:text-text transition-colors duration-200">
         Docs
       </a>

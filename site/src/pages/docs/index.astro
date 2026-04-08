@@ -4,6 +4,13 @@ import Base from '../../layouts/Base.astro';
 
 const allDocs = await getCollection('docs');
 
+// Find all release notes, sorted by version descending, excluding drafts
+const releaseDocs = allDocs
+  .filter(d => d.id.startsWith('releases/') && !d.data.draft)
+  .sort((a, b) => b.id.localeCompare(a.id, undefined, { numeric: true }));
+const latestRelease = releaseDocs[0];
+const previousReleases = releaseDocs.slice(1);
+
 const sections = [
   {
     label: 'Getting Started',
@@ -20,10 +27,6 @@ const sections = [
   {
     label: 'Development',
     slugs: ['xml-tag-standard'],
-  },
-  {
-    label: 'Releases',
-    slugs: ['releases/v071', 'releases/v070'],
   },
 ];
 
@@ -72,6 +75,37 @@ function urlSlug(id: string) {
         );
       })}
     </div>
+
+    {latestRelease && (
+      <div class="mt-12">
+        <h2 class="text-xs font-mono uppercase tracking-wider text-text-dim mb-4">Releases</h2>
+        <a
+          href={`/docs/${urlSlug(latestRelease.id.replace(/\.md$/, ''))}`}
+          class="group block bg-surface border border-border hover:border-accent/50 rounded-xl p-5 transition-colors duration-150"
+        >
+          <h3 class="font-semibold text-text group-hover:text-accent transition-colors duration-150 mb-1">
+            {latestRelease.data.title}
+          </h3>
+          <p class="text-sm text-text-muted leading-relaxed">{latestRelease.data.description}</p>
+        </a>
+        {previousReleases.length > 0 && (
+          <div class="mt-3 text-sm text-text-muted">
+            Previous releases:{' '}
+            {previousReleases.map((r, i) => (
+              <>
+                <a
+                  href={`/docs/${urlSlug(r.id.replace(/\.md$/, ''))}`}
+                  class="text-accent hover:underline"
+                >
+                  {r.data.title.replace(' Release Notes', '')}
+                </a>
+                {i < previousReleases.length - 1 ? ', ' : ''}
+              </>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
 
   </div>
 </Base>
