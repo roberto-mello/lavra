@@ -20,7 +20,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/sanitize-content.sh"
 
 # Version of lavra that wrote this hook (updated by installer)
-LAVRA_VERSION="0.7.1"
+LAVRA_VERSION="0.7.2"
 
 # Exit silently if bd is not installed
 if ! command -v bd &>/dev/null; then
