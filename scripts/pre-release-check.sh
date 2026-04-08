@@ -37,9 +37,11 @@ echo "=== Version consistency ==="
 
 PLUGIN_VERSION=$(jq -r '.version' plugins/lavra/.claude-plugin/plugin.json)
 MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name == "lavra") | .version' .claude-plugin/marketplace.json)
+NPM_VERSION=$(jq -r '.version' package.json)
 
 echo "  plugin.json:      $PLUGIN_VERSION"
 echo "  marketplace.json: $MARKETPLACE_VERSION"
+echo "  package.json:     $NPM_VERSION"
 
 if [[ "$PLUGIN_VERSION" == "$MARKETPLACE_VERSION" ]]; then
   echo "  PASS  Versions match"
@@ -47,6 +49,8 @@ if [[ "$PLUGIN_VERSION" == "$MARKETPLACE_VERSION" ]]; then
 else
   fail "Version mismatch" "plugin.json=$PLUGIN_VERSION marketplace.json=$MARKETPLACE_VERSION"
 fi
+
+[[ "$NPM_VERSION" == "$PLUGIN_VERSION" ]] && { echo "  PASS  package.json version"; ((PASS++)) || true; } || fail "package.json version" "has $NPM_VERSION, expected $PLUGIN_VERSION"
 
 echo ""
 echo "=== Hook version constants ==="
