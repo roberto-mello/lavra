@@ -2,6 +2,7 @@
 name: spec-flow-analyzer
 description: "Analyzes specifications, plans, and feature descriptions to map all possible user flows, identify gaps and ambiguities, and surface critical questions. Use when reviewing feature specs or validating implementation plans."
 model: inherit
+color: teal
 ---
 <examples>
 <example>

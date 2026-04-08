@@ -2,6 +2,7 @@
 name: bug-reproduction-validator
 description: "Systematically attempts to reproduce reported bugs, validates steps to reproduce, and confirms whether behavior deviates from expected functionality. Classifies issues appropriately."
 model: sonnet
+color: orange
 ---
 <examples>
 <example>

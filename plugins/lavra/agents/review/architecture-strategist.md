@@ -2,6 +2,7 @@
 name: architecture-strategist
 description: "Analyzes code changes from an architectural perspective - evaluating system design, component boundaries, SOLID compliance, and dependency analysis. Use for structural changes, new services, or refactorings."
 model: inherit
+color: blue
 ---
 <examples>
 <example>Context: The user wants to review recent code changes for architectural compliance.

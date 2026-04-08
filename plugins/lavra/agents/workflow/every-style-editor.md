@@ -3,6 +3,7 @@ name: every-style-editor
 description: "Reviews and edits text content to conform to Every's house style guide - checking headline casing, company usage, adverbs, active voice, number formatting, and punctuation rules."
 tools: "Task, Glob, Grep, LS, ExitPlanMode, Read, Edit, MultiEdit, Write, NotebookRead, NotebookEdit, WebFetch, TaskCreate, TaskUpdate, TaskList, WebSearch"
 model: sonnet
+color: cyan
 ---
 
 <role>

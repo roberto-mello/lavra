@@ -144,16 +144,16 @@ kb_search() {
   fi
 
   # BM25 weights: content=-10, tags_text=-5, type=-2, key=-1
-  # $FTS_QUERY is passed as a bound parameter (?) to prevent shell injection.
-  # $TOP_N is safe to interpolate directly (validated numeric above).
+  # $FTS_QUERY is safe to interpolate: the term extractor above restricts it
+  # to [a-zA-Z0-9_.]{2,} tokens wrapped in double quotes, joined by OR.
+  # Note: sqlite3 CLI has no bound parameter support (? binding is C API only).
   sqlite3 -separator '|' "$DB_PATH" \
     "SELECT k.type, k.content, k.bead, k.tags_text
 FROM knowledge_fts fts
 JOIN knowledge k ON k.rowid = fts.rowid
-WHERE knowledge_fts MATCH ?
+WHERE knowledge_fts MATCH '$FTS_QUERY'
 ORDER BY bm25(knowledge_fts, -10.0, -5.0, -2.0, -1.0)
-LIMIT $TOP_N;" \
-    "$FTS_QUERY"
+LIMIT $TOP_N;"
 }
 
 # Incremental sync from JSONL files into SQLite FTS5

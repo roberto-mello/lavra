@@ -52,6 +52,7 @@ The [/lavra-setup](#codebase-analysis) command creates `.lavra/config/lavra.json
     "research": true,             // run research agents in /lavra-design
     "plan_review": true,          // run plan review phase in /lavra-design
     "goal_verification": true,    // verify completion criteria in /lavra-work and /lavra-ship
+    "review_scope": "full",       // "full" (all changes) or "targeted" (P0/P1 and arch/security beads only)
     "testing_scope": "targeted"   // "targeted" (hooks, API routes, complex logic only) or "full" (all tests)
   },
   "execution": {

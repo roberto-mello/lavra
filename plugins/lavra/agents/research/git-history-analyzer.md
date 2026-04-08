@@ -2,6 +2,7 @@
 name: git-history-analyzer
 description: "Analyzes git history to understand code evolution, trace origins of specific code patterns, identify key contributors and their expertise areas, and extract development patterns from commit history."
 model: sonnet
+color: gray
 ---
 <examples>
 <example>Context: The user wants to understand the history and evolution of recently modified files.

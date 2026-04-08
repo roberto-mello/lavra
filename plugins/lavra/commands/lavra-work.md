@@ -371,14 +371,36 @@ After all fixes, **re-review** (return to step 2 above). Loop continues until:
 
 Maximum fix iterations: 3. If issues persist after 3 rounds, report remaining issues and proceed.
 
+### Phase 3 Exit Gate
+
+<review-gate>
+You MUST output this checklist before leaving Phase 3. Every item must be checked.
+Copy it, fill it in, and print it to the conversation:
+
+```
+## Phase 3 Review Gate
+[ ] lavra-review: Skill(lavra-review) invoked -- first line of output: ___
+    (if review_scope: "targeted" and bead does not qualify, write: SKIPPED -- targeted, reason: ___)
+[ ] Findings: {N} issues found / {N} fixed / {N} deferred to PR description
+[ ] Self-review: clean | {N} issues fixed
+[ ] Goal verification: passed | failed-and-fixed | skipped (no Validation section)
+```
+
+**You cannot check the lavra-review box without having invoked the Skill and pasting its output.**
+Summarizing what you think the review would find is not a substitute.
+If any box is unchecked, complete that step now before continuing.
+</review-gate>
+
 </phase>
 
-<phase name="learn" order="4" requires="review-complete">
+<phase name="learn" order="4" requires="review-gate-complete">
 
 ## Phase 4: Learn (LEARNING state)
 
 <prerequisite>
-Phase 3 (Review) must be complete before this phase. If review has not run, STOP and go back to Phase 3 now.
+Check: is the Phase 3 Review Gate checklist present in this conversation with all boxes checked?
+If not -- if you cannot scroll up and find it -- Phase 3 did not complete. STOP and go back to Phase 3 now.
+Do not proceed on the assumption that review happened. Verify it in the conversation history.
 </prerequisite>
 
 After review is clean, extract and structure knowledge from this work session.
@@ -912,6 +934,25 @@ cat > .lavra/memory/session-state.md << EOF
 - Wave {N+1}: {bead titles} (or "All waves complete")
 EOF
 ```
+
+### Phase M8 Exit Gate
+
+<review-gate>
+You MUST output this checklist before starting the next wave. Every item must be checked.
+Copy it, fill it in, and print it to the conversation:
+
+```
+## Wave {N} Review Gate
+[ ] lavra-review: Skill(lavra-review) invoked -- first line of output: ___
+    (if review_scope: "targeted" and wave does not qualify, write: SKIPPED -- targeted, reason: ___)
+[ ] Findings: {N} issues found / {N} fixed / {N} deferred
+[ ] Tests: passing after fixes
+[ ] Goal verification: passed | N/A (no Validation sections in this wave)
+```
+
+**You cannot check the lavra-review box without having invoked the Skill and pasting its output.**
+If any box is unchecked, complete that step now before starting the next wave.
+</review-gate>
 
 Proceed to the next wave only after all steps pass.
 

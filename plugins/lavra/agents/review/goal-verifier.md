@@ -2,6 +2,7 @@
 name: goal-verifier
 description: "Verify implementation actually delivers what the bead's success criteria require. Three-level check: Exists, Substantive, Wired. Catches stubs, placeholders, and unconnected code."
 model: sonnet
+color: green
 ---
 <examples>
 <example>Context: A bead requires an auth middleware that protects API routes. user: "Verify goal completion for BD-001" assistant: "I'll check whether the auth middleware exists, is substantive (not a stub), and is wired into the route definitions." <commentary>Goal verification goes beyond code review -- it checks whether the declared success criteria are actually met end-to-end.</commentary></example>
