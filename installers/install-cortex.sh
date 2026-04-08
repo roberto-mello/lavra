@@ -228,6 +228,10 @@ else
   # Run conversion
   echo "  Running convert-cortex.ts..."
   cd "$SCRIPT_DIR/scripts"
+  if [ ! -d "node_modules" ]; then
+    echo "  Installing script dependencies..."
+    bun install --silent
+  fi
   if ! BEADS_INSTALLING=1 bun run convert-cortex.ts; then
     echo "[!] Error: Conversion failed"
     exit 1
@@ -463,7 +467,7 @@ if [ "$GLOBAL_INSTALL" = true ]; then
   echo "$CMD_COUNT commands, $AGENT_COUNT agents, and $SKILL_COUNT skills are now available in all Cortex Code sessions."
   echo ""
   echo "For beads integration (memory system + hooks):"
-  echo "  bash $SCRIPT_DIR/install.sh -cortex /path/to/your-project"
+  echo "  bunx @lavralabs/lavra@latest --cortex /path/to/your-project"
   echo ""
 else
   echo "$CMD_COUNT commands, $AGENT_COUNT agents, and $SKILL_COUNT skills installed."
@@ -480,5 +484,5 @@ echo "Restart Cortex Code to load the plugin."
 echo ""
 
 if [ "$GLOBAL_INSTALL" = false ]; then
-  echo "To uninstall: bash $SCRIPT_DIR/installers/uninstall-cortex.sh $TARGET"
+  echo "To uninstall: bunx @lavralabs/lavra@latest --uninstall"
 fi

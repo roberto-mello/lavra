@@ -437,7 +437,7 @@ if [ "$GLOBAL_INSTALL" = true ]; then
   echo "$CMD_COUNT commands, $AGENT_COUNT agents, and $SKILL_COUNT skills are now available in all Claude Code sessions."
   echo ""
   echo "For beads integration (memory system + hooks):"
-  echo "  bash $SCRIPT_DIR/install.sh /path/to/your-project"
+  echo "  bunx @lavralabs/lavra@latest --claude /path/to/your-project"
   echo ""
 else
   if [ "$GLOBALLY_INSTALLED" = false ]; then
@@ -456,5 +456,5 @@ echo "Restart Claude Code to load the plugin."
 echo ""
 
 if [ "$GLOBAL_INSTALL" = false ]; then
-  echo "To uninstall: bash $SCRIPT_DIR/uninstall.sh $TARGET"
+  echo "To uninstall: bunx @lavralabs/lavra@latest --uninstall"
 fi
