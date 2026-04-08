@@ -12,7 +12,6 @@ A plugin for coding agents that orchestrates the full development lifecycle -- f
 [![OpenCode](https://img.shields.io/badge/OpenCode-000000?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwb2x5bGluZSBwb2ludHM9IjE2IDE4IDIyIDEyIDE2IDYiLz48cG9seWxpbmUgcG9pbnRzPSI4IDYgMiAxMiA4IDE4Ii8+PC9zdmc+&logoColor=white)](https://opencode.ai/)
 [![Gemini CLI](https://img.shields.io/badge/Gemini_CLI-4285F4?logo=google&logoColor=white)](https://github.com/google-gemini/gemini-cli)
 [![Cortex Code](https://img.shields.io/badge/Cortex_Code-29B5E8?logo=snowflake&logoColor=white)](https://www.snowflake.com/en/product/features/cortex-code/)
-[![Cursor](https://img.shields.io/badge/Cursor-000000?logo=cursor&logoColor=white)](https://cursor.com)
 
 **[Quick Start](https://lavra.dev/docs/quickstart)** | **[Full Catalog](https://lavra.dev/docs/catalog)** | **[Architecture](https://lavra.dev/docs/architecture)** | **[Security](https://lavra.dev/docs/security)** | **[Command Map](https://lavra.dev/command-map)** | **[v0.7.1 Release Notes](https://lavra.dev/docs/releases/v0.7.1)**
 
@@ -103,7 +102,6 @@ cd lavra
 ./install.sh --opencode    # OpenCode
 ./install.sh --gemini      # Gemini CLI
 ./install.sh --cortex      # Cortex Code
-./install.sh --cursor      # Cursor IDE (v2.4+)
 ```
 
 <details>
