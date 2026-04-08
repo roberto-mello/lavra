@@ -30,7 +30,6 @@ Platforms:
   -opencode, --opencode   Install for OpenCode
   -gemini, --gemini       Install for Gemini CLI
   -cortex, --cortex       Install for Cortex Code
-  -cursor, --cursor       Install for Cursor IDE
 
 Target:
   [path]                  Install to specific project directory
@@ -47,7 +46,6 @@ Examples:
   ./install.sh -opencode                # Global OpenCode install
   ./install.sh -gemini /path/to/project # Project-specific Gemini install
   ./install.sh -cortex                  # Global Cortex Code install
-  ./install.sh -cursor /path/to/project # Project-specific Cursor install
 
 EOF
   exit 0
@@ -58,12 +56,12 @@ validate_platform() {
   local platform="$1"
 
   case "$platform" in
-    claude|opencode|gemini|cortex|cursor)
+    claude|opencode|gemini|cortex)
       return 0
       ;;
     *)
       echo "[!] Error: Invalid platform '$platform'"
-      echo "    Allowed platforms: claude, opencode, gemini, cortex, cursor"
+      echo "    Allowed platforms: claude, opencode, gemini, cortex"
       echo ""
       echo "Run './install.sh --help' for usage information."
       exit 1
@@ -91,10 +89,6 @@ while [[ $# -gt 0 ]]; do
       ;;
     -cortex|--cortex)
       PLATFORM="cortex"
-      shift
-      ;;
-    -cursor|--cursor)
-      PLATFORM="cursor"
       shift
       ;;
     *)

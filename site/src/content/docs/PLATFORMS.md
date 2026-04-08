@@ -1,23 +1,23 @@
 ---
 title: Platform Support
-description: Installation and setup for Claude Code, OpenCode, Gemini CLI, Cortex Code, and Cursor IDE
+description: Installation and setup for Claude Code, OpenCode, Gemini CLI, and Cortex Code
 order: 4
 ---
 
 # Multi-Platform Support
 
-Lavra supports five AI coding agents. The core memory system (hooks, knowledge capture, auto-recall) works identically across all platforms. Commands, agents, and skills are available on all platforms.
+Lavra supports four AI coding agents. The core memory system (hooks, knowledge capture, auto-recall) works identically across all platforms. Commands, agents, and skills are available on all platforms.
 
 ## What works where
 
-| Feature | Claude Code | OpenCode | Gemini CLI | Cortex Code | Cursor IDE |
-|---------|-------------|----------|------------|-------------|------------|
-| Memory capture | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Auto-recall | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Commands | ✓ | ✓ | ✓ | ✓ | — |
-| Agents | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Skills | ✓ | ✓ | ✓ | ✓ | — |
-| Context7 MCP | ✓ | ✓ | ✓ | manual | ✓ |
+| Feature | Claude Code | OpenCode | Gemini CLI | Cortex Code |
+|---------|-------------|----------|------------|-------------|
+| Memory capture | ✓ | ✓ | ✓ | ✓ |
+| Auto-recall | ✓ | ✓ | ✓ | ✓ |
+| Commands | ✓ | ✓ | ✓ | ✓ |
+| Agents | ✓ | ✓ | ✓ | ✓ |
+| Skills | ✓ | ✓ | ✓ | ✓ |
+| Context7 MCP | ✓ | ✓ | ✓ | manual |
 
 ## Claude Code
 
@@ -85,31 +85,6 @@ Context7 MCP is not installed automatically. To enable framework documentation l
 ```
 
 > Cortex Code also reads `.claude/` directories for compatibility, but native `.cortex/` paths are preferred.
-
-## Cursor IDE
-
-```bash
-npx @lavralabs/lavra@latest --cursor       # local project
-npx @lavralabs/lavra@latest --cursor --global  # all projects (~/.cursor/)
-```
-
-Requires Cursor v2.4 or later (earlier versions ignore `sessionStart` hooks).
-
-The installer copies hooks to `.cursor/hooks/`, agents to `.cursor/agents/`, and configures `.cursor/hooks.json` and `.cursor/mcp.json`. Commands and skills are not installed — use Cursor's built-in agent features instead.
-
-**Hook events:**
-- `sessionStart` — auto-recall injects relevant knowledge as `additional_context`
-- `afterShellExecution` — `bd comments add` commands captured automatically
-- `subagentStop` — subagent knowledge logging enforced
-
-**Verify:**
-```bash
-cat .cursor/hooks.json | jq '.hooks'
-ls .cursor/agents/review/
-ls .cursor/hooks/
-```
-
-**Use agents** by mentioning them in chat: `@architecture-strategist`, `@security-sentinel`, `@performance-oracle`, etc.
 
 ## See Also
 
