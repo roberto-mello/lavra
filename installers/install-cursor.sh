@@ -67,18 +67,10 @@ if [[ "$TARGET_OWNER" != "$USER" ]]; then
   exit 1
 fi
 
-# For project installs, files go into $CURSOR_DIR/
-# For global installs, TARGET is already ~/.cursor so use it directly
-if [ "$GLOBAL_INSTALL" = true ]; then
-  CURSOR_DIR="$TARGET"
-else
-  CURSOR_DIR="$TARGET/.cursor"
-fi
-
 # Step 1: Copy hooks
 echo "[1/4] Installing hooks..."
 
-HOOKS_DIR="$CURSOR_DIR/hooks"
+HOOKS_DIR="$TARGET/.cursor/hooks"
 create_dir_with_symlink_handling "$HOOKS_DIR"
 
 # auto-recall-cursor.sh is the Cursor-specific wrapper — install it first,
@@ -96,7 +88,7 @@ echo ""
 # Step 2: Write .cursor/hooks.json
 echo "[2/4] Writing hooks manifest..."
 
-HOOKS_JSON="$CURSOR_DIR/hooks.json"
+HOOKS_JSON="$TARGET/.cursor/hooks.json"
 cat > "$HOOKS_JSON" << 'EOF'
 {
   "version": 1,
@@ -128,7 +120,7 @@ echo ""
 # Step 3: Copy agents (direct copy — Cursor reads .md frontmatter natively)
 echo "[3/4] Installing agents..."
 
-AGENTS_DIR="$CURSOR_DIR/agents"
+AGENTS_DIR="$TARGET/.cursor/agents"
 for category in review research design workflow docs; do
   mkdir -p "$AGENTS_DIR/$category"
   if [ -d "$PLUGIN_DIR/agents/$category" ]; then
@@ -160,7 +152,7 @@ fi
 # Configure MCP server (Context7 for framework documentation)
 echo "[5/4] Configuring MCP servers..."
 
-MCP_JSON="$CURSOR_DIR/mcp.json"
+MCP_JSON="$TARGET/.cursor/mcp.json"
 CONTEXT7_ENTRY='{"url":"https://mcp.context7.com/mcp","type":"http"}'
 
 if ! command -v jq &>/dev/null; then
