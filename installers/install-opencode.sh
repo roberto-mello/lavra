@@ -35,7 +35,7 @@ source "$INSTALLER_DIR/shared-functions.sh"
 LAVRA_GLOBAL_DEFAULT="$HOME/.config/opencode"
 LAVRA_HOOKS_ARE_GLOBAL=false
 eval "$(parse_installer_args "$@")"
-[ "$NO_BANNER" = false ] && print_banner "OpenCode" "0.7.1"
+[ "$NO_BANNER" = false ] && print_banner "OpenCode" "0.7.2"
 
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"

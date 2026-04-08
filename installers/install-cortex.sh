@@ -77,7 +77,7 @@ fi
 LAVRA_GLOBAL_DEFAULT="$HOME/.snowflake/cortex"
 LAVRA_HOOKS_ARE_GLOBAL=false
 NO_BANNER=false
-[ "$NO_BANNER" = false ] && print_banner "Cortex Code" "0.7.1"
+[ "$NO_BANNER" = false ] && print_banner "Cortex Code" "0.7.2"
 echo "  Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  Type: Global installation"

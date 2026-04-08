@@ -42,7 +42,7 @@ source "$INSTALLER_DIR/shared-functions.sh"
 LAVRA_GLOBAL_DEFAULT="$HOME/.claude"
 LAVRA_HOOKS_ARE_GLOBAL=false
 eval "$(parse_installer_args "$@")"
-[ "$NO_BANNER" = false ] && print_banner "Claude Code" "0.7.1"
+[ "$NO_BANNER" = false ] && print_banner "Claude Code" "0.7.2"
 
 # Resolve target to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
@@ -440,8 +440,10 @@ if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  bash $SCRIPT_DIR/install.sh /path/to/your-project"
   echo ""
 else
-  echo "$CMD_COUNT commands, $AGENT_COUNT agents, and $SKILL_COUNT skills installed."
-  echo ""
+  if [ "$GLOBALLY_INSTALLED" = false ]; then
+    echo "$CMD_COUNT commands, $AGENT_COUNT agents, and $SKILL_COUNT skills installed."
+    echo ""
+  fi
   echo "Main workflow:"
   echo "  /lavra-design <feature description>   Plan a feature end-to-end before writing code"
   echo "  /lavra-work <bead id>                 Execute work on a bead"
