@@ -187,19 +187,11 @@ echo ""
 # Installation complete
 echo "Done."
 echo ""
-echo "Next steps:"
+echo "Main workflow:"
+echo "  /lavra-design <feature description>   Plan a feature end-to-end before writing code"
+echo "  /lavra-work <bead id>                 Execute work on a bead"
+echo "  /lavra-qa                             Browser-based QA verification (web apps)"
+echo "  /lavra-ship                           Finalize, open PR, close beads"
 echo ""
-echo "1. Configure hooks in settings.json:"
-echo "   See: $PLUGIN_DIR/gemini-src/settings.json for hook configuration"
+echo "Restart Gemini CLI to load the plugin."
 echo ""
-echo "2. Context7 MCP server configured (framework documentation lookup)"
-echo ""
-echo "3. Commands are available as slash commands:"
-echo "   - /lavra-plan, /lavra-work, /lavra-review, etc."
-echo ""
-
-if [ "$GLOBAL_INSTALL" = true ]; then
-  echo "Global installation complete. All Gemini CLI projects will have access to the plugin."
-else
-  echo "Project-specific installation complete for: $TARGET"
-fi

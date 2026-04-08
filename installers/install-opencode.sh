@@ -259,18 +259,11 @@ echo ""
 # Installation complete
 echo "Done."
 echo ""
-echo "Next steps:"
+echo "Main workflow:"
+echo "  /lavra-design <feature description>   Plan a feature end-to-end before writing code"
+echo "  /lavra-work <bead id>                 Execute work on a bead"
+echo "  /lavra-qa                             Browser-based QA verification (web apps)"
+echo "  /lavra-ship                           Finalize, open PR, close beads"
 echo ""
-echo "1. Context7 MCP server configured (framework documentation lookup)"
+echo "Restart OpenCode to load the plugin."
 echo ""
-echo "2. The TypeScript plugin will automatically load on next OpenCode session"
-echo ""
-echo "3. Commands are available via Ctrl+K:"
-echo "   - lavra-plan, lavra-work, lavra-review, etc."
-echo ""
-
-if [ "$GLOBAL_INSTALL" = true ]; then
-  echo "Global installation complete. All OpenCode projects will have access to the plugin."
-else
-  echo "Project-specific installation complete for: $TARGET"
-fi
