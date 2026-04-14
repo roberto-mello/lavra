@@ -127,7 +127,7 @@ Use one of: LEARNED, DECISION, FACT, PATTERN, INVESTIGATION`,
     }
 
     // Pre-filter: check for knowledge prefixes
-    if (!command.match(/(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:)/)) {
+    if (!command.match(/(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:)/)) {
       return;
     }
 
