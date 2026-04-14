@@ -211,13 +211,8 @@ create_dir_with_symlink_handling "$SKILLS_DIR"
 for skill_dir in "$PLUGIN_DIR/opencode/skills"/*; do
   if [ -d "$skill_dir" ]; then
     skill_name=$(basename "$skill_dir")
-    mkdir -p "$SKILLS_DIR/$skill_name"
-    cp "$skill_dir/SKILL.md" "$SKILLS_DIR/$skill_name/" 2>/dev/null || true
-    chmod 444 "$SKILLS_DIR/$skill_name/SKILL.md" 2>/dev/null || true
-    # Copy references/ subdirectory if present (e.g. lavra-work-multi/references/)
-    if [ -d "$skill_dir/references" ]; then
-      cp -r "$skill_dir/references" "$SKILLS_DIR/$skill_name/"
-    fi
+    cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
+    chmod 644 "$SKILLS_DIR/$skill_name/SKILL.md" 2>/dev/null || true
   fi
 done
 
