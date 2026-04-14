@@ -305,8 +305,7 @@ ${RELATED_BEADS}
 
 Read the agent prompt template:
 ```bash
-_TMPL="lavra-work-multi/references/subagent-prompt.md"
-AGENT_TEMPLATE=$(cat ".claude/skills/$_TMPL" 2>/dev/null || cat ".opencode/skills/$_TMPL" 2>/dev/null || cat ".cortex/skills/$_TMPL" 2>/dev/null || cat "skills/$_TMPL" 2>/dev/null || cat "$HOME/.config/opencode/plugins/lavra/skills/$_TMPL" 2>/dev/null || cat "$HOME/.snowflake/cortex/skills/$_TMPL" 2>/dev/null)
+AGENT_TEMPLATE=$(cat ".claude/skills/lavra-work-multi/references/subagent-prompt.md")
 ```
 Fill all {PLACEHOLDERS} in `$AGENT_TEMPLATE` with the gathered values, then pass the filled string to Task().
 
