@@ -1,8 +1,8 @@
 {
   "opencode": {
-    "haiku": "anthropic/claude-haiku-4-5-20251001",
-    "sonnet": "anthropic/claude-sonnet-4-5-20250929",
-    "opus": "anthropic/claude-opus-4-6"
+    "haiku": "opencode/minimax-m2.5-free",
+    "sonnet": "opencode-go/kimi-k2.5",
+    "opus": "opencode-go/glm-5.1"
   },
   "gemini": {
     "haiku": "gemini-2.5-flash",
