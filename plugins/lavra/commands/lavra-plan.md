@@ -113,6 +113,16 @@ If no brainstorm found (or not relevant), refine the idea through collaborative 
 - Focus on understanding: purpose, constraints and success criteria
 - Continue until the idea is clear OR user says "proceed"
 
+**Think Before Planning.** Before asking any refinement questions or proceeding to research, externalize your interpretation:
+
+- State in 1–2 sentences what you understand the request to be
+- List any assumptions you are making that the user did not explicitly state
+- If anything is ambiguous: ask ONE focused question to resolve it — not a list
+- If multiple valid interpretations exist: present them briefly and ask which is intended
+- If the request is unambiguous: say so and continue without interruption
+
+Do not silently assume. Do not ask multiple questions at once.
+
 **Gather signals for research decision.** During refinement, note:
 
 - **User's familiarity**: Do they know the codebase patterns? Are they pointing to examples?
