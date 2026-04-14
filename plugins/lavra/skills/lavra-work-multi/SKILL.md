@@ -529,18 +529,6 @@ Use AskUserQuestion:
 
 </phase>
 
-<success_criteria>
-
-### Multi-Bead Path
-- [ ] All resolved beads are closed with `bd close`
-- [ ] Each bead has at least one knowledge comment
-- [ ] `/lavra-review` ran after each wave (or was correctly skipped under `review_scope: "targeted"` for non-critical waves)
-- [ ] Code changes committed and pushed
-- [ ] File ownership respected (no cross-bead file modifications)
-- [ ] Any skipped beads reported with reasons
-
-</success_criteria>
-
 <guardrails>
 
 ### Start Fast, Execute Faster
@@ -576,11 +564,5 @@ Use AskUserQuestion:
 
 - Subagents must only modify files in their ownership list
 - Violations are reverted by the orchestrator
-
-### For Autonomous Retry or Persistent Workers
-
-Use the dedicated commands:
-- `/lavra-work-ralph` -- autonomous retry with completion promises
-- `/lavra-work-teams` -- persistent worker teammates with COMPLETED/ACCEPTED protocol
 
 </guardrails>

@@ -455,21 +455,6 @@ This step should take 1-2 minutes. It is curation of what was already captured, 
 
 </phase>
 
-<success_criteria>
-
-### Single-Bead Path
-- [ ] All clarifying questions asked and answered
-- [ ] All tasks marked completed
-- [ ] Tests pass
-- [ ] Linting passes
-- [ ] `/lavra-review` ran (or was correctly skipped under `review_scope: "targeted"` for non-critical bead)
-- [ ] Knowledge captured (at least one LEARNED/DECISION comment)
-- [ ] Code follows existing patterns
-- [ ] Bead validation criteria met
-- [ ] Commit messages follow conventional format
-
-</success_criteria>
-
 <guardrails>
 
 ### Start Fast, Execute Faster
@@ -500,11 +485,5 @@ This step should take 1-2 minutes. It is curation of what was already captured, 
 
 - Mark all tasks completed before moving on
 - Don't leave features 80% done
-
-### For Autonomous Retry or Persistent Workers
-
-Use the dedicated commands:
-- `/lavra-work-ralph` -- autonomous retry with completion promises
-- `/lavra-work-teams` -- persistent worker teammates with COMPLETED/ACCEPTED protocol
 
 </guardrails>
