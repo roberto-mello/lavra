@@ -140,6 +140,10 @@ for skill_dir in "$PLUGIN_DIR/gemini/skills"/*; do
     mkdir -p "$SKILLS_DIR/$skill_name"
     cp "$skill_dir/SKILL.md" "$SKILLS_DIR/$skill_name/" 2>/dev/null || true
     chmod 444 "$SKILLS_DIR/$skill_name/SKILL.md" 2>/dev/null || true
+    # Copy references/ subdirectory if present (e.g. lavra-work-multi/references/)
+    if [ -d "$skill_dir/references" ]; then
+      cp -r "$skill_dir/references" "$SKILLS_DIR/$skill_name/"
+    fi
   fi
 done
 
