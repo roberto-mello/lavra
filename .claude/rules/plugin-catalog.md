@@ -72,7 +72,7 @@ Agents are in `plugins/lavra/agents/`:
 
 **Docs (1)**: ankane-readme-writer
 
-## Skills (15: 8 core + 7 optional)
+## Skills (17: 10 core + 7 optional)
 
 Skills are in `plugins/lavra/skills/` (core) and `plugins/lavra/skills/optional/` (optional):
 
@@ -82,6 +82,8 @@ Skills are in `plugins/lavra/skills/` (core) and `plugins/lavra/skills/optional/
 - **agent-native-architecture**: Design agent-native system architectures
 - **lavra-knowledge**: Document solved problems as knowledge entries
 - **agent-browser**: Browser automation for testing and screenshots
+- **lavra-work-single**: Single-bead implementation path — invoked by lavra-work router
+- **lavra-work-multi**: Multi-bead orchestration path — invoked by lavra-work router
 - **andrew-kane-gem-writer**: Write Ruby gems following Andrew Kane's style
 - **dhh-rails-style**: Rails development following DHH's conventions
 - **dspy-ruby**: DSPy integration for Ruby applications

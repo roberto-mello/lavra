@@ -82,9 +82,9 @@ Domain-specific commands in `commands/optional/`. Not installed by default, copy
 
 `agent-native-reviewer`, `architecture-strategist`, `data-integrity-guardian`, `data-migration-expert`, `julik-frontend-races-reviewer`, `performance-oracle`, `spec-flow-analyzer`
 
-## Skills (15)
+## Skills (17)
 
-### Core (8): Installed by default
+### Core (10): Installed by default
 
 | Skill | Description |
 |-------|-------------|
@@ -95,6 +95,8 @@ Domain-specific commands in `commands/optional/`. Not installed by default, copy
 | `file-todos` | Find and manage TODO comments in code |
 | `git-worktree` | Manage git worktrees for parallel bead work |
 | `lavra-knowledge` | Document solved problems as knowledge entries |
+| `lavra-work-single` | Single-bead implementation path (Phases 1-5) — invoked by `/lavra-work` router |
+| `lavra-work-multi` | Multi-bead orchestration path (Phases M1-M10) — invoked by `/lavra-work` router |
 
 ### Optional (7): Copy from `skills/optional/` to use
 
