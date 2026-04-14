@@ -110,22 +110,6 @@ Used when exactly one bead is being worked on. Full-quality interactive flow wit
 
 ## Phase 2: Implement (IMPLEMENTING state)
 
-**Read workflow config (no-op if missing):**
-
-```bash
-[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
-```
-
-Parse `execution.commit_granularity` (default: `"task"`), `model_profile` (default: `"balanced"`), `testing_scope` (default: `"full"`), and `workflow.review_scope` (default: `"full"`). When `testing_scope` is `"targeted"`, deviation rule 2 applies only to hooks, API routes, external service calls, and complex business logic -- skip adding tests for structural/render-only code.
-
-**Detect installed skills (no-op if directory missing):**
-
-```bash
-ls .claude/skills/ 2>/dev/null
-```
-
-For each skill directory found, read the `description:` line from its `SKILL.md` frontmatter. Filter to only skills that contain an explicit "Use when" or "Triggers on" phrase. Skip utility skills with no clear trigger condition. Store the filtered list as `{available_skills}`.
-
 ## Coding Principles
 
 - **Simplicity First:** Implement the minimum code that fulfills the bead. No speculative features, unnecessary abstractions, or unasked-for configurability.
@@ -144,6 +128,22 @@ For each skill directory found, read the `description:` line from its `SKILL.md`
 ```bash
 bd comments add {BEAD_ID} "DEVIATION: Unable to fix {issue} after 3 attempts. Documented for manual resolution."
 ```
+
+**Read workflow config (no-op if missing):**
+
+```bash
+[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
+```
+
+Parse `execution.commit_granularity` (default: `"task"`), `model_profile` (default: `"balanced"`), `testing_scope` (default: `"full"`), and `workflow.review_scope` (default: `"full"`). When `testing_scope` is `"targeted"`, deviation rule 2 applies only to hooks, API routes, external service calls, and complex business logic -- skip adding tests for structural/render-only code.
+
+**Detect installed skills (no-op if directory missing):**
+
+```bash
+ls .claude/skills/ 2>/dev/null
+```
+
+For each skill directory found, read the `description:` line from its `SKILL.md` frontmatter. Filter to only skills that contain an explicit "Use when" or "Triggers on" phrase. Skip utility skills with no clear trigger condition. Store the filtered list as `{available_skills}`.
 
 **Use available skills during implementation:** If `{available_skills}` is non-empty, review each skill's trigger condition against the bead content and the files you're about to touch. Invoke any that apply using the Skill tool.
 
