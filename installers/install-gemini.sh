@@ -137,9 +137,8 @@ mkdir -p "$SKILLS_DIR"
 for skill_dir in "$PLUGIN_DIR/gemini/skills"/*; do
   if [ -d "$skill_dir" ]; then
     skill_name=$(basename "$skill_dir")
-    mkdir -p "$SKILLS_DIR/$skill_name"
-    cp "$skill_dir/SKILL.md" "$SKILLS_DIR/$skill_name/" 2>/dev/null || true
-    chmod 444 "$SKILLS_DIR/$skill_name/SKILL.md" 2>/dev/null || true
+    cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
+    chmod 644 "$SKILLS_DIR/$skill_name/SKILL.md" 2>/dev/null || true
   fi
 done
 

@@ -53,6 +53,16 @@ Do not proceed until you have a clear feature description from the user.
 
 ### 0. Idea Refinement
 
+**Think Before Planning.** Before running any detection or asking any questions, externalize your interpretation:
+
+- State in 1–2 sentences what you understand the request to be
+- List any assumptions you are making that the user did not explicitly state
+- If anything is ambiguous: ask ONE focused question to resolve it — not a list
+- If multiple valid interpretations exist: present them briefly and ask which is intended
+- If the request is unambiguous: say so and continue without interruption
+
+Do not silently assume. Do not ask multiple questions at once.
+
 **Check for brainstorm output first:**
 
 Use this decision tree — stop at the first match and skip idea refinement:

@@ -165,7 +165,13 @@ Task(general-purpose, mode="bypassPermissions", "...prompt for BD-003...")
 
 ### Agent Prompt Template
 
-**Build agent prompts** by using the agent prompt template from `/lavra-work` Phase M7 (MULTI-BEAD PATH) and filling all `{PLACEHOLDERS}`.
+**Build agent prompts** by reading the agent prompt template and filling all `{PLACEHOLDERS}`:
+
+```bash
+AGENT_TEMPLATE=$(cat ".claude/skills/lavra-work-multi/references/subagent-prompt.md")
+```
+
+Fill all {PLACEHOLDERS} in `$AGENT_TEMPLATE` with the gathered values.
 
 Fill `{EXTRA_INSTRUCTIONS}` with the ralph-specific sections below:
 

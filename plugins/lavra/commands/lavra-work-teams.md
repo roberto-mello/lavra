@@ -190,7 +190,13 @@ The lead's role is purely supervisory after spawning -- do not implement beads y
 
 **Worker prompt template:**
 
-Build worker prompts by using the agent prompt template from `/lavra-work` MULTI-BEAD PATH Phase M7 and filling all `{PLACEHOLDERS}`.
+Build worker prompts by reading the agent prompt template and filling all `{PLACEHOLDERS}`:
+
+```bash
+AGENT_TEMPLATE=$(cat ".claude/skills/lavra-work-multi/references/subagent-prompt.md")
+```
+
+Fill all {PLACEHOLDERS} in `$AGENT_TEMPLATE` with the gathered values.
 
 Fill `{EXTRA_INSTRUCTIONS}` with the teams-specific sections below:
 
