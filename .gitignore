@@ -22,3 +22,6 @@ plugins/lavra/cortex/
 .lavra/
 !.lavra/config/
 !.lavra/config/**
+
+# Beads / Dolt files (added by bd init)
+.beads-credential-key

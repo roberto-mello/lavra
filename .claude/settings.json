@@ -1,13 +1,57 @@
 {
   "hooks": {
-    "SessionStart": [
-      {"hooks": [{"type": "command", "command": "bash .claude/hooks/auto-recall.sh", "async": true}]}
-    ],
     "PostToolUse": [
-      {"matcher": "Bash", "hooks": [{"type": "command", "command": "bash .claude/hooks/memory-capture.sh", "async": true}]}
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "bash .claude/hooks/memory-capture.sh",
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash"
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "command": "bd prime",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "bash .claude/hooks/auto-recall.sh",
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "command": "bd prime",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
     ],
     "SubagentStop": [
-      {"hooks": [{"type": "command", "command": "bash .claude/hooks/subagent-wrapup.sh"}]}
+      {
+        "hooks": [
+          {
+            "command": "bash .claude/hooks/subagent-wrapup.sh",
+            "type": "command"
+          }
+        ]
+      }
     ]
   }
 }
