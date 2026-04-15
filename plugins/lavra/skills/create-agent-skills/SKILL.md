@@ -284,6 +284,10 @@ For detailed guidance, see:
 - [official-spec.md](references/official-spec.md) - Anthropic's official skill specification
 - [best-practices.md](references/best-practices.md) - Skill authoring best practices
 
+## Prose Style
+
+Follow caveman-lite prose rules if the caveman skill is available. Drop filler phrases (`Make sure to`, `Note that`, `Be sure to`, `you will`, `In order to`, `simply`, `basically`, `actually`). Keep full sentences, technical precision, and safety warnings intact.
+
 ## Success Criteria
 
 A well-structured skill:
