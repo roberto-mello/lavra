@@ -5,7 +5,7 @@ argument-hint: "[--window 14d] [--since 2026-03-01]"
 ---
 
 <objective>
-Run a retrospective that analyzes what shipped, how the team performed, and what patterns emerged. Synthesizes knowledge.jsonl entries to surface recurring themes, compound learning, and knowledge gaps. Outputs a markdown report and saves a snapshot for trend tracking.
+Run retro: analyze what shipped, team performance, patterns. Synthesize knowledge.jsonl — surface recurring themes, compound learning, gaps. Output markdown report, save snapshot for trend tracking.
 </objective>
 
 <execution_context>
@@ -16,12 +16,12 @@ Run a retrospective that analyzes what shipped, how the team performed, and what
 
 ### Phase 1: Time Window
 
-1. **Determine the retrospective window**
+1. **Determine retrospective window**
 
-   Parse arguments for time range:
+   Parse arguments:
    - Default: last 7 days
-   - `--window Nd` sets the window to N days back from today
-   - `--since YYYY-MM-DD` sets an explicit start date
+   - `--window Nd` → N days back from today
+   - `--since YYYY-MM-DD` → explicit start date
 
    ```bash
    # Calculate the since date
@@ -43,20 +43,20 @@ Run a retrospective that analyzes what shipped, how the team performed, and what
    ls -1 .lavra/retros/*.json 2>/dev/null | sort | tail -1
    ```
 
-   If a previous snapshot exists, load it. This enables velocity trend comparison and topic drift analysis in later phases.
+   If exists, load it. Enables velocity trend comparison and topic drift analysis in later phases.
 
 ### Phase 2: Shipping Analysis
 
-Analyze git history within the window.
+Analyze git history within window.
 
-1. **Identify the current user**
+1. **Identify current user**
 
    ```bash
    git config user.email
    git config user.name
    ```
 
-   Use this to distinguish "You" from teammates in all output.
+   Use to distinguish "You" from teammates in all output.
 
 2. **Commit breakdown**
 
@@ -64,10 +64,10 @@ Analyze git history within the window.
    git log --since="$since_date" --until="$until_date" --format="%H|%an|%ae|%s" --no-merges
    ```
 
-   From this data, compute:
+   Compute:
    - Total commits by author
-   - Commit type breakdown using conventional commit prefixes (feat/fix/refactor/test/chore/docs)
-   - Commits that don't follow conventional format (flag as "untyped")
+   - Type breakdown by conventional commit prefix (feat/fix/refactor/test/chore/docs)
+   - Non-conventional commits → flagged "untyped"
 
 3. **Diff statistics**
 
@@ -77,7 +77,7 @@ Analyze git history within the window.
 
    Aggregate: files changed, lines added, lines removed.
 
-4. **Hotspot files** (most frequently changed)
+4. **Hotspot files** (most changed)
 
    ```bash
    git log --since="$since_date" --until="$until_date" --name-only --no-merges --format="" | sort | uniq -c | sort -rn | head -10
@@ -90,11 +90,11 @@ Analyze git history within the window.
    gh pr list --state open --json number,title,author,createdAt
    ```
 
-   Compute: PRs merged, PRs still open, merge rate.
+   Compute: PRs merged, open, merge rate.
 
 ### Phase 3: Beads Analysis
 
-Analyze bead activity within the window.
+Analyze bead activity within window.
 
 1. **Bead throughput**
 
@@ -102,16 +102,16 @@ Analyze bead activity within the window.
    bd list --json
    ```
 
-   From the JSON output, filter by timestamps within the window:
-   - Beads created in the window
-   - Beads closed in the window
-   - Beads still open/in-progress
+   Filter by timestamps in window:
+   - Created in window
+   - Closed in window
+   - Still open/in-progress
 
 2. **Cycle time**
 
-   For beads closed in the window, calculate the time from creation to closure. Report:
+   For beads closed in window: time from creation to closure. Report:
    - Average cycle time
-   - Fastest and slowest beads (with IDs and titles)
+   - Fastest and slowest (IDs + titles)
 
 3. **Blocked beads**
 
@@ -119,7 +119,7 @@ Analyze bead activity within the window.
    bd list --status=blocked --json 2>/dev/null || true
    ```
 
-   List blocked beads with their blocking reasons. If `bd` does not support `--status=blocked`, scan bead descriptions and comments for blocking language.
+   List blocked beads with reasons. If `--status=blocked` unsupported, scan descriptions and comments for blocking language.
 
 4. **Epic progress**
 
@@ -127,7 +127,7 @@ Analyze bead activity within the window.
    bd list --type=epic --json 2>/dev/null || true
    ```
 
-   For each epic, count children by status and report percentage complete.
+   Per epic: child count by status, percentage complete.
 
 ### Phase 4: Work Patterns
 
@@ -135,14 +135,14 @@ Analyze temporal patterns from git timestamps.
 
 1. **Session detection**
 
-   Parse commit timestamps and group into sessions using a 45-minute gap threshold. A session is a contiguous block of commits where no two adjacent commits are more than 45 minutes apart.
+   Group commits into sessions using 45-minute gap threshold. Session = contiguous block where no adjacent commits exceed 45 min apart.
 
-   Classify sessions:
-   - **Deep work**: 3+ commits spanning 60+ minutes
-   - **Quick fix**: 1-2 commits spanning less than 30 minutes
+   Classify:
+   - **Deep work**: 3+ commits, 60+ minutes
+   - **Quick fix**: 1-2 commits, under 30 minutes
    - **Standard**: everything else
 
-   Report: number of sessions by type, average session length.
+   Report: sessions by type, average length.
 
 2. **Peak hours**
 
@@ -150,50 +150,48 @@ Analyze temporal patterns from git timestamps.
    git log --since="$since_date" --until="$until_date" --format="%H" --no-merges | sort | uniq -c | sort -rn | head -5
    ```
 
-   Report the top 5 most active hours.
-
 3. **Velocity trend**
 
-   If a previous retro snapshot exists, compare:
-   - Commits this period vs last period
-   - Beads closed this period vs last period
-   - Knowledge entries this period vs last period
+   If previous snapshot exists, compare:
+   - Commits this period vs last
+   - Beads closed this period vs last
+   - Knowledge entries this period vs last
 
-   Express as percentage change with direction indicator.
+   Express as % change with direction.
 
 ### Phase 5: Team Breakdown
 
-For each contributor in the window (skip this section entirely for solo projects with only one author):
+Per contributor in window (skip entirely for solo projects with one author):
 
 1. **What they shipped**
 
-   List their specific commits grouped by type. Use actual commit messages, not generic summaries. Limit to the 10 most significant commits per person (prioritize feat > fix > refactor > others).
+   List commits by type. Use actual commit messages. Limit: 10 most significant per person (feat > fix > refactor > others).
 
 2. **Strengths demonstrated**
 
-   Anchor observations in actual work:
+   Anchor in actual work:
    - "Shipped 3 security fixes across auth and payments" (not "Good at security")
-   - "Refactored the billing pipeline from 400 to 180 lines" (not "Writes clean code")
+   - "Refactored billing pipeline from 400 to 180 lines" (not "Writes clean code")
 
-   Only make claims that are directly supported by the commit data.
+   Only claim what commit data supports.
 
 3. **Growth opportunities**
 
-   Be specific, constructive, and kind:
-   - "12 of 15 commits lack conventional prefixes -- adopting them would make changelogs easier" (not "Needs better commit messages")
-   - "No test commits this week -- consider pairing tests with the 3 new features" (not "Doesn't write tests")
+   Specific, constructive, kind:
+   - "12 of 15 commits lack conventional prefixes — adopting them makes changelogs easier" (not "Needs better commit messages")
+   - "No test commits this week — consider pairing tests with the 3 new features" (not "Doesn't write tests")
 
-   Frame as opportunities, not criticisms. If there is nothing constructive to say, skip this subsection.
+   Frame as opportunities. If nothing constructive, skip subsection.
 
 4. **AI-assisted work**
 
-   Count commits with `Co-Authored-By` trailers containing AI indicators (Claude, Copilot, GPT, etc.). Report as a percentage of their total commits.
+   Count commits with `Co-Authored-By` trailers containing AI indicators (Claude, Copilot, GPT, etc.). Report as % of total.
 
 ### Phase 6: Knowledge Synthesis
 
-This is the lavra differentiator. Read and analyze the knowledge base.
+This is the lavra differentiator. Read and analyze knowledge base.
 
-1. **Load knowledge entries from the window**
+1. **Load knowledge entries from window**
 
    ```bash
    # Read knowledge.jsonl and filter by timestamp
@@ -205,30 +203,30 @@ This is the lavra differentiator. Read and analyze the knowledge base.
    done
    ```
 
-   Alternatively, read the entire file and filter in your analysis.
+   Or read entire file and filter in analysis.
 
-2. **Tag frequency analysis**
+2. **Tag frequency**
 
-   Group entries by tags. Report the top 10 most frequent tags with counts. These represent the topics the team engaged with most heavily.
+   Group by tags. Top 10 most frequent with counts = topics team engaged most.
 
 3. **Type breakdown**
 
-   Count entries by type (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION). A healthy distribution has all types represented. Flag if any type is absent.
+   Count by type (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION). Healthy = all types present. Flag absent types.
 
 4. **Recurring patterns**
 
-   Identify clusters: topics that appear 3+ times in the window. For each cluster:
-   - Summarize the theme
-   - List the specific entries
-   - Assess whether this is a systemic issue or normal domain complexity
+   Clusters = topics appearing 3+ times in window. Per cluster:
+   - Summarize theme
+   - List specific entries
+   - Assess: systemic issue or normal domain complexity
 
-   For genuine recurring issues (same problem hit multiple times), create a new PATTERN entry:
+   For genuine recurring issues, create PATTERN entry:
 
    ```bash
    bd comments add {RELEVANT_BEAD_ID} "PATTERN: Recurring theme from retro -- {description of the pattern and its frequency}"
    ```
 
-   If no relevant bead exists, log it directly:
+   If no relevant bead:
 
    ```bash
    echo '{"key":"pattern-retro-{slug}","type":"pattern","content":"{description}","source":"retro","tags":[{tags}],"ts":'$(date +%s)'}' >> .lavra/memory/knowledge.jsonl
@@ -236,23 +234,21 @@ This is the lavra differentiator. Read and analyze the knowledge base.
 
 5. **Knowledge gaps**
 
-   Cross-reference: for each hotspot file (Phase 2) and each closed bead (Phase 3), check whether any knowledge entries reference them. Files or beads with significant activity but zero knowledge entries represent gaps.
+   Cross-reference: for each hotspot file (Phase 2) and closed bead (Phase 3), check for knowledge entries referencing them. Significant activity + zero entries = gap.
 
-   Report these gaps with a recommendation: "Consider running /lavra-compound on {bead} to capture what was learned."
+   Report with recommendation: "Consider running /lavra-compound on {bead} to capture what was learned."
 
 6. **Trend comparison**
 
-   If a previous retro snapshot exists, compare:
-   - Top tags this period vs last period
-   - New topics that appeared
-   - Topics that disappeared (potentially resolved)
+   If previous snapshot exists:
+   - Top tags this vs last period
+   - New topics appeared
+   - Topics disappeared (potentially resolved)
    - "Last week's top concern was X, this week it's Y"
 
 ### Phase 7: Output
 
 1. **Generate markdown report**
-
-   Structure the report with these sections:
 
    ```markdown
    # Retrospective: {since_date} to {until_date}
@@ -292,15 +288,13 @@ This is the lavra differentiator. Read and analyze the knowledge base.
    {Synthesized from all sections: what to do differently next week}
    ```
 
-   Output the report to the user.
-
 2. **Save snapshot**
 
    ```bash
    mkdir -p .lavra/retros
    ```
 
-   Save a JSON snapshot to `.lavra/retros/{until_date}.json` containing:
+   Save JSON to `.lavra/retros/{until_date}.json`:
 
    ```json
    {
@@ -337,7 +331,7 @@ This is the lavra differentiator. Read and analyze the knowledge base.
 
 3. **Final summary**
 
-   Print a one-line summary: "Retro saved to .lavra/retros/{until_date}.json. {N} action items identified."
+   Print: "Retro saved to .lavra/retros/{until_date}.json. {N} action items identified."
 
 </process>
 
@@ -357,42 +351,42 @@ This is the lavra differentiator. Read and analyze the knowledge base.
 
 ### Praise is Specific
 
-Never write generic praise like "Great work this week." Every positive observation must reference a specific commit, PR, or metric. "Shipped the OAuth migration (12 files, 3 PRs) with zero rollbacks" is praise. "Did a good job" is noise.
+Never write generic praise like "Great work this week." Every positive observation must reference specific commit, PR, or metric. "Shipped OAuth migration (12 files, 3 PRs) with zero rollbacks" = praise. "Did a good job" = noise.
 
 ### Growth Feedback is Constructive
 
-Frame growth areas as opportunities with clear next steps. Never criticize. "No test commits alongside the 4 new endpoints -- consider adding integration tests next week" gives actionable direction without judgment.
+Frame as opportunities with clear next steps. Never criticize. "No test commits alongside 4 new endpoints — consider adding integration tests next week" gives direction without judgment.
 
 ### Identify "You" Correctly
 
-Use `git config user.email` to determine the current user. Label their work as "You" in the report. Do not guess or assume based on common names.
+Use `git config user.email`. Label their work "You". Don't guess based on names.
 
 ### Handle Solo Projects Gracefully
 
-If all commits in the window belong to a single author, skip the Team Breakdown section entirely. Do not generate a team section with one person.
+All commits from one author → skip Team Breakdown entirely. Don't generate team section with one person.
 
-### Knowledge Synthesis is the Priority
+### Knowledge Synthesis is Priority
 
-The shipping and pattern analysis is table stakes. The real value is in Phase 6: surfacing recurring themes, identifying knowledge gaps, and creating PATTERN entries for systemic issues. Spend the most analytical effort here.
+Shipping and pattern analysis = table stakes. Real value = Phase 6: recurring themes, knowledge gaps, PATTERN entries for systemic issues. Spend most analytical effort here.
 
 ### Snapshots Enable Trends
 
-Always save the snapshot, even for the first retro. Future retros depend on having historical data for comparison. The snapshot format must remain stable across versions.
+Always save snapshot, even first retro. Future retros depend on historical data. Snapshot format must stay stable across versions.
 
 </guardrails>
 
 <handoff>
-After presenting the retrospective report, use the **AskUserQuestion tool**:
+After presenting report, use **AskUserQuestion tool**:
 
 **Question:** "Retro complete for the last {N} days. What would you like to do next?"
 
 **Options:**
-1. **Plan action items** -- Run `/lavra-plan` on the action items identified above to create structured beads with research and sub-tasks
-2. **`/lavra-learn`** -- Curate the raw knowledge comments surfaced this week into structured entries
-3. **`/lavra-triage`** -- Triage the backlog: review deferred and open beads and decide what to carry forward, dismiss, or reprioritize (run this command in a new message)
-4. **Done** -- Close out the session
+1. **Plan action items** — Run `/lavra-plan` on action items above to create structured beads with research and sub-tasks
+2. **`/lavra-learn`** — Curate raw knowledge comments surfaced this week into structured entries
+3. **`/lavra-triage`** — Triage backlog: review deferred and open beads, decide what to carry forward, dismiss, or reprioritize (run in new message)
+4. **Done** — Close out session
 
-If the user picks option 1, extract the action items from the `## Action Items` section of the report and pass them as input to `/lavra-plan`. Invoke it as a skill:
+If user picks option 1, extract action items from `## Action Items` section and pass to `/lavra-plan`:
 ```
 skill: lavra-plan
 args: "{action items summary}"
