@@ -136,6 +136,7 @@ Excluded: code blocks, bash examples, XML tags themselves, content inside `<exam
 ## Checking for Violations
 
 ```bash
+# SYNC: Keep this pattern in sync with scripts/pre-release-check.sh and .github/workflows/test-installation.yml
 rg 'Make sure to|Note that|Be sure to|you will|In order to|simply|basically|actually' \
   plugins/lavra/commands/ plugins/lavra/skills/ plugins/lavra/agents/
 ```
