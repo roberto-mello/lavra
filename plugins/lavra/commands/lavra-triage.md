@@ -12,15 +12,13 @@ Present all findings, decisions, or issues one by one for triage. Go through eac
 <execution_context>
 <bead_input> #$ARGUMENTS </bead_input>
 
-**First, determine if the argument is a bead ID or empty:**
-
-Check if the argument matches a bead ID pattern:
+Determine if the argument is a bead ID or empty. Check if it matches a bead ID pattern:
 - Pattern: lowercase alphanumeric segments separated by hyphens (e.g., `bikiniup-xhr`, `beads-123`, `fix-auth-bug2`)
 - Regex: `^[a-z0-9]+-[a-z0-9]+(-[a-z0-9]+)*$`
 
 **If the argument matches a bead ID pattern:**
 
-1. Try to load the bead using the Bash tool:
+1. Load the bead:
    ```bash
    bd show "#$ARGUMENTS" --json
    ```
@@ -38,14 +36,14 @@ Check if the argument matches a bead ID pattern:
    - Triage the epic's child beads
 
    **If the bead is not an epic:**
-   - Triage just that single bead
+   - Triage that single bead
 
 3. If the bead doesn't exist (command fails):
-   - Report: "Bead ID '#$ARGUMENTS' not found. Please check the ID or provide a valid bead ID."
+   - Report: "Bead ID '#$ARGUMENTS' not found. Check the ID or provide a valid bead ID."
    - Stop execution
 
 **If the argument does NOT match a bead ID pattern (or is empty):**
-- Triage all open beads (original behavior):
+- Triage all open beads:
   ```bash
   bd list --status=open --json
   ```
@@ -93,34 +91,34 @@ What would you like to do with this bead?
 
 ### Step 2: Handle User Decision
 
-**When user says "Keep":**
-1. Update bead status to ready: `bd update {BEAD_ID} --status=open`
+**Keep:**
+1. `bd update {BEAD_ID} --status=open`
 2. Confirm: "Approved: `{BEAD_ID}` - {title} -> Ready to work on"
 
-**When user says "Modify":**
+**Modify:**
 - Ask what to modify (priority, description, details)
-- Update the bead: `bd update {BEAD_ID} --priority {N} -d "{new description}"`
+- `bd update {BEAD_ID} --priority {N} -d "{new description}"`
 - Present revised version
 - Ask again: Keep/Modify/Dismiss/Defer
 
-**When user says "Dismiss":**
-- Close the bead: `bd close {BEAD_ID} --reason "Dismissed during triage"`
-- Log: `bd comments add {BEAD_ID} "DECISION: Dismissed during triage - {reason}"`
+**Dismiss:**
+- `bd close {BEAD_ID} --reason "Dismissed during triage"`
+- `bd comments add {BEAD_ID} "DECISION: Dismissed during triage - {reason}"`
 - Skip to next item
 
-**When user says "Defer":**
-- Lower priority: `bd update {BEAD_ID} --priority 5`
-- Add tag: `bd update {BEAD_ID} --tags "deferred"`
-- Log: `bd comments add {BEAD_ID} "DECISION: Deferred during triage - {reason}"`
+**Defer:**
+- `bd update {BEAD_ID} --priority 5`
+- `bd update {BEAD_ID} --tags "deferred"`
+- `bd comments add {BEAD_ID} "DECISION: Deferred during triage - {reason}"`
 
 ### Step 3: Progress Tracking
 
-Every time you present a bead, include:
+With each bead, include:
 - **Progress:** X/Y completed (e.g., "3/10 completed")
 
 ### Step 4: Final Summary
 
-After all items processed:
+After all items:
 
 ```markdown
 ## Triage Complete

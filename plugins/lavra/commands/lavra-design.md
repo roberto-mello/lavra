@@ -34,7 +34,7 @@ Orchestrate the full six-phase design pipeline as a single invocation: brainstor
 </execution_context>
 
 <context>
-**Note: The current year is 2026.**
+The current year is 2026.
 
 **Architecture decisions (locked):** This command is a pure orchestrator. It delegates to `/lavra-brainstorm`, `/lavra-plan`, `/lavra-research`, `/lavra-ceo-review`, and `/lavra-eng-review`. No planning logic, research dispatch, or bead creation lives here. When those commands improve, this command automatically inherits the improvements.
 
@@ -350,7 +350,7 @@ bd show {CHILD_ID} --json | jq -r '.[0].description'
 bd update {CHILD_ID} -d "{updated description}"
 ```
 
-**6.2 Ensure every child bead has the required final sections:**
+**6.2 Verify every child bead has the required final sections:**
 
 Read each child bead and verify it contains all of:
 

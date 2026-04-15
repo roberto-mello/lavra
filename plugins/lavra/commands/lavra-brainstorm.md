@@ -5,7 +5,7 @@ argument-hint: "[bead ID or feature idea]"
 ---
 
 <objective>
-Brainstorm a feature or improvement through collaborative dialogue. Brainstorming helps answer **WHAT** to build, surfaces gray areas that need decisions, and breaks the vision into implementation phases filed as child beads. It precedes `/lavra-design`, which answers **HOW** to build each phase.
+Brainstorm a feature or improvement through collaborative dialogue. Brainstorming answers **WHAT** to build, surfaces gray areas that need decisions, and breaks the vision into implementation phases filed as child beads. It precedes `/lavra-design`, which answers **HOW** to build each phase.
 </objective>
 
 <execution_context>
@@ -19,7 +19,7 @@ Check if the argument matches a bead ID pattern:
 
 **If the argument matches a bead ID pattern:**
 
-1. Try to load the bead using the Bash tool:
+1. Load the bead using the Bash tool:
    ```bash
    bd show "#$ARGUMENTS" --json
    ```
@@ -32,7 +32,7 @@ Check if the argument matches a bead ID pattern:
    - Continue brainstorming to explore the idea more deeply
 
 3. If the bead doesn't exist (command fails):
-   - Report: "Bead ID '#$ARGUMENTS' not found. Please check the ID or provide a feature description instead."
+   - Report: "Bead ID '#$ARGUMENTS' not found. Check the ID or provide a feature description instead."
    - Stop execution
 
 **If the argument does NOT match a bead ID pattern:**
@@ -40,13 +40,13 @@ Check if the argument matches a bead ID pattern:
 - Continue with the workflow
 
 **If the argument is empty:**
-- Ask: "What would you like to explore? Please provide either a bead ID (e.g., 'bikiniup-xhr') or describe the feature, problem, or improvement you're thinking about."
+- Ask: "What would you like to explore? Provide either a bead ID (e.g., 'bikiniup-xhr') or describe the feature, problem, or improvement you're thinking about."
 
 Do not proceed until you have a clear feature description from the user.
 </execution_context>
 
 <context>
-**Note: The current year is 2026.** Use this when dating brainstorm documents.
+**The current year is 2026.** Use this when dating brainstorm documents.
 
 **Process knowledge:** Load the `brainstorming` skill for detailed question techniques, approach exploration patterns, and YAGNI principles.
 </context>
@@ -117,7 +117,7 @@ Use the **AskUserQuestion tool** to ask questions **one at a time**. Keep asking
    - "How will you know this feature is working well?"
    - "What's the happy path? What's the worst failure mode?"
 
-**Exit condition:** Continue until the picture is clear (vision, constraints, scope, and success criteria are all addressed) OR user says "proceed."
+**Exit condition:** Continue until the picture is clear (vision, constraints, scope, and success criteria all addressed) OR user says "proceed."
 
 ### Phase 2: Gray Area Identification
 
@@ -199,7 +199,7 @@ Each phase bead description should include:
 
 ### Phase 5: Capture the Design
 
-Update the epic bead description with structured requirements. **Size budget: 80 lines max.** If the description exceeds 80 lines, it has too much scope -- split into more phases or move detail into child beads.
+Update the epic bead description with structured requirements. **Size budget: 80 lines max.** If the description exceeds 80 lines, the scope is too broad -- split into more phases or move detail into child beads.
 
 ```bash
 bd update {EPIC_BEAD_ID} -d "$(cat <<'EOF'
@@ -259,7 +259,7 @@ Before recommending a scope mode, run these checks (use Bash/Grep/Read/Glob as n
 
 **B. Existing Code Leverage**
 - For every sub-problem in the proposed phases, identify existing code that already partially or fully solves it.
-- Note any phase that rebuilds something already present — and whether the plan reuses or rebuilds it.
+- Flag any phase that rebuilds something already present -- note whether the plan reuses or rebuilds it.
 
 **C. Dream State Mapping**
 
@@ -272,7 +272,7 @@ Does this plan move toward the 12-month ideal or away from it?
 
 **D. Temporal Interrogation** (skip for SCOPE REDUCTION)
 
-Walk through implementation in your head and surface unresolved decisions now:
+Walk through implementation mentally and surface unresolved decisions now:
 - Hour 1 (foundations): What must the implementer know before writing a line?
 - Hours 2–3 (core logic): What ambiguities will they hit mid-build?
 - Hours 4–5 (integration): What will surprise them?
@@ -287,16 +287,16 @@ Brainstorming expands possibilities. This phase forces contraction. Of everythin
 
 **6.1 Evaluate scope and recommend a mode:**
 
-Review the full conversation -- the vision, requirements, phases, and locked decisions -- and recommend one of three modes:
+Review the full conversation -- vision, requirements, phases, and locked decisions -- and recommend one of three modes:
 
-- **SCOPE EXPANSION**: "The 10-star version of this is..." -- recommend when the initial idea is too small, when there is an obvious larger opportunity the user has not considered, or when the phases feel like a fraction of what is needed.
-- **HOLD SCOPE**: "The scope is right. Here is how to make it bulletproof." -- recommend when the idea is well-sized, when the phases cover the problem space without excess, and when the locked decisions are sound.
-- **SCOPE REDUCTION**: "Strip to essentials. The 80/20 version is..." -- recommend when feature creep is happening, when phases have grown beyond what a first cut needs, or when nice-to-haves have crept into must-haves.
+- **SCOPE EXPANSION**: "The 10-star version of this is..." -- recommend when the initial idea is too small, when an obvious larger opportunity exists, or when the phases feel like a fraction of what is needed.
+- **HOLD SCOPE**: "The scope is right. Here is how to make it bulletproof." -- recommend when the idea is well-sized, phases cover the problem space without excess, and locked decisions are sound.
+- **SCOPE REDUCTION**: "Strip to essentials. The 80/20 version is..." -- recommend when feature creep is happening, phases have grown beyond what a first cut needs, or nice-to-haves have crept into must-haves.
 
 **Mode-specific depth (run before presenting your recommendation):**
 
-- **SCOPE EXPANSION**: Articulate (a) the 10x version — what's 10x more ambitious for 2x effort? (b) the platonic ideal — what would the best engineer with perfect taste build, starting from user experience not architecture? (c) at least 3 delight opportunities — adjacent 30-min improvements that make users think "nice, they thought of that."
-- **HOLD SCOPE**: Check if the plan touches >8 files or introduces >2 new classes/services. If yes, challenge whether the goal can be achieved with fewer moving parts. Identify minimum change set.
+- **SCOPE EXPANSION**: Articulate (a) the 10x version -- what's 10x more ambitious for 2x effort? (b) the platonic ideal -- what would the best engineer with perfect taste build, starting from user experience not architecture? (c) at least 3 delight opportunities -- adjacent 30-min improvements that make users think "nice, they thought of that."
+- **HOLD SCOPE**: Check if the plan touches >8 files or introduces >2 new classes/services. If yes, challenge whether the goal can be achieved with fewer moving parts. Identify the minimum change set.
 - **SCOPE REDUCTION**: Identify the absolute minimum that ships core value. Explicitly list what becomes a follow-up.
 
 Use **AskUserQuestion tool** to present your recommendation with a brief rationale (2-3 sentences) and let the user confirm or pick a different mode.
@@ -310,7 +310,7 @@ Based on the chosen mode, ask these questions using **AskUserQuestion tool** (on
 3. "Is this solving a real problem or an imagined one?"
 4. "If we could only ship 3 of these {N} items, which 3?"
 
-Skip questions that were already answered during earlier phases. The goal is pressure-testing, not repetition.
+Skip questions already answered during earlier phases. The goal is pressure-testing, not repetition.
 
 **6.3 Apply the sharpening:**
 
@@ -318,7 +318,7 @@ Based on the user's answers:
 
 - If **SCOPE EXPANSION**: add or revise phases to capture the larger vision. Update the epic description.
 - If **HOLD SCOPE**: validate that nothing needs trimming. Tighten phase descriptions if needed.
-- If **SCOPE REDUCTION**: remove or defer phases. Move deferred items to the `## Deferred` section in the epic description with rationale. Close any child beads that are no longer in scope.
+- If **SCOPE REDUCTION**: remove or defer phases. Move deferred items to the `## Deferred` section in the epic description with rationale. Close any child beads no longer in scope.
 
 **6.4 Log scope decisions:**
 

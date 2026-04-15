@@ -19,7 +19,7 @@ Do not proceed until you have a valid epic bead ID.
 </execution_context>
 
 <context>
-**Note: The current year is 2026.** Use this when searching for recent documentation and best practices.
+**The current year is 2026.** Use this when searching for recent documentation and best practices.
 </context>
 
 <process>
@@ -106,7 +106,7 @@ SELECTED AGENTS:
 ...
 ```
 
-Present this roster to the user before dispatching. No confirmation needed -- just show it so they know what is running.
+Present this roster to the user before dispatching. No confirmation needed -- show it so they know what is running.
 
 ### 3. Discover Relevant Skills
 
@@ -130,7 +130,7 @@ RELEVANT SKILLS:
 - frontend-design: Plan includes UI components (matched: frontend concern)
 ```
 
-Note these for agents to reference, but do NOT spawn separate skill sub-agents.
+List these for agents to reference, but do NOT spawn separate skill sub-agents.
 
 ### 4. Search Knowledge Base
 

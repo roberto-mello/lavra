@@ -83,7 +83,7 @@ If you find yourself calling `mcp__claude-in-chrome__*` tools, STOP. Use `agent-
 
 ## 0. Verify agent-browser Installation
 
-Before starting ANY browser testing, verify agent-browser is installed:
+Before any browser testing, verify agent-browser is installed:
 
 ```bash
 command -v agent-browser >/dev/null 2>&1 && echo "Ready" || (echo "Installing..." && npm install -g agent-browser && agent-browser install)
@@ -93,15 +93,15 @@ If installation fails, inform the user and stop.
 
 ## 1. Ask Browser Mode
 
-Before starting tests, ask user if they want to watch the browser:
+Ask user if they want to watch the browser:
 
-Use AskUserQuestion with:
+Use AskUserQuestion:
 - Question: "Do you want to watch the browser tests run?"
 - Options:
   1. **Headed (watch)** - Opens visible browser window so you can see tests run
-  2. **Headless (faster)** - Runs in background, faster but invisible
+  2. **Headless (faster)** - Runs in background, invisible
 
-Store the choice and use `--headed` flag when user selects "Headed".
+Store the choice and use `--headed` when user selects "Headed".
 
 ## 2. Determine Test Scope
 
@@ -140,7 +140,7 @@ Build a list of URLs to test based on the mapping.
 
 ## 4. Verify Server is Running
 
-Before testing, verify the local server is accessible:
+Verify the local server is accessible:
 
 ```bash
 agent-browser open http://localhost:3000
@@ -162,38 +162,37 @@ Then run `/test-browser` again.
 
 For each affected route, use agent-browser CLI commands (NOT Chrome MCP):
 
-**Step 1: Navigate and capture snapshot**
+**Navigate and capture snapshot:**
 ```bash
 agent-browser open "http://localhost:3000/[route]"
 agent-browser snapshot -i
 ```
 
-**Step 2: For headed mode (visual debugging)**
+**Headed mode (visual debugging):**
 ```bash
 agent-browser --headed open "http://localhost:3000/[route]"
 agent-browser --headed snapshot -i
 ```
 
-**Step 3: Verify key elements**
-- Use `agent-browser snapshot -i` to get interactive elements with refs
+**Verify key elements:**
 - Page title/heading present
 - Primary content rendered
 - No error messages visible
 - Forms have expected fields
 
-**Step 4: Test critical interactions**
+**Test critical interactions:**
 ```bash
 agent-browser click @e1  # Use ref from snapshot
 agent-browser snapshot -i
 ```
 
-**Step 5: Take screenshots**
+**Screenshots:**
 ```bash
 agent-browser screenshot page-name.png
 agent-browser screenshot --full page-name-full.png  # Full page
 ```
 
-## 6. Human Verification (When Required)
+## 6. Human Verification
 
 Pause for human input when testing touches:
 
@@ -223,8 +222,8 @@ Did it work correctly?
 When a test fails:
 
 1. **Document the failure:**
-   - Screenshot the error state: `agent-browser screenshot error.png`
-   - Note the exact reproduction steps
+   - `agent-browser screenshot error.png`
+   - Note reproduction steps
 
 2. **Ask user how to proceed:**
    ```markdown
@@ -239,23 +238,15 @@ When a test fails:
    3. Skip - Continue testing other pages
    ```
 
-3. **If "Fix now":**
-   - Investigate the issue
-   - Propose a fix
-   - Apply fix
-   - Re-run the failing test
+3. **Fix now:** Investigate, propose a fix, apply it, re-run the failing test.
 
-4. **If "Create bead":**
-   - Create bead: `bd create "Browser test failure: {description}" --type bug --priority 1`
-   - Continue testing
+4. **Create bead:** `bd create "Browser test failure: {description}" --type bug --priority 1` then continue.
 
-5. **If "Skip":**
-   - Log as skipped
-   - Continue testing
+5. **Skip:** Log as skipped and continue.
 
 ## 8. Test Summary
 
-After all tests complete, present summary:
+Present summary after all tests complete:
 
 ```markdown
 ## Browser Test Results

@@ -13,7 +13,7 @@ CEO/founder-mode plan review. Challenge premises, validate business fit, envisio
 
 **If the epic bead ID above is empty:**
 1. Check for recent epic beads: `bd list --type epic --status=open --json`
-2. Ask the user: "Which epic plan would you like reviewed? Please provide the bead ID (e.g., `BD-001`)."
+2. Ask the user: "Which epic plan would you like reviewed? Provide the bead ID (e.g., `BD-001`)."
 
 Do not proceed until you have a valid epic bead ID.
 </execution_context>
@@ -68,7 +68,7 @@ Assemble the full plan content from epic description + all child bead descriptio
 
 ### Phase 1: Pre-Review System Audit
 
-Before doing anything else, run a system audit to review the plan intelligently:
+Run a system audit before reviewing the plan:
 
 ```bash
 git log --oneline -30
@@ -76,14 +76,14 @@ git diff main --stat
 git stash list
 ```
 
-Then read CLAUDE.md and any architecture docs. Map:
-- What is the current system state?
-- What is already in flight (other open beads, branches, stashed changes)?
-- What are the existing known pain points most relevant to this plan?
+Read CLAUDE.md and any architecture docs. Map:
+- Current system state
+- What is in flight (other open beads, branches, stashed changes)
+- Existing pain points most relevant to this plan
 
-**Retrospective Check**: Check the git log. If prior commits suggest a previous review cycle (review-driven refactors, reverted changes), note what was changed and whether the current plan re-touches those areas. Be MORE aggressive reviewing areas that were previously problematic.
+**Retrospective Check**: Check the git log. If prior commits suggest a previous review cycle (review-driven refactors, reverted changes), note what changed and whether the current plan re-touches those areas. Be MORE aggressive reviewing areas that were previously problematic.
 
-**Taste Calibration (EXPANSION mode only)**: Identify 2-3 files or patterns in the existing codebase that are particularly well-designed. Also note 1-2 anti-patterns to avoid repeating.
+**Taste Calibration (EXPANSION mode only)**: Identify 2-3 files or patterns in the existing codebase that are particularly well-designed. Note 1-2 anti-patterns to avoid repeating.
 
 Report findings before proceeding to Step 0.
 
@@ -91,18 +91,18 @@ Report findings before proceeding to Step 0.
 
 #### 0A. Premise Challenge
 
-1. Is this the right problem to solve? Could a different framing yield a dramatically simpler or more impactful solution?
+1. Is this the right problem to solve? Could a different framing yield a simpler or more impactful solution?
 2. What is the actual user/business outcome? Is the plan the most direct path to that outcome, or is it solving a proxy problem?
-3. What would happen if we did nothing? Real pain point or hypothetical one?
+3. What happens if we do nothing? Real pain point or hypothetical?
 
 #### 0B. Existing Code Leverage
 
-1. What existing code already partially or fully solves each sub-problem? Map every sub-problem to existing code. Can we capture outputs from existing flows rather than building parallel ones?
+1. What existing code already partially or fully solves each sub-problem? Map every sub-problem to existing code. Can outputs from existing flows be captured rather than building parallel ones?
 2. Is this plan rebuilding anything that already exists? If yes, explain why rebuilding is better than refactoring.
 
 #### 0C. Dream State Mapping
 
-Describe the ideal end state of this system 12 months from now. Does this plan move toward that state or away from it?
+Describe the ideal end state 12 months from now. Does this plan move toward that state or away from it?
 
 ```
 CURRENT STATE                  THIS PLAN                  12-MONTH IDEAL
@@ -112,8 +112,8 @@ CURRENT STATE                  THIS PLAN                  12-MONTH IDEAL
 #### 0D. Mode-Specific Analysis
 
 **For SCOPE EXPANSION** — run all three:
-1. 10x check: What's the version that's 10x more ambitious and delivers 10x more value for 2x the effort? Describe it concretely.
-2. Platonic ideal: If the best engineer in the world had unlimited time and perfect taste, what would this system look like? What would the user feel when using it? Start from experience, not architecture.
+1. 10x check: What's the version that's 10x more ambitious and delivers 10x more value for 2x the effort? Describe concretely.
+2. Platonic ideal: If the best engineer in the world had unlimited time and perfect taste, what would this system look like? Start from user experience, not architecture.
 3. Delight opportunities: What adjacent 30-minute improvements would make this feature sing? Things where a user would think "oh nice, they thought of that." List at least 3.
 
 **For HOLD SCOPE** — run this:
@@ -126,7 +126,7 @@ CURRENT STATE                  THIS PLAN                  12-MONTH IDEAL
 
 #### 0E. Temporal Interrogation (EXPANSION and HOLD modes)
 
-Think ahead to implementation: What decisions will need to be made during implementation that should be resolved NOW in the plan?
+What decisions will need to be made during implementation that should be resolved NOW in the plan?
 
 ```
 HOUR 1 (foundations):     What does the implementer need to know?
@@ -135,7 +135,7 @@ HOUR 4-5 (integration):  What will surprise them?
 HOUR 6+ (polish/tests):  What will they wish they'd planned for?
 ```
 
-Surface these as questions for the user NOW, not as "figure it out later."
+Surface these as questions for the user now, not as "figure it out later."
 
 #### 0F. Mode Selection
 
@@ -144,22 +144,22 @@ Use **AskUserQuestion tool** to present three options:
 2. **HOLD SCOPE**: The plan's scope is right. Make it bulletproof.
 3. **SCOPE REDUCTION**: The plan is overbuilt. Propose the minimal version.
 
-Context-dependent defaults:
-- Greenfield feature → default EXPANSION
-- Bug fix or hotfix → default HOLD SCOPE
-- Refactor → default HOLD SCOPE
+Defaults by context:
+- Greenfield feature → EXPANSION
+- Bug fix or hotfix → HOLD SCOPE
+- Refactor → HOLD SCOPE
 - Plan touching >15 files → suggest REDUCTION unless user pushes back
 
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 ### Phase 3: 10-Section Review
 
-Run all 10 sections after scope and mode are agreed:
+Run all 10 sections after scope and mode are confirmed:
 
 #### Section 1: Architecture Review
 
 Evaluate and diagram:
-- Overall system design and component boundaries (draw the dependency graph)
+- System design and component boundaries (draw the dependency graph)
 - Data flow — all four paths: happy, nil, empty, error
 - State machines — ASCII diagram for every new stateful object
 - Coupling concerns — before/after dependency graph
@@ -169,7 +169,7 @@ Evaluate and diagram:
 - Production failure scenarios — for each new integration point
 - Rollback posture
 
-**EXPANSION mode additions**: What would make this architecture beautiful? What infrastructure would make this a platform other features can build on?
+**EXPANSION mode**: What would make this architecture beautiful? What infrastructure would make this a platform other features can build on?
 
 Required ASCII diagram: full system architecture showing new components and relationships.
 
@@ -225,9 +225,9 @@ Evaluate: code organization, DRY violations, naming quality, error handling patt
 
 #### Section 6: Test Review
 
-Make a complete diagram of every new thing this plan introduces (UX flows, data flows, codepaths, background jobs, integrations, error/rescue paths).
+Diagram every new thing this plan introduces (UX flows, data flows, codepaths, background jobs, integrations, error/rescue paths).
 
-For each: What type of test? Does a test exist in the plan? Happy path test? Failure path test? Edge case test?
+For each: type of test, whether a test exists in the plan, happy path test, failure path test, edge case test.
 
 Test pyramid check. Flakiness risk. Load/stress test requirements.
 
@@ -243,7 +243,7 @@ Evaluate: N+1 queries, memory usage, database indexes, caching opportunities, ba
 
 Evaluate: logging (structured, at entry/exit/branch?), metrics (what tells you it's working? broken?), tracing (trace IDs propagated?), alerting, dashboards, debuggability (reconstruct bug from logs alone?), admin tooling, runbooks.
 
-**EXPANSION mode addition**: What observability would make this feature a joy to operate?
+**EXPANSION mode**: What observability would make this feature a joy to operate?
 
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
 
@@ -251,7 +251,7 @@ Evaluate: logging (structured, at entry/exit/branch?), metrics (what tells you i
 
 Evaluate: migration safety, feature flags, rollout order, rollback plan (explicit step-by-step), deploy-time risk window, environment parity, post-deploy verification checklist, smoke tests.
 
-**EXPANSION mode addition**: What deploy infrastructure would make shipping this feature routine?
+**EXPANSION mode**: What deploy infrastructure would make shipping this feature routine?
 
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
 
@@ -259,19 +259,19 @@ Evaluate: migration safety, feature flags, rollout order, rollback plan (explici
 
 Evaluate: technical debt introduced, path dependency, knowledge concentration, reversibility (1-5 scale), ecosystem fit, the 1-year question (read this plan as a new engineer in 12 months — obvious?).
 
-**EXPANSION mode additions**: What comes after this ships? Does the architecture support that trajectory? Platform potential?
+**EXPANSION mode**: What comes after this ships? Does the architecture support that trajectory? Platform potential?
 
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 ### Phase 4: Required Outputs
 
-After all sections complete, produce:
+After all sections, produce:
 
 #### "NOT in scope" section
-List work considered and explicitly deferred, with one-line rationale each.
+Work considered and explicitly deferred, with one-line rationale each.
 
 #### "What already exists" section
-List existing code/flows that partially solve sub-problems and whether the plan reuses them.
+Existing code/flows that partially solve sub-problems and whether the plan reuses them.
 
 #### "Dream state delta" section
 Where this plan leaves us relative to the 12-month ideal.
@@ -287,9 +287,9 @@ CODEPATH | FAILURE MODE   | RESCUED? | TEST? | USER SEES?     | LOGGED?
 Any row with RESCUED=N, TEST=N, USER SEES=Silent → **CRITICAL GAP**.
 
 #### TODOS protocol
-Present each potential TODO as its own individual AskUserQuestion. Never batch TODOs — one per question.
+Present each potential TODO as its own AskUserQuestion. Never batch TODOs — one per question.
 
-For each TODO, describe:
+For each TODO:
 - **What**: One-line description of the work.
 - **Why**: The concrete problem it solves or value it unlocks.
 - **Pros**: What you gain.
@@ -297,7 +297,7 @@ For each TODO, describe:
 - **Context**: Enough detail for someone picking this up in 3 months.
 - **Effort estimate**: S/M/L/XL
 
-Then present options: **A)** Create a backlog bead **B)** Skip — not valuable enough **C)** Build it now in this plan instead of deferring.
+Options: **A)** Create a backlog bead **B)** Skip — not valuable enough **C)** Build it now in this plan.
 
 #### Delight Opportunities (EXPANSION mode only)
 Identify at least 5 "bonus chunk" opportunities (<30 min each). Present each as its own AskUserQuestion. For each: what it is, why it would delight users, effort estimate. Options: **A)** Create a backlog bead **B)** Skip **C)** Build it now.
@@ -315,7 +315,7 @@ List every ASCII diagram in files this plan touches. Still accurate?
 
 ### Phase 5: Log & Hand Off
 
-Log key findings:
+Log key findings as bd comments:
 
 ```bash
 bd comments add {EPIC_ID} "DECISION: CEO review mode: {EXPANSION|HOLD|REDUCTION} -- {rationale}"
@@ -369,11 +369,11 @@ bd comments add {EPIC_ID} "FACT: {critical constraints surfaced}"
 </success_criteria>
 
 <guardrails>
-- **CEO layer, not engineering layer** -- Validate business fit and scope first. lavra-eng-review handles technical depth.
-- **NEVER CODE** -- Do not implement anything. Review only.
-- **Stop-per-issue** -- One AskUserQuestion per finding with tradeoffs. Never batch issues.
-- **Commit to the mode** -- After mode selection, do not silently drift. Raise concerns once in Step 0.
-- **Lead with recommendation** -- "Do B. Here's why:" not "Option B might be worth considering."
+- **CEO layer, not engineering layer** — Validate business fit and scope first. lavra-eng-review handles technical depth.
+- **NEVER CODE** — Do not implement anything. Review only.
+- **Stop-per-issue** — One AskUserQuestion per finding with tradeoffs. Never batch issues.
+- **Commit to the mode** — After mode selection, do not silently drift. Raise concerns once in Step 0.
+- **Lead with recommendation** — "Do B. Here's why:" not "Option B might be worth considering."
 </guardrails>
 
 <handoff>

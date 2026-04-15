@@ -5,7 +5,7 @@ argument-hint: "[path/to/plan.md] [optional epic title]"
 ---
 
 <objective>
-Import a markdown plan document into beads as an epic with child task beads. Automatically extracts research findings, decisions, and implementation steps from the markdown structure.
+Import a markdown plan document into beads as an epic with child task beads. Extracts research findings, decisions, and implementation steps from the markdown structure.
 </objective>
 
 <execution_context>
@@ -23,10 +23,10 @@ Import a markdown plan document into beads as an epic with child task beads. Aut
    - Epic title (optional)
 
    If no arguments provided:
-   - Ask: "Please provide the path to the markdown plan file, e.g.: /lavra-import plan.md"
+   - Ask: "Provide the path to the markdown plan file, e.g.: /lavra-import plan.md"
    - Stop execution
 
-   If only file path provided, the title will be auto-extracted from the first `#` header in the markdown file.
+   If only file path provided, the title is auto-extracted from the first `#` header.
 
 2. **Validate File Path**
 
@@ -39,7 +39,7 @@ Import a markdown plan document into beads as an epic with child task beads. Aut
    ```
 
    If file doesn't exist:
-   - Report: "File not found: {file_path}. Please provide a valid markdown file path."
+   - Report: "File not found: {file_path}. Provide a valid markdown file path."
    - Stop execution
 
 3. **Extract Title from Markdown** (if not provided)
@@ -57,14 +57,14 @@ Import a markdown plan document into beads as an epic with child task beads. Aut
    ```
 
    If no `#` header found and no title argument provided:
-   - Ask: "No title found in markdown file. Please provide a title: /lavra-import {file_path} \"Your Epic Title\""
+   - Ask: "No title found in markdown file. Provide a title: /lavra-import {file_path} \"Your Epic Title\""
    - Stop execution
 
 ### Phase 2: Run Import Script
 
 1. **Call Import Script**
 
-   Execute the import script with the validated arguments:
+   Execute with the validated arguments:
 
    ```bash
    # Determine PLUGIN_DIR based on whether this is a global or project install
@@ -83,10 +83,10 @@ Import a markdown plan document into beads as an epic with child task beads. Aut
 
 2. **Capture Script Output**
 
-   The import-plan.sh script will output:
+   The import-plan.sh script outputs:
    - Progress messages as it creates beads
    - Epic ID when created
-   - Child bead IDs as they're created
+   - Child bead IDs as created
    - Summary with next steps
 
    Capture the epic ID from the output:
@@ -99,8 +99,6 @@ Import a markdown plan document into beads as an epic with child task beads. Aut
 ### Phase 3: Report Results
 
 1. **Display Summary**
-
-   Present the import results to the user:
 
    ```
    Successfully imported plan from {file_path}
@@ -166,26 +164,25 @@ Details about UI changes...
 
 ## Notes
 
-- The import script automatically creates sequential dependencies (each step depends on the previous)
+- The import script creates sequential dependencies (each step depends on the previous)
 - Research and decision sections are captured as knowledge comments on the epic
-- Child bead descriptions are extracted from the content between `###` headers
-- The script expects the plan to have an "Implementation Steps" section with `###` subheadings
+- Child bead descriptions are extracted from content between `###` headers
+- The plan must have an "Implementation Steps" section with `###` subheadings
 </context>
 
 <success_criteria>
 - Valid markdown file with clear structure
 - At least one `#` header for the title (or title provided as argument)
 - An "Implementation Steps" section with at least one `### Step`
-- Each step has descriptive content below the `###` header
+- Each step has descriptive content below its `###` header
 - File path validated before calling the script
 - Title extracted from markdown if not provided
 - Clear progress and results displayed
-- Actionable next steps suggested
 - Errors handled gracefully with helpful messages
 </success_criteria>
 
 <handoff>
-Plan imported as epic `{EPIC_ID}`. What would you like to do next?
+Plan imported as epic `{EPIC_ID}`. Next steps:
 
 1. **Run `/lavra-research {EPIC_ID}`** - Gather evidence for each child bead with domain-matched research agents
 2. **Run `/lavra-eng-review {EPIC_ID}`** - Get feedback from reviewers on the plan
