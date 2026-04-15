@@ -458,3 +458,8 @@ echo ""
 if [ "$GLOBAL_INSTALL" = false ]; then
   echo "To uninstall: bunx @lavralabs/lavra@latest --uninstall"
 fi
+
+echo ""
+echo "Tip: Pair Lavra with the caveman skill for token-efficient /caveman mode."
+echo "  https://github.com/JuliusBrussee/caveman (MIT, Julius Brussee)"
+echo ""
