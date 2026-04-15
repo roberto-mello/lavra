@@ -1,4 +1,5 @@
 .DS_Store
+.claude/launch.json
 __pycache__
 
 # bv (beads viewer) local config and caches
