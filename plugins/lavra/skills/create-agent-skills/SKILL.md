@@ -286,7 +286,7 @@ For detailed guidance, see:
 
 ## Prose Style
 
-Follow caveman-lite prose rules if the caveman skill is available. Drop filler phrases (`Make sure to`, `Note that`, `Be sure to`, `you will`, `In order to`, `simply`, `basically`, `actually`). Keep full sentences, technical precision, and safety warnings intact.
+Apply caveman-lite prose rules from `.claude/rules/prose-style.md` (the canonical source).
 
 ## Success Criteria
 
