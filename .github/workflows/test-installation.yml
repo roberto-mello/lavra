@@ -225,3 +225,20 @@ jobs:
 
           [[ "$FAIL" -eq 0 ]] || exit 1
           echo "✅ Catalog accurate (no ghosts, no missing entries)"
+
+      - name: Prose style check (warn only)
+        # SYNC: This step must stay in sync with the "Prose style check" section
+        # in scripts/pre-release-check.sh. When modifying either, update the other.
+        run: |
+          if ! command -v rg &>/dev/null; then
+            echo "❌ ripgrep (rg) not installed — cannot run prose style check"
+            exit 1
+          fi
+          if rg --quiet 'Make sure to|Note that|Be sure to|you will|In order to|simply|basically|actually' \
+              plugins/lavra/commands/ plugins/lavra/skills/ plugins/lavra/agents/ 2>/dev/null; then
+            echo "⚠️  WARN: Filler phrases found (not blocking release):"
+            rg --no-heading -n 'Make sure to|Note that|Be sure to|you will|In order to|simply|basically|actually' \
+              plugins/lavra/commands/ plugins/lavra/skills/ plugins/lavra/agents/ | head -20
+          else
+            echo "✅ No filler phrases detected"
+          fi
