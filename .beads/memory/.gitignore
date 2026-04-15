@@ -3,3 +3,5 @@ knowledge.db
 knowledge.db-journal
 knowledge.db-wal
 knowledge.db-shm
+# Backup files from in-place repairs
+*.bak

@@ -176,16 +176,15 @@ echo "=== Compatibility tests ==="
 
 echo ""
 echo "=== Prose style check ==="
+FILLER='Make sure to|Note that|Be sure to|you will|In order to|simply|basically|actually'
 if ! command -v rg &>/dev/null; then
   echo "  WARN  Prose style check skipped (ripgrep not installed)"
+elif rg --quiet "$FILLER" plugins/lavra/commands/ plugins/lavra/skills/ plugins/lavra/agents/ 2>/dev/null; then
+  echo "  WARN  Filler phrases found (not blocking):"
+  rg --no-heading -n "$FILLER" plugins/lavra/commands/ plugins/lavra/skills/ plugins/lavra/agents/ | head -20
 else
-  if rg --quiet 'Make sure to|Note that|Be sure to|you will|In order to|simply|basically|actually' plugins/lavra/commands/ plugins/lavra/skills/ plugins/lavra/agents/ 2>/dev/null; then
-    echo "  WARN  Filler phrases found (not blocking):"
-    rg --no-heading -n 'Make sure to|Note that|Be sure to|you will|In order to|simply|basically|actually' plugins/lavra/commands/ plugins/lavra/skills/ plugins/lavra/agents/ | head -20
-  else
-    echo "  PASS  No filler phrases detected"
-    ((PASS++)) || true
-  fi
+  echo "  PASS  No filler phrases detected"
+  ((PASS++)) || true
 fi
 
 echo ""
