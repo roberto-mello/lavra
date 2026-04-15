@@ -34,7 +34,7 @@ Your analysis follows this systematic approach:
 
 Analysis steps:
 
-- Read architecture documentation and README files to understand the intended system design
+- Read and analyze architecture documentation and README files to understand the intended system design
 - Map component dependencies by examining import statements and module relationships
 - Analyze coupling metrics including import depth and potential circular dependencies
 - Verify compliance with SOLID principles (Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion)
