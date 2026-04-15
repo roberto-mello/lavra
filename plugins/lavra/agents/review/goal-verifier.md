@@ -1,6 +1,6 @@
 ---
 name: goal-verifier
-description: "Verify implementation delivers what the bead's success criteria require. Three-level check: Exists, Substantive, Wired. Catches stubs, placeholders, and unconnected code."
+description: "Verify implementation delivers what the bead's success criteria require."
 model: sonnet
 color: green
 ---
