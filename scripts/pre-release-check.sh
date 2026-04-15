@@ -177,7 +177,7 @@ echo "=== Compatibility tests ==="
 echo ""
 echo "=== Prose style check ==="
 if ! command -v rg &>/dev/null; then
-  fail "Prose style check" "ripgrep (rg) not installed"
+  echo "  WARN  Prose style check skipped (ripgrep not installed)"
 else
   if rg --quiet 'Make sure to|Note that|Be sure to|you will|In order to|simply|basically|actually' plugins/lavra/commands/ plugins/lavra/skills/ plugins/lavra/agents/ 2>/dev/null; then
     echo "  WARN  Filler phrases found (not blocking):"
