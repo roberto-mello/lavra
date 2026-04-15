@@ -5,16 +5,16 @@ argument-hint: "[bead ID or branch name]"
 ---
 
 <objective>
-Fully automated ship sequence. One command to go from "code is ready" to "PR is open, beads are closed, knowledge is captured." Procedural and deterministic -- every step either passes or the pipeline halts with a clear reason.
+Fully automated ship sequence. One command: "code ready" → "PR open, beads closed, knowledge captured." Procedural, deterministic — every step passes or pipeline halts with clear reason.
 </objective>
 
 <execution_context>
 <ship_target> #$ARGUMENTS </ship_target>
 
 <requirements>
-- Git repository with GitHub CLI (`gh`) installed and authenticated
+- Git repo with GitHub CLI (`gh`) installed and authenticated
 - `bd` CLI installed for bead management
-- Code changes already committed or staged (this is a ship command, not a work command)
+- Changes already committed or staged (ship command, not work command)
 </requirements>
 </execution_context>
 
@@ -22,7 +22,7 @@ Fully automated ship sequence. One command to go from "code is ready" to "PR is 
 
 ### Phase 1: Pre-Flight Checks
 
-Validate that the workspace is in a shippable state. Any failure here halts the pipeline.
+Validate shippable state. Any failure halts pipeline.
 
 1. **Branch Safety**
 
@@ -38,15 +38,15 @@ Validate that the workspace is in a shippable state. Any failure here halts the 
    git status --porcelain
    ```
 
-   If there are uncommitted changes:
-   - Show the list of modified/untracked files
+   If uncommitted changes exist:
+   - Show modified/untracked files
    - Ask: "There are uncommitted changes. Commit them now before shipping?"
-   - If yes: stage relevant files, create a commit with a conventional message
+   - If yes: stage relevant files, commit with conventional message
    - If no: HALT. Print "Uncommitted changes must be resolved before shipping."
 
 3. **Bead Status**
 
-   If a bead ID was provided as argument, use that. Otherwise, detect from branch name or in-progress beads:
+   If bead ID provided as argument, use it. Otherwise detect from branch name or in-progress beads:
 
    ```bash
    # Try branch name first (bd-{ID}/... pattern)
@@ -58,16 +58,16 @@ Validate that the workspace is in a shippable state. Any failure here halts the 
    fi
    ```
 
-   If beads are still `in_progress`:
-   - List them with titles
+   If beads still `in_progress`:
+   - List with titles
    - Warn: "These beads are still in_progress. They will be closed after the PR is created."
-   - Proceed (this is a warning, not a blocker)
+   - Proceed (warning, not blocker)
 
-   If no beads are found: proceed without bead tracking (branch-only ship).
+   If no beads found: proceed without bead tracking (branch-only ship).
 
 ### Phase 2: Sync with Upstream
 
-Rebase onto the latest default branch to avoid merge conflicts in the PR.
+Rebase onto latest default branch to avoid merge conflicts in PR.
 
 ```bash
 default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
@@ -79,16 +79,16 @@ git fetch origin "$default_branch"
 git rebase "origin/$default_branch"
 ```
 
-If rebase conflicts occur: HALT. Print the conflicting files and instruct:
+If rebase conflicts: HALT. Print conflicting files and instruct:
 - "Rebase conflicts detected. Resolve conflicts, then run `git rebase --continue` and re-run /lavra-ship."
 
-Do not force-push. Do not skip the rebase.
+No force-push. No skipping rebase.
 
 ### Phase 3: Run Tests
 
-Auto-detect the project's test runner and execute it. If no test runner is found, skip with a note.
+Auto-detect test runner and execute. No runner found → skip with note.
 
-**Detection order** (check for existence, run the first match):
+**Detection order** (check existence, run first match):
 
 | Check | Command |
 |-------|---------|
@@ -105,13 +105,13 @@ Auto-detect the project's test runner and execute it. If no test runner is found
 # Detect and run (pseudo-code -- implement the detection logic)
 ```
 
-If tests fail: HALT. Print the failure output. Do not proceed -- broken code does not ship.
+If tests fail: HALT. Print failure output. Broken code does not ship.
 
-If no test runner detected: print "No test runner detected. Skipping local tests." and proceed.
+No runner detected: print "No test runner detected. Skipping local tests." and proceed.
 
 ### Phase 4: Pre-Landing Review Gate
 
-Run a lightweight review focused on ship-blockers only. This is NOT a full /lavra-review -- it checks for things that should never ship.
+Lightweight review for ship-blockers only. NOT a full /lavra-review.
 
 **4a. Goal Verification** *(skippable via `lavra.json` `workflow.goal_verification: false`)*
 
@@ -120,7 +120,7 @@ Read workflow config:
 [ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
 ```
 
-Parse `model_profile` from the config (default: `"balanced"`). For each bead being shipped that has a `## Validation` section, dispatch the `goal-verifier` agent. Add `model: opus` when `model_profile` is `"quality"`:
+Parse `model_profile` (default: `"balanced"`). For each bead with `## Validation` section, dispatch `goal-verifier` agent. Add `model: opus` when `model_profile` is `"quality"`:
 
 ```
 Task(goal-verifier, "Verify goal completion for {BEAD_ID}. Validation criteria: {validation section}. What section: {what section}.")
@@ -128,39 +128,39 @@ Task(goal-verifier, "Verify goal completion for {BEAD_ID}. Validation criteria: 
 ```
 
 **Interpret results:**
-- Exists-level failures → CRITICAL (halt the ship)
-- Substantive-level failures → CRITICAL (halt the ship)
-- Wired-level failures → WARNING (proceed but include in PR body)
+- Exists-level failures → CRITICAL (halt)
+- Substantive-level failures → CRITICAL (halt)
+- Wired-level failures → WARNING (proceed, include in PR body)
 
-Store goal verification results for the PR body.
+Store results for PR body.
 
 **4b. Security & Quality Scan**
 
-Scan the diff for:
+Scan diff:
 
 ```bash
 git diff "origin/$default_branch"...HEAD
 ```
 
-**Check for these categories:**
+**Check these categories:**
 
-1. **Security issues**: hardcoded secrets, API keys, passwords, tokens, private keys in the diff
-2. **Debug leftovers**: `console.log`, `debugger`, `binding.pry`, `byebug`, `import pdb`, `print(` used for debugging, `TODO: remove`
-3. **Hardcoded values**: localhost URLs, hardcoded IPs, test credentials that should be environment variables
+1. **Security**: hardcoded secrets, API keys, passwords, tokens, private keys
+2. **Debug leftovers**: `console.log`, `debugger`, `binding.pry`, `byebug`, `import pdb`, `print(` for debugging, `TODO: remove`
+3. **Hardcoded values**: localhost URLs, hardcoded IPs, test credentials that should be env vars
 4. **Unresolved conflicts**: `<<<<<<<`, `=======`, `>>>>>>>`
 
-**Severity classification:**
+**Severity:**
 
-- CRITICAL (halts the ship): secrets, unresolved conflicts, credentials
-- WARNING (noted but proceeds): debug leftovers, TODOs, hardcoded localhost
+- CRITICAL (halts): secrets, unresolved conflicts, credentials
+- WARNING (proceeds): debug leftovers, TODOs, hardcoded localhost
 
-If CRITICAL issues found: HALT. List each issue with file and line number. Print "Critical issues must be resolved before shipping."
+CRITICAL found: HALT. List each issue with file and line. Print "Critical issues must be resolved before shipping."
 
-If only WARNING issues: print the warnings, then proceed. Include them in the PR description.
+WARNING only: print warnings, proceed. Include in PR description.
 
 ### Phase 5: Create PR
 
-Generate the PR from the accumulated context.
+Generate PR from accumulated context.
 
 1. **Gather PR context**
 
@@ -177,9 +177,9 @@ Generate the PR from the accumulated context.
 
 2. **Generate PR title**
 
-   - If single bead: use bead title, prefixed with bead ID
-   - If multiple beads: summarize the common theme
-   - If no beads: derive from branch name, converting hyphens to spaces
+   - Single bead: use bead title, prefixed with bead ID
+   - Multiple beads: summarize common theme
+   - No beads: derive from branch name, convert hyphens to spaces
    - Keep under 70 characters
 
 3. **Push and create PR**
@@ -220,11 +220,11 @@ Generate the PR from the accumulated context.
    )"
    ```
 
-   Capture and store the PR URL from the output.
+   Capture and store PR URL from output.
 
 ### Phase 6: Close Beads and Capture Knowledge
 
-For each bead that was in_progress:
+For each in_progress bead:
 
 1. **Check for knowledge comments**
 
@@ -232,13 +232,13 @@ For each bead that was in_progress:
    bd show {BEAD_ID} | grep -cE "LEARNED:|DECISION:|FACT:|PATTERN:|INVESTIGATION:|DEVIATION:"
    ```
 
-   If zero knowledge comments exist on the bead: log at least one before closing.
+   If zero knowledge comments: log at least one before closing.
 
    ```bash
    bd comments add {BEAD_ID} "LEARNED: {most significant insight from the work}"
    ```
 
-2. **Close the bead**
+2. **Close bead**
 
    ```bash
    bd close {BEAD_ID} --reason="Shipped in PR {PR_URL}"
@@ -250,11 +250,11 @@ For each bead that was in_progress:
    bd show {BEAD_ID} | grep -cE "LEARNED:|INVESTIGATION:"
    ```
 
-   If LEARNED or INVESTIGATION comments exist, note this for the summary -- the user may want to run /lavra-compound later to extract reusable knowledge.
+   If LEARNED or INVESTIGATION comments exist, note for summary — user may want to run /lavra-compound to extract reusable knowledge.
 
 ### Phase 7: Push Beads Backup
 
-Persist the bead state so it survives across machines and sessions.
+Persist bead state across machines and sessions.
 
 ```bash
 bd backup
@@ -265,7 +265,7 @@ git push
 
 ### Phase 8: Summary
 
-Print a concise ship report:
+Print concise ship report:
 
 ```
 ## Ship Complete
@@ -299,7 +299,7 @@ Print a concise ship report:
 - [ ] No uncommitted changes at ship time
 - [ ] Rebased on latest default branch without conflicts
 - [ ] Tests pass (or no test runner detected)
-- [ ] No critical security or quality issues in the diff
+- [ ] No critical security or quality issues in diff
 - [ ] PR created with descriptive title and body
 - [ ] All in_progress beads closed with reason linking to PR
 - [ ] At least one knowledge comment per closed bead
@@ -310,21 +310,21 @@ Print a concise ship report:
 <guardrails>
 
 ### Never Force-Push
-Use `git push`, never `git push --force` or `git push --force-with-lease`. If the push fails, diagnose and fix -- do not override.
+Use `git push`, never `git push --force` or `git push --force-with-lease`. Push fails → diagnose and fix, do not override.
 
 ### Never Push to Main/Master
-If the current branch is main or master, halt immediately. Ship creates PRs, it does not push directly to protected branches.
+If current branch is main or master, halt immediately. Ship creates PRs, does not push directly to protected branches.
 
 ### Stop on Test Failures
-If tests fail, the pipeline halts. Do not skip tests, do not ignore failures. Broken code does not ship.
+Tests fail → pipeline halts. No skipping, no ignoring failures. Broken code does not ship.
 
 ### Stop on Critical Review Findings
-Secrets, credentials, and unresolved merge conflicts are ship-blockers. The pipeline halts until they are resolved.
+Secrets, credentials, unresolved merge conflicts are ship-blockers. Pipeline halts until resolved.
 
 ### Do Not Substitute for Full Review
-Phase 4 is a safety net, not a code review. It catches ship-blockers only. For thorough review, use /lavra-review before or after /lavra-ship.
+Phase 4 catches ship-blockers only. For thorough review, use /lavra-review before or after /lavra-ship.
 
 ### Bead Closure is Permanent
-Beads are closed with a reason linking to the PR. If the PR is later rejected, the user must manually reopen beads. This command does not handle PR rejection workflows.
+Beads closed with reason linking to PR. If PR later rejected, user must manually reopen beads. This command does not handle PR rejection workflows.
 
 </guardrails>

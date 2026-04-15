@@ -5,7 +5,7 @@ argument-hint: "[bead ID, PR number, GitHub URL, branch name, or latest]"
 ---
 
 <objective>
-Perform exhaustive code reviews using multi-agent analysis, ultra-thinking, and Git worktrees for deep local inspection.
+Perform exhaustive code reviews using multi-agent analysis, ultra-thinking, and Git worktrees.
 </objective>
 
 <execution_context>
@@ -23,27 +23,21 @@ Perform exhaustive code reviews using multi-agent analysis, ultra-thinking, and 
 
 ### 1. Determine Review Target & Setup (ALWAYS FIRST)
 
-<thinking>
-First, I need to determine the review target type and set up the code for analysis.
-</thinking>
-
 #### Immediate Actions:
 
 - [ ] Determine review type: bead ID (BD-xxx), PR number (numeric), GitHub URL, or empty (current in-progress bead)
-- [ ] If bead ID provided, get bead details: `bd show {BEAD_ID} --json`
-- [ ] If no target provided, find current in-progress bead: `bd list --status in_progress --json | jq -r '.[0].id'`
+- [ ] If bead ID provided: `bd show {BEAD_ID} --json`
+- [ ] If no target: `bd list --status in_progress --json | jq -r '.[0].id'`
 - [ ] Check current git branch
-- [ ] If ALREADY on the target branch -> proceed with analysis on current branch
-- [ ] If DIFFERENT branch than the review target -> offer to use worktree: "Use git-worktree skill for isolated checkout." Call `skill: git-worktree` with branch name
-- [ ] Fetch PR metadata using `gh pr view --json` for title, body, files, linked issues (if PR exists)
+- [ ] If ALREADY on target branch -> proceed with analysis on current branch
+- [ ] If DIFFERENT branch -> offer worktree: "Use git-worktree skill for isolated checkout." Call `skill: git-worktree` with branch name
+- [ ] Fetch PR metadata via `gh pr view --json` for title, body, files, linked issues (if PR exists)
 - [ ] Set up language-specific analysis tools
-- [ ] Make sure we are on the branch we are reviewing
+- [ ] Verify on the branch being reviewed
 
-Ensure that the code is ready for analysis (either in worktree or on current branch). ONLY then proceed to the next step.
+Code must be ready for analysis before proceeding.
 
 ### 2. Recall Relevant Knowledge
-
-Search for knowledge related to the code being reviewed:
 
 ```bash
 # Extract keywords from bead title/description
@@ -52,7 +46,7 @@ Search for knowledge related to the code being reviewed:
 .lavra/memory/recall.sh --recent 10
 ```
 
-Present any relevant LEARNED/DECISION/FACT/PATTERN entries that reviewers should consider.
+Present relevant LEARNED/DECISION/FACT/PATTERN entries for reviewers.
 
 #### Protected Artifacts
 
@@ -71,15 +65,13 @@ If a review agent flags any file in `.lavra/memory/` or `.lavra/config/` for cle
 
 #### 3a. Read Project Config (optional)
 
-Check for a project-setup configuration file and workflow config:
-
 ```bash
 [ -f .lavra/config/project-setup.md ] && cat .lavra/config/project-setup.md
 [ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
 ```
 
-From `project-setup.md`, parse its YAML frontmatter for one field:
-- `review_agents`: list of agent names to dispatch (replaces the default list below)
+From `project-setup.md`, parse YAML frontmatter for one field:
+- `review_agents`: agent names to dispatch (replaces the default list below)
 
 From `lavra.json`, parse `model_profile` (default: `"balanced"`).
 
@@ -94,27 +86,27 @@ All other agents run at their default tier regardless of profile.
 
 **Agent allowlist validation** (when `review_agents` is present):
 
-Derive the allowlist dynamically from all installed agent directories:
+Derive allowlist from installed agent directories:
 ```bash
 { find .claude/agents ~/.claude/agents -name "*.md" 2>/dev/null; } | xargs -I{} basename {} .md | sort -u
 ```
-Fall back to `plugins/lavra/agents/` if neither `.claude/agents/` nor `~/.claude/agents/` yields results (e.g. running from the plugin repo itself).
+Fall back to `plugins/lavra/agents/` if neither `.claude/agents/` nor `~/.claude/agents/` yields results.
 
-- Reject any name that does not match `^[a-z][a-z0-9-]*$` or is not in the derived allowlist
-- Silently skip invalid names (do not reveal which agents were disabled or skipped)
-- If `review_agents` is present but all entries are invalid, fall back to dispatching all agents
+- Reject names not matching `^[a-z][a-z0-9-]*$` or not in the derived allowlist
+- Silently skip invalid names
+- If all entries are invalid, fall back to dispatching all agents
 
-**Config-missing behavior:** If `.lavra/config/project-setup.md` does not exist, dispatch ALL agents below (backward compatible, no prompts, no degradation).
+**Config-missing behavior:** If `.lavra/config/project-setup.md` absent, dispatch ALL agents below.
 
 #### 3b. Read Epic Plan (if provided)
 
-If the invocation arguments include an `## Epic Plan` block (injected by `/lavra-work`), extract the Locked Decisions from it and store as `{EPIC_LOCKED_DECISIONS}`. This context is **not** passed to review agents (it would bias them toward the plan rather than the code). Instead, use it only in the synthesis step (step 6) as a discard filter: before creating a bead for any finding, check whether the flagged item — field, struct, behavior, data flow — appears in Locked Decisions. If it does, discard the finding and note: "Discarded: planned item per epic Locked Decisions."
+If arguments include an `## Epic Plan` block (injected by `/lavra-work`), extract Locked Decisions and store as `{EPIC_LOCKED_DECISIONS}`. Do not pass to review agents (biases toward plan over code). Use only in synthesis step (step 6) as a discard filter: if a flagged item appears in Locked Decisions, discard and note: "Discarded: planned item per epic Locked Decisions."
 
-If no `## Epic Plan` block is present, `{EPIC_LOCKED_DECISIONS}` is empty and the discard filter is a no-op.
+If no `## Epic Plan` block present, `{EPIC_LOCKED_DECISIONS}` is empty and discard filter is a no-op.
 
 #### 3c. Dispatch Agents in Parallel
 
-Dispatch the validated agent list (from config) or ALL agents below.
+Dispatch the validated agent list (from config) or ALL agents below:
 
 1. Task kieran-rails-reviewer(PR content)
 2. Task dhh-rails-reviewer(PR content)
@@ -129,9 +121,9 @@ Dispatch the validated agent list (from config) or ALL agents below.
 11. Task agent-native-reviewer(PR content)
 12. Task julik-frontend-races-reviewer(PR content)
 
-#### Conditional Agents (Run if applicable):
+#### Conditional Agents (run if applicable):
 
-These agents are run ONLY when the PR matches specific criteria. Check the PR files list to determine if they apply:
+Run ONLY when PR matches specific criteria. Check PR files list:
 
 **If PR contains migrations or schema changes (any ORM):**
 
@@ -153,13 +145,13 @@ These agents are run ONLY when the PR matches specific criteria. Check the PR fi
 - PR changes how data is read/written
 - PR title/body mentions: migration, backfill, data transformation, ID mapping
 
-**Agent roles are complementary, not redundant:**
-- `data-migration-expert`: validates migration **code** correctness (SQL logic, rollback safety, ID mapping values)
-- `migration-drift-detector`: validates migration **consistency** (schema artifacts in sync with migration history)
+**Agent roles are complementary:**
+- `data-migration-expert`: migration **code** correctness (SQL logic, rollback safety, ID mapping values)
+- `migration-drift-detector`: migration **consistency** (schema artifacts in sync with migration history)
 
 ### 4. Ultra-Thinking Deep Dive Phases
 
-For each phase below, spend maximum cognitive effort. Think step by step. Consider all angles. Question assumptions. And bring all reviews in a synthesis to the user.
+Spend maximum cognitive effort on each phase. Think step by step. Question assumptions. Synthesize all reviews for the user.
 
 #### Phase A: Stakeholder Perspective Analysis
 
@@ -168,28 +160,28 @@ ULTRA-THINK: Put yourself in each stakeholder's shoes. What matters to them? Wha
 </thinking>
 
 1. **Developer Perspective**
-   - How easy is this to understand and modify?
-   - Are the APIs intuitive?
-   - Is debugging straightforward?
-   - Can I test this easily?
+   - Easy to understand and modify?
+   - APIs intuitive?
+   - Debugging straightforward?
+   - Testable?
 
 2. **Operations Perspective**
-   - How do I deploy this safely?
-   - What metrics and logs are available?
-   - How do I troubleshoot issues?
-   - What are the resource requirements?
+   - Safe to deploy?
+   - Metrics and logs available?
+   - Troubleshooting path clear?
+   - Resource requirements known?
 
 3. **End User Perspective**
-   - Is the feature intuitive?
-   - Are error messages helpful?
-   - Is performance acceptable?
-   - Does it solve my problem?
+   - Feature intuitive?
+   - Error messages helpful?
+   - Performance acceptable?
+   - Solves the problem?
 
 4. **Security Team Perspective**
-   - What's the attack surface?
-   - Are there compliance requirements?
-   - How is data protected?
-   - What are the audit capabilities?
+   - Attack surface?
+   - Compliance requirements?
+   - Data protected?
+   - Audit capabilities?
 
 #### Phase B: Scenario Exploration
 
@@ -214,11 +206,11 @@ Run the Task code-simplicity-reviewer() to see if we can simplify the code.
 
 ### 6. Findings Synthesis and Bead Creation
 
-ALL findings MUST be stored as child beads of the reviewed bead. Create beads immediately after synthesis - do NOT present findings for user approval first.
+ALL findings MUST be stored as child beads. Create beads immediately after synthesis -- do NOT present for user approval first.
 
 #### Step 1: Build Agent Finding Inventory
 
-Before synthesizing, build a complete inventory of what each agent returned:
+Build a complete inventory of what each agent returned:
 
 ```
 From kieran-rails-reviewer: [finding 1], [finding 2], ...
@@ -228,7 +220,7 @@ From performance-oracle: [finding 1], [finding 2], ...
 ... (one row per agent that ran)
 ```
 
-This inventory is the source of truth for synthesis. Do not proceed to Step 2 until every agent's output is listed.
+Source of truth for synthesis. Do not proceed to Step 2 until every agent's output is listed.
 
 #### Step 2: Synthesize All Findings
 
@@ -237,27 +229,25 @@ Consolidate all agent reports into a categorized list of findings.
 Remove duplicates, prioritize by severity and impact.
 </thinking>
 
-- [ ] Collect findings from the inventory above
-- [ ] Discard any findings that recommend deleting or gitignoring files in `.lavra/memory/` or `.lavra/config/` (see Protected Artifacts above)
-- [ ] If `{EPIC_LOCKED_DECISIONS}` is non-empty: for each finding that flags a field, struct, behavior, or data flow as unused, dead, or unnecessary — check whether it appears in Locked Decisions. If it does, discard it with note: "Discarded: planned item per epic Locked Decisions (`{item name}`)." These are intentional placeholders for later beads; reviewers cannot see that context.
+- [ ] Collect findings from the inventory
+- [ ] Discard findings recommending deletion/gitignore of files in `.lavra/memory/` or `.lavra/config/` (see Protected Artifacts)
+- [ ] If `{EPIC_LOCKED_DECISIONS}` non-empty: for each finding flagging a field, struct, behavior, or data flow as unused/dead/unnecessary -- check Locked Decisions. If present, discard with note: "Discarded: planned item per epic Locked Decisions (`{item name}`)."
 - [ ] Categorize by type: security, performance, architecture, quality, etc.
-- [ ] Assign severity levels: P1 CRITICAL, P2 IMPORTANT, P3 NICE-TO-HAVE
-- [ ] Remove duplicate or overlapping findings — **note:** `data-migration-expert` and `migration-drift-detector` both inspect migration files and may report overlapping findings; deduplicate carefully, keeping the more specific finding (e.g., prefer a drift finding over a generic "migration present" observation)
-- [ ] Estimate effort for each finding (Small/Medium/Large)
+- [ ] Assign severity: P1 CRITICAL, P2 IMPORTANT, P3 NICE-TO-HAVE
+- [ ] Deduplicate -- `data-migration-expert` and `migration-drift-detector` may overlap; keep the more specific finding
+- [ ] Estimate effort per finding (Small/Medium/Large)
 
 #### Step 2a: Completeness Verification
 
-Before creating beads, verify no agent output was silently dropped:
+Before creating beads:
 
-- [ ] Every finding in the inventory is either included in the categorized list OR explicitly marked as duplicate/inapplicable with a reason
-- [ ] Count: inventory total findings vs. categorized findings + discarded -- they must reconcile
-- [ ] If any inventory items are unaccounted for, categorize them now
+- [ ] Every inventory finding is either included OR explicitly marked duplicate/inapplicable with reason
+- [ ] Count: inventory total vs. categorized + discarded -- must reconcile
+- [ ] Unaccounted items: categorize now
 
-**Do not proceed to bead creation until the inventory is fully accounted for.**
+**Do not proceed to bead creation until inventory fully accounted for.**
 
 #### Step 3: Create Beads for All Findings
-
-For each finding, create a child bead:
 
 ```bash
 bd create "{finding title}" \
@@ -293,19 +283,19 @@ bd create "{finding title}" \
 
 #### Step 4: Link Critical Issues
 
-For P1 findings, create blocking dependencies:
+P1 findings: create blocking dependencies:
 
 ```bash
 bd dep relate {FINDING_BEAD_ID} {ORIGINAL_BEAD_ID}
 ```
 
-This ensures the original bead cannot be closed until critical issues are resolved.
+Ensures the original bead cannot close until critical issues are resolved.
 
 #### Step 5: Mandatory Knowledge Capture *(required gate -- do not skip)*
 
-Every P1 (CRITICAL) and P2 (IMPORTANT) finding **must** have at least one LEARNED or PATTERN knowledge entry before proceeding to the summary. This captures the *root cause* so future `/lavra-design` and `/lavra-work` runs benefit from auto-recall.
+Every P1/P2 finding **must** have at least one LEARNED or PATTERN entry before the summary. Captures root cause for future `/lavra-design` and `/lavra-work` auto-recall.
 
-For each P1/P2 finding, log why it matters:
+For each P1/P2 finding:
 
 ```bash
 # Format: what was vulnerable/broken + root cause
@@ -318,13 +308,11 @@ bd comments add {BEAD_ID} "PATTERN: [anti-pattern name] -- [where it appeared an
 - `"PATTERN: N+1 query in OrdersController#index -- .includes(:line_items) was missing from the scope"`
 - `"LEARNED: migration 20240301 swaps source/target column IDs -- production data uses the reverse mapping"`
 
-**Gate check:** Run `bd show {BEAD_ID}` and verify that the number of LEARNED/PATTERN comments is >= the number of P1 + P2 findings. If not, add the missing entries now. **Do not proceed to the summary report until this gate passes.**
+**Gate check:** Run `bd show {BEAD_ID}` and verify LEARNED/PATTERN count >= P1 + P2 count. If not, add missing entries. **Do not proceed to summary until gate passes.**
 
-P3 (NICE-TO-HAVE) findings may also have knowledge entries but are not required.
+P3 findings may also have knowledge entries but are not required.
 
 #### Step 6: Summary Report
-
-After creating all beads, present comprehensive summary:
 
 ```
 ## Code Review Complete
@@ -366,7 +354,7 @@ After creating all beads, present comprehensive summary:
 
 ### 7. End-to-End Testing (Optional)
 
-**First, detect the project type from PR files:**
+**Detect project type from PR files:**
 
 | Indicator | Project Type |
 |-----------|--------------|
@@ -374,15 +362,13 @@ After creating all beads, present comprehensive summary:
 | `Gemfile`, `package.json`, `app/views/*` | Web |
 | Both iOS files AND web files | Hybrid |
 
-After presenting the Summary Report, offer appropriate testing based on project type:
+After the Summary Report, offer testing based on project type:
 
-**For Web Projects:**
-"Want to run browser tests on the affected pages?"
+**Web:** "Want to run browser tests on the affected pages?"
 1. Yes - run browser tests
 2. No - skip
 
-**For iOS Projects:**
-"Want to run Xcode simulator tests on the app?"
+**iOS:** "Want to run Xcode simulator tests on the app?"
 1. Yes - run Xcode tests
 2. No - skip
 

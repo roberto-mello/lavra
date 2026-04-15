@@ -5,7 +5,7 @@ argument-hint: "[bead ID or epic ID or comma-separated IDs] [--retries N] [--max
 ---
 
 <objective>
-Work on beads autonomously with iterative retry. Each subagent loops until its completion criteria pass or retries are exhausted, using the ralph-wiggum promise pattern. Combines the full lavra-work quality standard with self-healing execution.
+Work beads autonomously with iterative retry. Each subagent loops until completion criteria pass or retries exhausted, using ralph-wiggum promise pattern. Combines full lavra-work quality standard with self-healing execution.
 </objective>
 
 <execution_context>
@@ -16,49 +16,49 @@ Work on beads autonomously with iterative retry. Each subagent loops until its c
 
 ## 1. Parse Arguments
 
-Parse flags from the `$ARGUMENTS` string:
+Parse flags from `$ARGUMENTS`:
 
 - `--retries N`: max retries per subagent (default 5, range 1-20)
 - `--max-turns N`: max turns per subagent (default 50, range 10-200)
-- `--yes`: skip user approval gate (but NOT pre-push review)
+- `--yes`: skip user approval gate (NOT pre-push review)
 
-Remaining arguments (after removing flags) are the bead input (epic ID, comma-separated IDs, or empty).
+Remaining args = bead input (epic ID, comma-separated IDs, or empty).
 
 Echo parsed config: `Configuration: retries={N}, max-turns={N}`
 
 ## 2. Permission Check
 
-Subagents in ralph mode run with `bypassPermissions` and need Bash, Write, and Edit tool access without human approval. Restricted permissions cause workers to stall silently.
+Subagents in ralph mode run with `bypassPermissions` — need Bash, Write, Edit access without human approval. Restricted permissions cause silent stalls.
 
-If tool permissions appear restricted:
+If permissions appear restricted:
 - Warn: "Ralph mode works best with tool permissions pre-approved. See docs/AUTONOMOUS_EXECUTION.md"
-- Suggest granular permissions in `settings.json` or `--dangerously-skip-permissions` as a last resort.
+- Suggest granular permissions in `settings.json` or `--dangerously-skip-permissions` as last resort.
 
-This is a warning only -- continue regardless of the result.
+Warning only — continue regardless.
 
 ## 3. Resolve Completion Promise & Test Command
 
-Determine what "done" means for each agent and extract the test command.
+Determine "done" criteria per agent and extract test command.
 
 ### 3a. Extract test command (optional)
 
 1. Read CLAUDE.md (or AGENTS.md) for test command references
 2. If found, validate against known runner allowlist: `bundle exec rspec`, `pytest`, `npm test`, `npx vitest`, `go test`, `cargo test`, `mix test`, `bun test`, `yarn test`, `make test`
-3. Reject commands containing shell metacharacters: `;`, `&&`, `||`, `|`, `` ` ``, `$()`, `${}`, `<()`, `>`, `<`, `>>`, `2>`, newline
-4. If no valid test command found: use AskUserQuestion to ask the user. Do NOT let workers self-discover test commands.
+3. Reject commands with shell metacharacters: `;`, `&&`, `||`, `|`, `` ` ``, `$()`, `${}`, `<()`, `>`, `<`, `>>`, `2>`, newline
+4. No valid command found: use AskUserQuestion. Do NOT let workers self-discover test commands.
 5. Store as `TEST_COMMAND` for injection into agent prompts (may be empty)
 
 ### 3b. Determine completion promise per bead
 
-The **completion promise** is how the subagent signals it is done -- following the ralph-wiggum pattern. Each subagent must output `<promise>DONE</promise>` when its completion criteria are met.
+Each subagent must output `<promise>DONE</promise>` when completion criteria met.
 
-For each bead, derive the completion criteria from (in priority order):
-1. **`## Validation` section** in the bead description (from `/lavra-plan`) -- use these criteria directly
-2. **`## Testing` section** in the bead description -- "all specified tests pass"
-3. **`TEST_COMMAND` exists** -- "all tests pass"
-4. **None of the above** -- "implementation matches the bead description and no errors on manual review"
+Per bead, derive criteria (priority order):
+1. **`## Validation` section** in bead description — use directly
+2. **`## Testing` section** in bead description — "all specified tests pass"
+3. **`TEST_COMMAND` exists** — "all tests pass"
+4. **None** — "implementation matches bead description, no errors on manual review"
 
-Store as `COMPLETION_CRITERIA` per bead for injection into the subagent prompt.
+Store as `COMPLETION_CRITERIA` per bead for subagent prompt injection.
 
 ## 4. Gather Beads
 
@@ -66,7 +66,7 @@ Follow Phase M1 from `/lavra-work` (MULTI-BEAD PATH): resolve epic/comma-separat
 
 ## 5. Branch Check
 
-Check the current branch:
+Check current branch:
 
 ```bash
 current_branch=$(git branch --show-current)
@@ -81,22 +81,22 @@ fi
 PRE_BRANCH_SHA=$(git rev-parse HEAD)
 ```
 
-**If on the default branch**, use AskUserQuestion:
+**If on default branch**, use AskUserQuestion:
 
 **Question:** "You're on the default branch. Create a working branch for these changes?"
 
 **Options:**
 1. **Yes, create branch** - Create `bd-ralph/{short-description}` and work there
-2. **No, work here** - Commit directly to the current branch
+2. **No, work here** - Commit directly to current branch
 
-If creating a branch:
+If creating branch:
 ```bash
 git pull origin {default_branch}
 git checkout -b bd-ralph/{short-description-from-bead-titles}
 PRE_BRANCH_SHA=$(git rev-parse HEAD)
 ```
 
-**If already on a feature branch**, continue working there.
+**If already on feature branch**, continue there.
 
 ## 6. File-Scope Conflict Detection
 
@@ -108,16 +108,16 @@ Follow Phase M4 from `/lavra-work` (MULTI-BEAD PATH): use `bd swarm validate` fo
 
 ## 8. User Approval
 
-Present the plan once with AskUserQuestion including execution parameters:
+Present plan once with AskUserQuestion including execution params:
 
 **Question:** "Autonomous execution plan: {N} beads across {M} waves, max {retries} retries/bead, max {max_turns} turns/subagent. Estimated max subagent invocations: {beads * (retries + 1)}. Proceed?"
 
 **Options:**
-1. **Proceed** - Execute the plan as shown
-2. **Adjust** - Remove beads from the run (cannot reorder against conflict-forced deps)
+1. **Proceed** - Execute as shown
+2. **Adjust** - Remove beads from run (cannot reorder conflict-forced deps)
 3. **Cancel** - Abort
 
-If `--yes` is set, skip this approval and proceed automatically.
+If `--yes` set, skip and proceed automatically.
 
 ## 9. Recall Knowledge & Read Project Config *(required -- do not skip)*
 
@@ -125,35 +125,35 @@ Follow Phase M6 from `/lavra-work` (MULTI-BEAD PATH): run `recall.sh` with combi
 
 ## 10. Execute Waves (Autonomous Retry)
 
-**Before each wave (epic input):** Query swarm status to determine the next wave's bead set:
+**Before each wave (epic input):** Query swarm status for next wave's bead set:
 ```bash
 bd swarm status {EPIC_ID} --json
 ```
-Use the "ready" list from swarm status as this wave's beads. Beads in the "blocked" list are skipped entirely and reported in the wave status.
+Use "ready" list as this wave's beads. Beads in "blocked" list skipped entirely and reported in wave status.
 
-**Before each wave (non-epic input):** Verify all blocking beads for this wave's beads are closed. If any blocker is not closed, skip the blocked beads entirely and report them in the wave status.
+**Before each wave (non-epic input):** Verify all blocking beads for this wave are closed. If any blocker unclosed, skip blocked beads and report in wave status.
 
-**Before each wave:** Record the pre-wave git SHA:
+**Before each wave:** Record pre-wave git SHA:
 ```bash
 PRE_WAVE_SHA=$(git rev-parse HEAD)
 ```
 
-For each wave, spawn **general-purpose** agents in parallel -- one per bead.
+For each wave, spawn **general-purpose** agents in parallel — one per bead.
 
-Each agent gets a detailed prompt containing:
-- The full bead description (from `bd show`)
+Each agent gets prompt containing:
+- Full bead description (from `bd show`)
 - Related bead context (from `relates_to` links)
-- Relevant knowledge entries from the recall step
-- Clear instructions to follow the lavra-work methodology
+- Relevant knowledge from recall step
+- Clear instructions to follow lavra-work methodology
 - Completion criteria and retry budget
 
-**Resolve related beads:** For each bead in the wave, check for `relates_to` links:
+**Resolve related beads:** For each bead in wave, check `relates_to` links:
 ```bash
 bd dep list {BEAD_ID} --json
 ```
-Filter for `relates_to` type entries. For each related bead, fetch its title and description to include in the subagent prompt.
+Filter `relates_to` entries. Fetch title and description of each related bead for subagent prompt.
 
-**Spawn with `bypassPermissions`** so agents run autonomously without prompting:
+**Spawn with `bypassPermissions`:**
 
 ```
 Task(general-purpose, mode="bypassPermissions", "...prompt for BD-001...")
@@ -161,19 +161,17 @@ Task(general-purpose, mode="bypassPermissions", "...prompt for BD-002...")
 Task(general-purpose, mode="bypassPermissions", "...prompt for BD-003...")
 ```
 
-**Wait for the entire wave to complete before starting the next wave.**
+**Wait for entire wave before starting next.**
 
 ### Agent Prompt Template
 
-**Build agent prompts** by reading the agent prompt template and filling all `{PLACEHOLDERS}`:
+Build agent prompts from template:
 
 ```bash
 AGENT_TEMPLATE=$(cat ".claude/skills/lavra-work-multi/references/subagent-prompt.md")
 ```
 
-Fill all {PLACEHOLDERS} in `$AGENT_TEMPLATE` with the gathered values.
-
-Fill `{EXTRA_INSTRUCTIONS}` with the ralph-specific sections below:
+Fill all `{PLACEHOLDERS}` in `$AGENT_TEMPLATE`. Fill `{EXTRA_INSTRUCTIONS}` with ralph-specific sections:
 
 ```
 ## Completion Criteria
@@ -213,25 +211,25 @@ After implementing (phase 4 of the shared template), enter this loop:
 
 ## 11. Verify Results
 
-After each wave completes:
+After each wave:
 
-1. **Review agent outputs** for any reported issues or conflicts
-2. **Check completion promise:** For each agent, check whether its output contains `<promise>DONE</promise>`. If absent, treat that bead as failed -- the agent either ran out of turns or could not meet its completion criteria.
-3. **Check file ownership violations** -- diff the changed files against each agent's ownership list. If an agent modified files outside its ownership, revert those changes and flag them for the next wave or manual resolution
-4. **Run tests** to verify nothing is broken:
+1. **Review agent outputs** for reported issues or conflicts
+2. **Check completion promise:** Each agent output must contain `<promise>DONE</promise>`. If absent, treat bead as failed — agent ran out of turns or could not meet criteria.
+3. **Check file ownership violations** — diff changed files against each agent's ownership list. If agent modified files outside ownership, revert and flag for next wave or manual resolution
+4. **Run tests:**
    ```bash
    # Use project's test command from CLAUDE.md or AGENTS.md
    ```
 5. **Run linting** if applicable
-6. **Resolve conflicts** if multiple agents touched the same files
+6. **Resolve conflicts** if multiple agents touched same files
 7. **Handle failed beads:**
-   - Revert failed beads' file changes using the pre-wave SHA:
+   - Revert failed beads' file changes using pre-wave SHA:
      ```bash
      git checkout {PRE_WAVE_SHA} -- {files owned by failed bead}
      ```
    - Leave failed beads as `in_progress`
    - Log: `bd comments add {BEAD_ID} "INVESTIGATION: Agent failed after {N} retries. Reverted changes to pre-wave state."`
-8. **Create an incremental commit** for the wave:
+8. **Create incremental commit:**
    ```bash
    git add <changed files>
    git commit -m "feat: resolve wave N beads (BD-XXX, BD-YYY)"
@@ -241,27 +239,27 @@ After each wave completes:
    bd close {BD-XXX} {BD-YYY} {BD-ZZZ}
    ```
 
-Proceed to the next wave only after verification passes.
+Proceed to next wave only after verification passes.
 
-**Wave-completion status:** After each wave verification, emit brief status:
+**Wave-completion status:**
 ```
 Wave {N} complete: {X} beads closed, {Y} beads failed, {Z} total retries used.
 ```
 
-**Before starting the next wave**, recall knowledge captured during this wave to inject into the next wave's agent prompts:
+**Before starting next wave**, recall knowledge from this wave:
 
 ```bash
 # Recall by bead IDs from the completed wave
 .lavra/memory/recall.sh "{BD-XXX BD-YYY}"
 ```
 
-Include these results in the next wave's agent prompts under the "## Relevant Knowledge" section. This ensures discoveries from Wave N inform Wave N+1 agents.
+Include results in next wave's agent prompts under "## Relevant Knowledge". Ensures Wave N discoveries inform Wave N+1 agents.
 
 ## 12. Pre-Push Diff Review
 
-Before pushing, show the diff summary and require confirmation.
+Before pushing, show diff summary and require confirmation.
 
-**Diff base:** Use `PRE_BRANCH_SHA` (recorded in section 5) as the diff base:
+**Diff base:** Use `PRE_BRANCH_SHA` (section 5):
 ```bash
 git diff --stat {PRE_BRANCH_SHA}..HEAD
 ```
@@ -271,16 +269,16 @@ Use AskUserQuestion:
 **Question:** "Review the changes above before pushing. Proceed with push?"
 
 **Options:**
-1. **Push** - Push changes to remote
+1. **Push** - Push to remote
 2. **Cancel** - Do not push (changes remain committed locally)
 
-**Note:** `--yes` does NOT skip this gate. The pre-push review always requires explicit approval.
+**Note:** `--yes` does NOT skip this gate. Pre-push review always requires explicit approval.
 
 ## 13. Final Steps
 
-After all waves complete and push is approved:
+After all waves complete and push approved:
 
-1. **Push to remote:**
+1. **Push:**
    ```bash
    git push
    bd backup
@@ -288,11 +286,10 @@ After all waves complete and push is approved:
 
 2. **Scan for substantial findings:**
 
-   Check all closed beads for `LEARNED:` or `INVESTIGATION:` comments:
    ```bash
    for id in {closed-bead-ids}; do bd show $id | grep -E "LEARNED:|INVESTIGATION:" && echo "  bead: $id"; done
    ```
-   Store the list of beads with matches as `COMPOUND_CANDIDATES` for use in the handoff.
+   Store matches as `COMPOUND_CANDIDATES` for handoff.
 
 3. **Output summary:**
 
@@ -324,10 +321,10 @@ After all waves complete and push is approved:
 </process>
 
 <success_criteria>
-- All resolved beads are closed with `bd close`
-- Each bead has at least one knowledge comment logged (`LEARNED:`, `DECISION:`, `FACT:`, `PATTERN:`, or `INVESTIGATION:`)
-- Code changes are committed and pushed to remote
-- Any failing beads are reported with reasons (not silently dropped)
+- All resolved beads closed with `bd close`
+- Each bead has at least one knowledge comment (`LEARNED:`, `DECISION:`, `FACT:`, `PATTERN:`, or `INVESTIGATION:`)
+- Code changes committed and pushed
+- Failing beads reported with reasons (not silently dropped)
 - All beads either closed or exhausted retries with failure summary
 - Completion promise (`<promise>DONE</promise>`) checked for every subagent
 </success_criteria>
@@ -336,10 +333,8 @@ After all waves complete and push is approved:
 All work complete. What next?
 
 1. **Run `/lavra-review`** on all changes
-2. **Create a PR** with all changes
-3. **Run `/lavra-compound {COMPOUND_CANDIDATES}`** - Document non-obvious findings as reusable knowledge *(only shown if COMPOUND_CANDIDATES is non-empty)*
-4. **Retry failed beads** - Re-run with only the failed bead IDs
+2. **Create PR** with all changes
+3. **Run `/lavra-compound {COMPOUND_CANDIDATES}`** - Document non-obvious findings as reusable knowledge *(only shown if COMPOUND_CANDIDATES non-empty)*
+4. **Retry failed beads** - Re-run with only failed bead IDs
 5. **Continue** with remaining open beads
 </handoff>
-</content>
-</invoke>
