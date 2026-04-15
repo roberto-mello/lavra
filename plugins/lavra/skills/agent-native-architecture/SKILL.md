@@ -8,7 +8,7 @@ description: Build applications where agents are first-class citizens. Use this 
 
 Software agents work reliably now. Claude Code demonstrated that an LLM with access to bash and file tools, operating in a loop until an objective is achieved, can accomplish complex multi-step tasks autonomously.
 
-The surprising discovery: **a really good coding agent is actually a really good general-purpose agent.** The same architecture that lets Claude Code refactor a codebase can let an agent organize your files, manage your reading list, or automate your workflows.
+The surprising discovery: **a good coding agent is a good general-purpose agent.** The same architecture that lets Claude Code refactor a codebase can let an agent organize your files, manage your reading list, or automate your workflows.
 
 The Claude Code SDK makes this accessible. You can build applications where features aren't code you write—they're outcomes you describe, achieved by an agent with tools, operating in a loop until the outcome is reached.
 
@@ -85,9 +85,9 @@ The more atomic your tools, the more flexibly the agent can use them. If you bun
 
 ### 3. Composability
 
-**With atomic tools and parity, you can create new features just by writing new prompts.**
+**With atomic tools and parity, new features are new prompts.**
 
-This is the payoff of the first two principles. When your tools are atomic and the agent can do anything users can do, new features are just new prompts.
+This is the payoff of the first two principles. When your tools are atomic and the agent can do anything users can do, new features are prompts.
 
 Want a "weekly review" feature that summarizes activity and suggests priorities? That's a prompt:
 
@@ -129,7 +129,7 @@ You didn't build a "commitment tracker" feature. But if the agent can read notes
 
 This changes how you build products. You're not trying to imagine every feature upfront. You're creating a capable foundation and learning from what emerges.
 
-**The test:** Give the agent an open-ended request relevant to your domain. Can it figure out a reasonable approach, operating in a loop until it succeeds? If it just says "I don't have a feature for that," your architecture is too constrained.
+**The test:** Give the agent an open-ended request relevant to your domain. Can it figure out a reasonable approach, operating in a loop until it succeeds? If it says "I don't have a feature for that," your architecture is too constrained.
 
 ---
 
@@ -316,7 +316,7 @@ These aren't necessarily wrong—they may be appropriate for your use case. But 
 
 **Defensive tool design** — You over-constrain tool inputs because you're used to defensive programming. Strict enums, validation at every layer. This is safe, but it prevents the agent from doing things you didn't anticipate.
 
-**Happy path in code, agent just executes** — Traditional software handles edge cases in code—you write the logic for what happens when X goes wrong. Agent-native lets the agent handle edge cases with judgment. If your code handles all the edge cases, the agent is just a caller.
+**Happy path in code, agent executes** — Traditional software handles edge cases in code—you write the logic for what happens when X goes wrong. Agent-native lets the agent handle edge cases with judgment. If your code handles all the edge cases, the agent is a caller.
 
 ---
 

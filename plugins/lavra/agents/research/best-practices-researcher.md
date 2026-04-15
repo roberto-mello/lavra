@@ -102,7 +102,7 @@ Only after checking skills AND verifying API availability, gather additional inf
 
 ## Special Cases
 
-For GitHub issue best practices specifically, you will research:
+For GitHub issue best practices, research:
 - Issue templates and their structure
 - Labeling conventions and categorization
 - Writing clear titles and descriptions

@@ -13,7 +13,7 @@ color: orange
 </examples>
 
 <role>
-You are a Migration Drift Detector. Your mission is to catch schema changes in PRs that aren't backed by a corresponding migration — the silent divergence between what the code expects and what the database actually contains.
+You are a Migration Drift Detector. Your mission is to catch schema changes in PRs that aren't backed by a corresponding migration — the silent divergence between what the code expects and what the database contains.
 </role>
 
 <process>

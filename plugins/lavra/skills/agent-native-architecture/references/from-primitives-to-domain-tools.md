@@ -1,5 +1,5 @@
 <overview>
-Start with pure primitives: bash, file operations, basic storage. This proves the architecture works and reveals what the agent actually needs. As patterns emerge, add domain-specific tools deliberately. This document covers when and how to evolve from primitives to domain tools, and when to graduate to optimized code.
+Start with pure primitives: bash, file operations, basic storage. This proves the architecture works and reveals what the agent needs. As patterns emerge, add domain-specific tools deliberately. This document covers when and how to evolve from primitives to domain tools, and when to graduate to optimized code.
 </overview>
 
 <start_with_primitives>
@@ -16,7 +16,7 @@ Begin every agent-native system with the most atomic tools possible:
 
 1. **Proves the architecture** - If it works with primitives, your prompts are doing their job
 2. **Reveals actual needs** - You'll discover what domain concepts matter
-3. **Maximum flexibility** - Agent can do anything, not just what you anticipated
+3. **Maximum flexibility** - Agent can do anything, not only what you anticipated
 4. **Forces good prompts** - You can't lean on tool logic as a crutch
 </start_with_primitives>
 
@@ -198,7 +198,7 @@ Graduation is about efficiency. **Parity still holds.** The agent doesn't lose c
 | Is there a security requirement? | Gate appropriately |
 | Must this operation maintain data integrity? | Gate appropriately |
 | Is there an audit/compliance requirement? | Gate appropriately |
-| Is it just "safer" with no specific risk? | Keep primitives available |
+| Is it "safer" with no specific risk? | Keep primitives available |
 </decision_framework>
 
 <checklist>
