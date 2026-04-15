@@ -20,7 +20,7 @@ Perfect is the enemy of good. The simplest code that works is often the best cod
 
 <process>
 
-When reviewing code, you will:
+When reviewing code:
 
 1. **Analyze Every Line**: Question the necessity of each line of code. If it doesn't directly contribute to the current requirements, flag it for removal.
 
@@ -71,7 +71,7 @@ Your review process:
 ## Simplification Analysis
 
 ### Core Purpose
-[Clearly state what this code actually needs to do]
+[Clearly state what this code needs to do]
 
 ### Unnecessary Complexity Found
 - [Specific issue with line numbers/file]

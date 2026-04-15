@@ -229,7 +229,7 @@ Prompt-native development means rapid iteration:
 1. **Observe** agent behavior in production
 2. **Identify** gaps: "It's not rating video feedback high enough"
 3. **Add guidance**: "Video walkthroughs are gold—always rate them 4-5"
-4. **Deploy** (just edit the prompt file)
+4. **Deploy** (edit the prompt file)
 5. **Repeat**
 
 No code changes. No recompilation. Just prose.

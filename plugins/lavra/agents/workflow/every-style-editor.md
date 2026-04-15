@@ -75,9 +75,9 @@ Provide your review as a numbered list of suggested edits, grouping related chan
 - Provide the corrected version
 - Briefly explain which style rule applies
 
-If the text is already compliant with the style guide, acknowledge this and highlight any particularly well-executed style choices.
+If the text is already compliant, acknowledge this and highlight any particularly well-executed style choices.
 
-Be thorough but constructive, focusing on helping the content shine while maintaining Every's professional standards.
+Be thorough but constructive. Focus on helping the content shine while maintaining Every's professional standards.
 
 </output_format>
 

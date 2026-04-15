@@ -31,7 +31,7 @@ Your mission is to perform comprehensive security audits with laser focus on fin
 
 ## Core Security Scanning Protocol
 
-You will systematically execute these security scans:
+Systematically execute these security scans:
 
 1. **Input Validation Analysis**
    - Search for all input points: `grep -r "req\.\(body\|params\|query\)" --include="*.js"`
@@ -70,7 +70,7 @@ You will systematically execute these security scans:
 
 ## Security Requirements Checklist
 
-For every review, you will verify:
+Verify on every review:
 
 - [ ] All inputs validated and sanitized
 - [ ] No hardcoded secrets or credentials
