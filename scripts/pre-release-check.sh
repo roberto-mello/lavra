@@ -175,6 +175,20 @@ echo "=== Compatibility tests ==="
 (cd scripts && bun run test-compatibility.ts) && { echo "  PASS  Compatibility tests"; ((PASS++)) || true; } || fail "Compatibility tests" "see output above"
 
 echo ""
+echo "=== Prose style check ==="
+if ! command -v rg &>/dev/null; then
+  fail "Prose style check" "ripgrep (rg) not installed"
+else
+  if rg --quiet 'Make sure to|Note that|Be sure to|you will|In order to|simply|basically|actually' plugins/lavra/commands/ plugins/lavra/skills/ plugins/lavra/agents/ 2>/dev/null; then
+    echo "  WARN  Filler phrases found (not blocking):"
+    rg --no-heading -n 'Make sure to|Note that|Be sure to|you will|In order to|simply|basically|actually' plugins/lavra/commands/ plugins/lavra/skills/ plugins/lavra/agents/ | head -20
+  else
+    echo "  PASS  No filler phrases detected"
+    ((PASS++)) || true
+  fi
+fi
+
+echo ""
 echo "================================"
 echo "  $PASS passed, $FAIL failed"
 echo "================================"
