@@ -47,20 +47,20 @@ jobs:
 
           while IFS= read -r cmd; do
             if ! echo "$ACTUAL_COMMANDS" | grep -qx "$cmd"; then
-              echo "❌ Catalog ghost: /${cmd} listed in CATALOG.md but no ${cmd}.md file found"
+              echo "FAIL Catalog ghost: /${cmd} listed in CATALOG.md but no ${cmd}.md file found"
               FAIL=1
             fi
           done <<< "$CATALOG_COMMANDS"
 
           while IFS= read -r cmd; do
             if ! echo "$CATALOG_COMMANDS" | grep -qx "$cmd"; then
-              echo "❌ Missing from catalog: ${cmd}.md exists but /${cmd} not in CATALOG.md"
+              echo "FAIL Missing from catalog: ${cmd}.md exists but /${cmd} not in CATALOG.md"
               FAIL=1
             fi
           done <<< "$ACTUAL_COMMANDS"
 
           [[ "$FAIL" -eq 0 ]] || exit 1
-          echo "✅ Catalog accurate (no ghosts, no missing entries)"
+          echo "PASS Catalog accurate (no ghosts, no missing entries)"
 
   test-installation:
     name: Multi-Platform Installation Tests
@@ -153,11 +153,11 @@ jobs:
           MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name == "lavra") | .version' .claude-plugin/marketplace.json)
 
           if [[ "$PLUGIN_VERSION" != "$MARKETPLACE_VERSION" ]]; then
-            echo "❌ Version mismatch: plugin.json=$PLUGIN_VERSION, marketplace.json=$MARKETPLACE_VERSION"
+            echo "FAIL Version mismatch: plugin.json=$PLUGIN_VERSION, marketplace.json=$MARKETPLACE_VERSION"
             exit 1
           fi
 
-          echo "✅ Versions consistent: $PLUGIN_VERSION"
+          echo "PASS Versions consistent: $PLUGIN_VERSION"
 
       - name: Verify component counts
         run: |
@@ -173,29 +173,29 @@ jobs:
           [[ "$AGENTS" -ge 30 ]] || exit 1
           [[ "$SKILLS" -ge 15 ]] || exit 1
 
-          echo "✅ Component counts verified"
+          echo "PASS Component counts verified"
 
       - name: Verify source files and conversion outputs
         run: |
           # Verify source files exist
-          [[ -f "plugins/lavra/opencode-src/plugin.ts" ]] || { echo "❌ OpenCode plugin.ts source missing"; exit 1; }
-          [[ -f "plugins/lavra/opencode-src/package.json" ]] || { echo "❌ OpenCode package.json source missing"; exit 1; }
-          [[ -f "plugins/lavra/gemini-src/settings.json" ]] || { echo "❌ Gemini settings.json source missing"; exit 1; }
+          [[ -f "plugins/lavra/opencode-src/plugin.ts" ]] || { echo "FAIL OpenCode plugin.ts source missing"; exit 1; }
+          [[ -f "plugins/lavra/opencode-src/package.json" ]] || { echo "FAIL OpenCode package.json source missing"; exit 1; }
+          [[ -f "plugins/lavra/gemini-src/settings.json" ]] || { echo "FAIL Gemini settings.json source missing"; exit 1; }
 
           # Verify generated outputs exist (from previous step)
-          [[ -d "plugins/lavra/opencode" ]] || { echo "❌ OpenCode conversion outputs missing"; exit 1; }
-          [[ -d "plugins/lavra/gemini" ]] || { echo "❌ Gemini conversion outputs missing"; exit 1; }
+          [[ -d "plugins/lavra/opencode" ]] || { echo "FAIL OpenCode conversion outputs missing"; exit 1; }
+          [[ -d "plugins/lavra/gemini" ]] || { echo "FAIL Gemini conversion outputs missing"; exit 1; }
 
           OPENCODE_COMMANDS=$(find plugins/lavra/opencode/commands -name "*.md" 2>/dev/null | wc -l)
-          [[ "$OPENCODE_COMMANDS" -ge 24 ]] || { echo "❌ OpenCode .md commands missing"; exit 1; }
+          [[ "$OPENCODE_COMMANDS" -ge 24 ]] || { echo "FAIL OpenCode .md commands missing"; exit 1; }
 
           GEMINI_TOML=$(find plugins/lavra/gemini/commands -name "*.toml" 2>/dev/null | wc -l)
-          [[ "$GEMINI_TOML" -ge 24 ]] || { echo "❌ Gemini .toml commands missing"; exit 1; }
+          [[ "$GEMINI_TOML" -ge 24 ]] || { echo "FAIL Gemini .toml commands missing"; exit 1; }
 
           CORTEX_COMMANDS=$(find plugins/lavra/cortex/commands -name "*.md" 2>/dev/null | wc -l)
-          [[ "$CORTEX_COMMANDS" -ge 20 ]] || { echo "❌ Cortex .md commands missing"; exit 1; }
+          [[ "$CORTEX_COMMANDS" -ge 20 ]] || { echo "FAIL Cortex .md commands missing"; exit 1; }
 
-          echo "✅ All source files and conversion outputs verified"
+          echo "PASS All source files and conversion outputs verified"
 
       - name: Verify catalog accuracy
         # SYNC: This step must stay in sync with the "Catalog accuracy" section
@@ -211,20 +211,20 @@ jobs:
 
           while IFS= read -r cmd; do
             if ! echo "$ACTUAL_COMMANDS" | grep -qx "$cmd"; then
-              echo "❌ Catalog ghost: /${cmd} listed in CATALOG.md but no ${cmd}.md file found"
+              echo "FAIL Catalog ghost: /${cmd} listed in CATALOG.md but no ${cmd}.md file found"
               FAIL=1
             fi
           done <<< "$CATALOG_COMMANDS"
 
           while IFS= read -r cmd; do
             if ! echo "$CATALOG_COMMANDS" | grep -qx "$cmd"; then
-              echo "❌ Missing from catalog: ${cmd}.md exists but /${cmd} not in CATALOG.md"
+              echo "FAIL Missing from catalog: ${cmd}.md exists but /${cmd} not in CATALOG.md"
               FAIL=1
             fi
           done <<< "$ACTUAL_COMMANDS"
 
           [[ "$FAIL" -eq 0 ]] || exit 1
-          echo "✅ Catalog accurate (no ghosts, no missing entries)"
+          echo "PASS Catalog accurate (no ghosts, no missing entries)"
 
       - name: Prose style check (warn only)
         continue-on-error: true
@@ -233,10 +233,10 @@ jobs:
         run: |
           FILLER='Make sure to|Note that|Be sure to|you will|In order to|simply|basically|actually'
           if ! command -v rg &>/dev/null; then
-            echo "⚠️  ripgrep (rg) not installed — skipping prose style check"
+            echo "WARN  ripgrep (rg) not installed — skipping prose style check"
           elif rg --quiet "$FILLER" plugins/lavra/commands/ plugins/lavra/skills/ plugins/lavra/agents/ 2>/dev/null; then
-            echo "⚠️  WARN: Filler phrases found (not blocking release):"
+            echo "WARN: Filler phrases found (not blocking release):"
             rg --no-heading -n "$FILLER" plugins/lavra/commands/ plugins/lavra/skills/ plugins/lavra/agents/ | head -20
           else
-            echo "✅ No filler phrases detected"
+            echo "PASS No filler phrases detected"
           fi
