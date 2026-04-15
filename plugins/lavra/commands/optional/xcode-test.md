@@ -32,9 +32,7 @@ Task general-purpose("Run /xcode-test for scheme [name]. Build, install on simul
 
 ## 0. Verify XcodeBuildMCP is Installed
 
-**First, check if XcodeBuildMCP tools are available.**
-
-Try calling:
+Check if XcodeBuildMCP tools are available. Try calling:
 ```
 mcp__xcodebuildmcp__list_simulators({})
 ```
@@ -45,7 +43,7 @@ Tell the user:
 ```markdown
 **XcodeBuildMCP not installed**
 
-Please install the XcodeBuildMCP server first:
+Install the XcodeBuildMCP server first:
 
 \`\`\`bash
 claude mcp add XcodeBuildMCP -- npx xcodebuildmcp@latest
@@ -68,9 +66,7 @@ mcp__xcodebuildmcp__discover_projs({})
 mcp__xcodebuildmcp__list_schemes({ project_path: "/path/to/Project.xcodeproj" })
 ```
 
-**If argument provided:**
-- Use the specified scheme name
-- Or "current" to use the default/last-used scheme
+**If argument provided:** Use the specified scheme name, or "current" for the default/last-used scheme.
 
 ## 2. Boot Simulator
 
@@ -84,7 +80,6 @@ mcp__xcodebuildmcp__list_simulators({})
 mcp__xcodebuildmcp__boot_simulator({ simulator_id: "[uuid]" })
 ```
 
-**Wait for simulator to be ready:**
 Check simulator state before proceeding with installation.
 
 ## 3. Build the App
@@ -97,14 +92,9 @@ mcp__xcodebuildmcp__build_ios_sim_app({
 })
 ```
 
-**Handle build failures:**
-- Capture build errors
-- Create P1 bead for each build error
-- Report to user with specific error details
+**On build failure:** Capture errors, create a P1 bead for each, report with specific details.
 
-**On success:**
-- Note the built app path for installation
-- Proceed to installation step
+**On success:** Note the built app path and proceed to installation.
 
 ## 4. Install and Launch
 
@@ -134,7 +124,7 @@ mcp__xcodebuildmcp__capture_sim_logs({
 
 ## 5. Test Key Screens
 
-For each key screen in the app:
+For each key screen:
 
 **Take screenshot:**
 ```
@@ -150,18 +140,14 @@ mcp__xcodebuildmcp__take_screenshot({
 - Expected content displayed
 - Layout looks correct
 
-**Check logs for errors:**
+**Check logs:**
 ```
 mcp__xcodebuildmcp__get_sim_logs({ simulator_id: "[uuid]" })
 ```
 
-Look for:
-- Crashes
-- Exceptions
-- Error-level log messages
-- Failed network requests
+Look for: crashes, exceptions, error-level messages, failed network requests.
 
-## 6. Human Verification (When Required)
+## 6. Human Verification
 
 Pause for human input when testing touches:
 
@@ -190,10 +176,7 @@ Did it work correctly?
 
 When a test fails:
 
-1. **Document the failure:**
-   - Take screenshot of error state
-   - Capture console logs
-   - Note reproduction steps
+1. **Document:** Screenshot the error state, capture console logs, note reproduction steps.
 
 2. **Ask user how to proceed:**
    ```markdown
@@ -208,18 +191,13 @@ When a test fails:
    3. Skip - Continue testing other screens
    ```
 
-3. **If "Fix now":**
-   - Investigate the issue in code
-   - Propose a fix
-   - Rebuild and retest
+3. **Fix now:** Investigate in code, propose a fix, rebuild and retest.
 
-4. **If "Create bead":**
-   - Create bead: `bd create "Xcode test failure: {description}" --type bug --priority 1`
-   - Continue testing
+4. **Create bead:** `bd create "Xcode test failure: {description}" --type bug --priority 1` then continue.
 
 ## 8. Test Summary
 
-After all tests complete, present summary:
+Present summary after all tests complete:
 
 ```markdown
 ## Xcode Test Results
@@ -257,14 +235,12 @@ After all tests complete, present summary:
 
 ## 9. Cleanup
 
-After testing:
-
 **Stop log capture:**
 ```
 mcp__xcodebuildmcp__stop_log_capture({ simulator_id: "[uuid]" })
 ```
 
-**Optionally shut down simulator:**
+**Shut down simulator (optional):**
 ```
 mcp__xcodebuildmcp__shutdown_simulator({ simulator_id: "[uuid]" })
 ```

@@ -16,12 +16,9 @@ disable-model-invocation: true
 
 ## Overview
 
-This skill captures problem solutions immediately after confirmation, creating structured knowledge entries that:
-- Are stored in `.lavra/memory/knowledge.jsonl` for auto-recall search
-- Are logged as bead comments for traceability back to specific work items
-- Use the five knowledge prefixes: LEARNED, DECISION, FACT, PATTERN, INVESTIGATION
+Captures problem solutions immediately after confirmation, creating structured knowledge entries stored in `.lavra/memory/knowledge.jsonl` for auto-recall search and logged as bead comments for traceability. Uses the five knowledge prefixes: LEARNED, DECISION, FACT, PATTERN, INVESTIGATION.
 
-**Organization:** Append-only JSONL file. Each solved problem produces one or more knowledge entries. The auto-recall hook (`auto-recall.sh`) searches these entries by keyword and injects relevant ones at session start.
+**Organization:** Append-only JSONL file. Each solved problem produces one or more entries. The auto-recall hook (`auto-recall.sh`) searches by keyword and injects relevant entries at session start.
 
 ---
 
@@ -42,18 +39,9 @@ This skill captures problem solutions immediately after confirmation, creating s
 
 **OR manual invocation.**
 
-**Non-trivial problems only:**
+**Non-trivial problems only:** multiple investigation attempts, tricky debugging, non-obvious solution, or future sessions would benefit.
 
-- Multiple investigation attempts needed
-- Tricky debugging that took time
-- Non-obvious solution
-- Future sessions would benefit
-
-**Skip for:**
-
-- Simple typos
-- Obvious syntax errors
-- Trivial fixes immediately corrected
+**Skip for:** simple typos, obvious syntax errors, trivial fixes.
 </step>
 
 <step number="2" required="true" depends_on="1">
@@ -61,7 +49,7 @@ This skill captures problem solutions immediately after confirmation, creating s
 
 Extract from conversation history:
 
-**Required information:**
+**Required:**
 
 - **Area/module**: Which part of the codebase had the problem
 - **Symptom**: Observable error/behavior (exact error messages)
@@ -70,7 +58,7 @@ Extract from conversation history:
 - **Solution**: What fixed it (code/config changes)
 - **Prevention**: How to avoid in future
 
-**BLOCKING REQUIREMENT:** If critical context is missing (area, exact error, or resolution steps), ask user and WAIT for response before proceeding to Step 3:
+**BLOCKING REQUIREMENT:** If critical context is missing (area, exact error, or resolution steps), ask and WAIT before proceeding to Step 3:
 
 ```
 I need a few details to document this properly:
@@ -86,7 +74,7 @@ I need a few details to document this properly:
 <step number="3" required="false" depends_on="2">
 ### Step 3: Check Existing Knowledge
 
-Search knowledge.jsonl for similar issues:
+Search `knowledge.jsonl` for similar issues:
 
 ```bash
 # Search by error message keywords
@@ -132,10 +120,7 @@ Classify the solution into one or more knowledge prefixes:
 | PATTERN | Identified a recurring pattern (good or bad) | "PATTERN: Always check for nil before accessing nested hash keys in API responses" |
 | INVESTIGATION | Documented an investigation path for future reference | "INVESTIGATION: Debugged memory leak - profiler showed retained objects from..." |
 
-Most solved problems produce 1-3 entries. A complex debugging session might produce:
-- 1 LEARNED (the key insight)
-- 1 PATTERN (the prevention rule)
-- 1 INVESTIGATION (the debugging path for future reference)
+Most solved problems produce 1-3 entries. A complex debugging session might produce 1 LEARNED (key insight), 1 PATTERN (prevention rule), 1 INVESTIGATION (debugging path for future reference).
 </step>
 
 <step number="5" required="true" depends_on="4" blocking="true">
@@ -192,7 +177,7 @@ Errors:
 Please provide corrected values.
 ```
 
-**GATE ENFORCEMENT:** Do NOT proceed to Step 6 until all entries pass validation.
+**GATE ENFORCEMENT:** Do not proceed to Step 6 until all entries pass validation.
 
 </validation_gate>
 </step>
@@ -200,7 +185,7 @@ Please provide corrected values.
 <step number="6" required="true" depends_on="5">
 ### Step 6: Write Knowledge Entries
 
-**Append entries to knowledge.jsonl:**
+**Append entries to `knowledge.jsonl`:**
 
 ```bash
 # Append each validated entry as a single JSON line
@@ -209,16 +194,14 @@ echo '{"key":"learned-oauth-redirect-must-match","type":"learned","content":"OAu
 
 **Log as bead comments (if bead ID available):**
 
-For each knowledge entry, also log it as a bead comment using the appropriate prefix:
+For each entry, log a bead comment using the appropriate prefix:
 
 ```bash
 bd comments add BD-001 "LEARNED: OAuth redirect URI must match exactly including trailing slash"
 bd comments add BD-001 "PATTERN: Always verify OAuth redirect URIs match exactly, including protocol and trailing slash"
 ```
 
-**Handle rotation:** If knowledge.jsonl exceeds 1000 lines after appending:
-1. Move first 500 lines to `knowledge.archive.jsonl`
-2. Keep remaining lines as new `knowledge.jsonl`
+**Rotation:** If `knowledge.jsonl` exceeds 1000 lines after appending, move first 500 lines to `knowledge.archive.jsonl` and keep remaining lines as new `knowledge.jsonl`.
 
 ```bash
 LINE_COUNT=$(wc -l < .lavra/memory/knowledge.jsonl)
@@ -235,12 +218,9 @@ fi
 
 If similar knowledge found in Step 3:
 
-**Add cross-reference tag:**
-Include the key of the related entry in the tags array (e.g., `"tags": ["auth", "see-also:learned-oauth-token-expiry"]`).
+**Add cross-reference tag:** include the key of the related entry in the tags array (e.g., `"tags": ["auth", "see-also:learned-oauth-token-expiry"]`).
 
-**Detect recurring patterns:**
-
-If 3+ entries share the same tags or describe similar issues, suggest creating a PATTERN entry that synthesizes the recurring theme:
+**Detect recurring patterns:** if 3+ entries share the same tags or describe similar issues, suggest creating a PATTERN entry that synthesizes the recurring theme:
 
 ```
 Detected recurring pattern: 3 entries related to "auth" + "redirect"
@@ -261,7 +241,7 @@ Choose (1-2): _
 
 ## Decision Menu After Capture
 
-After successful knowledge capture, present options and WAIT for user response:
+After successful capture, present options and WAIT for user response:
 
 ```
 Knowledge captured successfully.
@@ -282,25 +262,15 @@ What's next?
 
 **Handle responses:**
 
-**Option 1: Continue workflow**
-- Return to calling skill/workflow
-- Knowledge capture is complete
+**Option 1:** Return to calling skill/workflow. Capture is complete.
 
-**Option 2: View captured entries**
-- Display the JSONL entries that were written
-- Present decision menu again
+**Option 2:** Display the JSONL entries written. Present menu again.
 
-**Option 3: Search related knowledge**
-- Run recall search with the tags from the new entries
-- Display related knowledge
-- Present decision menu again
+**Option 3:** Run recall search with the new entry tags. Display related knowledge. Present menu again.
 
-**Option 4: Add more entries**
-- Return to Step 4 to classify additional knowledge
-- Useful when the solution reveals multiple insights
+**Option 4:** Return to Step 4 to classify additional knowledge. Useful when the solution reveals multiple insights.
 
-**Option 5: Other**
-- Ask what they'd like to do
+**Option 5:** Ask what they'd like to do.
 
 </decision_gate>
 
@@ -310,20 +280,17 @@ What's next?
 
 ## Integration Points
 
-**Invoked by:**
-- Manual invocation in conversation after solution confirmed
-- Can be triggered by detecting confirmation phrases like "that worked", "it's fixed", etc.
-- Called from `/lavra-work` and `/lavra-review` workflows
+**Invoked by:** manual invocation after solution confirmed, confirmation phrases ("that worked", "it's fixed"), or called from `/lavra-work` and `/lavra-review` workflows.
 
 **Works with:**
-- `auto-recall.sh` hook reads from knowledge.jsonl at session start
-- `memory-capture.sh` hook captures knowledge from `bd comments add` commands
-- `recall.sh` script provides manual search
+- `auto-recall.sh` — reads `knowledge.jsonl` at session start
+- `memory-capture.sh` — captures knowledge from `bd comments add` commands
+- `recall.sh` — manual search
 
 **Data flow:**
-1. This skill writes structured entries to `.lavra/memory/knowledge.jsonl`
-2. This skill also logs comments via `bd comments add` (which triggers `memory-capture.sh`)
-3. At next session start, `auto-recall.sh` searches knowledge.jsonl and injects relevant entries
+1. Writes structured entries to `.lavra/memory/knowledge.jsonl`
+2. Logs comments via `bd comments add` (triggers `memory-capture.sh`)
+3. At next session start, `auto-recall.sh` searches and injects relevant entries
 
 </integration_protocol>
 
@@ -333,12 +300,12 @@ What's next?
 
 ## Success Criteria
 
-Knowledge capture is successful when ALL of the following are true:
+Capture is successful when ALL of the following are true:
 
 - All JSONL entries have valid schema (required fields, correct types)
 - Entries appended to `.lavra/memory/knowledge.jsonl`
 - Bead comments logged via `bd comments add` (if bead ID available)
-- Content is specific and searchable (not vague)
+- Content is specific and searchable
 - Tags are appropriate for future recall
 - User presented with decision menu and action confirmed
 
@@ -348,34 +315,20 @@ Knowledge capture is successful when ALL of the following are true:
 
 ## Error Handling
 
-**Missing context:**
+**Missing context:** ask for missing details. Do not proceed until critical info is provided.
 
-- Ask user for missing details
-- Don't proceed until critical info provided
+**JSONL validation failure:** show specific errors, present retry with corrected values. BLOCK until valid.
 
-**JSONL validation failure:**
+**Missing bead ID:** knowledge can still be captured to `knowledge.jsonl`. Skip `bd comments add`. Warn: "No active bead - knowledge saved to JSONL only, not linked to a bead."
 
-- Show specific errors
-- Present retry with corrected values
-- BLOCK until valid
-
-**Missing bead ID:**
-
-- Knowledge can still be captured to knowledge.jsonl
-- Skip `bd comments add` step
-- Warn: "No active bead - knowledge saved to JSONL only, not linked to a bead"
-
-**Knowledge.jsonl doesn't exist:**
-
-- Create it: `touch .lavra/memory/knowledge.jsonl`
-- Continue normally
+**`knowledge.jsonl` doesn't exist:** create it with `touch .lavra/memory/knowledge.jsonl` and continue.
 
 ---
 
 ## Execution Guidelines
 
 **MUST do:**
-- Validate JSONL entries (BLOCK if invalid per Step 5 validation gate)
+- Validate JSONL entries (BLOCK if invalid per Step 5 gate)
 - Extract exact error messages from conversation
 - Include specific, searchable content
 - Use `bd comments add` with knowledge prefixes when bead ID is available
@@ -383,28 +336,17 @@ Knowledge capture is successful when ALL of the following are true:
 
 **MUST NOT do:**
 - Skip JSONL validation
-- Use vague descriptions (not searchable for auto-recall)
-- Create markdown files in docs/solutions/ (this is NOT compound-docs)
+- Use vague descriptions
+- Create markdown files in `docs/solutions/` (this is not compound-docs)
 - Write entries with missing required fields
 
 ---
 
 ## Quality Guidelines
 
-**Good knowledge entries have:**
+**Good entries have:** specific, searchable content (exact error messages, specific techniques); appropriate type classification; relevant tags; clear cause-and-effect; prevention guidance where applicable.
 
-- Specific, searchable content (exact error messages, specific techniques)
-- Appropriate type classification (LEARNED vs FACT vs PATTERN etc.)
-- Relevant tags for future keyword-based recall
-- Clear cause-and-effect (not just "what" but "why")
-- Prevention guidance where applicable
-
-**Avoid:**
-
-- Vague content ("something was wrong with auth")
-- Missing technical details ("fixed the code")
-- Overly broad tags ("code", "bug")
-- Duplicate content across entries (each entry should add unique value)
+**Avoid:** vague content ("something was wrong with auth"), missing technical details ("fixed the code"), overly broad tags ("code", "bug"), duplicate content across entries.
 
 ---
 

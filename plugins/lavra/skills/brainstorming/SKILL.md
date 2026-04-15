@@ -5,7 +5,7 @@ description: This skill should be used before implementing features, building co
 
 # Brainstorming
 
-This skill provides detailed process knowledge for effective brainstorming sessions that clarify **WHAT** to build before diving into **HOW** to build it.
+Process knowledge for brainstorming sessions that clarify **WHAT** to build before **HOW** to build it.
 
 ## When to Use This Skill
 
@@ -25,7 +25,7 @@ Brainstorming can be skipped when:
 
 ### Phase 0: Assess Requirement Clarity
 
-Before diving into questions, assess whether brainstorming is needed.
+Assess whether brainstorming is needed before asking questions.
 
 **Signals that requirements are clear:**
 - User provided specific acceptance criteria
@@ -43,7 +43,7 @@ If requirements are clear, suggest: "Your requirements seem clear. Consider proc
 
 ### Phase 1: Understand the Idea
 
-Ask questions **one at a time** to understand the user's intent. Avoid overwhelming with multiple questions.
+Ask questions **one at a time**. Avoid overwhelming with multiple questions.
 
 **Question Techniques:**
 
@@ -105,11 +105,7 @@ After understanding the idea, propose 2-3 concrete approaches.
 
 ### Phase 3: Capture the Design
 
-Summarize key decisions as bead comments to persist the brainstorming output.
-
-**Capture key decisions and investigation results using bead comments:**
-
-For each significant decision or finding, log it to the active bead:
+Log key decisions and investigation results as bead comments. For each significant decision or finding:
 
 ```bash
 # Log the chosen approach
@@ -141,7 +137,7 @@ bd comments add {BEAD_ID} "FACT: [Constraint or requirement discovered during br
 
 ### Phase 4: Handoff
 
-Present clear options for what to do next:
+Options for what to do next:
 
 1. **Proceed to planning** -> Run `/lavra-plan`
 2. **Refine further** -> Continue exploring the design
@@ -159,13 +155,13 @@ During brainstorming, actively resist complexity:
 
 ## Incremental Validation
 
-Keep sections short--200-300 words maximum. After each section of output, pause to validate understanding:
+Keep sections short--200-300 words maximum. After each section, pause to validate understanding:
 
 - "Does this match what you had in mind?"
 - "Any adjustments before we continue?"
 - "Is this the direction you want to go?"
 
-This prevents wasted effort on misaligned designs.
+Prevents wasted effort on misaligned designs.
 
 ## Anti-Patterns to Avoid
 
@@ -180,14 +176,8 @@ This prevents wasted effort on misaligned designs.
 
 ## Integration with Planning
 
-Brainstorming answers **WHAT** to build:
-- Requirements and acceptance criteria
-- Chosen approach and rationale
-- Key decisions and trade-offs
+Brainstorming answers **WHAT** to build: requirements, chosen approach, key decisions.
 
-Planning answers **HOW** to build it:
-- Implementation steps and file changes
-- Technical details and code patterns
-- Testing strategy and verification
+Planning answers **HOW** to build it: implementation steps, technical details, testing strategy.
 
-When brainstorm output exists (as bead comments), `/lavra-plan` should detect it and use it as input, skipping its own idea refinement phase.
+When brainstorm output exists (as bead comments), `/lavra-plan` detects it and uses it as input, skipping its own idea refinement phase.
