@@ -58,6 +58,7 @@ fi
 
 # Resolve target to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
+MANIFEST_FILE="$TARGET/.lavra/.lavra-manifest"
 
 # Detect if user is trying to install into the plugin directory itself
 if [[ "$TARGET" == "$SCRIPT_DIR" || "$TARGET" == "$PLUGIN_DIR" ]]; then
@@ -211,6 +212,11 @@ if [ "$GLOBAL_INSTALL" = false ] && [ -f "$HOME/.snowflake/cortex/commands/lavra
   GLOBALLY_INSTALLED=true
 fi
 
+# Start manifest for tracking installed files (enables stale cleanup on upgrade)
+if [ "$GLOBALLY_INSTALLED" = false ]; then
+  begin_manifest "$MANIFEST_FILE"
+fi
+
 # [5/8] Install commands (requires bun, run convert-cortex.ts)
 echo "[5/8] Installing workflow commands..."
 
@@ -244,15 +250,7 @@ else
   fi
   create_dir_with_symlink_handling "$COMMANDS_DIR"
 
-  CMD_COUNT=0
-
-  for cmd in "$PLUGIN_DIR/cortex/commands"/*.md; do
-    if [ -f "$cmd" ]; then
-      cp "$cmd" "$COMMANDS_DIR/$(basename "$cmd")"
-      CMD_COUNT=$((CMD_COUNT + 1))
-    fi
-  done
-
+  CMD_COUNT=$(sync_flat_dir "$PLUGIN_DIR/cortex/commands" "$COMMANDS_DIR" "$MANIFEST_FILE" "commands")
   echo "  - Installed $CMD_COUNT commands"
 fi
 
@@ -270,24 +268,7 @@ else
   fi
   mkdir -p "$AGENTS_DIR"
 
-  AGENT_COUNT=0
-
-  if [ -d "$PLUGIN_DIR/cortex/agents" ]; then
-    for category in "$PLUGIN_DIR/cortex/agents"/*/; do
-      if [ -d "$category" ]; then
-        category_name=$(basename "$category")
-        mkdir -p "$AGENTS_DIR/$category_name"
-
-        for agent in "$category"/*.md; do
-          if [ -f "$agent" ]; then
-            cp "$agent" "$AGENTS_DIR/$category_name/$(basename "$agent")"
-            AGENT_COUNT=$((AGENT_COUNT + 1))
-          fi
-        done
-      fi
-    done
-  fi
-
+  AGENT_COUNT=$(sync_nested_dir "$PLUGIN_DIR/cortex/agents" "$AGENTS_DIR" "$MANIFEST_FILE" "agents")
   echo "  - Installed $AGENT_COUNT agents"
 fi
 
@@ -307,34 +288,45 @@ else
   fi
   mkdir -p "$SKILLS_DIR"
 
+  source_skill_list_cx=""
   if [ -d "$PLUGIN_DIR/cortex/skills" ]; then
     for skill_dir in "$PLUGIN_DIR/cortex/skills"/*/; do
-      if [ -d "$skill_dir" ]; then
-        skill_name=$(basename "$skill_dir")
+      [ -d "$skill_dir" ] || continue
+      skill_name=$(basename "$skill_dir")
+      source_skill_list_cx="${source_skill_list_cx}${skill_name}"$'\n'
 
-        if [ -L "$SKILLS_DIR/$skill_name" ]; then
-          # Symlink -- installed by plugin system, don't touch
-          echo "  - Skipped $skill_name (symlink, not ours)"
+      if [ -L "$SKILLS_DIR/$skill_name" ]; then
+        echo "  - Skipped $skill_name (symlink, not ours)"
+        SKILL_SKIPPED=$((SKILL_SKIPPED + 1))
+        continue
+      elif [ -d "$SKILLS_DIR/$skill_name" ]; then
+        if [ -f "$SKILLS_DIR/$skill_name/.lavra" ]; then
+          rm -rf "$SKILLS_DIR/$skill_name"
+        else
+          echo "  - Skipped $skill_name (already exists, not ours)"
           SKILL_SKIPPED=$((SKILL_SKIPPED + 1))
           continue
-        elif [ -d "$SKILLS_DIR/$skill_name" ]; then
-          if [ -f "$SKILLS_DIR/$skill_name/.lavra" ]; then
-            # Our plugin installed this -- safe to overwrite
-            rm -rf "$SKILLS_DIR/$skill_name"
-          else
-            # User's own skill -- skip it
-            echo "  - Skipped $skill_name (already exists, not ours)"
-            SKILL_SKIPPED=$((SKILL_SKIPPED + 1))
-            continue
-          fi
         fi
-
-        # Copy entire skill directory
-        cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
-        touch "$SKILLS_DIR/$skill_name/.lavra"
-        SKILL_COUNT=$((SKILL_COUNT + 1))
       fi
+
+      cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
+      touch "$SKILLS_DIR/$skill_name/.lavra"
+      printf 'skills:%s\n' "$skill_name" >> "${MANIFEST_FILE}.new"
+      SKILL_COUNT=$((SKILL_COUNT + 1))
     done
+  fi
+
+  # Remove stale skill dirs
+  if [ -f "$MANIFEST_FILE" ]; then
+    while IFS= read -r line; do
+      [[ "$line" == "skills:"* ]] || continue
+      stale_skill="${line#skills:}"
+      if ! printf '%s' "$source_skill_list_cx" | grep -qxF "$stale_skill" \
+         && [ -d "$SKILLS_DIR/$stale_skill" ] && [ -f "$SKILLS_DIR/$stale_skill/.lavra" ]; then
+        rm -rf "$SKILLS_DIR/$stale_skill"
+        echo "  - Removed stale skill: $stale_skill"
+      fi
+    done < "$MANIFEST_FILE"
   fi
 
   echo "  - Installed $SKILL_COUNT skills"
@@ -456,6 +448,11 @@ else
 HOOKS_EOF
     echo "  - Created hooks.json with dispatcher hooks"
   fi
+fi
+
+# Finalize manifest (enables stale cleanup on next install)
+if [ "$GLOBALLY_INSTALLED" = false ]; then
+  commit_manifest "$MANIFEST_FILE"
 fi
 
 # Summary

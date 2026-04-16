@@ -3,7 +3,7 @@ name: frontend-design
 description: "Create distinctive, production-grade frontend interfaces. Use when building web components, pages, or apps where design quality and polish matter."
 license: Complete terms in LICENSE.txt
 metadata:
-  author: lavra
+  source: Lavra
   site: 'https://lavra.dev'
   overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---

@@ -189,6 +189,118 @@ parse_installer_args() {
   printf 'TARGET=%s\n' "$(cd "$target" 2>/dev/null && pwd || echo "$target")"
 }
 
+# Sync a flat directory of files from source to target.
+# Copies new/changed files, removes files present in target but not source.
+# Only removes files that were previously installed by Lavra (tracked in manifest).
+#
+# Usage: sync_flat_dir SOURCE_DIR TARGET_DIR MANIFEST_FILE MANIFEST_KEY [PATTERN]
+#
+# MANIFEST_FILE: path to .lavra-manifest (one "KEY:relative/path" per line)
+# MANIFEST_KEY:  prefix in manifest lines for this directory (e.g. "commands")
+# PATTERN:       glob pattern, defaults to "*.md"
+#
+# Returns: number of files installed (stdout)
+sync_flat_dir() {
+  local SOURCE_DIR="$1"
+  local TARGET_DIR="$2"
+  local MANIFEST_FILE="$3"
+  local MANIFEST_KEY="$4"
+  local PATTERN="${5:-*.md}"
+  local count=0
+  local new_manifest="${MANIFEST_FILE}.new"
+  local src_list
+
+  # Build sorted list of source filenames (newline-separated, for grep lookup)
+  src_list=""
+  for src in "$SOURCE_DIR"/$PATTERN; do
+    [ -f "$src" ] || continue
+    local fname
+    fname=$(basename "$src")
+    src_list="${src_list}${fname}"$'\n'
+    cp "$src" "$TARGET_DIR/$fname"
+    count=$((count + 1))
+    printf '%s:%s\n' "$MANIFEST_KEY" "$fname" >> "$new_manifest"
+  done
+
+  # Remove stale files: in old manifest but no longer in source
+  if [ -f "$MANIFEST_FILE" ]; then
+    while IFS= read -r line; do
+      [[ "$line" == "$MANIFEST_KEY:"* ]] || continue
+      local fname="${line#$MANIFEST_KEY:}"
+      # Check if fname is in src_list
+      if ! printf '%s' "$src_list" | grep -qxF "$fname" && [ -f "$TARGET_DIR/$fname" ]; then
+        rm -f "$TARGET_DIR/$fname"
+        echo "  - Removed stale: $fname" >&2
+      fi
+    done < "$MANIFEST_FILE"
+  fi
+
+  echo "$count"
+}
+
+# Sync a nested directory (one level of subdirs) from source to target.
+# Each subdir is treated as a unit. Removes files that no longer exist in source.
+# Only removes files tracked in manifest.
+#
+# Usage: sync_nested_dir SOURCE_DIR TARGET_DIR MANIFEST_FILE MANIFEST_KEY [PATTERN]
+sync_nested_dir() {
+  local SOURCE_DIR="$1"
+  local TARGET_DIR="$2"
+  local MANIFEST_FILE="$3"
+  local MANIFEST_KEY="$4"
+  local PATTERN="${5:-*.md}"
+  local count=0
+  local new_manifest="${MANIFEST_FILE}.new"
+  local src_rel_list
+
+  # Build sorted list of "category/fname" entries from source (for grep lookup)
+  src_rel_list=""
+  for category_path in "$SOURCE_DIR"/*/; do
+    [ -d "$category_path" ] || continue
+    local category
+    category=$(basename "$category_path")
+    mkdir -p "$TARGET_DIR/$category"
+
+    for src in "$category_path"/$PATTERN; do
+      [ -f "$src" ] || continue
+      local fname
+      fname=$(basename "$src")
+      src_rel_list="${src_rel_list}${category}/${fname}"$'\n'
+      cp "$src" "$TARGET_DIR/$category/$fname"
+      count=$((count + 1))
+      printf '%s:%s/%s\n' "$MANIFEST_KEY" "$category" "$fname" >> "$new_manifest"
+    done
+  done
+
+  # Remove stale files: in old manifest but no longer in source
+  if [ -f "$MANIFEST_FILE" ]; then
+    while IFS= read -r line; do
+      [[ "$line" == "$MANIFEST_KEY:"* ]] || continue
+      local rel="${line#$MANIFEST_KEY:}"
+      if ! printf '%s' "$src_rel_list" | grep -qxF "$rel" && [ -f "$TARGET_DIR/$rel" ]; then
+        rm -f "$TARGET_DIR/$rel"
+        echo "  - Removed stale: $rel" >&2
+      fi
+    done < "$MANIFEST_FILE"
+  fi
+
+  echo "$count"
+}
+
+# Begin a new manifest write cycle. Call before installing files.
+# Creates a .new manifest file. Finalize with commit_manifest.
+begin_manifest() {
+  local MANIFEST_FILE="$1"
+  mkdir -p "$(dirname "$MANIFEST_FILE")"
+  : > "${MANIFEST_FILE}.new"
+}
+
+# Commit the new manifest, replacing the old one.
+commit_manifest() {
+  local MANIFEST_FILE="$1"
+  mv "${MANIFEST_FILE}.new" "$MANIFEST_FILE"
+}
+
 # Resolve target directory to absolute path with error handling
 resolve_target_dir() {
   local target="$1"

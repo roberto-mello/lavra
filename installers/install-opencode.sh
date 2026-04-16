@@ -39,6 +39,7 @@ eval "$(parse_installer_args "$@")"
 
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
+MANIFEST_FILE="$TARGET/.lavra/.lavra-manifest"
 echo "  Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  Type: Global installation"
@@ -180,44 +181,57 @@ else
   BASE_DIR="$TARGET/.opencode"
 fi
 
+begin_manifest "$MANIFEST_FILE"
+
 # Commands
 COMMANDS_DIR="$BASE_DIR/commands"
 create_dir_with_symlink_handling "$COMMANDS_DIR"
 
-find "$PLUGIN_DIR/opencode/commands" -name "*.md" -exec cp {} "$COMMANDS_DIR/" \;
+CMD_COUNT=$(sync_flat_dir "$PLUGIN_DIR/opencode/commands" "$COMMANDS_DIR" "$MANIFEST_FILE" "commands")
 find "$COMMANDS_DIR" -type f -exec chmod 644 {} \;
-
-echo "  - Installed $(find "$PLUGIN_DIR/opencode/commands" -name "*.md" | wc -l | tr -d ' ') commands"
+echo "  - Installed $CMD_COUNT commands"
 
 # Agents
 AGENTS_DIR="$BASE_DIR/agents"
 create_dir_with_symlink_handling "$AGENTS_DIR"
 
-for category in review research design workflow docs; do
-  mkdir -p "$AGENTS_DIR/$category"
-  if [ -d "$PLUGIN_DIR/opencode/agents/$category" ]; then
-    find "$PLUGIN_DIR/opencode/agents/$category" -name "*.md" -exec cp {} "$AGENTS_DIR/$category/" \;
-  fi
-done
-
+AGENT_COUNT=$(sync_nested_dir "$PLUGIN_DIR/opencode/agents" "$AGENTS_DIR" "$MANIFEST_FILE" "agents")
 find "$AGENTS_DIR" -type f -exec chmod 644 {} \;
-
-echo "  - Installed $(find "$PLUGIN_DIR/opencode/agents" -name "*.md" | wc -l | tr -d ' ') agents"
+echo "  - Installed $AGENT_COUNT agents"
 
 # Skills
 SKILLS_DIR="$BASE_DIR/skills"
 create_dir_with_symlink_handling "$SKILLS_DIR"
 
+source_skill_list_oc=""
+SKILL_COUNT=0
 for skill_dir in "$PLUGIN_DIR/opencode/skills"/*; do
-  if [ -d "$skill_dir" ]; then
-    skill_name=$(basename "$skill_dir")
-    cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
-    chmod 644 "$SKILLS_DIR/$skill_name/SKILL.md" 2>/dev/null || true
-  fi
+  [ -d "$skill_dir" ] || continue
+  skill_name=$(basename "$skill_dir")
+  source_skill_list_oc="${source_skill_list_oc}${skill_name}"$'\n'
+  cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
+  chmod 644 "$SKILLS_DIR/$skill_name/SKILL.md" 2>/dev/null || true
+  printf 'skills:%s\n' "$skill_name" >> "${MANIFEST_FILE}.new"
+  SKILL_COUNT=$((SKILL_COUNT + 1))
 done
 
-echo "  - Installed $(find "$PLUGIN_DIR/opencode/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ') skills"
+# Remove stale skill dirs
+if [ -f "$MANIFEST_FILE" ]; then
+  while IFS= read -r line; do
+    [[ "$line" == "skills:"* ]] || continue
+    stale_skill="${line#skills:}"
+    if ! printf '%s' "$source_skill_list_oc" | grep -qxF "$stale_skill" \
+       && [ -d "$SKILLS_DIR/$stale_skill" ]; then
+      rm -rf "$SKILLS_DIR/$stale_skill"
+      echo "  - Removed stale skill: $stale_skill"
+    fi
+  done < "$MANIFEST_FILE"
+fi
+
+echo "  - Installed $SKILL_COUNT skills"
 echo ""
+
+commit_manifest "$MANIFEST_FILE"
 
 # Step 6: Provision memory (only for project-specific installs)
 if [ "$GLOBAL_INSTALL" = true ]; then

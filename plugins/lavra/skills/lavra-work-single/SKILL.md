@@ -2,7 +2,7 @@
 name: lavra-work-single
 description: "Single-bead implementation path for lavra-work, phases 1-5. Invoked by lavra-work router. Use when working on exactly one bead."
 metadata:
-  author: lavra
+  source: Lavra
   site: 'https://lavra.dev'
   overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---

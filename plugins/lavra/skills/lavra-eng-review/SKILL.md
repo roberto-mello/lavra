@@ -3,7 +3,7 @@ name: lavra-eng-review
 description: "Engineering review -- parallel agents check architecture, simplicity, security, and performance"
 argument-hint: "[epic bead ID] [--small]"
 metadata:
-  author: lavra
+  source: Lavra
   site: 'https://lavra.dev'
   overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---

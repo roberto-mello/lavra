@@ -3,7 +3,7 @@ name: file-todos
 description: "Manage file-based todos in todos/ directory. Use when creating, triaging, or tracking todos and integrating them with code review."
 disable-model-invocation: true
 metadata:
-  author: lavra
+  source: Lavra
   site: 'https://lavra.dev'
   overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---

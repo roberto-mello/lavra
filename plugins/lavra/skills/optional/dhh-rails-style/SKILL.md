@@ -2,7 +2,7 @@
 name: dhh-rails-style
 description: "Write Ruby and Rails code in DHH's 37signals style. Use for Rails apps, models, controllers, or when DHH/Basecamp/Hotwire conventions are requested."
 metadata:
-  author: lavra
+  source: Lavra
   site: 'https://lavra.dev'
   overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---

@@ -3,7 +3,7 @@ name: rclone
 description: "Sync and manage files across cloud storage using rclone. Use when uploading to S3, R2, Backblaze, Google Drive, Dropbox, or any S3-compatible storage."
 disable-model-invocation: true
 metadata:
-  author: lavra
+  source: Lavra
   site: 'https://lavra.dev'
   overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---

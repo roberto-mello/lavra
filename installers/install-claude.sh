@@ -46,6 +46,7 @@ eval "$(parse_installer_args "$@")"
 
 # Resolve target to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
+MANIFEST_FILE="$TARGET/.lavra/.lavra-manifest"
 
 # Detect if user is trying to install into the plugin directory itself
 if [[ "$TARGET" == "$SCRIPT_DIR" || "$TARGET" == "$PLUGIN_DIR" ]]; then
@@ -166,6 +167,12 @@ if [ "$GLOBAL_INSTALL" = false ] && [ -f "$HOME/.claude/commands/lavra-plan.md" 
   GLOBALLY_INSTALLED=true
 fi
 
+# Start manifest for tracking installed files (enables stale cleanup on upgrade).
+# Only when we'll actually install files -- skip if globally installed.
+if [ "$GLOBALLY_INSTALLED" = false ]; then
+  begin_manifest "$MANIFEST_FILE"
+fi
+
 # Install commands (all from commands directory)
 echo "[5/9] Installing workflow commands..."
 
@@ -180,15 +187,7 @@ else
   fi
   create_dir_with_symlink_handling "$COMMANDS_DIR"
 
-  CMD_COUNT=0
-
-  for cmd in "$PLUGIN_DIR/commands"/*.md; do
-    if [ -f "$cmd" ]; then
-      cp "$cmd" "$COMMANDS_DIR/$(basename "$cmd")"
-      CMD_COUNT=$((CMD_COUNT + 1))
-    fi
-  done
-
+  CMD_COUNT=$(sync_flat_dir "$PLUGIN_DIR/commands" "$COMMANDS_DIR" "$MANIFEST_FILE" "commands")
   echo "  - Installed $CMD_COUNT commands"
 fi
 
@@ -206,24 +205,7 @@ else
   fi
   mkdir -p "$AGENTS_DIR"
 
-  AGENT_COUNT=0
-
-  if [ -d "$PLUGIN_DIR/agents" ]; then
-    for category in "$PLUGIN_DIR/agents"/*/; do
-      if [ -d "$category" ]; then
-        category_name=$(basename "$category")
-        mkdir -p "$AGENTS_DIR/$category_name"
-
-        for agent in "$category"/*.md; do
-          if [ -f "$agent" ]; then
-            cp "$agent" "$AGENTS_DIR/$category_name/$(basename "$agent")"
-            AGENT_COUNT=$((AGENT_COUNT + 1))
-          fi
-        done
-      fi
-    done
-  fi
-
+  AGENT_COUNT=$(sync_nested_dir "$PLUGIN_DIR/agents" "$AGENTS_DIR" "$MANIFEST_FILE" "agents")
   echo "  - Installed $AGENT_COUNT agents"
 fi
 
@@ -243,34 +225,46 @@ else
   fi
   mkdir -p "$SKILLS_DIR"
 
+  # Build newline-delimited list of source skill names for stale detection
+  source_skill_list=""
   if [ -d "$PLUGIN_DIR/skills" ]; then
     for skill_dir in "$PLUGIN_DIR/skills"/*/; do
-      if [ -d "$skill_dir" ]; then
-        skill_name=$(basename "$skill_dir")
+      [ -d "$skill_dir" ] || continue
+      skill_name=$(basename "$skill_dir")
+      source_skill_list="${source_skill_list}${skill_name}"$'\n'
 
-        if [ -L "$SKILLS_DIR/$skill_name" ]; then
-          # Symlink -- installed by Claude's plugin system, don't touch
-          echo "  - Skipped $skill_name (symlink, not ours)"
+      if [ -L "$SKILLS_DIR/$skill_name" ]; then
+        echo "  - Skipped $skill_name (symlink, not ours)"
+        SKILL_SKIPPED=$((SKILL_SKIPPED + 1))
+        continue
+      elif [ -d "$SKILLS_DIR/$skill_name" ]; then
+        if [ -f "$SKILLS_DIR/$skill_name/.lavra" ]; then
+          rm -rf "$SKILLS_DIR/$skill_name"
+        else
+          echo "  - Skipped $skill_name (already exists, not ours)"
           SKILL_SKIPPED=$((SKILL_SKIPPED + 1))
           continue
-        elif [ -d "$SKILLS_DIR/$skill_name" ]; then
-          if [ -f "$SKILLS_DIR/$skill_name/.lavra" ]; then
-            # Our plugin installed this -- safe to overwrite
-            rm -rf "$SKILLS_DIR/$skill_name"
-          else
-            # User's own skill -- skip it
-            echo "  - Skipped $skill_name (already exists, not ours)"
-            SKILL_SKIPPED=$((SKILL_SKIPPED + 1))
-            continue
-          fi
         fi
-
-        # Copy entire skill directory (may contain references/, templates/, etc.)
-        cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
-        touch "$SKILLS_DIR/$skill_name/.lavra"
-        SKILL_COUNT=$((SKILL_COUNT + 1))
       fi
+
+      cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
+      touch "$SKILLS_DIR/$skill_name/.lavra"
+      printf 'skills:%s\n' "$skill_name" >> "${MANIFEST_FILE}.new"
+      SKILL_COUNT=$((SKILL_COUNT + 1))
     done
+  fi
+
+  # Remove stale skill dirs: previously installed but no longer in source
+  if [ -f "$MANIFEST_FILE" ]; then
+    while IFS= read -r line; do
+      [[ "$line" == "skills:"* ]] || continue
+      stale_skill="${line#skills:}"
+      if ! printf '%s' "$source_skill_list" | grep -qxF "$stale_skill" \
+         && [ -d "$SKILLS_DIR/$stale_skill" ] && [ -f "$SKILLS_DIR/$stale_skill/.lavra" ]; then
+        rm -rf "$SKILLS_DIR/$stale_skill"
+        echo "  - Removed stale skill: $stale_skill"
+      fi
+    done < "$MANIFEST_FILE"
   fi
 
   echo "  - Installed $SKILL_COUNT skills"
@@ -428,6 +422,11 @@ fi
 # bd init manages .beads/ visibility via .beads/.gitignore and (for stealth mode)
 # .git/info/exclude. Adding .beads/ to the project .gitignore would silently
 # prevent issues.jsonl and comments from being committed, causing data loss.
+
+# Finalize manifest (enables stale cleanup on next install)
+if [ "$GLOBALLY_INSTALLED" = false ]; then
+  commit_manifest "$MANIFEST_FILE"
+fi
 
 echo ""
 echo "Done."

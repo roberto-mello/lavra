@@ -9,7 +9,7 @@ preconditions: "- Problem has been solved (not in-progress)
   - Solution has been verified working"
 disable-model-invocation: true
 metadata:
-  author: lavra
+  source: Lavra
   site: 'https://lavra.dev'
   overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---

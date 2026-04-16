@@ -2,7 +2,7 @@
 name: lavra-work-multi
 description: "Multi-bead orchestration path (Phases M1-M10) — invoked by lavra-work router. Use when working on multiple beads in parallel."
 metadata:
-  author: lavra
+  source: Lavra
   site: 'https://lavra.dev'
   overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---
