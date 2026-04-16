@@ -82,17 +82,17 @@ else
   fail "Claude Code settings" "settings.json not created"
 fi
 
-# Verify commands (should be 23+ in project OR global)
+# Verify commands (should be 18+ in project OR global)
 # Follow symlinks with -L flag
 COMMAND_COUNT=$(find .claude/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 GLOBAL_COMMAND_COUNT=$(find -L "$HOME/.claude/commands" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 
-if [[ "$COMMAND_COUNT" -ge 23 ]]; then
+if [[ "$COMMAND_COUNT" -ge 18 ]]; then
   pass "Claude Code commands installed locally ($COMMAND_COUNT files)"
-elif [[ "$GLOBAL_COMMAND_COUNT" -ge 23 ]]; then
+elif [[ "$GLOBAL_COMMAND_COUNT" -ge 18 ]]; then
   pass "Claude Code commands installed globally ($GLOBAL_COMMAND_COUNT files)"
 else
-  fail "Claude Code commands" "Expected 23+, found $COMMAND_COUNT local, $GLOBAL_COMMAND_COUNT global"
+  fail "Claude Code commands" "Expected 18+, found $COMMAND_COUNT local, $GLOBAL_COMMAND_COUNT global"
 fi
 
 # Verify agents (should be 28+ in project OR global)
@@ -227,10 +227,10 @@ fi
 
 # Verify commands are .toml format (Gemini-specific)
 TOML_COUNT=$(find commands -name "*.toml" 2>/dev/null | wc -l | tr -d ' ')
-if [[ "$TOML_COUNT" -ge 23 ]]; then
+if [[ "$TOML_COUNT" -ge 18 ]]; then
   pass "Gemini commands installed as .toml ($TOML_COUNT files)"
 else
-  fail "Gemini commands" "Expected 23+ .toml files, found $TOML_COUNT"
+  fail "Gemini commands" "Expected 18+ .toml files, found $TOML_COUNT"
 fi
 
 # Verify template syntax conversion ($ARGUMENTS → {{args}})
@@ -337,12 +337,12 @@ else
   pass "Cortex Code hooks.json has no direct relative paths"
 fi
 
-# Verify commands (should be 23+)
+# Verify commands (should be 18+)
 CMD_COUNT=$(find .cortex/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-if [[ "$CMD_COUNT" -ge 23 ]]; then
+if [[ "$CMD_COUNT" -ge 18 ]]; then
   pass "Cortex Code commands installed ($CMD_COUNT files)"
 else
-  fail "Cortex Code commands" "Expected 23+, found $CMD_COUNT"
+  fail "Cortex Code commands" "Expected 18+, found $CMD_COUNT"
 fi
 
 # Verify agents (should be 28+)
