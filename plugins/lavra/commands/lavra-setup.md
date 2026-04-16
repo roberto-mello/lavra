@@ -1,6 +1,6 @@
 ---
 name: lavra-setup
-description: Configure this project's tech stack and review agents. Auto-detects stack from project files, lets you toggle specific agents off, and saves config to .lavra/config/project-setup.md.
+description: "Configure project stack, review agents, and workflow settings"
 argument-hint: ""
 ---
 

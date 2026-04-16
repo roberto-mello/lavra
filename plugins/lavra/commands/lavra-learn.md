@@ -1,6 +1,6 @@
 ---
 name: lavra-learn
-description: Curate raw knowledge comments into structured, well-tagged entries for future auto-recall
+description: "Curate raw knowledge comments into structured, well-tagged entries for future auto-recall"
 argument-hint: "[bead IDs to process, or omit for all closed-today beads]"
 ---
 

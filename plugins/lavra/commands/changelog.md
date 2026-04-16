@@ -1,6 +1,6 @@
 ---
 name: changelog
-description: Create engaging changelogs for recent merges to main branch
+description: "Create engaging changelogs for recent merges to main branch"
 argument-hint: [optional: daily|weekly, or time period in days]
 disable-model-invocation: true
 ---

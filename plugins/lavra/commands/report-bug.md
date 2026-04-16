@@ -1,6 +1,6 @@
 ---
 name: report-bug
-description: Report a bug in the lavra plugin
+description: "Report a bug in the lavra plugin"
 argument-hint: [optional: brief description of the bug]
 disable-model-invocation: true
 ---

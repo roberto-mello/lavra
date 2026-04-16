@@ -1,6 +1,6 @@
 ---
 name: lavra-work
-description: Execute work on one or many beads -- auto-routes between single-bead and multi-bead paths based on input
+description: "Execute work on one or many beads -- auto-routes between single-bead and multi-bead paths based on input"
 argument-hint: "[bead ID, epic ID, comma-separated IDs, or empty for all ready beads] [--yes] [--no-parallel]"
 ---
 

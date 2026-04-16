@@ -2,7 +2,7 @@ Here is the compressed markdown:
 
 ---
 name: lavra-work-multi
-description: Multi-bead orchestration path for lavra-work — Phases M1-M10: gather, branch, conflict detection, waves, approval, recall, execute, verify, pre-push, final. Invoked by lavra-work router. Use when working on multiple beads in parallel.
+description: "Multi-bead orchestration path (Phases M1-M10) — invoked by lavra-work router. Use when working on multiple beads in parallel."
 ---
 
 ## MULTI-BEAD PATH

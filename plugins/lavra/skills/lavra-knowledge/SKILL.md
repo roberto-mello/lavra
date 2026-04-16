@@ -1,6 +1,6 @@
 ---
 name: lavra-knowledge
-description: "Capture solved problems as knowledge entries in JSONL format for fast recall. Use when a problem has been solved and the solution should be preserved for future sessions."
+description: "Capture solved problems as knowledge entries for fast recall. Use when a solution should be preserved for future sessions."
 allowed-tools: "- Read # Parse conversation context
   - Write # Append to knowledge.jsonl
   - Bash # Run bd commands, search knowledge

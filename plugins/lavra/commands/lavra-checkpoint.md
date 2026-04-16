@@ -1,6 +1,6 @@
 ---
 name: lavra-checkpoint
-description: Save session progress by filing beads, capturing knowledge, and syncing state
+description: "Save session progress by filing beads, capturing knowledge, and syncing state"
 disable-model-invocation: true
 ---
 

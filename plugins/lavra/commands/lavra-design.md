@@ -1,6 +1,6 @@
 ---
 name: lavra-design
-description: Orchestrate the full design pipeline -- brainstorm, plan, research, revise, review, lock
+description: "Orchestrate the full design pipeline -- brainstorm, plan, research, revise, review, lock"
 argument-hint: "[brainstorm bead ID or feature description]"
 ---
 

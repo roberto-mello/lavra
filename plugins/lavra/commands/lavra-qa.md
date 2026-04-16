@@ -1,6 +1,6 @@
 ---
 name: lavra-qa
-description: Browser-based QA verification of the running app -- systematic testing from the user's perspective
+description: "Browser-based QA verification of the running app -- systematic testing from the user's perspective"
 argument-hint: "[bead ID or --quick for smoke test]"
 ---
 

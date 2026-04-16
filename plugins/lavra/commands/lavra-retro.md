@@ -1,6 +1,6 @@
 ---
 name: lavra-retro
-description: Weekly retrospective with shipping analytics, team performance, and knowledge synthesis
+description: "Weekly retrospective with shipping analytics, team performance, and knowledge synthesis"
 argument-hint: "[--window 14d] [--since 2026-03-01]"
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: lavra-ship
-description: Fully automated ship sequence from code-ready to PR-open with beads closed and knowledge captured
+description: "Fully automated ship sequence from code-ready to PR-open with beads closed and knowledge captured"
 argument-hint: "[bead ID or branch name]"
 ---
 

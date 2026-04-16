@@ -1,6 +1,6 @@
 ---
 name: lavra-recall
-description: Search knowledge base mid-session and inject relevant context
+description: "Search knowledge base mid-session and inject relevant context"
 argument-hint: "[keywords, bead ID, or --flag]"
 disable-model-invocation: true
 ---

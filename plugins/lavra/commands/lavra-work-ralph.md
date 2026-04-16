@@ -1,6 +1,6 @@
 ---
 name: lavra-work-ralph
-description: Autonomous retry mode for bead work -- iterates until completion criteria are met or retry budget is exhausted
+description: "Autonomous retry mode for bead work -- iterates until completion criteria are met or retry budget is exhausted"
 argument-hint: "[bead ID or epic ID or comma-separated IDs] [--retries N] [--max-turns N] [--yes]"
 ---
 

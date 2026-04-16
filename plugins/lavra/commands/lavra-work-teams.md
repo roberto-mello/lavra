@@ -1,6 +1,6 @@
 ---
 name: lavra-work-teams
-description: Work on multiple beads with persistent worker teammates that self-organize through a ready queue
+description: "Work on multiple beads with persistent worker teammates that self-organize through a ready queue"
 argument-hint: "[epic bead ID, list of bead IDs, or empty for all ready beads] [--workers N] [--retries N] [--max-turns N] [--yes]"
 ---
 

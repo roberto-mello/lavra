@@ -1,6 +1,6 @@
 ---
 name: lavra-import
-description: Import a markdown plan into beads as an epic with child tasks
+description: "Import a markdown plan into beads as an epic with child tasks"
 argument-hint: "[path/to/plan.md] [optional epic title]"
 ---
 

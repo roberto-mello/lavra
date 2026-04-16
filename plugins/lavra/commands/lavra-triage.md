@@ -1,6 +1,6 @@
 ---
 name: lavra-triage
-description: Triage and categorize beads for prioritization
+description: "Triage and categorize beads for prioritization"
 argument-hint: "[bead ID or empty]"
 disable-model-invocation: true
 ---

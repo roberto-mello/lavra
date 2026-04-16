@@ -1,6 +1,6 @@
 ---
 name: lavra-quick
-description: Fast-track small tasks — abbreviated plan then straight to execution
+description: "Fast-track small tasks — abbreviated plan then straight to execution"
 argument-hint: "[task description or bead ID]"
 ---
 
