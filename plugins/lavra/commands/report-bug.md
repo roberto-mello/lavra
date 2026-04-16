@@ -1,12 +1,12 @@
 ---
 name: report-bug
-description: "Report a bug in the lavra plugin"
+description: "Report a bug in the Lavra plugin"
 argument-hint: [optional: brief description of the bug]
 disable-model-invocation: true
 ---
 
 <objective>
-Report bugs encountered while using the lavra plugin by gathering structured information and creating a GitHub issue for the maintainer.
+Report bugs encountered while using the Lavra plugin by gathering structured information and generating a pre-filled GitHub issue link.
 </objective>
 
 <process>
@@ -97,32 +97,39 @@ Create a well-structured bug report with:
 *Reported via `/report-bug` command*
 ```
 
-## Step 4: Create GitHub Issue
+## Step 4: Generate Issue Link
 
-Use the GitHub CLI to create the issue:
+URL-encode the title and body, then construct a pre-filled GitHub issue URL:
 
-```bash
-gh issue create \
-  --repo rbm/lavra \
-  --title "[lavra] Bug: [Brief description]" \
-  --body "[Formatted bug report from Step 3]" \
-  --label "bug"
+```
+https://github.com/roberto-mello/lavra/issues/new?title=<url-encoded-title>&body=<url-encoded-body>&labels=bug
 ```
 
-**Note:** If labels don't exist, create without labels:
+Title: `[Lavra] Bug: [Brief description]`
+Body: the formatted report from Step 3
+
+Use Python to build the URL:
+
 ```bash
-gh issue create \
-  --repo rbm/lavra \
-  --title "[lavra] Bug: [Brief description]" \
-  --body "[Formatted bug report]"
+python3 -c "
+import urllib.parse
+title = '[Lavra] Bug: <brief description>'
+body = '''<formatted report>'''
+base = 'https://github.com/roberto-mello/lavra/issues/new'
+print(base + '?title=' + urllib.parse.quote(title) + '&body=' + urllib.parse.quote(body) + '&labels=bug')
+"
 ```
 
-## Step 5: Confirm Submission
+## Step 5: Present the Link
 
-After the issue is created:
-1. Display the issue URL to the user
-2. Thank them for reporting the bug
-3. Let them know the maintainer will be notified
+Display the URL and instruct the user to open it in a browser:
+
+```
+Open this link to submit the bug report (pre-filled):
+<generated URL>
+```
+
+The link works on any platform — no `gh` CLI required.
 
 </process>
 
@@ -130,16 +137,15 @@ After the issue is created:
 - [ ] All six bug information questions answered
 - [ ] Environment information collected automatically
 - [ ] Bug report formatted with all sections
-- [ ] GitHub issue created successfully
-- [ ] Issue URL displayed to user
+- [ ] Pre-filled GitHub issue URL generated
+- [ ] URL displayed to user with instructions to open in browser
 </success_criteria>
 
 <guardrails>
 
 ## Error Handling
 
-- If `gh` CLI is not authenticated: Prompt user to run `gh auth login` first
-- If issue creation fails: Display the formatted report so user can manually create the issue
+- If Python is unavailable: display the formatted report and direct user to https://github.com/roberto-mello/lavra/issues/new to paste it manually
 - If required information is missing: Re-prompt for that specific field
 
 ## Privacy Notice
