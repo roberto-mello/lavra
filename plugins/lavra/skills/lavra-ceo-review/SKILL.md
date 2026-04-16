@@ -2,6 +2,10 @@
 name: lavra-ceo-review
 description: "CEO/founder-mode plan review -- challenge premises, validate business fit, run 10-section structured review"
 argument-hint: "[epic bead ID]"
+metadata:
+  author: lavra
+  site: 'https://lavra.dev'
+  overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---
 
 <objective>

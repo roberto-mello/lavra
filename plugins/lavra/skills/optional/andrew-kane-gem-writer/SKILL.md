@@ -1,6 +1,10 @@
 ---
 name: andrew-kane-gem-writer
 description: "Write Ruby gems following Andrew Kane's patterns. Use when creating or refactoring gems, designing gem APIs, or building minimal production-ready Ruby libraries."
+metadata:
+  author: lavra
+  site: 'https://lavra.dev'
+  overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---
 
 # Andrew Kane Gem Writer

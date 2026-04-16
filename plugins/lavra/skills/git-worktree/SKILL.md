@@ -2,6 +2,10 @@
 name: git-worktree
 description: "Manage Git worktrees for isolated parallel development. Use when creating, switching, or cleaning up worktrees for parallel bead work."
 disable-model-invocation: true
+metadata:
+  author: lavra
+  site: 'https://lavra.dev'
+  overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---
 
 # Git Worktree Manager

@@ -1,6 +1,10 @@
 ---
 name: agent-native-architecture
 description: "Design agent-native architectures where agents are first-class citizens. Use when building autonomous agents, MCP tools, or self-modifying systems."
+metadata:
+  author: lavra
+  site: 'https://lavra.dev'
+  overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---
 
 <why_now>

@@ -2,6 +2,10 @@
 name: frontend-design
 description: "Create distinctive, production-grade frontend interfaces. Use when building web components, pages, or apps where design quality and polish matter."
 license: Complete terms in LICENSE.txt
+metadata:
+  author: lavra
+  site: 'https://lavra.dev'
+  overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---
 
 This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic details and creative choices.

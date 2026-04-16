@@ -2,6 +2,10 @@
 name: lavra-brainstorm
 description: "Explore requirements and approaches through collaborative dialogue before planning"
 argument-hint: "[bead ID or feature idea]"
+metadata:
+  author: lavra
+  site: 'https://lavra.dev'
+  overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---
 
 <objective>

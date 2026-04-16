@@ -1,6 +1,10 @@
 ---
 name: agent-browser
 description: "Browser automation via Vercel's agent-browser CLI. Use when browsing websites, filling forms, taking screenshots, or scraping data."
+metadata:
+  author: lavra
+  site: 'https://lavra.dev'
+  overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---
 
 # agent-browser: CLI Browser Automation

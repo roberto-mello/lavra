@@ -2,6 +2,10 @@
 name: lavra-research
 description: "Gather evidence and best practices for a plan using domain-matched research agents"
 argument-hint: "[epic bead ID]"
+metadata:
+  author: lavra
+  site: 'https://lavra.dev'
+  overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---
 
 <objective>

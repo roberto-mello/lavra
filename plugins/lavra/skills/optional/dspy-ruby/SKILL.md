@@ -1,6 +1,10 @@
 ---
 name: dspy-ruby
 description: "Build type-safe LLM applications with DSPy.rb. Use when implementing AI features, LLM signatures, agent systems, or prompt optimization in Ruby."
+metadata:
+  author: lavra
+  site: 'https://lavra.dev'
+  overwrite-warning: "Edit source at https://github.com/roberto-mello/lavra. Changes will be overwritten on next install."
 ---
 
 # DSPy.rb
