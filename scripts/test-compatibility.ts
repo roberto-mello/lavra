@@ -468,7 +468,7 @@ async function testFormatCompatibility() {
 
   // Verify template syntax conversion
   try {
-    const tomlContent = await Bun.file(join(geminiDir, "commands/lavra-plan.toml")).text();
+    const tomlContent = await Bun.file(join(geminiDir, "commands/lavra-work.toml")).text();
 
     // Check that template variable conversion happened ({{args}} exists)
     // Note: $ARGUMENTS may still appear in code blocks, which is correct
