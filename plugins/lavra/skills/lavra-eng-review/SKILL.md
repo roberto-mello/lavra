@@ -1,6 +1,6 @@
 ---
 name: lavra-eng-review
-description: Engineering review -- parallel agents check architecture, simplicity, security, and performance
+description: "Engineering review -- parallel agents check architecture, simplicity, security, and performance"
 argument-hint: "[epic bead ID] [--small]"
 ---
 

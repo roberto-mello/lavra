@@ -390,9 +390,8 @@ After presenting report, use **AskUserQuestion tool**:
 3. **`/lavra-triage`** — Triage backlog: review deferred and open beads, decide what to carry forward, dismiss, or reprioritize (run in new message)
 4. **Done** — Close out session
 
-If user picks option 1, extract action items from `## Action Items` section and pass to `/lavra-plan`:
+If user picks option 1, extract action items from `## Action Items` section and invoke:
 ```
-skill: lavra-plan
-args: "{action items summary}"
+Skill("lavra-plan", args="{action items summary}")
 ```
 </handoff>

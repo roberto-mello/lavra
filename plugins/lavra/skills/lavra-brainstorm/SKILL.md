@@ -1,6 +1,6 @@
 ---
 name: lavra-brainstorm
-description: Explore requirements and approaches through collaborative dialogue before planning
+description: "Explore requirements and approaches through collaborative dialogue before planning"
 argument-hint: "[bead ID or feature idea]"
 ---
 
@@ -343,7 +343,7 @@ Use **AskUserQuestion tool** to present next steps:
 **Question:** "Brainstorm captured as {EPIC_BEAD_ID} with {N} phases filed as child beads. What would you like to do next?"
 
 **Options:**
-1. **Proceed to design** -- Run `/lavra-design {EPIC_BEAD_ID}` to design all phases
+1. **Proceed to design** -- invoke Skill("lavra-design") with the epic bead ID to design all phases
 2. **Refine further** -- Continue exploring
 3. **Done for now** -- Return later
 

@@ -10,16 +10,13 @@ Full listing of all commands, agents, skills, hooks, and MCP servers included in
 
 See the [Command Reference](/docs/commands) for descriptions and direct links, or the [Command Map](/command-map) for a visual overview.
 
-## Commands (23 core + 5 optional)
+## Commands (18 core + 5 optional)
 
-### Workflow (12)
+### Workflow (9)
 
 | Command | Description | When to Use |
 |---------|-------------|-------------|
 | `/lavra-design` | Orchestrate the full design pipeline, brainstorm, plan, research, revise, review, lock | Runs the entire design pipeline automatically |
-| `/lavra-brainstorm` | Explore requirements and approaches through collaborative dialogue before planning | When requirements are unclear or you need to explore approaches. Included in `/lavra-design` |
-| `/lavra-plan` | Transform feature descriptions into well-structured beads with parallel research and multi-phase planning | Start every feature, creates a structured plan with research. Included in `/lavra-design` |
-| `/lavra-review` | Perform exhaustive code reviews using multi-agent analysis and ultra-thinking | Before closing beads, comprehensive quality check. Included in `/lavra-design` |
 | `/lavra-quick` | Fast-track small tasks, abbreviated plan then straight to execution | Quick fixes and small features that don't need the full pipeline |
 | `/lavra-work` | Execute work on one or many beads, auto-routes between single-bead and multi-bead paths based on input | Standard workflow, any number of beads |
 | `/lavra-work-ralph` | Autonomous retry mode, iterates until completion criteria are met or retry budget is exhausted | Hands-off execution with self-correction |
@@ -29,13 +26,10 @@ See the [Command Reference](/docs/commands) for descriptions and direct links, o
 | `/lavra-checkpoint` | Save session progress by filing beads, capturing knowledge, and syncing state | Mid-session, checkpoint your work before context runs out |
 | `/lavra-retro` | Weekly retrospective with shipping analytics, team performance, and knowledge synthesis | Weekly, review what shipped and surface deferred decisions |
 
-### Planning & Triage (5)
+### Planning & Triage (2)
 
 | Command | Description | When to Use |
 |---------|-------------|-------------|
-| `/lavra-research` | Gather evidence and best practices for a plan using domain-matched research agents | For complex features. Gathers best practices and prior art. Included in `/lavra-design` |
-| `/lavra-ceo-review` | CEO/founder-mode plan review, challenge premises, validate business fit, run 10-section structured review | Before committing to a feature, validate scope and business fit. Included in `/lavra-design` |
-| `/lavra-eng-review` | Engineering review, parallel agents check architecture, simplicity, security, and performance | Before implementation, catch design issues early. Included in `/lavra-design` |
 | `/lavra-triage` | Triage and categorize beads for prioritization | After planning or review, organize the work queue |
 | `/lavra-import` | Import a markdown plan into beads as an epic with child tasks | When you have an external plan to convert into beads |
 
@@ -82,9 +76,9 @@ Domain-specific commands in `commands/optional/`. Not installed by default, copy
 
 `agent-native-reviewer`, `architecture-strategist`, `data-integrity-guardian`, `data-migration-expert`, `julik-frontend-races-reviewer`, `performance-oracle`, `spec-flow-analyzer`
 
-## Skills (17)
+## Skills (22)
 
-### Core (10): Installed by default
+### Core (15): Installed by default
 
 | Skill | Description |
 |-------|-------------|
@@ -94,7 +88,13 @@ Domain-specific commands in `commands/optional/`. Not installed by default, copy
 | `create-agent-skills` | Create new agents and skills |
 | `file-todos` | Find and manage TODO comments in code |
 | `git-worktree` | Manage git worktrees for parallel bead work |
+| `lavra-brainstorm` | Collaborative brainstorming with bead capture — invoked by `/lavra-design` |
+| `lavra-ceo-review` | CEO/founder-mode plan review for scope and business fit — invoked by `/lavra-design` |
+| `lavra-eng-review` | Engineering review for architecture, simplicity, security, performance — invoked by `/lavra-design` |
 | `lavra-knowledge` | Document solved problems as knowledge entries |
+| `lavra-plan` | Transform feature descriptions into well-structured beads with parallel research — invoked by `/lavra-design` |
+| `lavra-research` | Gather evidence with domain-matched agents — invoked by `/lavra-design` |
+| `lavra-review` | Multi-agent code review — invoked by `/lavra-work` |
 | `lavra-work-single` | Single-bead implementation path (Phases 1-5) — invoked by `/lavra-work` router |
 | `lavra-work-multi` | Multi-bead orchestration path (Phases M1-M10) — invoked by `/lavra-work` router |
 

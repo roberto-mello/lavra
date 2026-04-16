@@ -165,13 +165,13 @@ jobs:
           AGENTS=$(find plugins/lavra/agents -name "*.md" | wc -l)
           SKILLS=$(find plugins/lavra/skills -name "SKILL.md" | wc -l)
 
-          echo "Commands: $COMMANDS (expected 23+)"
+          echo "Commands: $COMMANDS (expected 18+)"
           echo "Agents: $AGENTS (expected 30+)"
-          echo "Skills: $SKILLS (expected 15+)"
+          echo "Skills: $SKILLS (expected 21+)"
 
-          [[ "$COMMANDS" -ge 23 ]] || exit 1
+          [[ "$COMMANDS" -ge 18 ]] || exit 1
           [[ "$AGENTS" -ge 30 ]] || exit 1
-          [[ "$SKILLS" -ge 15 ]] || exit 1
+          [[ "$SKILLS" -ge 21 ]] || exit 1
 
           echo "PASS Component counts verified"
 

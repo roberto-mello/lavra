@@ -1,6 +1,6 @@
 ---
 name: lavra-ceo-review
-description: CEO/founder-mode plan review -- challenge premises, validate business fit, run 10-section structured review
+description: "CEO/founder-mode plan review -- challenge premises, validate business fit, run 10-section structured review"
 argument-hint: "[epic bead ID]"
 ---
 
@@ -386,7 +386,7 @@ After presenting the completion summary, use the **AskUserQuestion tool**:
 **Question:** "CEO review complete for `{EPIC_ID}`. What would you like to do next?"
 
 **Options:**
-1. **Proceed to engineering review** -- Run `/lavra-eng-review {EPIC_ID}` for technical depth (architecture, security, performance, simplicity)
+1. **Proceed to engineering review** -- invoke Skill("lavra-eng-review") with the epic bead ID for technical depth (architecture, security, performance, simplicity)
 2. **Revise the plan first** -- Update child beads based on review findings before deeper review
 3. **Stop here** -- CEO review findings are sufficient to proceed to implementation
 </handoff>

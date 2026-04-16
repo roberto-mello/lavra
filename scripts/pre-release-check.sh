@@ -79,13 +79,13 @@ OPTIONAL_COMMANDS=$(find plugins/lavra/commands/optional -name "*.md" 2>/dev/nul
 AGENTS=$(find plugins/lavra/agents -name "*.md" | wc -l | tr -d ' ')
 SKILLS=$(find plugins/lavra/skills -name "SKILL.md" | wc -l | tr -d ' ')
 
-echo "  Commands: $COMMANDS (need 24+) + $OPTIONAL_COMMANDS optional"
+echo "  Commands: $COMMANDS (need 18+) + $OPTIONAL_COMMANDS optional"
 echo "  Agents:   $AGENTS (need 30+)"
-echo "  Skills:   $SKILLS (need 14+)"
+echo "  Skills:   $SKILLS (need 21+)"
 
-[[ "$COMMANDS" -ge 24 ]] && { echo "  PASS  Commands"; ((PASS++)) || true; } || fail "Commands" "$COMMANDS < 24"
+[[ "$COMMANDS" -ge 18 ]] && { echo "  PASS  Commands"; ((PASS++)) || true; } || fail "Commands" "$COMMANDS < 18"
 [[ "$AGENTS"   -ge 30 ]] && { echo "  PASS  Agents";   ((PASS++)) || true; } || fail "Agents"   "$AGENTS < 30"
-[[ "$SKILLS"   -ge 14 ]] && { echo "  PASS  Skills";   ((PASS++)) || true; } || fail "Skills"   "$SKILLS < 14"
+[[ "$SKILLS"   -ge 21 ]] && { echo "  PASS  Skills";   ((PASS++)) || true; } || fail "Skills"   "$SKILLS < 21"
 
 echo ""
 echo "=== Source files ==="

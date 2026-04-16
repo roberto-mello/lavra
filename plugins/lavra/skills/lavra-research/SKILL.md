@@ -1,6 +1,6 @@
 ---
 name: lavra-research
-description: Gather evidence and best practices for a plan using domain-matched research agents
+description: "Gather evidence and best practices for a plan using domain-matched research agents"
 argument-hint: "[epic bead ID]"
 ---
 
@@ -264,8 +264,8 @@ After logging all findings, use the **AskUserQuestion tool** to present these op
 4. **View findings** - Show all research findings organized by child bead
 
 Based on selection:
-- **`/lavra-design`** -> Call the /lavra-design command with the epic bead ID
-- **`/lavra-eng-review`** -> Call the /lavra-eng-review command with the epic bead ID
+- **`/lavra-design`** -> invoke Skill("lavra-design") with the epic bead ID
+- **`/lavra-eng-review`** -> invoke Skill("lavra-eng-review") with the epic bead ID
 - **Research deeper** -> Ask which sections need more research, add targeted agents
 - **View findings** -> Show findings grouped by child bead with agent attribution
 </handoff>

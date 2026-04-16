@@ -1,6 +1,6 @@
 ---
 name: lavra-plan
-description: Transform feature descriptions into well-structured beads with parallel research and multi-phase planning
+description: "Transform feature descriptions into well-structured beads with parallel research and multi-phase planning"
 argument-hint: "[bead ID or feature description]"
 ---
 
@@ -525,10 +525,10 @@ After creating the epic and child beads, use **AskUserQuestion tool**:
 5. **Simplify** - Reduce detail level
 
 Based on selection:
-- **`/lavra-research`** -> Call /lavra-research with the epic bead ID
-- **`/lavra-eng-review`** -> Call /lavra-eng-review with the epic bead ID
-- **`/lavra-work`** -> Call /lavra-work with the first ready child bead ID
-- **`/lavra-work {EPIC_ID}`** -> Call /lavra-work with the epic bead ID
+- **`/lavra-research`** -> invoke Skill("lavra-research") with the epic bead ID
+- **`/lavra-eng-review`** -> invoke Skill("lavra-eng-review") with the epic bead ID
+- **`/lavra-work`** -> invoke Skill("lavra-work") with the first ready child bead ID
+- **`/lavra-work {EPIC_ID}`** -> invoke Skill("lavra-work") with the epic bead ID
 - **Simplify** -> Ask "What should I simplify?" then regenerate simpler descriptions
 - **Other** (automatically provided) -> Accept free text for rework or specific changes
 
