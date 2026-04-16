@@ -43,11 +43,8 @@ Use the AskUserQuestion tool to collect the following information:
 
 Automatically gather:
 ```bash
-# Get plugin version
-cat ~/.claude/plugins/installed_plugins.json 2>/dev/null | grep -A5 "lavra" | head -10 || echo "Plugin info not found"
-
-# Get Claude Code version
-claude --version 2>/dev/null || echo "Claude CLI version unknown"
+# Get Lavra version from plugin manifest (works on all platforms)
+python3 -c "import json,glob; f=glob.glob('.claude/plugins/lavra/.claude-plugin/plugin.json') + glob.glob('.opencode/plugins/lavra/.claude-plugin/plugin.json'); print(json.load(open(f[0]))['version'] if f else 'unknown')" 2>/dev/null || echo "unknown"
 
 # Get OS info
 uname -a
@@ -65,9 +62,9 @@ Create a well-structured bug report with:
 
 ## Environment
 
-- **Plugin Version:** [from installed_plugins.json]
-- **Claude Code Version:** [from claude --version]
+- **Lavra Version:** [from plugin.json]
 - **OS:** [from uname]
+- **AI Platform:** [Claude Code / OpenCode / Gemini CLI / Cortex / other]
 
 ## What Happened
 
