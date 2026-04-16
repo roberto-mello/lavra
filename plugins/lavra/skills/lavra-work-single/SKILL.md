@@ -1,6 +1,6 @@
 ---
 name: lavra-work-single
-description: Single-bead implementation path for lavra-work — Phases 1-5: quick start, implement, review, learn, ship. Invoked by lavra-work router. Use when working on exactly one bead.
+description: Single-bead implementation path for lavra-work, phases 1-5. Invoked by lavra-work router. Use when working on exactly one bead.
 ---
 
 ## SINGLE-BEAD PATH

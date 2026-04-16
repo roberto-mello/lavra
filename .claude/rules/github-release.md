@@ -10,13 +10,14 @@ git pull --rebase
 
 ## 2. Verify versions are set correctly
 
-These five locations must all have the target version:
+These six locations must all have the target version:
 
 - `package.json` — npm package version (required for `bunx lavra@latest`)
 - `plugins/lavra/.claude-plugin/plugin.json`
 - `.claude-plugin/marketplace.json` — must match `plugin.json` exactly
 - `LAVRA_VERSION` constant in `plugins/lavra/hooks/auto-recall.sh`
 - Version string in `plugins/lavra/hooks/provision-memory.sh` (the `echo "X.Y.Z"` line)
+- Release notes link in `README.md` line 16 — update both version number and URL slug (e.g. `v0.7.4 Release Notes` → `https://lavra.dev/docs/releases/v0.7.4`)
 
 Also verify that `site/public/command-map.html` reflects current nodes/connections (new commands, agents, or skills should have nodes; updated handoff flows should have edges). To spot missing nodes:
 
