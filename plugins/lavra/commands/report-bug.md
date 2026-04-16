@@ -43,8 +43,8 @@ Use the AskUserQuestion tool to collect the following information:
 
 Automatically gather:
 ```bash
-# Get Lavra version from plugin manifest (works on all platforms)
-python3 -c "import json,glob; f=glob.glob('.claude/plugins/lavra/.claude-plugin/plugin.json') + glob.glob('.opencode/plugins/lavra/.claude-plugin/plugin.json'); print(json.load(open(f[0]))['version'] if f else 'unknown')" 2>/dev/null || echo "unknown"
+# Get Lavra version (works on all platforms)
+cat .lavra/.lavra-version 2>/dev/null || echo "unknown"
 
 # Get OS info
 uname -a
