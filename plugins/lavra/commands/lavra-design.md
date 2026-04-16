@@ -45,7 +45,12 @@ The current year is 2026.
 **Skill existence validation (run at startup before Phase 1):**
 
 ```bash
-ls .claude/skills/ 2>/dev/null
+# Check known skill locations across platforms
+# Claude Code: .claude/skills/  OpenCode: .opencode/skills/
+# Gemini CLI: skills/  Cortex: .cortex/skills/ or skills/
+for dir in .claude/skills .opencode/skills .cortex/skills skills; do
+  [ -d "$dir" ] && ls "$dir" 2>/dev/null && break
+done
 ```
 
 Check that these skill directories exist: `lavra-brainstorm`, `lavra-plan`, `lavra-research`, `lavra-ceo-review`, `lavra-eng-review`. If any are missing, report which ones are absent and stop with: "Required skills not found: {missing list}. Run the Lavra installer to set up skills."
