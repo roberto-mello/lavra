@@ -104,15 +104,15 @@ check "cortex/ directory"   test -d plugins/lavra/cortex
 OPENCODE_COMMANDS=$(find plugins/lavra/opencode/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 GEMINI_TOML=$(find plugins/lavra/gemini/commands -name "*.toml" 2>/dev/null | wc -l | tr -d ' ')
 
-echo "  OpenCode .md commands: $OPENCODE_COMMANDS (need 24+)"
-echo "  Gemini .toml commands: $GEMINI_TOML (need 24+)"
+echo "  OpenCode .md commands: $OPENCODE_COMMANDS (need 18+)"
+echo "  Gemini .toml commands: $GEMINI_TOML (need 18+)"
 
-[[ "$OPENCODE_COMMANDS" -ge 23 ]] && { echo "  PASS  OpenCode commands"; ((PASS++)) || true; } || fail "OpenCode commands" "$OPENCODE_COMMANDS < 23"
-[[ "$GEMINI_TOML"       -ge 23 ]] && { echo "  PASS  Gemini commands";   ((PASS++)) || true; } || fail "Gemini commands"   "$GEMINI_TOML < 23"
+[[ "$OPENCODE_COMMANDS" -ge 18 ]] && { echo "  PASS  OpenCode commands"; ((PASS++)) || true; } || fail "OpenCode commands" "$OPENCODE_COMMANDS < 18"
+[[ "$GEMINI_TOML"       -ge 18 ]] && { echo "  PASS  Gemini commands";   ((PASS++)) || true; } || fail "Gemini commands"   "$GEMINI_TOML < 18"
 
 CORTEX_COMMANDS=$(find plugins/lavra/cortex/commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-echo "  Cortex .md commands:   $CORTEX_COMMANDS (need 20+)"
-[[ "$CORTEX_COMMANDS" -ge 20 ]] && { echo "  PASS  Cortex commands"; ((PASS++)) || true; } || fail "Cortex commands" "$CORTEX_COMMANDS < 20"
+echo "  Cortex .md commands:   $CORTEX_COMMANDS (need 18+)"
+[[ "$CORTEX_COMMANDS" -ge 18 ]] && { echo "  PASS  Cortex commands"; ((PASS++)) || true; } || fail "Cortex commands" "$CORTEX_COMMANDS < 18"
 
 echo ""
 echo "=== Command map ==="

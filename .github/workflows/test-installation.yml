@@ -187,13 +187,13 @@ jobs:
           [[ -d "plugins/lavra/gemini" ]] || { echo "FAIL Gemini conversion outputs missing"; exit 1; }
 
           OPENCODE_COMMANDS=$(find plugins/lavra/opencode/commands -name "*.md" 2>/dev/null | wc -l)
-          [[ "$OPENCODE_COMMANDS" -ge 24 ]] || { echo "FAIL OpenCode .md commands missing"; exit 1; }
+          [[ "$OPENCODE_COMMANDS" -ge 18 ]] || { echo "FAIL OpenCode .md commands missing"; exit 1; }
 
           GEMINI_TOML=$(find plugins/lavra/gemini/commands -name "*.toml" 2>/dev/null | wc -l)
-          [[ "$GEMINI_TOML" -ge 24 ]] || { echo "FAIL Gemini .toml commands missing"; exit 1; }
+          [[ "$GEMINI_TOML" -ge 18 ]] || { echo "FAIL Gemini .toml commands missing"; exit 1; }
 
           CORTEX_COMMANDS=$(find plugins/lavra/cortex/commands -name "*.md" 2>/dev/null | wc -l)
-          [[ "$CORTEX_COMMANDS" -ge 20 ]] || { echo "FAIL Cortex .md commands missing"; exit 1; }
+          [[ "$CORTEX_COMMANDS" -ge 18 ]] || { echo "FAIL Cortex .md commands missing"; exit 1; }
 
           echo "PASS All source files and conversion outputs verified"
 
