@@ -47,8 +47,8 @@ The current year is 2026.
 ```bash
 # Check known skill locations across platforms
 # Claude Code: .claude/skills/  OpenCode: .opencode/skills/
-# Gemini CLI: skills/  Cortex: .cortex/skills/ or skills/
-for dir in .claude/skills .opencode/skills .cortex/skills skills; do
+# Gemini CLI: skills/  Cortex project: .cortex/skills/  Cortex global: ~/.snowflake/cortex/skills/
+for dir in .claude/skills .opencode/skills .cortex/skills skills "$HOME/.snowflake/cortex/skills"; do
   [ -d "$dir" ] && ls "$dir" 2>/dev/null && break
 done
 ```
