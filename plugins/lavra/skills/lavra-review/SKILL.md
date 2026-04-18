@@ -81,7 +81,7 @@ If a review agent flags any file in `.lavra/memory/` or `.lavra/config/` for cle
 From `project-setup.md`, parse YAML frontmatter for one field:
 - `review_agents`: agent names to dispatch (replaces the default list below)
 
-From `lavra.json`, parse `model_profile` (default: `"balanced"`).
+From `lavra.json`, parse `model_profile` (default: `"balanced"`) and `testing_scope` (default: `"full"`).
 
 **Model override rule:** When `model_profile` is `"quality"`, dispatch these critical agents with `model: opus`:
 - `security-sentinel`
@@ -278,11 +278,31 @@ bd create "{finding title}" \
 ## Validation Criteria
 - [ ] {Test that must pass}
 - [ ] {Behavior to verify}
+{TEST_COVERAGE_CRITERIA}
 
 ## Testing Steps
 1. {How to reproduce/test}
 2. {Expected outcome}"
 ```
+
+**Test coverage criteria injection (`{TEST_COVERAGE_CRITERIA}`):**
+
+Read `testing_scope` from `lavra.json` before creating beads.
+
+- **P1 findings** (always, regardless of `testing_scope`): append to Validation Criteria:
+  ```
+  - [ ] Test added covering this scenario according to project test standards
+  - [ ] Test fails before the fix, passes after
+  ```
+
+- **P2 findings** (only when `testing_scope` is `"full"`): append to Validation Criteria:
+  ```
+  - [ ] Test added covering this scenario according to project test standards
+  ```
+
+- **P3 findings** and P2 when `testing_scope` is `"targeted"`: no test criteria appended.
+
+When `testing_scope` is absent or unreadable, treat as `"full"`.
 
 **Priority mapping:**
 - P1 CRITICAL -> priority 1 (blocks closing original bead)
