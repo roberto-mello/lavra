@@ -32,8 +32,9 @@ bd comments add $BEAD_ID \"DECISION: [important choice you made and why]\"
 bd comments add $BEAD_ID \"FACT: [constraint, gotcha, or important detail]\"
 bd comments add $BEAD_ID \"PATTERN: [coding pattern or convention you followed]\"
 bd comments add $BEAD_ID \"INVESTIGATION: [root cause or how something works]\"
+bd comments add $BEAD_ID \"SKIP: [reason no new knowledge was gained]\"
 
-After logging at least one insight, you may complete."
+Use SKIP only here, only when the work produced no new insight (e.g. already documented, no-op change). Do not use SKIP in any other context. After logging at least one entry, you may complete."
 }
 EOF
     exit 0

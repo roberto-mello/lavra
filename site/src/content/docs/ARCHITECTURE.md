@@ -109,7 +109,7 @@ This plugin is a fork of [compound-engineering-plugin](https://github.com/EveryI
 
 - Replaced markdown-based knowledge storage with beads-based persistent memory (`.lavra/memory/knowledge.jsonl`)
 - SQLite FTS5 full-text search with BM25 ranking for knowledge recall, improving precision by 18%, recall by 17%, and MRR by 24% over grep-based search across 25 benchmark queries
-- Automatic knowledge capture from `bd comments add` with typed prefixes (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION/DEVIATION), dual-writing to SQLite (for fast searching with fuzzy matching) and JSONL (for committing to git)
+- Automatic knowledge capture from `bd comments add` with typed prefixes (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION/DEVIATION/SKIP), dual-writing to SQLite (for fast searching with fuzzy matching) and JSONL (for committing to git)
 - Automatic knowledge recall at session start based on open beads and git branch context
 - Subagent knowledge enforcement via `SubagentStop` hook
 - All workflows create and update beads instead of markdown files

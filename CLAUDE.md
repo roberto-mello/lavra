@@ -12,7 +12,7 @@ The plugin provides:
 - Skills (core + optional: git-worktree, brainstorming, create-agent-skills, agent-browser, dhh-rails-style, etc.)
 - 4 hooks (auto-recall, memory-capture, subagent-wrapup, teammate-idle-check)
 - 1 MCP server (Context7 for framework documentation)
-- Automatic knowledge capture from beads comments (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION/DEVIATION)
+- Automatic knowledge capture from beads comments (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION/DEVIATION/SKIP)
 - Automatic knowledge recall at session start based on current beads
 - Workflow configuration via `.lavra/config/lavra.json` (toggle research, review, goal verification, parallelism)
 

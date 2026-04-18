@@ -105,4 +105,4 @@ Task(subagent_type="general-purpose",
 The `subagent-wrapup.sh` hook will:
 1. Extract BEAD_ID from the subagent transcript
 2. Block completion until subagent logs knowledge
-3. Prompt with the six knowledge prefixes (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION/DEVIATION)
+3. Prompt with the seven knowledge prefixes (LEARNED/DECISION/FACT/PATTERN/INVESTIGATION/DEVIATION/SKIP)

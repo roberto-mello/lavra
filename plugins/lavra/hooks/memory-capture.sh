@@ -16,7 +16,10 @@ COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 [[ -z "$COMMAND" ]] && exit 0
 
 echo "$COMMAND" | grep -qE 'bd\s+comments?\s+add\s+' || exit 0
-echo "$COMMAND" | grep -qE '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:)' || exit 0
+echo "$COMMAND" | grep -qE '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:|SKIP:)' || exit 0
+
+# SKIP is a valid gate-satisfier but produces no knowledge entry
+echo "$COMMAND" | grep -qE 'SKIP:' && exit 0
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck source=sanitize-content.sh

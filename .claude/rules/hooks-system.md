@@ -44,7 +44,7 @@ Knowledge stored in `.lavra/memory/knowledge.jsonl`:
 
 The `memory-capture.sh` hook detects:
 ```bash
-bd comment add {BEAD_ID} "LEARNED|DECISION|FACT|PATTERN|INVESTIGATION|DEVIATION: ..."
+bd comment add {BEAD_ID} "LEARNED|DECISION|FACT|PATTERN|INVESTIGATION|DEVIATION|SKIP: ..."
 ```
 Regex matches both `bd comment add` (singular) and `bd comments add` (plural).
 
@@ -55,6 +55,7 @@ Knowledge types:
 - `PATTERN:` - Recurring convention or idiom
 - `INVESTIGATION:` - Root cause analysis
 - `DEVIATION:` - Auto-fix applied outside bead scope (from deviation rules)
+- `SKIP:` - Explicit opt-out when no new knowledge was gained (satisfies the gate, nothing stored). Only valid inside the `subagent-wrapup.sh` prompt — do not use in other contexts.
 
 ## Auto-Recall Strategy
 
