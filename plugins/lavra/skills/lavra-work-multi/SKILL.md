@@ -348,10 +348,12 @@ After each wave completes:
 
   When no bead meets those conditions, skip `/lavra-review` for this wave -- agent self-reviews in step 6 of agent prompt are the gate.
 
-**Pass epic plan context to reviewer** by prepending to `lavra-review` invocation arguments:
+**Pass `PRE_WAVE_SHA` and epic plan context to reviewer.** `PRE_WAVE_SHA` was recorded at the start of Phase M7 — pass it here so `lavra-review` can compute the exact diff introduced by this wave:
 
 ```
 Skill("lavra-review", "{bead IDs for this wave}
+
+PRE_WORK_SHA={PRE_WAVE_SHA}
 
 ## Epic Plan (read-only — reviewers must not flag planned-but-incomplete items as dead code)
 {EPIC_PLAN}
@@ -359,7 +361,7 @@ Skill("lavra-review", "{bead IDs for this wave}
 Locked Decisions in the epic above are intentional, even if a field or behavior appears unused or partially wired in this wave. Do not create beads recommending removal of items that appear in Locked Decisions. If {EPIC_PLAN} is empty, no epic-level decisions apply.")
 ```
 
-If `{EPIC_PLAN}` is empty, invoke `/lavra-review` normally without epic plan block.
+If `{EPIC_PLAN}` is empty, include only the `PRE_WORK_SHA` line and omit the epic plan block.
 
 Wait for `/lavra-review` to complete before proceeding to step 3.
 </mandatory>
