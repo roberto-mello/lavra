@@ -16,7 +16,7 @@ COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 [[ -z "$COMMAND" ]] && exit 0
 
 echo "$COMMAND" | grep -qE 'bd\s+comments?\s+add\s+' || exit 0
-echo "$COMMAND" | grep -qE '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:|SKIP:)' || exit 0
+echo "$COMMAND" | grep -qE '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:|SKIP:|MUST-CHECK:)' || exit 0
 
 # SKIP is a valid gate-satisfier but produces no knowledge entry
 echo "$COMMAND" | grep -qE 'SKIP:' && exit 0
@@ -43,7 +43,7 @@ fi
 #      concatenating all comment bodies into one blob with embedded shell operators.
 MATCH_LINE=$(echo "$COMMAND" \
   | grep -E 'bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+' \
-  | grep -m1 -E '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:)')
+  | grep -m1 -E '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:|MUST-CHECK:)')
 [[ -z "$MATCH_LINE" ]] && exit 0
 
 # Extract BEAD_ID from that line only
@@ -65,10 +65,16 @@ COMMENT_BODY=$(echo "$MATCH_LINE" \
 TYPE=""
 CONTENT=""
 
-for PREFIX in INVESTIGATION LEARNED DECISION FACT PATTERN DEVIATION; do
-  if echo "$COMMENT_BODY" | grep -q "${PREFIX}:"; then
-    TYPE=$(echo "$PREFIX" | tr '[:upper:]' '[:lower:]')
-    CONTENT=$(echo "$COMMENT_BODY" | sed "s/.*${PREFIX}:[[:space:]]*//" | sanitize_untrusted_content | head -c 2048)
+for PREFIX in INVESTIGATION LEARNED DECISION FACT PATTERN DEVIATION MUST_CHECK; do
+  # MUST_CHECK uses hyphen in the comment prefix but underscore as bash variable name
+  COMMENT_PREFIX="${PREFIX//_/-}"
+  if echo "$COMMENT_BODY" | grep -q "${COMMENT_PREFIX}:"; then
+    if [[ "$PREFIX" == "MUST_CHECK" ]]; then
+      TYPE="must-check"
+    else
+      TYPE=$(echo "$PREFIX" | tr '[:upper:]' '[:lower:]')
+    fi
+    CONTENT=$(echo "$COMMENT_BODY" | sed "s/.*${COMMENT_PREFIX}:[[:space:]]*//" | sanitize_untrusted_content | head -c 2048)
     break
   fi
 done
@@ -90,7 +96,7 @@ fi
 # Build tags
 TAGS_ARRAY=("$TYPE")
 
-for tag in swift swiftui appkit menubar api security test database \
+for tag in swift swiftui appkit menubar api security test database must-check \
            networking ui layout performance crash bug fix workaround \
            gotcha pattern convention architecture auth middleware \
            async concurrency model protocol adapter scanner engine \

@@ -193,6 +193,24 @@ ${RECALL_RESULTS}
 
 Store wrapped value as `{RECALL_RESULTS}` for use in agent prompt template.
 
+**Extract MUST-CHECK entries from recall results.** After building `{RECALL_RESULTS}`, extract any must-check entries from the raw recall output and build a `MUST_CHECK_SECTION` variable:
+
+```bash
+MUST_CHECK_ENTRIES=$(echo "$RAW_RECALL" | grep "^\[MUST-CHECK\]" | sed 's/^\[MUST-CHECK\] //')
+if [ -n "$MUST_CHECK_ENTRIES" ]; then
+  MUST_CHECK_SECTION="## Pre-Implementation Checklist
+
+The following checks MUST be verified before marking any task complete. These are structural failure patterns that have appeared before — verify each one:
+
+$(echo "$MUST_CHECK_ENTRIES" | sed 's/^/- [ ] /')
+"
+else
+  MUST_CHECK_SECTION=""
+fi
+```
+
+Store as `{MUST_CHECK_SECTION}` for use in agent prompt template. This section is injected OUTSIDE any untrusted-knowledge wrapper — it is the enforcement tier, not advisory context.
+
 **Pre-process bead context for agent prompts:**
 
 For each bead in wave, run:
@@ -307,6 +325,7 @@ ${RELATED_BEADS}
 | `{REVIEW_CONTEXT}` | From project config (or empty) |
 | `{AVAILABLE_SKILLS}` | From skill detection (or empty) |
 | `{RECALL_RESULTS}` | From Phase M6 recall |
+| `{MUST_CHECK_SECTION}` | From Phase M6 MUST-CHECK extraction (empty string if no entries) |
 
 Read agent prompt template:
 ```bash

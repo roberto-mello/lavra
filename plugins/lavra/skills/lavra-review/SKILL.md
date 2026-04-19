@@ -412,7 +412,7 @@ Ensures the original bead cannot close until critical introduced-code issues are
 
 #### Step 5: Mandatory Knowledge Capture *(required gate -- do not skip)*
 
-Every P1/P2 finding **must** have at least one LEARNED or PATTERN entry before the summary. Captures root cause for future `/lavra-design` and `/lavra-work` auto-recall.
+Every P1/P2 finding **must** have at least one LEARNED, PATTERN, or MUST-CHECK entry before the summary. Captures root cause for future `/lavra-design` and `/lavra-work` auto-recall.
 
 For each P1/P2 finding:
 
@@ -427,7 +427,24 @@ bd comments add {BEAD_ID} "PATTERN: [anti-pattern name] -- [where it appeared an
 - `"PATTERN: N+1 query in OrdersController#index -- .includes(:line_items) was missing from the scope"`
 - `"LEARNED: migration 20240301 swaps source/target column IDs -- production data uses the reverse mapping"`
 
-**Gate check:** Run `bd show {BEAD_ID}` and verify LEARNED/PATTERN count >= P1 + P2 count. If not, add missing entries. **Do not proceed to summary until gate passes.**
+**After logging LEARNED:, evaluate each P1 finding for structural escalation.** Log a `MUST-CHECK:` entry when the finding meets any of these criteria:
+- Same mistake appeared 2+ times (check prior waves or bead comments)
+- Violation is silent — no test failure until production
+- Security or isolation property that is not obvious from local code review
+
+When any criterion applies, add a concise verification instruction (what to check before shipping, not just what went wrong):
+
+```bash
+bd comments add {BEAD_ID} "MUST-CHECK: {concise verification instruction — what to verify before shipping}"
+```
+
+**Example pair:**
+```
+LEARNED: RLS context is cleared by db.commit() in SQLAlchemy — SET LOCAL is transaction-scoped
+MUST-CHECK: After any db.commit() inside a loop that uses RLS, verify set_rls_context() is called again before the next DB operation
+```
+
+**Gate check:** Run `bd show {BEAD_ID}` and verify LEARNED/PATTERN/MUST-CHECK count >= P1 + P2 count. If not, add missing entries. **Do not proceed to summary until gate passes.**
 
 P3 findings may also have knowledge entries but are not required.
 

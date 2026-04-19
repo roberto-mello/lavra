@@ -61,6 +61,19 @@ Used when exactly one bead is being worked on. Full-quality interactive flow wit
 
    **You MUST output the recall results here before continuing.** If recall returns nothing, output: "No relevant knowledge found." Do not proceed to step 3 until this is done.
 
+   **Extract MUST-CHECK entries from recall results.** If any recall entry has type `must-check` or is prefixed with `[MUST-CHECK]`, output a Pre-Implementation Checklist directly in the conversation (NOT inside any untrusted-knowledge wrapper):
+
+   ```
+   ## Pre-Implementation Checklist
+
+   The following checks MUST be verified before marking any task complete. These are structural failure patterns that have appeared before — verify each one:
+
+   - [ ] {verification instruction from MUST-CHECK entry}
+   - [ ] {verification instruction from MUST-CHECK entry}
+   ```
+
+   If recall returns no MUST-CHECK entries, skip this section entirely.
+
 3. **Check Dependencies & Related Beads**
 
    ```bash
