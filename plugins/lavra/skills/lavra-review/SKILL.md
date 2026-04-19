@@ -92,19 +92,33 @@ All other agents run at their default tier regardless of profile.
 
 > **Note:** `reviewer_context_note` is intentionally **not** injected into review agents. Review agents derive project context from the code itself. Context note injection is only done in `/lavra-work` multi-bead path (pre-work conventions for implementors) where the value is clearer and the injection surface is smaller.
 
-**Agent allowlist validation** (when `review_agents` is present):
+**Agent discovery:**
 
-Derive allowlist from installed agent directories:
+Discover all installed agents by scanning platform-appropriate directories, project-local first:
+
 ```bash
-{ find .claude/agents ~/.claude/agents -name "*.md" 2>/dev/null; } | xargs -I{} basename {} .md | sort -u
+DISCOVERED_AGENTS=$(
+  {
+    # Project-local (all platforms)
+    find .claude/agents .opencode/agents .cortex/agents hooks/agents -name "*.md" 2>/dev/null
+    # Global / user-level
+    find ~/.claude/agents ~/.config/opencode/agents ~/.cortex/agents -name "*.md" 2>/dev/null
+    # Plugin source (fallback if nothing else found)
+    find plugins/lavra/agents -name "*.md" 2>/dev/null
+  } | xargs -I{} basename {} .md 2>/dev/null | grep -E '^[a-z][a-z0-9-]+$' | sort -u
+)
 ```
-Fall back to `plugins/lavra/agents/` if neither `.claude/agents/` nor `~/.claude/agents/` yields results.
 
-- Reject names not matching `^[a-z][a-z0-9-]*$` or not in the derived allowlist
+This is the **dispatch set** when `review_agents` is absent. Project-local agents (including custom ones like `rust-reviewer`) are included automatically.
+
+**When `review_agents` is set in `project-setup.md`** (explicit override):
+
+Validate each name against `DISCOVERED_AGENTS`:
+- Reject names not matching `^[a-z][a-z0-9-]*$` or not in `DISCOVERED_AGENTS`
 - Silently skip invalid names
-- If all entries are invalid, fall back to dispatching all agents
+- If all entries are invalid, fall back to `DISCOVERED_AGENTS`
 
-**Config-missing behavior:** If `.lavra/config/project-setup.md` absent, dispatch ALL agents below.
+**Config-missing behavior:** If `.lavra/config/project-setup.md` absent, dispatch all `DISCOVERED_AGENTS`.
 
 #### 3b. Read Epic Plan (if provided)
 
@@ -144,7 +158,7 @@ Store `INTRODUCED_DIFF` and `DIFF_SCOPE_LABEL` for use in agent dispatch and the
 
 #### 3c. Dispatch Agents in Parallel
 
-Dispatch the validated agent list (from config) or ALL agents below. Pass `{INTRODUCED_DIFF}` as the primary review input — not the full file contents. Also pass the list of changed files:
+Dispatch the agent list — `review_agents` from config if set and valid, otherwise `DISCOVERED_AGENTS` from Step 3a. Pass `{INTRODUCED_DIFF}` as the primary review input — not full file contents. Also pass the list of changed files:
 
 ```bash
 CHANGED_FILES=$(git diff "${PRE_WORK_SHA}"..HEAD --name-only 2>/dev/null || git diff "origin/${DEFAULT_BRANCH}"...HEAD --name-only)
@@ -156,18 +170,9 @@ Include this instruction in each agent prompt:
 
 Pass `{CHANGED_FILES}` alongside `{INTRODUCED_DIFF}` so agents have a machine-checkable boundary.
 
-1. Task kieran-rails-reviewer(INTRODUCED_DIFF)
-2. Task dhh-rails-reviewer(INTRODUCED_DIFF)
-3. Task kieran-typescript-reviewer(INTRODUCED_DIFF)
-4. Task kieran-python-reviewer(INTRODUCED_DIFF)
-5. Task git-history-analyzer(INTRODUCED_DIFF)
-6. Task pattern-recognition-specialist(INTRODUCED_DIFF)
-7. Task architecture-strategist(INTRODUCED_DIFF) -- add `model: opus` if profile=quality
-8. Task security-sentinel(INTRODUCED_DIFF) -- add `model: opus` if profile=quality
-9. Task performance-oracle(INTRODUCED_DIFF) -- add `model: opus` if profile=quality
-10. Task data-integrity-guardian(INTRODUCED_DIFF)
-11. Task agent-native-reviewer(INTRODUCED_DIFF)
-12. Task julik-frontend-races-reviewer(INTRODUCED_DIFF)
+For each agent in the dispatch set:
+- Add `model: opus` if `model_profile` is `"quality"` AND agent name is one of: `security-sentinel`, `architecture-strategist`, `performance-oracle`
+- Dispatch all agents in parallel: `Task {agent-name}(INTRODUCED_DIFF)`
 
 #### Conditional Agents (run if applicable):
 
