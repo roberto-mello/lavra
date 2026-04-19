@@ -112,22 +112,42 @@ If arguments include an `## Epic Plan` block (injected by `/lavra-work`), extrac
 
 If no `## Epic Plan` block present, `{EPIC_LOCKED_DECISIONS}` is empty and discard filter is a no-op.
 
+#### 3b2. Compute Diff Scope
+
+If a `PRE_WORK_SHA` was passed in arguments (injected by `lavra-work-multi` Phase M8), compute the introduced diff:
+
+```bash
+PRE_WORK_SHA="{value from arguments}"
+INTRODUCED_DIFF=$(git diff ${PRE_WORK_SHA}..HEAD)
+```
+
+If `PRE_WORK_SHA` is not present in arguments, fall back to diffing against the branch base:
+
+```bash
+DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
+INTRODUCED_DIFF=$(git diff origin/${DEFAULT_BRANCH}...HEAD)
+```
+
+Store as `{INTRODUCED_DIFF}`. This is the primary review input passed to agents.
+
 #### 3c. Dispatch Agents in Parallel
 
-Dispatch the validated agent list (from config) or ALL agents below:
+Dispatch the validated agent list (from config) or ALL agents below. Pass `{INTRODUCED_DIFF}` as the primary review input — not the full file contents. Include this instruction in each agent prompt:
 
-1. Task kieran-rails-reviewer(PR content)
-2. Task dhh-rails-reviewer(PR content)
-3. Task kieran-typescript-reviewer(PR content)
-4. Task kieran-python-reviewer(PR content)
-5. Task git-history-analyzer(PR content)
-6. Task pattern-recognition-specialist(PR content)
-7. Task architecture-strategist(PR content) -- add `model: opus` if profile=quality
-8. Task security-sentinel(PR content) -- add `model: opus` if profile=quality
-9. Task performance-oracle(PR content) -- add `model: opus` if profile=quality
-10. Task data-integrity-guardian(PR content)
-11. Task agent-native-reviewer(PR content)
-12. Task julik-frontend-races-reviewer(PR content)
+> "Review only the code introduced in the diff below. If you identify an issue in surrounding code that was NOT changed in this diff, list it separately under `## Pre-existing Findings` — do not include it in your main findings list."
+
+1. Task kieran-rails-reviewer(INTRODUCED_DIFF)
+2. Task dhh-rails-reviewer(INTRODUCED_DIFF)
+3. Task kieran-typescript-reviewer(INTRODUCED_DIFF)
+4. Task kieran-python-reviewer(INTRODUCED_DIFF)
+5. Task git-history-analyzer(INTRODUCED_DIFF)
+6. Task pattern-recognition-specialist(INTRODUCED_DIFF)
+7. Task architecture-strategist(INTRODUCED_DIFF) -- add `model: opus` if profile=quality
+8. Task security-sentinel(INTRODUCED_DIFF) -- add `model: opus` if profile=quality
+9. Task performance-oracle(INTRODUCED_DIFF) -- add `model: opus` if profile=quality
+10. Task data-integrity-guardian(INTRODUCED_DIFF)
+11. Task agent-native-reviewer(INTRODUCED_DIFF)
+12. Task julik-frontend-races-reviewer(INTRODUCED_DIFF)
 
 #### Conditional Agents (run if applicable):
 
@@ -214,19 +234,26 @@ Run the Task code-simplicity-reviewer() to see if we can simplify the code.
 
 ### 6. Findings Synthesis and Bead Creation
 
-ALL findings MUST be stored as child beads. Create beads immediately after synthesis -- do NOT present for user approval first.
+All findings from agents MUST be stored as beads. The filing path depends on whether the finding is in introduced code or pre-existing code. Create beads immediately after synthesis -- do NOT present for user approval first.
 
 #### Step 1: Build Agent Finding Inventory
 
-Build a complete inventory of what each agent returned:
+Build a complete inventory of what each agent returned. For each finding, classify it as **introduced** (in the diff) or **pre-existing** (in surrounding code not changed by this bead):
 
 ```
-From kieran-rails-reviewer: [finding 1], [finding 2], ...
-From dhh-rails-reviewer: [finding 1], [finding 2], ...
-From security-sentinel: [finding 1], [finding 2], ...
-From performance-oracle: [finding 1], [finding 2], ...
+From kieran-rails-reviewer:
+  [INTRODUCED] [finding 1], [finding 2], ...
+  [PRE-EXISTING] [finding 3], ...
+From dhh-rails-reviewer:
+  [INTRODUCED] ...
+  [PRE-EXISTING] ...
+From security-sentinel:
+  [INTRODUCED] ...
+  [PRE-EXISTING] ...
 ... (one row per agent that ran)
 ```
+
+Agents report pre-existing findings under `## Pre-existing Findings` in their output. All other findings are treated as introduced.
 
 Source of truth for synthesis. Do not proceed to Step 2 until every agent's output is listed.
 
@@ -237,7 +264,7 @@ Consolidate all agent reports into a categorized list of findings.
 Remove duplicates, prioritize by severity and impact.
 </thinking>
 
-- [ ] Collect findings from the inventory
+- [ ] Collect findings from the inventory, preserving introduced/pre-existing classification
 - [ ] Discard findings recommending deletion/gitignore of files in `.lavra/memory/` or `.lavra/config/` (see Protected Artifacts)
 - [ ] If `{EPIC_LOCKED_DECISIONS}` non-empty: for each finding flagging a field, struct, behavior, or data flow as unused/dead/unnecessary -- check Locked Decisions. If present, discard with note: "Discarded: planned item per epic Locked Decisions (`{item name}`)."
 - [ ] Categorize by type: security, performance, architecture, quality, etc.
@@ -256,6 +283,10 @@ Before creating beads:
 **Do not proceed to bead creation until inventory fully accounted for.**
 
 #### Step 3: Create Beads for All Findings
+
+**Two filing paths depending on finding origin:**
+
+**Path A — Introduced code findings:** File as child beads of the reviewed bead. Blocking dependencies apply normally.
 
 ```bash
 bd create "{finding title}" \
@@ -285,6 +316,40 @@ bd create "{finding title}" \
 2. {Expected outcome}"
 ```
 
+**Path B — Pre-existing code findings:** File as standalone beads with no parent and no blocking dependency on the current bead. Tag with `pre-existing,review-sweep` so they surface in triage.
+
+```bash
+bd create "{finding title}" \
+  --type {bug|task|improvement} \
+  --priority {1-5} \
+  --tags "pre-existing,review-sweep,{category}" \
+  -d "## Issue
+{Detailed description}
+
+## Origin
+Pre-existing issue found during review of {BEAD_ID}. Not introduced by that bead. Does not block {BEAD_ID} from closing.
+
+## Severity
+{P1/P2/P3} - {Why this severity}
+
+## Location
+{file:line references}
+
+## Why This Matters
+{Impact and consequences}
+
+## Validation Criteria
+- [ ] {Test that must pass}
+- [ ] {Behavior to verify}
+{TEST_COVERAGE_CRITERIA}
+
+## Testing Steps
+1. {How to reproduce/test}
+2. {Expected outcome}"
+```
+
+**Pre-existing P1 findings still get filed** — they are not discarded. But they do NOT block closing the current bead. They enter the triage queue for prioritization in a future work session.
+
 **Test coverage criteria injection (`{TEST_COVERAGE_CRITERIA}`):**
 
 Read `testing_scope` from `lavra.json` before creating beads.
@@ -305,19 +370,23 @@ Read `testing_scope` from `lavra.json` before creating beads.
 When `testing_scope` is absent or unreadable, treat as `"full"`.
 
 **Priority mapping:**
-- P1 CRITICAL -> priority 1 (blocks closing original bead)
-- P2 IMPORTANT -> priority 2 (should fix before closing)
+- P1 CRITICAL -> priority 1
+  - Introduced: blocks closing original bead
+  - Pre-existing: filed standalone, does NOT block original bead
+- P2 IMPORTANT -> priority 2 (should fix before closing, introduced only)
 - P3 NICE-TO-HAVE -> priority 3-5 (can defer)
 
 #### Step 4: Link Critical Issues
 
-P1 findings: create blocking dependencies:
+P1 findings in **introduced code only**: create blocking dependencies:
 
 ```bash
 bd dep relate {FINDING_BEAD_ID} {ORIGINAL_BEAD_ID}
 ```
 
-Ensures the original bead cannot close until critical issues are resolved.
+Do NOT create blocking dependencies for pre-existing findings. The original bead can close once its introduced code is clean.
+
+Ensures the original bead cannot close until critical introduced-code issues are resolved.
 
 #### Step 5: Mandatory Knowledge Capture *(required gate -- do not skip)*
 
@@ -347,18 +416,23 @@ P3 findings may also have knowledge entries but are not required.
 
 **Review Target:** {BEAD_ID} - {title}
 **Branch:** {branch-name}
+**Diff scope:** {PRE_WORK_SHA}..HEAD (or branch base if no SHA provided)
 
 ### Findings Summary:
 
-- **Total Findings:** [X]
+**Introduced code (blocks {BEAD_ID} closure):**
 - **P1 CRITICAL:** [count] - BLOCKS CLOSURE
 - **P2 IMPORTANT:** [count] - Should Fix
 - **P3 NICE-TO-HAVE:** [count] - Enhancements
 
-### Created Beads:
+**Pre-existing code (filed for triage, does NOT block {BEAD_ID}):**
+- **P1 CRITICAL:** [count] - Filed standalone
+- **P2 IMPORTANT:** [count] - Filed standalone
+- **P3 NICE-TO-HAVE:** [count] - Filed standalone
+
+### Created Beads — Introduced Code:
 
 **P1 - Critical (BLOCKS CLOSURE):**
-- {BD-XXX}: {description}
 - {BD-XXX}: {description}
 
 **P2 - Important:**
@@ -367,17 +441,22 @@ P3 findings may also have knowledge entries but are not required.
 **P3 - Nice-to-Have:**
 - {BD-XXX}: {description}
 
+### Created Beads — Pre-existing (triage queue):
+
+- {BD-XXX}: {description} [P1]
+- {BD-XXX}: {description} [P2]
+
 ### Review Agents Used:
 - {list of agents}
 
 ### Next Steps:
 
-1. **Address P1 Findings**: CRITICAL - must be fixed before closing
+1. **Address P1 Findings in introduced code**: CRITICAL - must be fixed before closing
    - `/lavra-work {P1_BEAD_ID}` for each critical finding
-2. **Close bead** (if no P1/P2 findings): `bd close {BEAD_ID}`
+2. **Close bead** (if no P1/P2 introduced findings): `bd close {BEAD_ID}`
 3. **Resolve in parallel**: `/lavra-work {BEAD_ID}`
-4. **Triage remaining**: `/lavra-triage {BEAD_ID}`
-5. **View all findings**: `bd list --tags "review,{BEAD_ID}"`
+4. **Triage pre-existing findings**: `/lavra-triage` -- view with `bd list --tags "pre-existing,review-sweep"`
+5. **View introduced findings**: `bd list --tags "review,{BEAD_ID}"`
 ```
 
 ### 7. End-to-End Testing (Optional)
