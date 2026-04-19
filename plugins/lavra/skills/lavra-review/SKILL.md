@@ -114,27 +114,47 @@ If no `## Epic Plan` block present, `{EPIC_LOCKED_DECISIONS}` is empty and disca
 
 #### 3b2. Compute Diff Scope
 
-If a `PRE_WORK_SHA` was passed in arguments (injected by `lavra-work-multi` Phase M8), compute the introduced diff:
+If a `PRE_WORK_SHA` was passed in arguments (injected by `lavra-work-multi` Phase M8):
+
+1. Extract the raw value from the `PRE_WORK_SHA=...` line in arguments
+2. **Validate against SHA format before use:** reject if value does not match `^[0-9a-f]{7,40}$`. If invalid, treat as absent and use the fallback below.
+3. Compute introduced diff using the validated SHA:
 
 ```bash
-PRE_WORK_SHA="{value from arguments}"
-INTRODUCED_DIFF=$(git diff ${PRE_WORK_SHA}..HEAD)
+# Only after validation passes:
+INTRODUCED_DIFF=$(git diff "${PRE_WORK_SHA}"..HEAD)
+DIFF_SCOPE_LABEL="${PRE_WORK_SHA}..HEAD"
 ```
 
-If `PRE_WORK_SHA` is not present in arguments, fall back to diffing against the branch base:
+If `PRE_WORK_SHA` is absent or failed validation, fall back to diffing against the branch base:
 
 ```bash
 DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@' || echo "main")
-INTRODUCED_DIFF=$(git diff origin/${DEFAULT_BRANCH}...HEAD)
+INTRODUCED_DIFF=$(git diff "origin/${DEFAULT_BRANCH}"...HEAD)
+DIFF_SCOPE_LABEL="origin/${DEFAULT_BRANCH}...HEAD (branch base fallback)"
 ```
 
-Store as `{INTRODUCED_DIFF}`. This is the primary review input passed to agents.
+**Guard against empty diff:** If `INTRODUCED_DIFF` is empty after either path, surface a warning and prompt the user:
+
+> `[lavra-review] WARN: Computed diff is empty — SHA may not be in local history, repo may be shallow, or there are no committed changes. Proceed with full file review instead, or cancel?`
+
+Do not silently dispatch agents with empty `INTRODUCED_DIFF`.
+
+Store `INTRODUCED_DIFF` and `DIFF_SCOPE_LABEL` for use in agent dispatch and the summary report.
 
 #### 3c. Dispatch Agents in Parallel
 
-Dispatch the validated agent list (from config) or ALL agents below. Pass `{INTRODUCED_DIFF}` as the primary review input — not the full file contents. Include this instruction in each agent prompt:
+Dispatch the validated agent list (from config) or ALL agents below. Pass `{INTRODUCED_DIFF}` as the primary review input — not the full file contents. Also pass the list of changed files:
 
-> "Review only the code introduced in the diff below. If you identify an issue in surrounding code that was NOT changed in this diff, list it separately under `## Pre-existing Findings` — do not include it in your main findings list."
+```bash
+CHANGED_FILES=$(git diff "${PRE_WORK_SHA}"..HEAD --name-only 2>/dev/null || git diff "origin/${DEFAULT_BRANCH}"...HEAD --name-only)
+```
+
+Include this instruction in each agent prompt:
+
+> "Review only the code introduced in the diff below. A finding is **pre-existing** if the file it appears in is NOT in the changed files list. Context lines shown in the diff (unchanged lines starting with a space, not `+`) are NOT introduced — treat issues there as pre-existing. List pre-existing findings separately under `## Pre-existing Findings`. Do not include them in your main findings list."
+
+Pass `{CHANGED_FILES}` alongside `{INTRODUCED_DIFF}` so agents have a machine-checkable boundary.
 
 1. Task kieran-rails-reviewer(INTRODUCED_DIFF)
 2. Task dhh-rails-reviewer(INTRODUCED_DIFF)
@@ -155,9 +175,9 @@ Run ONLY when PR matches specific criteria. Check PR files list:
 
 **If PR contains migrations or schema changes (any ORM):**
 
-13. Task data-migration-expert(PR content) - Validates migration code correctness: ID mappings match production, checks for swapped values, verifies rollback safety, SQL verification
-14. Task deployment-verification-agent(PR content) - Creates Go/No-Go deployment checklist with SQL verification queries
-15. Task migration-drift-detector(PR content) - Detects schema/migration drift: verifies schema artifacts are in sync with migration history across Rails, Alembic, Prisma, Drizzle, and Knex
+13. Task data-migration-expert(INTRODUCED_DIFF) - Validates migration code correctness: ID mappings match production, checks for swapped values, verifies rollback safety, SQL verification
+14. Task deployment-verification-agent(INTRODUCED_DIFF) - Creates Go/No-Go deployment checklist with SQL verification queries
+15. Task migration-drift-detector(INTRODUCED_DIFF) - Detects schema/migration drift: verifies schema artifacts are in sync with migration history across Rails, Alembic, Prisma, Drizzle, and Knex
 
 **When to run migration agents:**
 - PR includes migration files matching any ORM pattern:
@@ -254,6 +274,8 @@ From security-sentinel:
 ```
 
 Agents report pre-existing findings under `## Pre-existing Findings` in their output. All other findings are treated as introduced.
+
+**Tiebreaking rule:** If an agent's output contains a finding that is not clearly under `## Pre-existing Findings` and the file it references is in `{CHANGED_FILES}`, treat it as introduced. If the file is NOT in `{CHANGED_FILES}`, treat it as pre-existing regardless of which section the agent placed it in. When file attribution is unclear, default to introduced — err toward blocking rather than silently deferring to triage.
 
 Source of truth for synthesis. Do not proceed to Step 2 until every agent's output is listed.
 
@@ -416,7 +438,7 @@ P3 findings may also have knowledge entries but are not required.
 
 **Review Target:** {BEAD_ID} - {title}
 **Branch:** {branch-name}
-**Diff scope:** {PRE_WORK_SHA}..HEAD (or branch base if no SHA provided)
+**Diff scope:** {DIFF_SCOPE_LABEL}
 
 ### Findings Summary:
 
@@ -485,17 +507,19 @@ After the Summary Report, offer testing based on project type:
 - All review agents dispatched and findings collected
 - Complete agent finding inventory built before synthesis
 - Every finding accounted for (applied, deduplicated, or explicitly discarded with reason)
-- All findings stored as child beads with severity, validation criteria, and testing steps
-- P1 findings linked as blocking dependencies
+- Introduced-code findings stored as child beads with severity, validation criteria, and testing steps
+- Pre-existing findings stored as standalone beads tagged `pre-existing,review-sweep` (no parent, no blocking dep)
+- P1 introduced-code findings linked as blocking dependencies on the reviewed bead
 - Knowledge logged for every P1/P2 finding (at least one LEARNED or PATTERN per critical/important finding)
 - Summary report presented with next-step options
 </success_criteria>
 
 <guardrails>
-- P1 (CRITICAL) findings must be addressed before closing the bead -- they are linked as blocking dependencies
+- P1 (CRITICAL) findings in introduced code must be addressed before closing the bead -- they are linked as blocking dependencies
+- P1 pre-existing findings are filed for triage but do NOT block the current bead from closing
 - Each reviewer creates beads for issues found (not markdown files or comments)
 - Each bead has a thorough description with severity level, validation criteria, and testing steps
-- Beads are tagged with `review,{BEAD_ID}` for easy filtering
+- Introduced-code findings are tagged with `review,{BEAD_ID}` for easy filtering
 - Use `/lavra-work {ISSUE_BEAD_ID}` to fix issues found
-- The original bead cannot be closed until all blocking dependencies are resolved
+- The original bead cannot be closed until all introduced-code blocking dependencies are resolved
 </guardrails>
