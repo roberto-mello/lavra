@@ -114,7 +114,7 @@ cat /tmp/test-beads-install/.lavra/.gitattributes
 # Must contain: memory/knowledge.jsonl merge=union
 
 cat /tmp/test-beads-install/.lavra/.lavra-version
-# Must contain: 0.8.0
+# Must contain: the target release version (e.g. 0.7.5)
 
 ls /tmp/test-beads-install/.lavra/memory/
 # Must contain: knowledge.jsonl, recall.sh, knowledge-db.sh
@@ -197,13 +197,13 @@ git init -q && bd init -q 2>/dev/null || true
 # Claude
 node ~/Documents/projects/lavra/bin/install.js --claude --yes /tmp/test-npx-install
 # Verify
-ls .claude/commands/ | wc -l   # expect 24+
+ls .claude/commands/ | wc -l   # expect 18+
 ls .claude/agents/review/      # expect agent files
 
 # Cortex
 node ~/Documents/projects/lavra/bin/install.js --cortex --yes /tmp/test-npx-install
 # Verify
-ls .cortex/commands/ | wc -l   # expect 24+
+ls .cortex/commands/ | wc -l   # expect 18+
 ls .cortex/hooks/              # expect hook scripts
 ```
 
