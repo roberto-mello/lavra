@@ -120,6 +120,8 @@ Validate each name against `DISCOVERED_AGENTS`:
 
 **Config-missing behavior:** If `.lavra/config/project-setup.md` absent, dispatch all `DISCOVERED_AGENTS`.
 
+See `references/default-agents.md` for the agents Lavra ships and their purposes. That file is also a reference for building a `review_agents` config.
+
 #### 3b. Read Epic Plan (if provided)
 
 If arguments include an `## Epic Plan` block (injected by `/lavra-work`), extract Locked Decisions and store as `{EPIC_LOCKED_DECISIONS}`. Do not pass to review agents (biases toward plan over code). Use only in synthesis step (step 6) as a discard filter: if a flagged item appears in Locked Decisions, discard and note: "Discarded: planned item per epic Locked Decisions."
