@@ -386,68 +386,64 @@ If `{EPIC_PLAN}` is empty, include only the `PRE_WORK_SHA` line and omit the epi
 Wait for `/lavra-review` to complete before proceeding to step 3.
 </mandatory>
 
-### Step 3: Implement review fixes
+### Step 3: Cross-wave deduplication check
 
-For each finding from `/lavra-review`:
+Before implementing fixes, classify each finding from `/lavra-review` as new or recurrent. Skip this step if the input is not an epic (comma-separated IDs or `bd ready` path — no epic context).
+
+```bash
+bd list --parent {EPIC_ID} --status=closed --json | jq -r '.[].title'
+```
+
+For each finding, compare its bug class (subject + failure mode) against the closed bead titles. This is a manual semantic check — read the list and compare, do not use automated fuzzy matching.
+
+**Count prior occurrences:** Count closed bead titles matching this bug class. The current finding is NOT counted — the count is prior matches only.
+
+Apply the threshold:
+
+- **0 prior matches (1st occurrence):** Proceed normally — implement fix and create a child bead.
+- **1 prior match (2nd occurrence):** Do NOT implement an instance fix or create a new child bead. Log recurrence on the epic and promote to MUST-CHECK:
+  ```bash
+  bd comments add {EPIC_ID} "RECURRENCE: {bug class description} appeared again in wave {N} bead {BEAD_ID}. Promoted to MUST-CHECK."
+  bd comments add {EPIC_ID} "MUST-CHECK: {concise verification instruction for this bug class}"
+  ```
+- **2+ prior matches (3rd+ occurrence):** Do NOT implement an instance fix or create an instance bead. Create ONE structural bead against the epic — but only if no structural bead for this class already exists in this wave pass (check open beads before creating):
+  ```bash
+  bd create "Eliminate structural source of: {bug class}" \
+    --parent {EPIC_ID} \
+    --type task \
+    --priority 1 \
+    --description "## Issue
+  This bug class has appeared {N} times across waves: {wave list}. Instance-level fixing has failed — structural intervention required.
+
+  ## Bug class
+  {description of the bug class — what keeps going wrong}
+
+  ## Prior instances
+  {list of closed bead IDs that fixed this same class}
+
+  ## What structural fix means
+  Identify the root cause that keeps producing this class of bug and fix it at the source — not another instance fix."
+  ```
+  Then log on the epic:
+  ```bash
+  bd comments add {EPIC_ID} "RECURRENCE: {bug class} appeared for the {N}th time in wave {N} bead {BEAD_ID}. Created structural bead {STRUCTURAL_BEAD_ID} (or logged on existing structural bead if one already exists for this class)."
+  ```
+
+**Threshold rationale:**
+- 0 prior = 1st occurrence → instance fix (expected)
+- 1 prior = 2nd occurrence → pattern recognition, MUST-CHECK so future agents are warned
+- 2+ prior = 3rd+ occurrence → instance-fix approach has failed; structural intervention required
+
+### Step 4: Implement non-suppressed fixes
+
+For each finding from `/lavra-review` that was NOT suppressed by Step 3 (i.e., 1st occurrences only):
 1. Implement fix
 2. Log knowledge for non-obvious fixes:
    ```bash
    bd comments add {BEAD_ID} "LEARNED: {what the review caught and why}"
    ```
 
-### Step 3.5: Cross-wave deduplication check
-
-Before creating child beads for wave findings, query closed beads in the current epic for semantically similar findings. Skip this step if the input is not an epic (comma-separated IDs or `bd ready` path — no epic context).
-
-```bash
-bd list --parent {EPIC_ID} --status=closed --json | jq -r '.[].title'
-```
-
-For each new finding from `/lavra-review`, compare its bug class (subject + failure mode) against the closed bead titles. This is a manual semantic check — read the list and compare, do not use automated fuzzy matching.
-
-**If a match is found (same bug class appeared in a prior wave):**
-
-1. Do NOT create a new child bead for this instance
-2. Count prior occurrences: search closed bead titles for the same class, count matches
-3. Apply the threshold rule:
-
-   - **1st occurrence (current finding):** Create a child bead as normal (no prior match — this step doesn't apply)
-   - **2nd occurrence (one prior closed bead matches):** Do NOT create a new child bead. Log recurrence on the epic and promote to MUST-CHECK:
-     ```bash
-     bd comments add {EPIC_ID} "RECURRENCE: {bug class description} appeared again in wave {N} bead {BEAD_ID}. Promoted to MUST-CHECK."
-     bd comments add {EPIC_ID} "MUST-CHECK: {concise verification instruction for this bug class}"
-     ```
-   - **3rd+ occurrence (two or more prior closed beads match):** Do NOT create an instance bead. Create ONE structural bead against the epic:
-     ```bash
-     bd create "Eliminate structural source of: {bug class}" \
-       --parent {EPIC_ID} \
-       --type task \
-       --priority 1 \
-       --description "## Issue
-     This bug class has appeared {N} times across waves: {wave list}. Instance-level fixing has failed — structural intervention required.
-
-     ## Bug class
-     {description of the bug class — what keeps going wrong}
-
-     ## Prior instances
-     {list of closed bead IDs that fixed this same class}
-
-     ## What structural fix means
-     Identify the root cause that keeps producing this class of bug and fix it at the source — not another instance fix."
-     ```
-     Then log on the epic:
-     ```bash
-     bd comments add {EPIC_ID} "RECURRENCE: {bug class} appeared for the {N}th time in wave {N} bead {BEAD_ID}. Created structural bead {STRUCTURAL_BEAD_ID}."
-     ```
-
-**If no match is found:** Create the child bead normally (proceed to Step 4 bead creation flow).
-
-**Threshold rationale:**
-- 1st occurrence = instance fix (expected)
-- 2nd = pattern recognition, promote to MUST-CHECK so future agents are warned
-- 3rd+ = instance-fix approach has failed; structural intervention required
-
-### Step 4: Re-run tests
+### Step 5: Re-run tests
 
 After all review fixes:
 ```bash
