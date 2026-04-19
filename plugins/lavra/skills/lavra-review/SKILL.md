@@ -444,7 +444,7 @@ LEARNED: RLS context is cleared by db.commit() in SQLAlchemy — SET LOCAL is tr
 MUST-CHECK: After any db.commit() inside a loop that uses RLS, verify set_rls_context() is called again before the next DB operation
 ```
 
-**Gate check:** Run `bd show {BEAD_ID}` and verify LEARNED/PATTERN/MUST-CHECK count >= P1 + P2 count. If not, add missing entries. **Do not proceed to summary until gate passes.**
+**Gate check:** Run `bd show {BEAD_ID}` and verify that each P1/P2 finding has at least one LEARNED or PATTERN entry. MUST-CHECK entries are additional (for escalation-qualifying findings) and do not substitute for LEARNED/PATTERN. If any P1/P2 finding lacks a LEARNED or PATTERN entry, add it now. **Do not proceed to summary until gate passes.**
 
 P3 findings may also have knowledge entries but are not required.
 
