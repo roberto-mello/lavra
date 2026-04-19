@@ -49,7 +49,7 @@ provision_memory_dir() {
 
   # Write installed version for staleness detection by auto-recall.sh
   # .lavra-version lives at .lavra/ root, not .lavra/memory/
-  echo "0.7.4" > "$LAVRA_DIR/.lavra-version"
+  echo "0.7.5" > "$LAVRA_DIR/.lavra-version"
 
   # Create .lavra/.gitignore (folder-level) to ignore SQLite cache and ephemeral state
   # Paths are relative to .lavra/ root, so they use memory/ prefix
