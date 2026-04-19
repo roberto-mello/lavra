@@ -447,6 +447,21 @@ After creating all child beads, run a warning-only validation pass.
 4. **Brainstorm reference** — If a brainstorm bead was used in Step 0, Sources includes a `Brainstorm:` entry
 5. **Completeness** — Each child bead has enough detail that the implementing agent makes zero judgment calls. Missing What/Context/Decisions/Testing/Validation sections = incomplete.
 6. **Scope budget** — Each child bead targets ~1000 LOC or fewer. Flag oversized beads for splitting.
+7. **Known-violation coverage** — For each child bead, identify its tech stack from the `## Files` section, query memory for `MUST-CHECK:` entries matching that stack, and verify the child bead's `## Decisions / Locked` section contains a corresponding constraint for each match.
+
+   Tech stack detection heuristics:
+   - Python files + SQLAlchemy/db imports → search `MUST-CHECK SQLAlchemy`
+   - React/TypeScript files → search `MUST-CHECK React async`
+   - Alembic migration files → search `MUST-CHECK migration`
+   - Rails `.rb` files → search `MUST-CHECK Rails`
+
+   ```bash
+   .lavra/memory/recall.sh "MUST-CHECK {stack keywords}"
+   ```
+
+   For each `MUST-CHECK:` entry found: check whether the child bead's `## Decisions / Locked` section mentions the relevant constraint. If not, emit a warning.
+
+   If `recall.sh` returns no `MUST-CHECK:` entries for a given stack, the check passes trivially — correct behavior for fresh projects without prior violations logged.
 
 **Output format:**
 
@@ -458,13 +473,15 @@ Cross-Check Results for {EPIC_ID}
 ! WARNING: Sources section missing brainstorm reference (brainstorm {ID} found)
 ! WARNING: {CHILD_ID} estimated >1000 LOC of changes -- split recommended
 ! WARNING: {CHILD_ID} missing required section(s): {missing sections}
+! WARNING: {CHILD_ID} touches SQLAlchemy session code but has no RLS-per-commit constraint in Locked Decisions
 v PASS: All child beads have Testing and Validation sections
 v PASS: DAG validation passes (bd swarm validate)
+v PASS: {CHILD_ID} Locked Decisions cover all MUST-CHECK entries for its stack
 
 -> Proceed to final review, or fix warnings first?
 ```
 
-All checks are **warnings only** — none block submission. Use **AskUserQuestion tool** to ask whether to proceed or fix warnings first.
+All checks are **warnings only** — none block submission. For Check 7 warnings (missing MUST-CHECK coverage), the default prompt option is "fix first" rather than "proceed." Use **AskUserQuestion tool** to ask whether to proceed or fix warnings first.
 
 ### 6. Final Review & Submission
 
