@@ -83,7 +83,8 @@ fi
 
 LAVRA_GLOBAL_DEFAULT="$HOME/.snowflake/cortex"
 LAVRA_HOOKS_ARE_GLOBAL=false
-[ "$NO_BANNER" = false ] && print_banner "Cortex Code" "0.7.4"
+INSTALLER_VERSION=$(get_lavra_version "$PLUGIN_DIR")
+[ "$NO_BANNER" = false ] && print_banner "Cortex Code" "$INSTALLER_VERSION"
 echo "  Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  Type: Global installation"
@@ -180,6 +181,11 @@ if [ "$GLOBAL_INSTALL" = true ]; then
     fi
   done
 
+  # Write version marker for hook auto-update
+  LAVRA_VERSION=$(get_lavra_version "$PLUGIN_DIR")
+  echo "$LAVRA_VERSION" > "$TARGET/hooks/.lavra-version"
+  echo "  - Version marker: $LAVRA_VERSION"
+
   echo "  - Installed hook scripts (check-memory + dispatch-hook + memory hooks)"
 else
   echo "[4/8] Installing hooks..."
@@ -202,18 +208,61 @@ else
       chmod +x "$GLOBAL_HOOKS/$hook"
     fi
   done
+  # Write version marker to global hooks for check-memory auto-update
+  LAVRA_VERSION=$(get_lavra_version "$PLUGIN_DIR")
+  echo "$LAVRA_VERSION" > "$GLOBAL_HOOKS/.lavra-version"
+
   echo "  - Installed dispatcher to $GLOBAL_HOOKS"
 fi
 
-# Detect if commands/agents/skills are already installed globally
+# Cortex per-project install: hooks only. Skip commands/agents/skills.
 GLOBALLY_INSTALLED=false
+if [ "$GLOBAL_INSTALL" = false ]; then
+  echo "[5/8] Skipping commands (Cortex per-project: hooks only)"
+  echo "[6/8] Skipping agents (Cortex per-project: hooks only)"
+  echo "[7/8] Skipping skills (Cortex per-project: hooks only)"
 
-if [ "$GLOBAL_INSTALL" = false ] && [ -f "$HOME/.snowflake/cortex/commands/lavra-plan.md" ]; then
-  GLOBALLY_INSTALLED=true
+  # Version check for per-project hooks
+  GLOBAL_VERSION="0.0.0"
+  if [ -f "$HOME/.snowflake/cortex/hooks/.lavra-version" ]; then
+    GLOBAL_VERSION=$(cat "$HOME/.snowflake/cortex/hooks/.lavra-version")
+  fi
+
+  if [ "$GLOBAL_VERSION" != "$INSTALLER_VERSION" ]; then
+    echo ""
+    echo "[!] Version mismatch: global hooks are v${GLOBAL_VERSION}, this installer is v${INSTALLER_VERSION}"
+    echo "    Global install is outdated. Options:"
+    echo "      1) Update global first (recommended), then re-run this installer"
+    echo "      2) Update project hooks anyway"
+    echo ""
+    if [ "$AUTO_YES" = true ]; then
+      echo "    --yes set: defaulting to option 2 (update hooks anyway)"
+      CHOICE=2
+    elif [ -t 0 ]; then
+      read -r -p "  Choose [1/2, default: 1]: " CHOICE </dev/tty
+    else
+      CHOICE=1
+    fi
+    case "$CHOICE" in
+      2)
+        ;;
+      *)
+        echo ""
+        echo "  Run global update first:"
+        echo "    bunx @lavralabs/lavra@latest --cortex"
+        echo ""
+        exit 0
+        ;;
+    esac
+  fi
+
+  # Write version marker to project hooks
+  echo "$INSTALLER_VERSION" > "$HOOKS_DIR/.lavra-version"
 fi
 
 # Start manifest for tracking installed files (enables stale cleanup on upgrade)
-if [ "$GLOBALLY_INSTALLED" = false ]; then
+# Only for global install (per-project skips commands/agents/skills)
+if [ "$GLOBAL_INSTALL" = true ]; then
   begin_manifest "$MANIFEST_FILE"
 fi
 
@@ -451,7 +500,8 @@ HOOKS_EOF
 fi
 
 # Finalize manifest (enables stale cleanup on next install)
-if [ "$GLOBALLY_INSTALLED" = false ]; then
+# Only for global install (per-project skips commands/agents/skills)
+if [ "$GLOBAL_INSTALL" = true ]; then
   commit_manifest "$MANIFEST_FILE"
 fi
 
@@ -467,13 +517,7 @@ if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  bunx @lavralabs/lavra@latest --cortex /path/to/your-project"
   echo ""
 else
-  echo "$CMD_COUNT commands, $AGENT_COUNT agents, and $SKILL_COUNT skills installed."
-  echo ""
-  echo "Main workflow:"
-  echo "  /lavra-design <feature description>   Plan a feature end-to-end before writing code"
-  echo "  /lavra-work <bead id>                 Execute work on a bead"
-  echo "  /lavra-qa                             Browser-based QA verification (web apps)"
-  echo "  /lavra-ship                           Finalize, open PR, close beads"
+  echo "Hooks installed for this project."
   echo ""
 fi
 

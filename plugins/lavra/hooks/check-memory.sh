@@ -39,8 +39,22 @@ if [ ! -d ".beads" ] && [ ! -d ".lavra" ]; then
   exit 0
 fi
 
-# Already has memory hooks -- nothing to do
-if [ -f "$PROJECT_HOOKS_DIR/memory-capture.sh" ]; then
+# Compare versions and determine if update is needed
+GLOBAL_VERSION=""
+PROJECT_VERSION=""
+NEED_UPDATE=false
+
+if [ -f "$GLOBAL_HOOKS_DIR/.lavra-version" ]; then
+  GLOBAL_VERSION=$(cat "$GLOBAL_HOOKS_DIR/.lavra-version")
+fi
+if [ -f "$PROJECT_HOOKS_DIR/.lavra-version" ]; then
+  PROJECT_VERSION=$(cat "$PROJECT_HOOKS_DIR/.lavra-version")
+fi
+
+if [ -n "$GLOBAL_VERSION" ] && [ "$GLOBAL_VERSION" != "$PROJECT_VERSION" ]; then
+  NEED_UPDATE=true
+elif [ -f "$PROJECT_HOOKS_DIR/memory-capture.sh" ]; then
+  # Hooks exist but no version mismatch (or no version markers yet) -- up to date
   exit 0
 fi
 
@@ -110,6 +124,11 @@ for hook in memory-capture.sh auto-recall.sh subagent-wrapup.sh knowledge-db.sh 
     chmod +x "$HOOKS_DIR/$hook"
   fi
 done
+
+# Write version marker so future updates are detected
+if [ -n "$GLOBAL_VERSION" ]; then
+  echo "$GLOBAL_VERSION" > "$HOOKS_DIR/.lavra-version"
+fi
 
 # Cortex Code: ensure dispatcher is in the global hooks dir
 if [ "$PLATFORM" = "cortex" ] && [ -f "$HOOKS_SOURCE_DIR/dispatch-hook.sh" ] && [ ! -f "$GLOBAL_HOOKS_DIR/dispatch-hook.sh" ]; then

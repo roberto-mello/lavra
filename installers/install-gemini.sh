@@ -35,7 +35,8 @@ source "$INSTALLER_DIR/shared-functions.sh"
 LAVRA_GLOBAL_DEFAULT="$HOME/.config/gemini"
 LAVRA_HOOKS_ARE_GLOBAL=false
 eval "$(parse_installer_args "$@")"
-[ "$NO_BANNER" = false ] && print_banner "Gemini CLI" "0.7.4"
+INSTALLER_VERSION=$(get_lavra_version "$PLUGIN_DIR")
+[ "$NO_BANNER" = false ] && print_banner "Gemini CLI" "$INSTALLER_VERSION"
 
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
@@ -102,62 +103,126 @@ for hook in sanitize-content.sh auto-recall.sh memory-capture.sh subagent-wrapup
   echo "  - $hook"
 done
 
+# Write version marker for hook auto-update
+echo "$INSTALLER_VERSION" > "$HOOKS_DIR/.lavra-version"
+
 echo ""
 
-# Step 3: Copy converted files
-echo "[3/4] Installing commands, agents, and skills..."
-
-begin_manifest "$MANIFEST_FILE"
-
-# Commands (.toml format)
-COMMANDS_DIR="$TARGET/commands"
-create_dir_with_symlink_handling "$COMMANDS_DIR"
-
-CMD_COUNT=$(sync_flat_dir "$PLUGIN_DIR/gemini/commands" "$COMMANDS_DIR" "$MANIFEST_FILE" "commands" "*.toml")
-find "$COMMANDS_DIR" -type f -exec chmod 644 {} \;
-echo "  - Installed $CMD_COUNT commands (.toml)"
-
-# Agents
-AGENTS_DIR="$TARGET/agents"
-create_dir_with_symlink_handling "$AGENTS_DIR"
-
-AGENT_COUNT=$(sync_nested_dir "$PLUGIN_DIR/gemini/agents" "$AGENTS_DIR" "$MANIFEST_FILE" "agents")
-find "$AGENTS_DIR" -type f -exec chmod 644 {} \;
-echo "  - Installed $AGENT_COUNT agents"
-
-# Skills
-SKILLS_DIR="$TARGET/skills"
-mkdir -p "$SKILLS_DIR"
-
-source_skill_list_gm=""
-SKILL_COUNT=0
-for skill_dir in "$PLUGIN_DIR/gemini/skills"/*; do
-  [ -d "$skill_dir" ] || continue
-  skill_name=$(basename "$skill_dir")
-  source_skill_list_gm="${source_skill_list_gm}${skill_name}"$'\n'
-  cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
-  chmod 644 "$SKILLS_DIR/$skill_name/SKILL.md" 2>/dev/null || true
-  printf 'skills:%s\n' "$skill_name" >> "${MANIFEST_FILE}.new"
-  SKILL_COUNT=$((SKILL_COUNT + 1))
-done
-
-# Remove stale skill dirs
-if [ -f "$MANIFEST_FILE" ]; then
-  while IFS= read -r line; do
-    [[ "$line" == "skills:"* ]] || continue
-    stale_skill="${line#skills:}"
-    if ! printf '%s' "$source_skill_list_gm" | grep -qxF "$stale_skill" \
-       && [ -d "$SKILLS_DIR/$stale_skill" ]; then
-      rm -rf "$SKILLS_DIR/$stale_skill"
-      echo "  - Removed stale skill: $stale_skill"
-    fi
-  done < "$MANIFEST_FILE"
+# Detect if commands/agents/skills are already installed globally
+GLOBALLY_INSTALLED=false
+if [ "$GLOBAL_INSTALL" = false ] && [ -f "$HOME/.config/gemini/commands/lavra-plan.toml" ]; then
+  GLOBALLY_INSTALLED=true
 fi
 
-echo "  - Installed $SKILL_COUNT skills"
-echo ""
+# Version check: if global is current, per-project install is hook-only
+GLOBAL_VERSION="0.0.0"
+if [ -f "$HOME/.config/gemini/hooks/.lavra-version" ]; then
+  GLOBAL_VERSION=$(cat "$HOME/.config/gemini/hooks/.lavra-version")
+fi
 
-commit_manifest "$MANIFEST_FILE"
+LIGHTWEIGHT_MODE=false
+if [ "$GLOBAL_INSTALL" = false ] && [ "$GLOBALLY_INSTALLED" = true ] && [ "$GLOBAL_VERSION" = "$INSTALLER_VERSION" ]; then
+  LIGHTWEIGHT_MODE=true
+  echo ""
+  echo "[i] Global install v${INSTALLER_VERSION} is current — lightweight project sync"
+  echo "    Updating hooks only. Commands, agents, and skills stay global."
+  echo ""
+fi
+
+if [ "$GLOBAL_INSTALL" = false ] && [ "$GLOBALLY_INSTALLED" = true ] && [ "$GLOBAL_VERSION" != "$INSTALLER_VERSION" ]; then
+  echo ""
+  echo "[!] Version mismatch: global install is v${GLOBAL_VERSION}, this installer is v${INSTALLER_VERSION}"
+  echo "    Global commands/agents/skills are outdated. Options:"
+  echo "      1) Update global first (recommended), then re-run this installer"
+  echo "      2) Install full copy into this project anyway"
+  echo "      3) Skip commands/agents/skills, update hooks only"
+  echo ""
+  if [ "$AUTO_YES" = true ]; then
+    echo "    --yes set: defaulting to option 3 (hooks only)"
+    CHOICE=3
+  elif [ -t 0 ]; then
+    read -r -p "  Choose [1/2/3, default: 1]: " CHOICE </dev/tty
+  else
+    CHOICE=1
+  fi
+  case "$CHOICE" in
+    2)
+      GLOBALLY_INSTALLED=false
+      ;;
+    3)
+      LIGHTWEIGHT_MODE=true
+      ;;
+    *)
+      echo ""
+      echo "  Run global update first:"
+      echo "    bunx @lavralabs/lavra@latest --gemini"
+      echo ""
+      exit 0
+      ;;
+  esac
+fi
+
+# Step 3: Copy converted files
+if [ "$LIGHTWEIGHT_MODE" = true ]; then
+  echo "[3/4] Skipping commands, agents, and skills (global install is current)"
+  CMD_COUNT=0
+  AGENT_COUNT=0
+  SKILL_COUNT=0
+else
+  echo "[3/4] Installing commands, agents, and skills..."
+
+  begin_manifest "$MANIFEST_FILE"
+
+  # Commands (.toml format)
+  COMMANDS_DIR="$TARGET/commands"
+  create_dir_with_symlink_handling "$COMMANDS_DIR"
+
+  CMD_COUNT=$(sync_flat_dir "$PLUGIN_DIR/gemini/commands" "$COMMANDS_DIR" "$MANIFEST_FILE" "commands" "*.toml")
+  find "$COMMANDS_DIR" -type f -exec chmod 644 {} \;
+  echo "  - Installed $CMD_COUNT commands (.toml)"
+
+  # Agents
+  AGENTS_DIR="$TARGET/agents"
+  create_dir_with_symlink_handling "$AGENTS_DIR"
+
+  AGENT_COUNT=$(sync_nested_dir "$PLUGIN_DIR/gemini/agents" "$AGENTS_DIR" "$MANIFEST_FILE" "agents")
+  find "$AGENTS_DIR" -type f -exec chmod 644 {} \;
+  echo "  - Installed $AGENT_COUNT agents"
+
+  # Skills
+  SKILLS_DIR="$TARGET/skills"
+  mkdir -p "$SKILLS_DIR"
+
+  source_skill_list_gm=""
+  SKILL_COUNT=0
+  for skill_dir in "$PLUGIN_DIR/gemini/skills"/*; do
+    [ -d "$skill_dir" ] || continue
+    skill_name=$(basename "$skill_dir")
+    source_skill_list_gm="${source_skill_list_gm}${skill_name}"$'\n'
+    cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
+    chmod 644 "$SKILLS_DIR/$skill_name/SKILL.md" 2>/dev/null || true
+    printf 'skills:%s\n' "$skill_name" >> "${MANIFEST_FILE}.new"
+    SKILL_COUNT=$((SKILL_COUNT + 1))
+  done
+
+  # Remove stale skill dirs
+  if [ -f "$MANIFEST_FILE" ]; then
+    while IFS= read -r line; do
+      [[ "$line" == "skills:"* ]] || continue
+      stale_skill="${line#skills:}"
+      if ! printf '%s' "$source_skill_list_gm" | grep -qxF "$stale_skill" \
+         && [ -d "$SKILLS_DIR/$stale_skill" ]; then
+        rm -rf "$SKILLS_DIR/$stale_skill"
+        echo "  - Removed stale skill: $stale_skill"
+      fi
+    done < "$MANIFEST_FILE"
+  fi
+
+  echo "  - Installed $SKILL_COUNT skills"
+  echo ""
+
+  commit_manifest "$MANIFEST_FILE"
+fi
 
 # Step 4: Provision memory (only for project-specific installs)
 if [ "$GLOBAL_INSTALL" = true ]; then
@@ -200,11 +265,28 @@ echo ""
 # Installation complete
 echo "Done."
 echo ""
-echo "Main workflow:"
-echo "  /lavra-design <feature description>   Plan a feature end-to-end before writing code"
-echo "  /lavra-work <bead id>                 Execute work on a bead"
-echo "  /lavra-qa                             Browser-based QA verification (web apps)"
-echo "  /lavra-ship                           Finalize, open PR, close beads"
-echo ""
+
+if [ "$GLOBAL_INSTALL" = true ]; then
+  echo "Commands, agents, and skills are now available in all Gemini CLI sessions."
+  echo ""
+  echo "For beads integration (memory system + hooks):"
+  echo "  bunx @lavralabs/lavra@latest --gemini /path/to/your-project"
+  echo ""
+else
+  if [ "$LIGHTWEIGHT_MODE" = true ]; then
+    echo "Hooks updated. Commands, agents, and skills remain global (v${INSTALLER_VERSION})."
+    echo ""
+  else
+    echo "$CMD_COUNT commands, $AGENT_COUNT agents, and $SKILL_COUNT skills installed."
+    echo ""
+  fi
+  echo "Main workflow:"
+  echo "  /lavra-design <feature description>   Plan a feature end-to-end before writing code"
+  echo "  /lavra-work <bead id>                 Execute work on a bead"
+  echo "  /lavra-qa                             Browser-based QA verification (web apps)"
+  echo "  /lavra-ship                           Finalize, open PR, close beads"
+  echo ""
+fi
+
 echo "Restart Gemini CLI to load the plugin."
 echo ""

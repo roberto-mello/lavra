@@ -138,8 +138,10 @@ If a `PRE_WORK_SHA` was passed in arguments (injected by `lavra-work-multi` Phas
 
 ```bash
 # Only after validation passes:
-INTRODUCED_DIFF=$(git diff "${PRE_WORK_SHA}"..HEAD)
-DIFF_SCOPE_LABEL="${PRE_WORK_SHA}..HEAD"
+# Use SHA without ..HEAD to include working-tree changes (required for lavra-work-multi,
+# where wave changes are committed only after review).
+INTRODUCED_DIFF=$(git diff "${PRE_WORK_SHA}")
+DIFF_SCOPE_LABEL="${PRE_WORK_SHA}..WORKTREE"
 ```
 
 If `PRE_WORK_SHA` is absent or failed validation, fall back to diffing against the branch base:
@@ -163,7 +165,7 @@ Store `INTRODUCED_DIFF` and `DIFF_SCOPE_LABEL` for use in agent dispatch and the
 Dispatch the agent list — `review_agents` from config if set and valid, otherwise `DISCOVERED_AGENTS` from Step 3a. Pass `{INTRODUCED_DIFF}` as the primary review input — not full file contents. Also pass the list of changed files:
 
 ```bash
-CHANGED_FILES=$(git diff "${PRE_WORK_SHA}"..HEAD --name-only 2>/dev/null || git diff "origin/${DEFAULT_BRANCH}"...HEAD --name-only)
+CHANGED_FILES=$(git diff "${PRE_WORK_SHA}" --name-only 2>/dev/null || git diff "origin/${DEFAULT_BRANCH}"...HEAD --name-only)
 ```
 
 Include this instruction in each agent prompt:

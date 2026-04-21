@@ -301,6 +301,20 @@ commit_manifest() {
   mv "${MANIFEST_FILE}.new" "$MANIFEST_FILE"
 }
 
+# Read lavra version from plugin manifest
+get_lavra_version() {
+  local plugin_dir="${1:-}"
+  if [ -z "$plugin_dir" ]; then
+    plugin_dir="$SCRIPT_DIR/plugins/lavra"
+  fi
+  local manifest="$plugin_dir/.claude-plugin/plugin.json"
+  if [ -f "$manifest" ] && command -v jq &>/dev/null; then
+    jq -r '.version // "0.0.0"' "$manifest"
+  else
+    echo "0.0.0"
+  fi
+}
+
 # Resolve target directory to absolute path with error handling
 resolve_target_dir() {
   local target="$1"

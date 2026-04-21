@@ -1,7 +1,7 @@
 {
   "opencode": {
-    "haiku": "opencode/minimax-m2.5-free",
-    "sonnet": "opencode-go/kimi-k2.5",
+    "haiku": "minimax/MiniMax-M2.7-highspeed",
+    "sonnet": "opencode-go/kimi-k2.6",
     "opus": "opencode-go/glm-5.1"
   },
   "gemini": {

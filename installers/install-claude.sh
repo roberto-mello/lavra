@@ -42,7 +42,8 @@ source "$INSTALLER_DIR/shared-functions.sh"
 LAVRA_GLOBAL_DEFAULT="$HOME/.claude"
 LAVRA_HOOKS_ARE_GLOBAL=false
 eval "$(parse_installer_args "$@")"
-[ "$NO_BANNER" = false ] && print_banner "Claude Code" "0.7.4"
+INSTALLER_VERSION=$(get_lavra_version "$PLUGIN_DIR")
+[ "$NO_BANNER" = false ] && print_banner "Claude Code" "$INSTALLER_VERSION"
 
 # Resolve target to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
@@ -158,6 +159,10 @@ else
     chmod +x "$HOOKS_DIR/$hook"
     echo "  - Installed $hook"
   done
+
+  # Write version marker so check-memory.sh can detect future updates
+  INSTALLER_VERSION=$(get_lavra_version "$PLUGIN_DIR")
+  echo "$INSTALLER_VERSION" > "$HOOKS_DIR/.lavra-version"
 fi
 
 # Detect if commands/agents/skills are already installed globally
@@ -167,8 +172,57 @@ if [ "$GLOBAL_INSTALL" = false ] && [ -f "$HOME/.claude/commands/lavra-plan.md" 
   GLOBALLY_INSTALLED=true
 fi
 
+# Version check: if global is current, per-project install is hook-only
+INSTALLER_VERSION=$(get_lavra_version "$PLUGIN_DIR")
+GLOBAL_VERSION="0.0.0"
+if [ -f "$HOME/.claude/hooks/.lavra-version" ]; then
+  GLOBAL_VERSION=$(cat "$HOME/.claude/hooks/.lavra-version")
+fi
+
+LIGHTWEIGHT_MODE=false
+if [ "$GLOBAL_INSTALL" = false ] && [ "$GLOBALLY_INSTALLED" = true ] && [ "$GLOBAL_VERSION" = "$INSTALLER_VERSION" ]; then
+  LIGHTWEIGHT_MODE=true
+  echo ""
+  echo "[i] Global install v${INSTALLER_VERSION} is current — lightweight project sync"
+  echo "    Updating hooks only. Commands, agents, and skills stay global."
+  echo ""
+fi
+
+if [ "$GLOBAL_INSTALL" = false ] && [ "$GLOBALLY_INSTALLED" = true ] && [ "$GLOBAL_VERSION" != "$INSTALLER_VERSION" ]; then
+  echo ""
+  echo "[!] Version mismatch: global install is v${GLOBAL_VERSION}, this installer is v${INSTALLER_VERSION}"
+  echo "    Global commands/agents/skills are outdated. Options:"
+  echo "      1) Update global first (recommended), then re-run this installer"
+  echo "      2) Install full copy into this project anyway"
+  echo "      3) Skip commands/agents/skills, update hooks only"
+  echo ""
+  if [ "$AUTO_YES" = true ]; then
+    echo "    --yes set: defaulting to option 3 (hooks only)"
+    CHOICE=3
+  elif [ -t 0 ]; then
+    read -r -p "  Choose [1/2/3, default: 1]: " CHOICE </dev/tty
+  else
+    CHOICE=1
+  fi
+  case "$CHOICE" in
+    2)
+      GLOBALLY_INSTALLED=false
+      ;;
+    3)
+      LIGHTWEIGHT_MODE=true
+      ;;
+    *)
+      echo ""
+      echo "  Run global update first:"
+      echo "    bunx @lavralabs/lavra@latest"
+      echo ""
+      exit 0
+      ;;
+  esac
+fi
+
 # Start manifest for tracking installed files (enables stale cleanup on upgrade).
-# Only when we'll actually install files -- skip if globally installed.
+# Skip if globally installed (lightweight or full global).
 if [ "$GLOBALLY_INSTALLED" = false ]; then
   begin_manifest "$MANIFEST_FILE"
 fi
@@ -330,6 +384,11 @@ if [ "$GLOBAL_INSTALL" = true ]; then
     fi
   done
 
+  # Write version marker for hook auto-update
+  LAVRA_VERSION=$(get_lavra_version "$PLUGIN_DIR")
+  echo "$LAVRA_VERSION" > "$TARGET/hooks/.lavra-version"
+  echo "  - Version marker: $LAVRA_VERSION"
+
   echo "  - Installed hook scripts (check-memory + memory hooks for auto-install)"
 
   # Add SessionStart hook for check-memory to global settings.json
@@ -439,7 +498,10 @@ if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  bunx @lavralabs/lavra@latest --claude /path/to/your-project"
   echo ""
 else
-  if [ "$GLOBALLY_INSTALLED" = false ]; then
+  if [ "$LIGHTWEIGHT_MODE" = true ]; then
+    echo "Hooks updated. Commands, agents, and skills remain global (v${INSTALLER_VERSION})."
+    echo ""
+  elif [ "$GLOBALLY_INSTALLED" = false ]; then
     echo "$CMD_COUNT commands, $AGENT_COUNT agents, and $SKILL_COUNT skills installed."
     echo ""
   fi

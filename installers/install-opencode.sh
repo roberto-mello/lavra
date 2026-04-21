@@ -35,7 +35,8 @@ source "$INSTALLER_DIR/shared-functions.sh"
 LAVRA_GLOBAL_DEFAULT="$HOME/.config/opencode"
 LAVRA_HOOKS_ARE_GLOBAL=false
 eval "$(parse_installer_args "$@")"
-[ "$NO_BANNER" = false ] && print_banner "OpenCode" "0.7.4"
+INSTALLER_VERSION=$(get_lavra_version "$PLUGIN_DIR")
+[ "$NO_BANNER" = false ] && print_banner "OpenCode" "$INSTALLER_VERSION"
 
 # Resolve to absolute path
 TARGET="$(resolve_target_dir "$TARGET")"
@@ -169,69 +170,137 @@ for hook in sanitize-content.sh auto-recall.sh memory-capture.sh subagent-wrapup
   echo "  - $hook"
 done
 
+# Write version marker for hook auto-update
+if [ "$GLOBAL_INSTALL" = true ]; then
+  echo "$INSTALLER_VERSION" > "$HOOKS_DIR/.lavra-version"
+else
+  echo "$INSTALLER_VERSION" > "$HOOKS_DIR/.lavra-version"
+fi
+
 echo ""
+
+# Detect if commands/agents/skills are already installed globally
+GLOBALLY_INSTALLED=false
+if [ "$GLOBAL_INSTALL" = false ] && [ -f "$HOME/.config/opencode/commands/lavra-plan.md" ]; then
+  GLOBALLY_INSTALLED=true
+fi
+
+# Version check: if global is current, per-project install is hook-only
+GLOBAL_VERSION="0.0.0"
+if [ -f "$HOME/.config/opencode/hooks/.lavra-version" ]; then
+  GLOBAL_VERSION=$(cat "$HOME/.config/opencode/hooks/.lavra-version")
+fi
+
+LIGHTWEIGHT_MODE=false
+if [ "$GLOBAL_INSTALL" = false ] && [ "$GLOBALLY_INSTALLED" = true ] && [ "$GLOBAL_VERSION" = "$INSTALLER_VERSION" ]; then
+  LIGHTWEIGHT_MODE=true
+  echo ""
+  echo "[i] Global install v${INSTALLER_VERSION} is current — lightweight project sync"
+  echo "    Updating hooks only. Commands, agents, and skills stay global."
+  echo ""
+fi
+
+if [ "$GLOBAL_INSTALL" = false ] && [ "$GLOBALLY_INSTALLED" = true ] && [ "$GLOBAL_VERSION" != "$INSTALLER_VERSION" ]; then
+  echo ""
+  echo "[!] Version mismatch: global install is v${GLOBAL_VERSION}, this installer is v${INSTALLER_VERSION}"
+  echo "    Global commands/agents/skills are outdated. Options:"
+  echo "      1) Update global first (recommended), then re-run this installer"
+  echo "      2) Install full copy into this project anyway"
+  echo "      3) Skip commands/agents/skills, update hooks only"
+  echo ""
+  if [ "$AUTO_YES" = true ]; then
+    echo "    --yes set: defaulting to option 3 (hooks only)"
+    CHOICE=3
+  elif [ -t 0 ]; then
+    read -r -p "  Choose [1/2/3, default: 1]: " CHOICE </dev/tty
+  else
+    CHOICE=1
+  fi
+  case "$CHOICE" in
+    2)
+      GLOBALLY_INSTALLED=false
+      ;;
+    3)
+      LIGHTWEIGHT_MODE=true
+      ;;
+    *)
+      echo ""
+      echo "  Run global update first:"
+      echo "    bunx @lavralabs/lavra@latest --opencode"
+      echo ""
+      exit 0
+      ;;
+  esac
+fi
 
 # Step 5: Copy converted files
-echo "[5/6] Installing commands, agents, and skills..."
-
-# Determine base directory: global uses $TARGET directly, project uses $TARGET/.opencode
-if [ "$GLOBAL_INSTALL" = true ]; then
-  BASE_DIR="$TARGET"
+if [ "$LIGHTWEIGHT_MODE" = true ]; then
+  echo "[5/6] Skipping commands, agents, and skills (global install is current)"
+  CMD_COUNT=0
+  AGENT_COUNT=0
+  SKILL_COUNT=0
 else
-  BASE_DIR="$TARGET/.opencode"
+  echo "[5/6] Installing commands, agents, and skills..."
+
+  # Determine base directory: global uses $TARGET directly, project uses $TARGET/.opencode
+  if [ "$GLOBAL_INSTALL" = true ]; then
+    BASE_DIR="$TARGET"
+  else
+    BASE_DIR="$TARGET/.opencode"
+  fi
+
+  begin_manifest "$MANIFEST_FILE"
+
+  # Commands
+  COMMANDS_DIR="$BASE_DIR/commands"
+  create_dir_with_symlink_handling "$COMMANDS_DIR"
+
+  CMD_COUNT=$(sync_flat_dir "$PLUGIN_DIR/opencode/commands" "$COMMANDS_DIR" "$MANIFEST_FILE" "commands")
+  find "$COMMANDS_DIR" -type f -exec chmod 644 {} \;
+  echo "  - Installed $CMD_COUNT commands"
+
+  # Agents
+  AGENTS_DIR="$BASE_DIR/agents"
+  create_dir_with_symlink_handling "$AGENTS_DIR"
+
+  AGENT_COUNT=$(sync_nested_dir "$PLUGIN_DIR/opencode/agents" "$AGENTS_DIR" "$MANIFEST_FILE" "agents")
+  find "$AGENTS_DIR" -type f -exec chmod 644 {} \;
+  echo "  - Installed $AGENT_COUNT agents"
+
+  # Skills
+  SKILLS_DIR="$BASE_DIR/skills"
+  create_dir_with_symlink_handling "$SKILLS_DIR"
+
+  source_skill_list_oc=""
+  SKILL_COUNT=0
+  for skill_dir in "$PLUGIN_DIR/opencode/skills"/*; do
+    [ -d "$skill_dir" ] || continue
+    skill_name=$(basename "$skill_dir")
+    source_skill_list_oc="${source_skill_list_oc}${skill_name}"$'\n'
+    cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
+    chmod 644 "$SKILLS_DIR/$skill_name/SKILL.md" 2>/dev/null || true
+    printf 'skills:%s\n' "$skill_name" >> "${MANIFEST_FILE}.new"
+    SKILL_COUNT=$((SKILL_COUNT + 1))
+  done
+
+  # Remove stale skill dirs
+  if [ -f "$MANIFEST_FILE" ]; then
+    while IFS= read -r line; do
+      [[ "$line" == "skills:"* ]] || continue
+      stale_skill="${line#skills:}"
+      if ! printf '%s' "$source_skill_list_oc" | grep -qxF "$stale_skill" \
+         && [ -d "$SKILLS_DIR/$stale_skill" ]; then
+        rm -rf "$SKILLS_DIR/$stale_skill"
+        echo "  - Removed stale skill: $stale_skill"
+      fi
+    done < "$MANIFEST_FILE"
+  fi
+
+  echo "  - Installed $SKILL_COUNT skills"
+  echo ""
+
+  commit_manifest "$MANIFEST_FILE"
 fi
-
-begin_manifest "$MANIFEST_FILE"
-
-# Commands
-COMMANDS_DIR="$BASE_DIR/commands"
-create_dir_with_symlink_handling "$COMMANDS_DIR"
-
-CMD_COUNT=$(sync_flat_dir "$PLUGIN_DIR/opencode/commands" "$COMMANDS_DIR" "$MANIFEST_FILE" "commands")
-find "$COMMANDS_DIR" -type f -exec chmod 644 {} \;
-echo "  - Installed $CMD_COUNT commands"
-
-# Agents
-AGENTS_DIR="$BASE_DIR/agents"
-create_dir_with_symlink_handling "$AGENTS_DIR"
-
-AGENT_COUNT=$(sync_nested_dir "$PLUGIN_DIR/opencode/agents" "$AGENTS_DIR" "$MANIFEST_FILE" "agents")
-find "$AGENTS_DIR" -type f -exec chmod 644 {} \;
-echo "  - Installed $AGENT_COUNT agents"
-
-# Skills
-SKILLS_DIR="$BASE_DIR/skills"
-create_dir_with_symlink_handling "$SKILLS_DIR"
-
-source_skill_list_oc=""
-SKILL_COUNT=0
-for skill_dir in "$PLUGIN_DIR/opencode/skills"/*; do
-  [ -d "$skill_dir" ] || continue
-  skill_name=$(basename "$skill_dir")
-  source_skill_list_oc="${source_skill_list_oc}${skill_name}"$'\n'
-  cp -r "$skill_dir" "$SKILLS_DIR/$skill_name"
-  chmod 644 "$SKILLS_DIR/$skill_name/SKILL.md" 2>/dev/null || true
-  printf 'skills:%s\n' "$skill_name" >> "${MANIFEST_FILE}.new"
-  SKILL_COUNT=$((SKILL_COUNT + 1))
-done
-
-# Remove stale skill dirs
-if [ -f "$MANIFEST_FILE" ]; then
-  while IFS= read -r line; do
-    [[ "$line" == "skills:"* ]] || continue
-    stale_skill="${line#skills:}"
-    if ! printf '%s' "$source_skill_list_oc" | grep -qxF "$stale_skill" \
-       && [ -d "$SKILLS_DIR/$stale_skill" ]; then
-      rm -rf "$SKILLS_DIR/$stale_skill"
-      echo "  - Removed stale skill: $stale_skill"
-    fi
-  done < "$MANIFEST_FILE"
-fi
-
-echo "  - Installed $SKILL_COUNT skills"
-echo ""
-
-commit_manifest "$MANIFEST_FILE"
 
 # Step 6: Provision memory (only for project-specific installs)
 if [ "$GLOBAL_INSTALL" = true ]; then
@@ -272,11 +341,28 @@ echo ""
 # Installation complete
 echo "Done."
 echo ""
-echo "Main workflow:"
-echo "  /lavra-design <feature description>   Plan a feature end-to-end before writing code"
-echo "  /lavra-work <bead id>                 Execute work on a bead"
-echo "  /lavra-qa                             Browser-based QA verification (web apps)"
-echo "  /lavra-ship                           Finalize, open PR, close beads"
-echo ""
+
+if [ "$GLOBAL_INSTALL" = true ]; then
+  echo "Commands, agents, and skills are now available in all OpenCode sessions."
+  echo ""
+  echo "For beads integration (memory system + hooks):"
+  echo "  bunx @lavralabs/lavra@latest --opencode /path/to/your-project"
+  echo ""
+else
+  if [ "$LIGHTWEIGHT_MODE" = true ]; then
+    echo "Hooks updated. Commands, agents, and skills remain global (v${INSTALLER_VERSION})."
+    echo ""
+  else
+    echo "$CMD_COUNT commands, $AGENT_COUNT agents, and $SKILL_COUNT skills installed."
+    echo ""
+  fi
+  echo "Main workflow:"
+  echo "  /lavra-design <feature description>   Plan a feature end-to-end before writing code"
+  echo "  /lavra-work <bead id>                 Execute work on a bead"
+  echo "  /lavra-qa                             Browser-based QA verification (web apps)"
+  echo "  /lavra-ship                           Finalize, open PR, close beads"
+  echo ""
+fi
+
 echo "Restart OpenCode to load the plugin."
 echo ""
