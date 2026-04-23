@@ -63,7 +63,8 @@ During implementation, you may encounter issues not described in the bead:
 
 1. **Before doing anything else**, output the recall results above. If `{RECALL_RESULTS}` is empty, run recall yourself:
    ```bash
-   .lavra/memory/recall.sh "{keywords from bead title}"
+   PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+   "$PROJECT_ROOT/.lavra/memory/recall.sh" "{keywords from bead title}"
    ```
    Output the results or "No relevant knowledge found." Do not skip this.
 

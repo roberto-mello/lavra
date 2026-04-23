@@ -129,7 +129,8 @@ async function convertCommands() {
       const rawBody = extractBody(content);
       const body = rawBody
         .replace(/\.claude\/skills\//g, "skills/")
-        .replace(/ls \.claude\/skills\//g, "ls skills/");
+        .replace(/ls \.claude\/skills\//g, "ls skills/")
+        .replace(/\.claude\/hooks\//g, "hooks/");
 
       // Extract description from frontmatter
       const description = frontmatter.description || baseName;

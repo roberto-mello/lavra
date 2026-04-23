@@ -57,6 +57,18 @@ Do not proceed without a clear feature description.
 **Note: The current year is 2026.** Use this when dating plans and searching for recent documentation.
 </context>
 
+<project_root>
+
+All `.lavra/` paths are relative to the project root. If you `cd` into a subdirectory during work, resolve the project root first:
+
+```bash
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+```
+
+Then prefix all `.lavra/` paths with `"$PROJECT_ROOT/"` when invoking them via Bash.
+
+</project_root>
+
 <process>
 
 ### 0. Idea Refinement
@@ -99,11 +111,11 @@ Search for brainstorm-related knowledge and beads using keywords from the featur
 
 ```bash
 # Search for brainstorm-related knowledge
-.lavra/memory/recall.sh "brainstorm"
-.lavra/memory/recall.sh "{keywords from feature description}"
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "brainstorm"
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "{keywords from feature description}"
 
 # Check for recent brainstorm beads (title-based)
-bd list --status=open --json 2>/dev/null | jq -r '.[] | select(.title | test("brainstorm|explore|investigate"; "i")) | "\(.id): \(.title) (\(.updated_at // .created_at))"'
 ```
 
 **Relevance criteria:** A brainstorm entry is relevant if:
@@ -186,7 +198,8 @@ Use **AskUserQuestion tool** to ask which brainstorm to use, or whether to proce
 ### 0.5. Read Workflow Config
 
 ```bash
-[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+[ -f "$PROJECT_ROOT/.lavra/config/lavra.json" ] && cat "$PROJECT_ROOT/.lavra/config/lavra.json"
 ```
 
 If the file exists, parse and store settings for use during planning. If it does not exist, use defaults: `research: true`, `plan_review: true`, `goal_verification: true`, `max_parallel_agents: 3`, `commit_granularity: "task"`, `testing_scope: "full"`.
@@ -456,7 +469,8 @@ After creating all child beads, run a warning-only validation pass.
    - Rails `.rb` files → search `MUST-CHECK Rails`
 
    ```bash
-   .lavra/memory/recall.sh "MUST-CHECK {stack keywords}"
+   PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+   "$PROJECT_ROOT/.lavra/memory/recall.sh" "MUST-CHECK {stack keywords}"
    ```
 
    For each `MUST-CHECK:` entry found: check whether the child bead's `## Decisions / Locked` section mentions the relevant constraint. If not, emit a warning.

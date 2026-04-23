@@ -15,6 +15,18 @@ Used when exactly one bead is being worked on. Full-quality interactive flow wit
 
 ---
 
+<project_root>
+
+All `.lavra/` paths are relative to the project root. If you `cd` into a subdirectory during work, resolve the project root first:
+
+```bash
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+```
+
+Then prefix all `.lavra/` paths with `"$PROJECT_ROOT/"` when invoking them via Bash.
+
+</project_root>
+
 <phase name="quick-start" order="1">
 
 ## Phase 1: Quick Start
@@ -55,8 +67,9 @@ Used when exactly one bead is being worked on. Full-quality interactive flow wit
 2. **Recall Relevant Knowledge** *(required -- do not skip)*
 
    ```bash
-   .lavra/memory/recall.sh "{keywords from bead title}"
-   .lavra/memory/recall.sh "{tech stack keywords}"
+   PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+   "$PROJECT_ROOT/.lavra/memory/recall.sh" "{keywords from bead title}"
+   "$PROJECT_ROOT/.lavra/memory/recall.sh" "{tech stack keywords}"
    ```
 
    **You MUST output the recall results here before continuing.** If recall returns nothing, output: "No relevant knowledge found." Do not proceed to step 3 until this is done.
@@ -149,7 +162,8 @@ bd comments add {BEAD_ID} "DEVIATION: Unable to fix {issue} after 3 attempts. Do
 **Read workflow config (no-op if missing):**
 
 ```bash
-[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+[ -f "$PROJECT_ROOT/.lavra/config/lavra.json" ] && cat "$PROJECT_ROOT/.lavra/config/lavra.json"
 ```
 
 Parse `execution.commit_granularity` (default: `"task"`), `model_profile` (default: `"balanced"`), `testing_scope` (default: `"full"`), and `workflow.review_scope` (default: `"full"`). When `testing_scope` is `"targeted"`, deviation rule 2 applies only to hooks, API routes, external service calls, and complex business logic -- skip adding tests for structural/render-only code.
@@ -223,7 +237,8 @@ For each skill directory found, read the `description:` line from its `SKILL.md`
    Update `.lavra/memory/session-state.md`:
 
    ```bash
-   cat > .lavra/memory/session-state.md << EOF
+   PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+   cat > "$PROJECT_ROOT/.lavra/memory/session-state.md" << EOF
    # Session State
    ## Current Position
    - Bead(s): {BEAD_ID}
@@ -386,7 +401,8 @@ After review is clean, extract and structure knowledge from this work session.
 
 2. **Check for duplicates** against existing knowledge:
    ```bash
-   .lavra/memory/recall.sh "{keywords from entries}" --all
+   PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+   "$PROJECT_ROOT/.lavra/memory/recall.sh" "{keywords from entries}" --all
    ```
 
 3. **Structure and store** -- for each raw comment, ensure it has clear, searchable content. If a comment is too terse, rewrite it self-contained, then re-log:

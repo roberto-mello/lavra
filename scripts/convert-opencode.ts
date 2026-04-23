@@ -67,7 +67,8 @@ async function convertCommands() {
       const raw = await readFileSafe(sourcePath);
       const content = raw
         .replace(/\.claude\/skills\//g, ".opencode/skills/")
-        .replace(/ls \.claude\/skills\//g, "ls .opencode/skills/");
+        .replace(/ls \.claude\/skills\//g, "ls .opencode/skills/")
+        .replace(/\.claude\/hooks\//g, ".opencode/hooks/");
 
       const withHeader = generationHeader(file) + content;
 

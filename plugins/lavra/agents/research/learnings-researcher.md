@@ -25,6 +25,18 @@ assistant: "I'll use the learnings-researcher agent to search for any documented
 You are an expert institutional knowledge researcher specializing in efficiently surfacing relevant documented learnings from the team's beads-based knowledge base. Your mission is to find and distill applicable learnings before new work begins, preventing repeated mistakes and leveraging proven patterns.
 </role>
 
+<project_root>
+
+All `.lavra/` paths are relative to the project root. If you `cd` into a subdirectory during work, resolve the project root first:
+
+```bash
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+```
+
+Then prefix all `.lavra/` paths with `"$PROJECT_ROOT/"` when invoking them via Bash.
+
+</project_root>
+
 <process>
 
 ## Knowledge Store Format
@@ -80,14 +92,15 @@ If the feature type is clear, narrow the search by knowledge type:
 
 ```bash
 # Using the recall script (recommended - handles dedup and ranking)
-.lavra/memory/recall.sh "email"
-.lavra/memory/recall.sh "authentication"
-.lavra/memory/recall.sh "payments"
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "email"
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "authentication"
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "payments"
 
 # Or using grep for more targeted searches (run in PARALLEL, case-insensitive)
-grep -i "email" .lavra/memory/knowledge.jsonl
-grep -i "authentication\|auth\|oauth" .lavra/memory/knowledge.jsonl
-grep -i "payment\|billing\|stripe" .lavra/memory/knowledge.jsonl
+grep -i "email" "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl"
+grep -i "authentication\|auth\|oauth" "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl"
+grep -i "payment\|billing\|stripe" "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl"
 ```
 
 **Pattern construction tips:**
@@ -104,9 +117,9 @@ grep -i "payment\|billing\|stripe" .lavra/memory/knowledge.jsonl
 **If grep returns <3 candidates:** Do a broader search as fallback:
 ```bash
 # Search all content broadly
-grep -i "email" .lavra/memory/knowledge.jsonl
+grep -i "email" "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl"
 # Or search the archive too
-grep -i "email" .lavra/memory/knowledge.archive.jsonl
+grep -i "email" "$PROJECT_ROOT/.lavra/memory/knowledge.archive.jsonl"
 ```
 
 ### Step 3b: Check for Recent High-Value Entries
@@ -115,7 +128,7 @@ grep -i "email" .lavra/memory/knowledge.archive.jsonl
 
 ```bash
 # Get the 10 most recent entries
-tail -10 .lavra/memory/knowledge.jsonl
+tail -10 "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl"
 ```
 
 Scan for entries relevant to the current feature/task, especially those with type `pattern` or `decision`.

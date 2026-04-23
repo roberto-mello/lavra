@@ -60,9 +60,11 @@ export async function convertSkills(
       await mkdir(outputSkillDir, { recursive: true, mode: 0o755 });
 
       const raw = await readFileSafe(skillMd);
+      const hooksReplacement = pathReplacement.replace(/skills\/$/, "hooks/");
       const content = raw
         .replace(/\.claude\/skills\//g, pathReplacement)
-        .replace(/ls \.claude\/skills\//g, `ls ${pathReplacement}`);
+        .replace(/ls \.claude\/skills\//g, `ls ${pathReplacement}`)
+        .replace(/\.claude\/hooks\//g, hooksReplacement);
 
       const outputSkillMd = join(outputSkillDir, "SKILL.md");
       await writeFileSafe(

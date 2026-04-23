@@ -26,6 +26,18 @@ Captures problem solutions immediately after confirmation, creating structured k
 
 ---
 
+<project_root>
+
+All `.lavra/` paths are relative to the project root. If you `cd` into a subdirectory during work, resolve the project root first:
+
+```bash
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+```
+
+Then prefix all `.lavra/` paths with `"$PROJECT_ROOT/"` when invoking them via Bash.
+
+</project_root>
+
 <critical_sequence name="knowledge-capture" enforce_order="strict">
 
 ## 7-Step Process
@@ -82,10 +94,11 @@ Search `knowledge.jsonl` for similar issues:
 
 ```bash
 # Search by error message keywords
-grep "exact error phrase" .lavra/memory/knowledge.jsonl
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+grep "exact error phrase" "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl"
 
 # Search using recall script if available
-.lavra/memory/recall.sh "keyword1 keyword2"
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "keyword1 keyword2"
 ```
 
 **IF similar knowledge found:**
@@ -193,7 +206,8 @@ Please provide corrected values.
 
 ```bash
 # Append each validated entry as a single JSON line
-echo '{"key":"learned-oauth-redirect-must-match","type":"learned","content":"OAuth redirect URI must match exactly including trailing slash","source":"agent","tags":["auth","oauth","security"],"ts":1706918400,"bead":"BD-001"}' >> .lavra/memory/knowledge.jsonl
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+echo '{"key":"learned-oauth-redirect-must-match","type":"learned","content":"OAuth redirect URI must match exactly including trailing slash","source":"agent","tags":["auth","oauth","security"],"ts":1706918400,"bead":"BD-001"}' >> "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl"
 ```
 
 **Log as bead comments (if bead ID available):**
@@ -208,11 +222,12 @@ bd comments add BD-001 "PATTERN: Always verify OAuth redirect URIs match exactly
 **Rotation:** If `knowledge.jsonl` exceeds 1000 lines after appending, move first 500 lines to `knowledge.archive.jsonl` and keep remaining lines as new `knowledge.jsonl`.
 
 ```bash
-LINE_COUNT=$(wc -l < .lavra/memory/knowledge.jsonl)
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+LINE_COUNT=$(wc -l < "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl")
 if [ "$LINE_COUNT" -gt 1000 ]; then
-  head -500 .lavra/memory/knowledge.jsonl >> .lavra/memory/knowledge.archive.jsonl
-  tail -n +501 .lavra/memory/knowledge.jsonl > .lavra/memory/knowledge.jsonl.tmp
-  mv .lavra/memory/knowledge.jsonl.tmp .lavra/memory/knowledge.jsonl
+  head -500 "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl" >> "$PROJECT_ROOT/.lavra/memory/knowledge.archive.jsonl"
+  tail -n +501 "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl" > "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl.tmp"
+  mv "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl.tmp" "$PROJECT_ROOT/.lavra/memory/knowledge.jsonl"
 fi
 ```
 </step>

@@ -121,7 +121,8 @@ Lightweight review for ship-blockers only. NOT a full /lavra-review.
 
 Read workflow config:
 ```bash
-[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+[ -f "$PROJECT_ROOT/.lavra/config/lavra.json" ] && cat "$PROJECT_ROOT/.lavra/config/lavra.json"
 ```
 
 Parse `model_profile` (default: `"balanced"`). For each bead with `## Validation` section, dispatch `goal-verifier` agent. Add `model: opus` when `model_profile` is `"quality"`:

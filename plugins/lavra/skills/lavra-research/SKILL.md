@@ -30,6 +30,18 @@ Do not proceed until you have a valid epic bead ID.
 **The current year is 2026.** Use this when searching for recent documentation and best practices.
 </context>
 
+<project_root>
+
+All `.lavra/` paths are relative to the project root. If you `cd` into a subdirectory during work, resolve the project root first:
+
+```bash
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+```
+
+Then prefix all `.lavra/` paths with `"$PROJECT_ROOT/"` when invoking them via Bash.
+
+</project_root>
+
 <process>
 
 ### 1. Parse Plan and Extract Domain Indicators
@@ -150,12 +162,13 @@ Search for relevant past learnings before dispatching agents. These inform what 
 
 ```bash
 # Search knowledge for each key topic in the plan
-.lavra/memory/recall.sh "{topic 1}"
-.lavra/memory/recall.sh "{topic 2}"
-.lavra/memory/recall.sh "{technology}"
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "{topic 1}"
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "{topic 2}"
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "{technology}"
 
 # Search with --all to include archived knowledge
-.lavra/memory/recall.sh --all "{broad topic}"
+"$PROJECT_ROOT/.lavra/memory/recall.sh" --all "{broad topic}"
 ```
 
 Collect all relevant entries. These will be provided to agents as context.

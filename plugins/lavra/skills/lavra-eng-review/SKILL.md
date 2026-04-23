@@ -31,6 +31,18 @@ Do not proceed until you have a valid epic bead ID.
 - In `--small` mode, each agent returns only its **single most important finding**; synthesis produces a compact prioritized list
 </execution_context>
 
+<project_root>
+
+All `.lavra/` paths are relative to the project root. If you `cd` into a subdirectory during work, resolve the project root first:
+
+```bash
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+```
+
+Then prefix all `.lavra/` paths with `"$PROJECT_ROOT/"` when invoking them via Bash.
+
+</project_root>
+
 <process>
 
 ### Step 1: Load the Plan
@@ -63,8 +75,9 @@ If prior commits suggest a previous review cycle on this branch (e.g., "address 
 
 ```bash
 # Search for knowledge related to the plan's topic
-.lavra/memory/recall.sh "{keywords from epic title}"
-.lavra/memory/recall.sh "{tech stack keywords}"
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "{keywords from epic title}"
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "{tech stack keywords}"
 ```
 
 Include any relevant LEARNED/DECISION/FACT/PATTERN entries as context for reviewers.
@@ -72,7 +85,8 @@ Include any relevant LEARNED/DECISION/FACT/PATTERN entries as context for review
 Read workflow config for model profile:
 
 ```bash
-[ -f .lavra/config/lavra.json ] && cat .lavra/config/lavra.json
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+[ -f "$PROJECT_ROOT/.lavra/config/lavra.json" ] && cat "$PROJECT_ROOT/.lavra/config/lavra.json"
 ```
 
 Parse `model_profile` (default: `"balanced"`). When `model_profile` is `"quality"`, dispatch `architecture-strategist`, `security-sentinel`, and `performance-oracle` with `model: opus`.

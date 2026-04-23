@@ -8,6 +8,18 @@ argument-hint: "[bead IDs to process, or omit for all closed-today beads]"
 Turn raw LEARNED/DECISION/FACT/PATTERN/INVESTIGATION comments captured during work sessions into structured, deduplicated, well-tagged knowledge entries in `.lavra/memory/knowledge.jsonl`. This is the step that converts inline observations into searchable, recallable knowledge that makes future work easier.
 </objective>
 
+<project_root>
+
+All `.lavra/` paths are relative to the project root. If you `cd` into a subdirectory during work, resolve the project root first:
+
+```bash
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+```
+
+Then prefix all `.lavra/` paths with `"$PROJECT_ROOT/"` when invoking them via Bash.
+
+</project_root>
+
 <context>
 **When to use:**
 - After `/lavra-work` completes (auto-suggested when LEARNED/INVESTIGATION comments exist)
@@ -64,7 +76,8 @@ Review all gathered entries and identify:
 
 Load existing knowledge for deduplication:
 ```bash
-.lavra/memory/recall.sh "{keywords from gathered entries}" --all
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "{keywords from gathered entries}" --all
 ```
 
 ### Step 3: Structure Each Entry

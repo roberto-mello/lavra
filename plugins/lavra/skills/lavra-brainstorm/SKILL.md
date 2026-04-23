@@ -59,6 +59,18 @@ Do not proceed until you have a clear feature description from the user.
 **Process knowledge:** Load the `brainstorming` skill for detailed question techniques, approach exploration patterns, and YAGNI principles.
 </context>
 
+<project_root>
+
+All `.lavra/` paths are relative to the project root. If you `cd` into a subdirectory during work, resolve the project root first:
+
+```bash
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+```
+
+Then prefix all `.lavra/` paths with `"$PROJECT_ROOT/"` when invoking them via Bash.
+
+</project_root>
+
 <process>
 
 ### Phase 0: Assess Requirements Clarity
@@ -89,7 +101,8 @@ Focus on: similar features, established patterns, CLAUDE.md or AGENTS.md guidanc
 Search for relevant knowledge from past sessions:
 
 ```bash
-.lavra/memory/recall.sh "{keywords from feature description}"
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+"$PROJECT_ROOT/.lavra/memory/recall.sh" "{keywords from feature description}"
 ```
 
 Present any relevant entries that might inform the brainstorm.
