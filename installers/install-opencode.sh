@@ -65,6 +65,18 @@ if [[ "$TARGET_OWNER" != "$USER" ]]; then
   exit 1
 fi
 
+# Check .beads exists (skip for global install)
+if [ "$GLOBAL_INSTALL" != true ]; then
+  if [ ! -d "$TARGET/.beads" ]; then
+    echo "[!] No .beads directory found in $TARGET."
+    echo ""
+    echo "    Run this first:"
+    echo "      cd $TARGET && bd init"
+    echo ""
+    exit 1
+  fi
+fi
+
 # Dependency check: jq is required for model selection and MCP config
 if ! command -v jq &>/dev/null; then
   echo "[!] Error: jq is required for OpenCode installation"
@@ -339,6 +351,14 @@ fi
 echo ""
 
 # Installation complete
+if ! command -v sqlite3 &>/dev/null; then
+  echo "[!] sqlite3 not found. Memory recall will use JSONL linear search (slower)."
+  echo "    Install sqlite3 for optimal recall performance:"
+  echo "      macOS:  brew install sqlite"
+  echo "      Ubuntu: sudo apt-get install sqlite3"
+  echo ""
+fi
+
 echo "Done."
 echo ""
 

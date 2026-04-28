@@ -112,10 +112,14 @@ else
 
   echo "[1/9] bd found: $(which bd)"
 
-  # Initialize .beads if needed
+  # Check .beads exists
   if [ ! -d "$TARGET/.beads" ]; then
-    echo "[2/9] Initializing .beads..."
-    (cd "$TARGET" && bd init)
+    echo "[!] No .beads directory found in $TARGET."
+    echo ""
+    echo "    Run this first:"
+    echo "      cd $TARGET && bd init"
+    echo ""
+    exit 1
   else
     echo "[2/9] .beads already exists"
   fi
@@ -485,6 +489,14 @@ fi
 # Finalize manifest (enables stale cleanup on next install)
 if [ "$GLOBALLY_INSTALLED" = false ]; then
   commit_manifest "$MANIFEST_FILE"
+fi
+
+if ! command -v sqlite3 &>/dev/null; then
+  echo "[!] sqlite3 not found. Memory recall will use JSONL linear search (slower)."
+  echo "    Install sqlite3 for optimal recall performance:"
+  echo "      macOS:  brew install sqlite"
+  echo "      Ubuntu: sudo apt-get install sqlite3"
+  echo ""
 fi
 
 echo ""

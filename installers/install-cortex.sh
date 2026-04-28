@@ -143,10 +143,14 @@ else
 
   echo "[1/8] bd found: $(which bd)"
 
-  # [2/8] Initialize .beads if needed
+  # Check .beads exists
   if [ ! -d "$TARGET/.beads" ]; then
-    echo "[2/8] Initializing .beads..."
-    (cd "$TARGET" && bd init)
+    echo "[!] No .beads directory found in $TARGET."
+    echo ""
+    echo "    Run this first:"
+    echo "      cd $TARGET && bd init"
+    echo ""
+    exit 1
   else
     echo "[2/8] .beads already exists"
   fi
@@ -507,6 +511,14 @@ fi
 
 # Summary
 echo ""
+if ! command -v sqlite3 &>/dev/null; then
+  echo "[!] sqlite3 not found. Memory recall will use JSONL linear search (slower)."
+  echo "    Install sqlite3 for optimal recall performance:"
+  echo "      macOS:  brew install sqlite"
+  echo "      Ubuntu: sudo apt-get install sqlite3"
+  echo ""
+fi
+
 echo "Done."
 echo ""
 
