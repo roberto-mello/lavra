@@ -300,6 +300,8 @@ else
     echo "$CMD_COUNT commands, $AGENT_COUNT agents, and $SKILL_COUNT skills installed."
     echo ""
   fi
+  echo "Context7 MCP server added (framework docs on demand)."
+  echo ""
   echo "Main workflow:"
   echo "  /lavra-design <feature description>   Plan a feature end-to-end before writing code"
   echo "  /lavra-work <bead id>                 Execute work on a bead"

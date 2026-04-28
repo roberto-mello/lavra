@@ -531,6 +531,8 @@ if [ "$GLOBAL_INSTALL" = true ]; then
 else
   echo "Hooks installed for this project."
   echo ""
+  echo "Context7 MCP server added (framework docs on demand)."
+  echo ""
 fi
 
 echo "Restart Cortex Code to load the plugin."
