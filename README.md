@@ -135,15 +135,27 @@ Six knowledge types (LEARNED, DECISION, FACT, PATTERN, INVESTIGATION, DEVIATION)
 ### Configuration
 
 **`.lavra/config/lavra.json`** can be created manually or by the `/lavra-setup` command.
-It allows users to toggle workflow phases, planning and execution behavior:
+It allows users to toggle workflow phases, planning and execution behavior.
+
+The trade-off is between more research and review happening in subagents for better quality,
+at the expense of more tokens. If you want to reduce token usage, turn off
+some of these.
 
 ```jsonc
 {
   "workflow": {
-    "research": true,             // run research agents in /lavra-design
-    "plan_review": true,          // run plan review phase in /lavra-design
-    "goal_verification": true,    // verify completion criteria in /lavra-work and /lavra-ship
-    "testing_scope": "targeted"   // "targeted" (hooks, API routes, complex logic only) or "full" (all tests)
+    // /lavra-design: run or skip 5 research subagents
+    "research": true,
+    // /lavra-design: run or skip engineering review with 4 subagents
+    "plan_review": true,
+    // use or skip goal-verifier agent to verify completion criteria in /lavra-work and /lavra-ship
+    "goal_verification": true,
+    // full (default) runs /lavra-review on all changes
+    // "targeted" runs only on beads meeting risk criteria (hooks, API routes, auth, external services)
+    review_scope: targeted,
+    // "full" (default) means full test criteria in child beads.
+    // "targeted" tests only when hooks, API routes, complex logic are involved
+    "testing_scope": "targeted"
   },
   "execution": {
     "max_parallel_agents": 3,     // max subagents running at once
