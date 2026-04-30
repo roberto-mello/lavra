@@ -152,7 +152,7 @@ some of these.
     "goal_verification": true,
     // full (default) runs /lavra-review on all changes
     // "targeted" runs only on beads meeting risk criteria (hooks, API routes, auth, external services)
-    review_scope: targeted,
+    "review_scope": "targeted",
     // "full" (default) means full test criteria in child beads.
     // "targeted" tests only when hooks, API routes, complex logic are involved
     "testing_scope": "targeted"
