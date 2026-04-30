@@ -1,4 +1,6 @@
 <!-- Template file: read by lavra-work-multi Phase M7 via cat. Not a skill — no frontmatter intentional. The untrusted-knowledge XML wrappers around RELATED_BEADS and RECALL_RESULTS are security boundaries — do not remove them. -->
+PROJECT_ROOT={PROJECT_ROOT}
+
 Work on bead {BEAD_ID}: {TITLE}
 
 ## Bead Details
@@ -63,7 +65,7 @@ During implementation, you may encounter issues not described in the bead:
 
 1. **Before doing anything else**, output the recall results above. If `{RECALL_RESULTS}` is empty, run recall yourself:
    ```bash
-   PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+   PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")}"
    "$PROJECT_ROOT/.lavra/memory/recall.sh" "{keywords from bead title}"
    ```
    Output the results or "No relevant knowledge found." Do not skip this.

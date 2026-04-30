@@ -17,10 +17,10 @@ Used when exactly one bead is being worked on. Full-quality interactive flow wit
 
 <project_root>
 
-All `.lavra/` paths are relative to the project root. If you `cd` into a subdirectory during work, resolve the project root first:
+All `.lavra/` paths are relative to the project root. `PROJECT_ROOT` may be injected into your context — use it if set. If not, resolve it once and reuse:
 
 ```bash
-PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")}"
 ```
 
 Then prefix all `.lavra/` paths with `"$PROJECT_ROOT/"` when invoking them via Bash.
@@ -67,7 +67,7 @@ Then prefix all `.lavra/` paths with `"$PROJECT_ROOT/"` when invoking them via B
 2. **Recall Relevant Knowledge** *(required -- do not skip)*
 
    ```bash
-   PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+   PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")}"
    "$PROJECT_ROOT/.lavra/memory/recall.sh" "{keywords from bead title}"
    "$PROJECT_ROOT/.lavra/memory/recall.sh" "{tech stack keywords}"
    ```
@@ -162,7 +162,7 @@ bd comments add {BEAD_ID} "DEVIATION: Unable to fix {issue} after 3 attempts. Do
 **Read workflow config (no-op if missing):**
 
 ```bash
-PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")}"
 [ -f "$PROJECT_ROOT/.lavra/config/lavra.json" ] && cat "$PROJECT_ROOT/.lavra/config/lavra.json"
 ```
 
@@ -237,7 +237,7 @@ For each skill directory found, read the `description:` line from its `SKILL.md`
    Update `.lavra/memory/session-state.md`:
 
    ```bash
-   PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+   PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")}"
    cat > "$PROJECT_ROOT/.lavra/memory/session-state.md" << EOF
    # Session State
    ## Current Position
@@ -401,7 +401,7 @@ After review is clean, extract and structure knowledge from this work session.
 
 2. **Check for duplicates** against existing knowledge:
    ```bash
-   PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+   PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")}"
    "$PROJECT_ROOT/.lavra/memory/recall.sh" "{keywords from entries}" --all
    ```
 

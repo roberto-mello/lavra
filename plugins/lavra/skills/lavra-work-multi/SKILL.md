@@ -15,10 +15,10 @@ Multiple beads. Dispatches subagents in parallel with file-scope conflict detect
 
 <project_root>
 
-All `.lavra/` paths are relative to the project root. If you `cd` into a subdirectory during work, resolve the project root first:
+All `.lavra/` paths are relative to the project root. `PROJECT_ROOT` may be injected into your context — use it if set. If not, resolve it once and reuse:
 
 ```bash
-PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")}"
 ```
 
 Then prefix all `.lavra/` paths with `"$PROJECT_ROOT/"` when invoking them via Bash.
@@ -184,7 +184,7 @@ Search memory for all beads to prime context. Subagents don't receive session-st
 </mandatory>
 
 ```bash
-PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")}"
 RAW_RECALL=$("$PROJECT_ROOT/.lavra/memory/recall.sh" "{combined keywords}")
 ```
 
@@ -228,7 +228,7 @@ Store wrapped value as `{RECALL_RESULTS}` for use in agent prompt template.
 
 For each bead in wave, run:
 ```bash
-PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")}"
 bash "$PROJECT_ROOT/.claude/hooks/extract-bead-context.sh" {BEAD_ID}
 ```
 Store output as `{BEAD_CONTEXT}`. If `.claude/hooks/extract-bead-context.sh` does not exist, fall back to `$PROJECT_ROOT/plugins/lavra/hooks/extract-bead-context.sh`.
@@ -265,7 +265,7 @@ Store wrapped value as `{EPIC_PLAN}`. If input was not an epic (comma-separated 
 **Read project config (no-op if missing):**
 
 ```bash
-PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")}"
 [ -f "$PROJECT_ROOT/.lavra/config/project-setup.md" ] && cat "$PROJECT_ROOT/.lavra/config/project-setup.md"
 [ -f "$PROJECT_ROOT/.lavra/config/codebase-profile.md" ] && cat "$PROJECT_ROOT/.lavra/config/codebase-profile.md"
 [ -f "$PROJECT_ROOT/.lavra/config/lavra.json" ] && cat "$PROJECT_ROOT/.lavra/config/lavra.json"
@@ -332,6 +332,7 @@ ${RELATED_BEADS}
 
 | Placeholder | Source |
 |---|---|
+| `{PROJECT_ROOT}` | From Phase M6 (`$PROJECT_ROOT`) — eliminates `git rev-parse` in subagents |
 | `{BEAD_ID}`, `{TITLE}` | From `bd show` |
 | `{BEAD_CONTEXT}` | From `extract-bead-context.sh` output |
 | `{EPIC_PLAN}` | From Phase M6 epic fetch (empty if no epic) |
@@ -512,7 +513,7 @@ bd close {BD-XXX} {BD-YYY} {BD-ZZZ}
 
 Write session state:
 ```bash
-PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")}"
 cat > "$PROJECT_ROOT/.lavra/memory/session-state.md" << EOF
 # Session State
 ## Current Position
@@ -550,7 +551,7 @@ Proceed to next wave only after all steps pass.
 **Before starting next wave**, recall knowledge from this wave:
 
 ```bash
-PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")}"
 "$PROJECT_ROOT/.lavra/memory/recall.sh" "{BD-XXX BD-YYY}"
 ```
 
