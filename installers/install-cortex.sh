@@ -16,6 +16,22 @@ set -euo pipefail
 # Security: Set restrictive umask
 umask 077
 
+# Runtime variant: cortex (default) or codex
+RUNTIME_VARIANT="${LAVRA_RUNTIME_VARIANT:-cortex}"
+if [ "$RUNTIME_VARIANT" = "codex" ]; then
+  PRODUCT_NAME="Codex"
+  GLOBAL_ROOT="$HOME/.codex"
+  PROJECT_CONFIG_DIR=".codex"
+  INSTALL_FLAG="--codex"
+  PLATFORM_DIR="codex"
+else
+  PRODUCT_NAME="Cortex Code"
+  GLOBAL_ROOT="$HOME/.snowflake/cortex"
+  PROJECT_CONFIG_DIR=".cortex"
+  INSTALL_FLAG="--cortex"
+  PLATFORM_DIR="cortex"
+fi
+
 # Use marketplace root from router if available, else derive from script location
 if [ -n "${BEADS_MARKETPLACE_ROOT:-}" ]; then
   SCRIPT_DIR="$BEADS_MARKETPLACE_ROOT"
@@ -48,11 +64,11 @@ done
 
 # Resolve target
 if [ "$GLOBAL_INSTALL" = true ]; then
-  TARGET="$HOME/.snowflake/cortex"
+  TARGET="$GLOBAL_ROOT"
 elif [ ${#POSITIONAL_ARGS[@]} -gt 0 ]; then
   TARGET="${POSITIONAL_ARGS[0]}"
 else
-  TARGET="$HOME/.snowflake/cortex"
+  TARGET="$GLOBAL_ROOT"
   GLOBAL_INSTALL=true
 fi
 
@@ -68,8 +84,8 @@ if [[ "$TARGET" == "$SCRIPT_DIR" || "$TARGET" == "$PLUGIN_DIR" ]]; then
   echo "    This is the plugin source directory, not a project."
   echo ""
   echo "    Usage:"
-  echo "      ./install.sh -cortex                      # global install to ~/.snowflake/cortex"
-  echo "      ./install.sh -cortex /path/to/project     # project-specific install"
+  echo "      ./install.sh $INSTALL_FLAG                      # global install to $GLOBAL_ROOT"
+  echo "      ./install.sh $INSTALL_FLAG /path/to/project     # project-specific install"
   echo ""
   exit 1
 fi
@@ -81,10 +97,29 @@ if [ ! -d "$PLUGIN_DIR" ]; then
   exit 1
 fi
 
-LAVRA_GLOBAL_DEFAULT="$HOME/.snowflake/cortex"
+# Codex packaging preflight: fail with actionable errors if required files are missing
+if [ "$RUNTIME_VARIANT" = "codex" ]; then
+  REQUIRED_FILES=(
+    "$PLUGIN_DIR/.codex-plugin/plugin.json"
+    "$PLUGIN_DIR/hooks/sanitize-content.sh"
+    "$PLUGIN_DIR/hooks/check-memory.sh"
+    "$PLUGIN_DIR/hooks/dispatch-hook.sh"
+    "$SCRIPT_DIR/scripts/convert-codex.ts"
+  )
+  for required in "${REQUIRED_FILES[@]}"; do
+    if [ ! -f "$required" ]; then
+      echo "[!] Error: Required Codex artifact missing: $required"
+      echo "    This usually means the package was built without needed Codex files."
+      echo "    Rebuild/release with complete package contents before installing."
+      exit 1
+    fi
+  done
+fi
+
+LAVRA_GLOBAL_DEFAULT="$GLOBAL_ROOT"
 LAVRA_HOOKS_ARE_GLOBAL=false
 INSTALLER_VERSION=$(get_lavra_version "$PLUGIN_DIR")
-[ "$NO_BANNER" = false ] && print_banner "Cortex Code" "$INSTALLER_VERSION"
+[ "$NO_BANNER" = false ] && print_banner "$PRODUCT_NAME" "$INSTALLER_VERSION"
 echo "  Target: $TARGET"
 if [ "$GLOBAL_INSTALL" = true ]; then
   echo "  Type: Global installation"
@@ -178,7 +213,7 @@ if [ "$GLOBAL_INSTALL" = true ]; then
 
   mkdir -p "$TARGET/hooks"
 
-  for hook in check-memory.sh dispatch-hook.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh recall.sh; do
+  for hook in sanitize-content.sh check-memory.sh dispatch-hook.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh recall.sh; do
     if [ -f "$PLUGIN_DIR/hooks/$hook" ]; then
       cp "$PLUGIN_DIR/hooks/$hook" "$TARGET/hooks/$hook"
       chmod +x "$TARGET/hooks/$hook"
@@ -194,17 +229,17 @@ if [ "$GLOBAL_INSTALL" = true ]; then
 else
   echo "[4/8] Installing hooks..."
 
-  HOOKS_DIR="$TARGET/.cortex/hooks"
+  HOOKS_DIR="$TARGET/$PROJECT_CONFIG_DIR/hooks"
   create_dir_with_symlink_handling "$HOOKS_DIR"
 
-  for hook in memory-capture.sh auto-recall.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh; do
+  for hook in sanitize-content.sh memory-capture.sh auto-recall.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh; do
     cp "$PLUGIN_DIR/hooks/$hook" "$HOOKS_DIR/$hook"
     chmod +x "$HOOKS_DIR/$hook"
     echo "  - Installed $hook"
   done
 
   # Ensure dispatcher is in global hooks dir (needed even without a global install)
-  GLOBAL_HOOKS="$HOME/.snowflake/cortex/hooks"
+  GLOBAL_HOOKS="$GLOBAL_ROOT/hooks"
   mkdir -p "$GLOBAL_HOOKS"
   for hook in dispatch-hook.sh check-memory.sh; do
     if [ -f "$PLUGIN_DIR/hooks/$hook" ]; then
@@ -228,8 +263,8 @@ if [ "$GLOBAL_INSTALL" = false ]; then
 
   # Version check for per-project hooks
   GLOBAL_VERSION="0.0.0"
-  if [ -f "$HOME/.snowflake/cortex/hooks/.lavra-version" ]; then
-    GLOBAL_VERSION=$(cat "$HOME/.snowflake/cortex/hooks/.lavra-version")
+  if [ -f "$GLOBAL_ROOT/hooks/.lavra-version" ]; then
+    GLOBAL_VERSION=$(cat "$GLOBAL_ROOT/hooks/.lavra-version")
   fi
 
   if [ "$GLOBAL_VERSION" != "$INSTALLER_VERSION" ]; then
@@ -253,7 +288,7 @@ if [ "$GLOBAL_INSTALL" = false ]; then
       *)
         echo ""
         echo "  Run global update first:"
-        echo "    bunx @lavralabs/lavra@latest --cortex"
+        echo "    bunx @lavralabs/lavra@latest $INSTALL_FLAG"
         echo ""
         exit 0
         ;;
@@ -270,7 +305,7 @@ if [ "$GLOBAL_INSTALL" = true ]; then
   begin_manifest "$MANIFEST_FILE"
 fi
 
-# [5/8] Install commands (requires bun, run convert-cortex.ts)
+# [5/8] Install commands (requires bun, run platform converter)
 echo "[5/8] Installing workflow commands..."
 
 if [ "$GLOBALLY_INSTALLED" = true ]; then
@@ -285,13 +320,19 @@ else
   fi
 
   # Run conversion
-  echo "  Running convert-cortex.ts..."
+  if [ "$RUNTIME_VARIANT" = "codex" ]; then
+    CONVERT_SCRIPT="convert-codex.ts"
+  else
+    CONVERT_SCRIPT="convert-cortex.ts"
+  fi
+
+  echo "  Running $CONVERT_SCRIPT..."
   cd "$SCRIPT_DIR/scripts"
   if [ ! -d "node_modules" ]; then
     echo "  Installing script dependencies..."
     bun install --silent
   fi
-  if ! BEADS_INSTALLING=1 bun run convert-cortex.ts; then
+  if ! BEADS_INSTALLING=1 bun run "$CONVERT_SCRIPT"; then
     echo "[!] Error: Conversion failed"
     exit 1
   fi
@@ -299,11 +340,11 @@ else
   if [ "$GLOBAL_INSTALL" = true ]; then
     COMMANDS_DIR="$TARGET/commands"
   else
-    COMMANDS_DIR="$TARGET/.cortex/commands"
+    COMMANDS_DIR="$TARGET/$PROJECT_CONFIG_DIR/commands"
   fi
   create_dir_with_symlink_handling "$COMMANDS_DIR"
 
-  CMD_COUNT=$(sync_flat_dir "$PLUGIN_DIR/cortex/commands" "$COMMANDS_DIR" "$MANIFEST_FILE" "commands")
+  CMD_COUNT=$(sync_flat_dir "$PLUGIN_DIR/$PLATFORM_DIR/commands" "$COMMANDS_DIR" "$MANIFEST_FILE" "commands")
   echo "  - Installed $CMD_COUNT commands"
 fi
 
@@ -317,11 +358,11 @@ else
   if [ "$GLOBAL_INSTALL" = true ]; then
     AGENTS_DIR="$TARGET/agents"
   else
-    AGENTS_DIR="$TARGET/.cortex/agents"
+    AGENTS_DIR="$TARGET/$PROJECT_CONFIG_DIR/agents"
   fi
   mkdir -p "$AGENTS_DIR"
 
-  AGENT_COUNT=$(sync_nested_dir "$PLUGIN_DIR/cortex/agents" "$AGENTS_DIR" "$MANIFEST_FILE" "agents")
+  AGENT_COUNT=$(sync_nested_dir "$PLUGIN_DIR/$PLATFORM_DIR/agents" "$AGENTS_DIR" "$MANIFEST_FILE" "agents")
   echo "  - Installed $AGENT_COUNT agents"
 fi
 
@@ -337,13 +378,13 @@ else
   if [ "$GLOBAL_INSTALL" = true ]; then
     SKILLS_DIR="$TARGET/skills"
   else
-    SKILLS_DIR="$TARGET/.cortex/skills"
+    SKILLS_DIR="$TARGET/$PROJECT_CONFIG_DIR/skills"
   fi
   mkdir -p "$SKILLS_DIR"
 
   source_skill_list_cx=""
-  if [ -d "$PLUGIN_DIR/cortex/skills" ]; then
-    for skill_dir in "$PLUGIN_DIR/cortex/skills"/*/; do
+  if [ -d "$PLUGIN_DIR/$PLATFORM_DIR/skills" ]; then
+    for skill_dir in "$PLUGIN_DIR/$PLATFORM_DIR/skills"/*/; do
       [ -d "$skill_dir" ] || continue
       skill_name=$(basename "$skill_dir")
       source_skill_list_cx="${source_skill_list_cx}${skill_name}"$'\n'
@@ -388,16 +429,16 @@ else
   fi
 fi
 
-# [8/8] Configure hooks.json (ALWAYS at ~/.snowflake/cortex/hooks.json)
+# [8/8] Configure hooks.json (global at $GLOBAL_ROOT/hooks.json)
 echo "[8/8] Configuring hooks.json..."
 
-HOOKS_JSON="$HOME/.snowflake/cortex/hooks.json"
+HOOKS_JSON="$GLOBAL_ROOT/hooks.json"
 mkdir -p "$(dirname "$HOOKS_JSON")"
 
 if [ "$GLOBAL_INSTALL" = true ]; then
   # Global install: check-memory + dispatcher hooks (all absolute paths)
-  DISPATCH="bash ~/.snowflake/cortex/hooks/dispatch-hook.sh .cortex/hooks"
-  CHECK_MEM="bash ~/.snowflake/cortex/hooks/check-memory.sh cortex"
+  DISPATCH="bash $GLOBAL_ROOT/hooks/dispatch-hook.sh $PROJECT_CONFIG_DIR/hooks"
+  CHECK_MEM="bash $GLOBAL_ROOT/hooks/check-memory.sh $RUNTIME_VARIANT"
 
   if [ -f "$HOOKS_JSON" ]; then
     if command -v jq &>/dev/null; then
@@ -405,17 +446,15 @@ if [ "$GLOBAL_INSTALL" = true ]; then
 
       UPDATED=$(echo "$EXISTING" | jq \
         --arg check_mem "$CHECK_MEM" \
-        --arg recall "$DISPATCH auto-recall.sh" \
         --arg capture "$DISPATCH memory-capture.sh" \
         --arg wrapup "$DISPATCH subagent-wrapup.sh" '
         .hooks.SessionStart = (
           [(.hooks.SessionStart // [])[] | select(.hooks[]?.command | (contains("check-memory") or contains("auto-recall")) | not)] +
-          [{"hooks":[{"type":"command","command":$check_mem}]},
-           {"hooks":[{"type":"command","command":$recall,"async":true}]}]
+          [{"hooks":[{"type":"command","command":$check_mem}]}]
         ) |
         .hooks.PostToolUse = (
           [(.hooks.PostToolUse // [])[] | select(.hooks[]?.command | contains("memory-capture") | not)] +
-          [{"matcher":"bash","hooks":[{"type":"command","command":$capture,"async":true}]}]
+          [{"matcher":"Bash","hooks":[{"type":"command","command":$capture}]}]
         ) |
         .hooks.SubagentStop = (
           [(.hooks.SubagentStop // [])[] | select(.hooks[]?.command | contains("subagent-wrapup") | not)] +
@@ -432,11 +471,10 @@ if [ "$GLOBAL_INSTALL" = true ]; then
 {
   "hooks": {
     "SessionStart": [
-      {"hooks": [{"type": "command", "command": "$CHECK_MEM"}]},
-      {"hooks": [{"type": "command", "command": "$DISPATCH auto-recall.sh", "async": true}]}
+      {"hooks": [{"type": "command", "command": "$CHECK_MEM"}]}
     ],
     "PostToolUse": [
-      {"matcher": "bash", "hooks": [{"type": "command", "command": "$DISPATCH memory-capture.sh", "async": true}]}
+      {"matcher": "Bash", "hooks": [{"type": "command", "command": "$DISPATCH memory-capture.sh"}]}
     ],
     "SubagentStop": [
       {"hooks": [{"type": "command", "command": "$DISPATCH subagent-wrapup.sh"}]}
@@ -448,25 +486,23 @@ HOOKS_EOF
   fi
 else
   # Project install: dispatcher hooks (same absolute-path pattern as global)
-  DISPATCH="bash ~/.snowflake/cortex/hooks/dispatch-hook.sh .cortex/hooks"
+  DISPATCH="bash $GLOBAL_ROOT/hooks/dispatch-hook.sh $PROJECT_CONFIG_DIR/hooks"
 
   if [ -f "$HOOKS_JSON" ]; then
     if command -v jq &>/dev/null; then
       EXISTING=$(cat "$HOOKS_JSON")
 
       UPDATED=$(echo "$EXISTING" | jq \
-        --arg recall "$DISPATCH auto-recall.sh" \
         --arg capture "$DISPATCH memory-capture.sh" \
         --arg wrapup "$DISPATCH subagent-wrapup.sh" '
-        # Add/update SessionStart hook
+        # Add/update SessionStart hook (check-memory only for Claude parity)
         .hooks.SessionStart = (
-          [(.hooks.SessionStart // [])[] | select(.hooks[]?.command | contains("auto-recall") | not)] +
-          [{"hooks":[{"type":"command","command":$recall,"async":true}]}]
+          [(.hooks.SessionStart // [])[] | select((.hooks[]?.command | contains("auto-recall")) | not)]
         ) |
         # Add/update PostToolUse hook with matcher
         .hooks.PostToolUse = (
           [(.hooks.PostToolUse // [])[] | select(.hooks[]?.command | contains("memory-capture") | not)] +
-          [{"matcher":"bash","hooks":[{"type":"command","command":$capture,"async":true}]}]
+          [{"matcher":"Bash","hooks":[{"type":"command","command":$capture}]}]
         ) |
         # Add/update SubagentStop hook for auto-wrapup
         .hooks.SubagentStop = (
@@ -488,10 +524,10 @@ else
 {
   "hooks": {
     "SessionStart": [
-      {"hooks": [{"type": "command", "command": "$DISPATCH auto-recall.sh", "async": true}]}
+      {"hooks": [{"type": "command", "command": "bash $GLOBAL_ROOT/hooks/check-memory.sh $RUNTIME_VARIANT"}]}
     ],
     "PostToolUse": [
-      {"matcher": "bash", "hooks": [{"type": "command", "command": "$DISPATCH memory-capture.sh", "async": true}]}
+      {"matcher": "Bash", "hooks": [{"type": "command", "command": "$DISPATCH memory-capture.sh"}]}
     ],
     "SubagentStop": [
       {"hooks": [{"type": "command", "command": "$DISPATCH subagent-wrapup.sh"}]}
@@ -523,19 +559,31 @@ echo "Done."
 echo ""
 
 if [ "$GLOBAL_INSTALL" = true ]; then
-  echo "$CMD_COUNT commands, $AGENT_COUNT agents, and $SKILL_COUNT skills are now available in all Cortex Code sessions."
+  echo "$CMD_COUNT commands, $AGENT_COUNT agents, and $SKILL_COUNT skills are now available in all $PRODUCT_NAME sessions."
+  if [ "$RUNTIME_VARIANT" = "codex" ]; then
+    echo ""
+    echo "Codex direct install uses skill invocation syntax:"
+    echo "  \$lavra-plan <description-or-bead-id>"
+    echo "  \$lavra-work <bead-id>"
+    echo "Slash commands (/lavra-*) are not exposed in the current direct-install path."
+    echo "Plugin marketplace packaging is planned for slash-command parity."
+  fi
   echo ""
   echo "For beads integration (memory system + hooks):"
-  echo "  bunx @lavralabs/lavra@latest --cortex /path/to/your-project"
+  echo "  bunx @lavralabs/lavra@latest $INSTALL_FLAG /path/to/your-project"
   echo ""
 else
   echo "Hooks installed for this project."
+  if [ "$RUNTIME_VARIANT" = "codex" ]; then
+    echo "Use skills in Codex with \$lavra-* for now."
+    echo "Plugin marketplace packaging is planned for slash-command parity."
+  fi
   echo ""
   echo "Context7 MCP server added (framework docs on demand)."
   echo ""
 fi
 
-echo "Restart Cortex Code to load the plugin."
+echo "Restart $PRODUCT_NAME to load the plugin."
 echo ""
 
 if [ "$GLOBAL_INSTALL" = false ]; then

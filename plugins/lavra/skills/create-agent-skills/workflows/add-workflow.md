@@ -10,7 +10,7 @@
 ## Step 1: Select the Skill
 
 ```bash
-ls ~/.claude/skills/
+ls ~/.agent/skills/
 ```
 
 Present numbered list, ask: "Which skill needs a new workflow?"

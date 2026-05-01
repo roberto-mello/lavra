@@ -6,6 +6,7 @@
   "scripts": {
     "convert:opencode": "bun run convert-opencode.ts",
     "convert:gemini": "bun run convert-gemini.ts",
+    "convert:codex": "bun run convert-codex.ts",
     "convert:all": "bun run convert-opencode.ts && bun run convert-gemini.ts",
     "test:security": "bun run test-security.ts",
     "test:compatibility": "bun run test-compatibility.ts",

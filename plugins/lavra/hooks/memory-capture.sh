@@ -23,7 +23,11 @@ echo "$COMMAND" | grep -qE 'SKIP:' && exit 0
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck source=sanitize-content.sh
-source "$SCRIPT_DIR/sanitize-content.sh"
+if [[ -f "$SCRIPT_DIR/sanitize-content.sh" ]]; then
+  source "$SCRIPT_DIR/sanitize-content.sh"
+else
+  sanitize_untrusted_content() { cat; }
+fi
 
 # Validate CLAUDE_PROJECT_DIR to prevent redirect attacks
 # Placed AFTER early-exit guards (PostToolUse fires very frequently; this runs on ~1% of calls)

@@ -24,6 +24,20 @@ export function generationHeader(source: string): string {
 `;
 }
 
+function injectHeaderAfterFrontmatter(content: string, header: string): string {
+  if (!content.startsWith("---\n")) {
+    return header + content;
+  }
+
+  const endIdx = content.indexOf("\n---\n", 4);
+  if (endIdx === -1) {
+    return header + content;
+  }
+
+  const fmEnd = endIdx + 5; // include closing "\n---\n"
+  return content.slice(0, fmEnd) + "\n" + header + content.slice(fmEnd);
+}
+
 /**
  * Converts skills from SOURCE_DIR to OUTPUT_DIR.
  * pathReplacement controls how .claude/skills/ references are rewritten.
@@ -67,9 +81,10 @@ export async function convertSkills(
         .replace(/\.claude\/hooks\//g, hooksReplacement);
 
       const outputSkillMd = join(outputSkillDir, "SKILL.md");
+      const header = generationHeader(`${skill}/SKILL.md`);
       await writeFileSafe(
         outputSkillMd,
-        generationHeader(`${skill}/SKILL.md`) + content,
+        injectHeaderAfterFrontmatter(content, header),
         0o644
       );
       console.log(`  ✓ ${skill}/SKILL.md`);

@@ -29,8 +29,8 @@ Analyze the current skill and identify:
 ## Step 4: Create Directory Structure
 
 ```bash
-mkdir -p ~/.claude/skills/{skill-name}/workflows
-mkdir -p ~/.claude/skills/{skill-name}/references
+mkdir -p ~/.agent/skills/{skill-name}/workflows
+mkdir -p ~/.agent/skills/{skill-name}/references
 ```
 
 ## Step 5: Extract Workflows

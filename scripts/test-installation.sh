@@ -379,6 +379,89 @@ fi
 export HOME="$REAL_HOME"
 
 # ==============================================================================
+# Test 4b: Codex Installation
+# ==============================================================================
+echo
+echo " Test 4b: Codex Installation"
+
+CODEX_TEST="$TEST_ROOT/codex-test"
+mkdir -p "$CODEX_TEST"
+cd "$CODEX_TEST"
+
+git init -q
+bd init -q 2>/dev/null || true
+
+# Save and override HOME for test isolation
+REAL_HOME="$HOME"
+export HOME="$TEST_ROOT/fake-home-codex"
+mkdir -p "$HOME/.codex"
+
+# Run installer with --codex flag
+if bash "$PROJECT_ROOT/install.sh" --codex "$CODEX_TEST" >/dev/null 2>&1; then
+  pass "Installer completed for Codex"
+else
+  fail "Codex install" "Installer failed"
+fi
+
+# Verify project hooks structure
+if [[ -d ".codex/hooks" ]]; then
+  pass "Codex directory structure created"
+else
+  fail "Codex structure" "Missing .codex/hooks directory"
+fi
+
+# Verify global hooks.json exists
+if [[ -f "$HOME/.codex/hooks.json" ]]; then
+  pass "Codex hooks.json created"
+else
+  fail "Codex hooks.json" "hooks.json not created at $HOME/.codex/hooks.json"
+fi
+
+# SessionStart parity: check-memory only (no auto-recall hook command)
+if grep -q "check-memory.sh codex" "$HOME/.codex/hooks.json" && \
+   ! grep -q "auto-recall.sh" "$HOME/.codex/hooks.json"; then
+  pass "Codex SessionStart uses check-memory only"
+else
+  fail "Codex SessionStart parity" "Expected check-memory only, found auto-recall or missing check-memory"
+fi
+
+# No async in Codex hooks config
+if grep -q '"async"[[:space:]]*:[[:space:]]*true' "$HOME/.codex/hooks.json"; then
+  fail "Codex hooks async" "Found async:true in Codex hooks.json"
+else
+  pass "Codex hooks correctly omit async"
+fi
+
+# Verify dispatcher command shape (hooks-dir + script-name args)
+if grep -q "dispatch-hook.sh .codex/hooks memory-capture.sh" "$HOME/.codex/hooks.json"; then
+  pass "Codex dispatcher command shape valid"
+else
+  fail "Codex dispatcher args" "Expected dispatch-hook.sh .codex/hooks <script>"
+fi
+
+# Verify converted codex skills have no AskUserQuestion references
+if rg -n "AskUserQuestion" "$HOME/.codex/skills" >/dev/null 2>&1; then
+  fail "Codex skill conversion" "Found AskUserQuestion reference(s) in installed Codex skills"
+else
+  pass "Codex skills converted (no AskUserQuestion refs)"
+fi
+
+# Optional marketplace smoke test (when codex CLI is available)
+if command -v codex >/dev/null 2>&1; then
+  mkdir -p "$HOME/.codex-marketplace-test"
+  if CODEX_HOME="$HOME/.codex-marketplace-test" codex plugin marketplace add "$PROJECT_ROOT" >/dev/null 2>&1; then
+    pass "Codex marketplace add smoke test"
+  else
+    fail "Codex marketplace add" "codex plugin marketplace add <repo-root> failed"
+  fi
+else
+  warn "Codex CLI not installed; marketplace add smoke test skipped"
+fi
+
+# Restore real HOME
+export HOME="$REAL_HOME"
+
+# ==============================================================================
 # Test 5: New Feature Provisioning (v0.7.0)
 # ==============================================================================
 echo

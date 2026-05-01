@@ -66,8 +66,8 @@ echo "  provision-memory.sh:  $PROVISION_VERSION"
 
 echo ""
 echo "=== Conversion outputs ==="
-echo "  Generating OpenCode and Gemini outputs..."
-(cd scripts && bun install --frozen-lockfile --silent && bun run convert-opencode.ts && bun run convert-gemini.ts && bun run convert-cortex.ts) || {
+echo "  Generating OpenCode, Gemini, Cortex, and Codex outputs..."
+(cd scripts && bun install --frozen-lockfile --silent && bun run convert-opencode.ts && bun run convert-gemini.ts && bun run convert-cortex.ts && bun run convert-codex.ts) || {
   fail "Conversion scripts" "bun run failed"
 }
 
@@ -93,6 +93,15 @@ echo "=== Source files ==="
 check "opencode-src/plugin.ts"    test -f plugins/lavra/opencode-src/plugin.ts
 check "opencode-src/package.json" test -f plugins/lavra/opencode-src/package.json
 check "gemini-src/settings.json"  test -f plugins/lavra/gemini-src/settings.json
+check "codex plugin manifest"     test -f plugins/lavra/.codex-plugin/plugin.json
+check "codex marketplace file"    test -f .agents/plugins/marketplace.json
+
+echo ""
+echo "=== Codex marketplace schema ==="
+
+check "codex plugin manifest valid JSON" jq -e . plugins/lavra/.codex-plugin/plugin.json
+check "codex marketplace valid JSON" jq -e . .agents/plugins/marketplace.json
+check "codex marketplace auth policy enum" bash -c '[[ "$(jq -r '"'"'.plugins[] | select(.name=="lavra") | .policy.authentication'"'"' .agents/plugins/marketplace.json)" =~ ^(ON_INSTALL|ON_USE)$ ]]'
 
 echo ""
 echo "=== Conversion output files ==="

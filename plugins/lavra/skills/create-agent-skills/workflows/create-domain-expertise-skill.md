@@ -17,7 +17,7 @@ Ask user what domain expertise to build. Get specific about the scope.
 
 ## Step 2: Confirm Target Location
 
-Domain expertise skills go in: `~/.claude/skills/expertise/{domain-name}/`
+Domain expertise skills go in: `~/.agent/skills/expertise/{domain-name}/`
 
 ## Step 3: Identify Workflows
 

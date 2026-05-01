@@ -290,7 +290,7 @@ For detailed guidance, see:
 
 ## Prose Style
 
-Apply caveman-lite prose rules from `.claude/rules/prose-style.md` (the canonical source).
+Apply caveman-lite prose rules from agent rule file (for example `.codex/rules/prose-style.md` or `<project-agent-dir>/rules/prose-style.md`) (the canonical source).
 
 ## Success Criteria
 

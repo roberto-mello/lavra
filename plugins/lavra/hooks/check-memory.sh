@@ -25,8 +25,17 @@ case "$PLATFORM" in
     SETTINGS_FILE="$HOME/.snowflake/cortex/hooks.json"
     SOURCE_SENTINEL="$HOME/.snowflake/cortex/.lavra-source"
     HOOK_CMD_PREFIX="bash ~/.snowflake/cortex/hooks/dispatch-hook.sh .cortex/hooks"
-    BASH_TOOL_NAME="bash"
+    BASH_TOOL_NAME="Bash"
     PRODUCT_NAME="Cortex Code"
+    ;;
+  codex)
+    PROJECT_HOOKS_DIR=".codex/hooks"
+    GLOBAL_HOOKS_DIR="$HOME/.codex/hooks"
+    SETTINGS_FILE="$HOME/.codex/hooks.json"
+    SOURCE_SENTINEL="$HOME/.codex/.lavra-source"
+    HOOK_CMD_PREFIX="bash ~/.codex/hooks/dispatch-hook.sh .codex/hooks"
+    BASH_TOOL_NAME="Bash"
+    PRODUCT_NAME="Codex"
     ;;
   *)
     echo "Unknown platform: $PLATFORM" >&2
@@ -105,8 +114,8 @@ PROVISION_SCRIPT="$HOOKS_SOURCE_DIR/provision-memory.sh"
 
 if [ -f "$PROVISION_SCRIPT" ]; then
   source "$PROVISION_SCRIPT"
-  migrate_beads_to_lavra "."
-  provision_memory_dir "." "$HOOKS_SOURCE_DIR"
+  migrate_beads_to_lavra "." >/dev/null 2>&1 || true
+  provision_memory_dir "." "$HOOKS_SOURCE_DIR" >/dev/null 2>&1 || true
 else
   # Fallback: minimal setup if provision script missing
   MEMORY_DIR=".lavra/memory"
@@ -142,8 +151,8 @@ SETTINGS="$SETTINGS_FILE"
 if [ -f "$SETTINGS" ] && command -v jq &>/dev/null; then
   EXISTING=$(cat "$SETTINGS")
 
-  # Cortex uses dispatcher (space-separated args), Claude uses direct paths (slash-separated)
-  if [ "$PLATFORM" = "cortex" ]; then
+  # Cortex/Codex use dispatcher (space-separated args), Claude uses direct paths (slash-separated)
+  if [ "$PLATFORM" = "cortex" ] || [ "$PLATFORM" = "codex" ]; then
     RECALL_CMD="$HOOK_CMD_PREFIX auto-recall.sh"
     CAPTURE_CMD="$HOOK_CMD_PREFIX memory-capture.sh"
     WRAPUP_CMD="$HOOK_CMD_PREFIX subagent-wrapup.sh"
@@ -153,14 +162,20 @@ if [ -f "$SETTINGS" ] && command -v jq &>/dev/null; then
     WRAPUP_CMD="$HOOK_CMD_PREFIX/subagent-wrapup.sh"
   fi
 
-  UPDATED=$(echo "$EXISTING" | jq --arg recall "$RECALL_CMD" --arg capture "$CAPTURE_CMD" --arg wrapup "$WRAPUP_CMD" --arg matcher "$BASH_TOOL_NAME" '
+  UPDATED=$(echo "$EXISTING" | jq --arg recall "$RECALL_CMD" --arg capture "$CAPTURE_CMD" --arg wrapup "$WRAPUP_CMD" --arg matcher "$BASH_TOOL_NAME" --arg platform "$PLATFORM" '
     .hooks.SessionStart = (
       [(.hooks.SessionStart // [])[] | select(.hooks[]?.command | contains("auto-recall") | not)] +
-      [{"hooks":[{"type":"command","command":($recall),"async":true}]}]
+      [if ($platform == "cortex" or $platform == "codex")
+       then empty
+       else {"hooks":[{"type":"command","command":($recall),"async":true}]}
+       end]
     ) |
     .hooks.PostToolUse = (
       [(.hooks.PostToolUse // [])[] | select(.hooks[]?.command | contains("memory-capture") | not)] +
-      [{"matcher":$matcher,"hooks":[{"type":"command","command":($capture),"async":true}]}]
+      [if ($platform == "cortex" or $platform == "codex")
+       then {"matcher":$matcher,"hooks":[{"type":"command","command":($capture)}]}
+       else {"matcher":$matcher,"hooks":[{"type":"command","command":($capture),"async":true}]}
+       end]
     ) |
     .hooks.SubagentStop = (
       [(.hooks.SubagentStop // [])[] | select(.hooks[]?.command | contains("subagent-wrapup") | not)] +
@@ -173,19 +188,23 @@ if [ -f "$SETTINGS" ] && command -v jq &>/dev/null; then
 elif [ ! -f "$SETTINGS" ]; then
   mkdir -p "$(dirname "$SETTINGS")"
   # Reuse the same CMD vars (set above only in jq path); recompute for heredoc
-  if [ "$PLATFORM" = "cortex" ]; then
+  if [ "$PLATFORM" = "cortex" ] || [ "$PLATFORM" = "codex" ]; then
     _SEP=" "
+    _ASYNC_FIELD=""
+    _SESSION_CMD="bash $GLOBAL_HOOKS_DIR/check-memory.sh $PLATFORM"
   else
     _SEP="/"
+    _ASYNC_FIELD=', "async": true'
+    _SESSION_CMD="${HOOK_CMD_PREFIX}${_SEP}auto-recall.sh"
   fi
   cat > "$SETTINGS" << SETTINGS_EOF
 {
   "hooks": {
     "SessionStart": [
-      {"hooks": [{"type": "command", "command": "${HOOK_CMD_PREFIX}${_SEP}auto-recall.sh", "async": true}]}
+      {"hooks": [{"type": "command", "command": "${_SESSION_CMD}"${_ASYNC_FIELD}}]}
     ],
     "PostToolUse": [
-      {"matcher": "$BASH_TOOL_NAME", "hooks": [{"type": "command", "command": "${HOOK_CMD_PREFIX}${_SEP}memory-capture.sh", "async": true}]}
+      {"matcher": "$BASH_TOOL_NAME", "hooks": [{"type": "command", "command": "${HOOK_CMD_PREFIX}${_SEP}memory-capture.sh"${_ASYNC_FIELD}}]}
     ],
     "SubagentStop": [
       {"hooks": [{"type": "command", "command": "${HOOK_CMD_PREFIX}${_SEP}subagent-wrapup.sh"}]}

@@ -171,7 +171,7 @@ Parse `execution.commit_granularity` (default: `"task"`), `model_profile` (defau
 **Detect installed skills (no-op if directory missing):**
 
 ```bash
-ls .claude/skills/ 2>/dev/null
+find . -type f -name SKILL.md 2>/dev/null
 ```
 
 For each skill directory found, read the `description:` line from its `SKILL.md` frontmatter. Filter to only skills that contain an explicit "Use when" or "Triggers on" phrase. Skip utility skills with no clear trigger condition. Store the filtered list as `{available_skills}`.

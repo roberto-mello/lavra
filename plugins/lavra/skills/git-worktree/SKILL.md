@@ -32,8 +32,10 @@ The script handles critical setup that raw git commands don't:
 3. Creates consistent directory structure
 
 ```bash
+WORKTREE_MANAGER="$(find . -type f -path "*/git-worktree/scripts/worktree-manager.sh" 2>/dev/null | head -1)"
+
 # CORRECT - Always use the script
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh create feature-name
+bash "$WORKTREE_MANAGER" create feature-name
 
 # WRONG - Never do this directly
 git worktree add .worktrees/feature-name -b feature-name main
@@ -43,16 +45,16 @@ git worktree add .worktrees/feature-name -b feature-name main
 
 Use this skill in these scenarios:
 
-1. **Code Review (`/workflows:review`)**: If NOT already on the target branch (PR branch or requested branch), offer worktree for isolated review
-2. **Feature Work (`/workflows:work`)**: Always ask if user wants parallel worktree or live branch work
+1. **Code Review (workflow review command)**: If NOT already on the target branch (PR branch or requested branch), offer worktree for isolated review
+2. **Feature Work (workflow work command)**: Always ask if user wants parallel worktree or live branch work
 3. **Parallel Development**: When working on multiple features simultaneously
 4. **Cleanup**: After completing work in a worktree
 
 ## How to Use
 
-### In Claude Code Workflows
+### In Agent Workflows
 
-The skill is automatically called from `/workflows:review` and `/workflows:work` commands:
+The skill is automatically called from workflow review/work commands:
 
 ```
 # For review: offers worktree if not on PR branch
@@ -65,19 +67,19 @@ You can also invoke the skill directly from bash:
 
 ```bash
 # Create a new worktree (copies .env files automatically)
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh create feature-login
+bash "$WORKTREE_MANAGER" create feature-login
 
 # List all worktrees
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh list
+bash "$WORKTREE_MANAGER" list
 
 # Switch to a worktree
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh switch feature-login
+bash "$WORKTREE_MANAGER" switch feature-login
 
 # Copy .env files to an existing worktree (if they weren't copied)
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh copy-env feature-login
+bash "$WORKTREE_MANAGER" copy-env feature-login
 
 # Clean up completed worktrees
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh cleanup
+bash "$WORKTREE_MANAGER" cleanup
 ```
 
 ## Commands
@@ -92,7 +94,7 @@ Creates a new worktree with the given branch name.
 
 **Example:**
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh create feature-login
+bash "$WORKTREE_MANAGER" create feature-login
 ```
 
 **What happens:**
@@ -108,7 +110,7 @@ Lists all available worktrees with their branches and current status.
 
 **Example:**
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh list
+bash "$WORKTREE_MANAGER" list
 ```
 
 **Output shows:**
@@ -123,7 +125,7 @@ Switches to an existing worktree and cd's into it.
 
 **Example:**
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh switch feature-login
+bash "$WORKTREE_MANAGER" switch feature-login
 ```
 
 **Optional:**
@@ -135,7 +137,7 @@ Interactively cleans up inactive worktrees with confirmation.
 
 **Example:**
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh cleanup
+bash "$WORKTREE_MANAGER" cleanup
 ```
 
 **What happens:**
@@ -154,34 +156,34 @@ bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh clean
 
 # You respond: yes
 # Script runs (copies .env files automatically):
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh create pr-123-feature-name
+bash "$WORKTREE_MANAGER" create pr-123-feature-name
 
 # You're now in isolated worktree for review with all env vars
 cd .worktrees/pr-123-feature-name
 
 # After review, return to main:
 cd ../..
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh cleanup
+bash "$WORKTREE_MANAGER" cleanup
 ```
 
 ### Parallel Feature Development
 
 ```bash
 # For first feature (copies .env files):
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh create feature-login
+bash "$WORKTREE_MANAGER" create feature-login
 
 # Later, start second feature (also copies .env files):
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh create feature-notifications
+bash "$WORKTREE_MANAGER" create feature-notifications
 
 # List what you have:
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh list
+bash "$WORKTREE_MANAGER" list
 
 # Switch between them as needed:
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh switch feature-login
+bash "$WORKTREE_MANAGER" switch feature-login
 
 # Return to main and cleanup when done:
 cd .
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh cleanup
+bash "$WORKTREE_MANAGER" cleanup
 ```
 
 ## Key Design Principles
@@ -209,7 +211,7 @@ bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh clean
 
 ## Integration with Workflows
 
-### `/workflows:review`
+### `workflow review command`
 
 Instead of always creating a worktree:
 
@@ -222,7 +224,7 @@ Instead of always creating a worktree:
    - no -> proceed with PR diff on current branch
 ```
 
-### `/workflows:work`
+### `workflow work command`
 
 Always offer choice:
 
@@ -247,7 +249,7 @@ Switch out of the worktree first (to main repo), then cleanup:
 
 ```bash
 cd $(git rev-parse --show-toplevel)
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh cleanup
+bash "$WORKTREE_MANAGER" cleanup
 ```
 
 ### Lost in a worktree?
@@ -255,7 +257,7 @@ bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh clean
 See where you are:
 
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh list
+bash "$WORKTREE_MANAGER" list
 ```
 
 ### .env files missing in worktree?
@@ -263,7 +265,7 @@ bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh list
 If a worktree was created without .env files (e.g., via raw `git worktree add`), copy them:
 
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/skills/git-worktree/scripts/worktree-manager.sh copy-env feature-name
+bash "$WORKTREE_MANAGER" copy-env feature-name
 ```
 
 Navigate back to main:

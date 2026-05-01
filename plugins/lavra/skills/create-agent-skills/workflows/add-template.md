@@ -22,7 +22,7 @@ Confirm this is a good template candidate:
 ## Step 3: Create Templates Directory
 
 ```bash
-mkdir -p ~/.claude/skills/{skill-name}/templates
+mkdir -p ~/.agent/skills/{skill-name}/templates
 ```
 
 ## Step 4: Design Template Structure

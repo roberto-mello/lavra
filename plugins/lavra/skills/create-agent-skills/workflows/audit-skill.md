@@ -11,7 +11,7 @@
 
 Enumerate skills in chat as numbered list:
 ```bash
-ls ~/.claude/skills/
+ls ~/.agent/skills/
 ```
 
 Ask: "Which skill would you like to audit? (enter number or name)"

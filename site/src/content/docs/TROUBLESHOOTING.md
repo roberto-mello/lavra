@@ -104,6 +104,25 @@ tail -1 .lavra/memory/knowledge.jsonl
 **Agent model selection:**
 - Uses haiku/sonnet/opus in Task tool (same tier names as Claude)
 
+### Codex
+
+**`/lavra-*` not recognized:**
+- Expected in the current direct-install path.
+- Use skills invocation instead: `$lavra-plan ...`, `$lavra-work ...`.
+- Current plugin marketplace install path also invokes as `$lavra-*` in Codex today.
+- Slash-command parity is planned via future Codex plugin command support.
+
+**SessionStart invalid JSON errors:**
+- Ensure `~/.codex/hooks.json` `SessionStart` runs only:
+  - `bash ~/.codex/hooks/check-memory.sh codex`
+- Ensure `~/.codex/hooks/` and `.codex/hooks/` both contain:
+  - `check-memory.sh`, `auto-recall.sh`, `memory-capture.sh`, `sanitize-content.sh`
+
+**Memory not capturing in Codex:**
+- Check PostToolUse matcher is `Bash` in `~/.codex/hooks.json`
+- Verify dispatcher command shape:
+  - `bash ~/.codex/hooks/dispatch-hook.sh .codex/hooks memory-capture.sh`
+
 ## Common Issues
 
 **No knowledge entries being saved:**

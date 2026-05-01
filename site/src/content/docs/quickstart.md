@@ -17,6 +17,7 @@ npx @lavralabs/lavra@latest --claude      # Claude Code
 npx @lavralabs/lavra@latest --opencode    # OpenCode
 npx @lavralabs/lavra@latest --gemini      # Gemini CLI
 npx @lavralabs/lavra@latest --cortex      # Cortex Code
+npx @lavralabs/lavra@latest --codex       # Codex
 ```
 
 If the installer detects a project in the current directory, it will ask whether to install for this project only or globally (`~/.claude`). A global install makes commands available in every project, but you still run [/lavra-setup](#codebase-analysis) per project to configure the memory system and review agents.
@@ -28,6 +29,8 @@ bunx @lavralabs/lavra@latest --claude
 ```
 
 Restart your agent after installing to pick up the new commands and hooks.
+
+> Codex note: current direct install runs Lavra through skills (`$lavra-*`). Slash-command parity (`/lavra-*`) is planned via plugin marketplace packaging.
 
 ## Verify Installation
 
@@ -147,6 +150,18 @@ You get relevant learnings without manually searching!
 | `/lavra-checkpoint` | When you've been working outside the pipeline (ad-hoc sessions). Save session progress by filing beads, capturing knowledge, and syncing state |
 
 See the full [Command Reference](/docs/commands) or the [Command Map](/command-map) for a visual overview of all commands and how they connect.
+
+### Codex Invocation
+
+In Codex direct installs, run Lavra workflows via skills:
+
+```text
+$lavra-plan add OAuth device flow
+$lavra-work lavra-7zm.2
+```
+
+Slash commands like `/lavra-work` are not exposed in the current Codex direct-install path.
+This is also true for current plugin marketplace installs in Codex.
 
 ## Manual Knowledge Search
 

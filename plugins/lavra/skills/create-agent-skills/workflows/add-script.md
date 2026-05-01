@@ -22,7 +22,7 @@ Confirm this is a good script candidate:
 ## Step 3: Create Scripts Directory
 
 ```bash
-mkdir -p ~/.claude/skills/{skill-name}/scripts
+mkdir -p ~/.agent/skills/{skill-name}/scripts
 ```
 
 ## Step 4: Design Script
@@ -36,7 +36,7 @@ Create `scripts/{script-name}.{ext}` with purpose comment, usage instructions, i
 ## Step 6: Make Executable (if bash)
 
 ```bash
-chmod +x ~/.claude/skills/{skill-name}/scripts/{script-name}.sh
+chmod +x ~/.agent/skills/{skill-name}/scripts/{script-name}.sh
 ```
 
 ## Step 7: Update Workflow to Use Script
