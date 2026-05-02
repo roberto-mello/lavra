@@ -33,7 +33,7 @@ You can add your own knowledge entries manually using `bd comments add` and they
 
 ## Storage
 
-Knowledge is stored in two places that stay in sync:
+Knowledge is stored as one shared log plus local derived artifacts:
 
 **`.lavra/memory/knowledge.jsonl`** — the source of truth, committed to git so knowledge is shared across your team and persists across machines:
 
@@ -47,9 +47,22 @@ The SQLite DB is rebuilt automatically from the JSONL on first use and kept in s
 
 **`.lavra/memory/knowledge.active.jsonl`** — a gitignored local cache built by `memory-sanitize.sh`. It removes exact and normalized duplicates from the append-only knowledge log so auto-recall and manual search can use a smaller, cleaner working set without rewriting shared memory history. Its paired `knowledge.active.db` cache serves the same purpose for local FTS search.
 
+**`.lavra/memory/knowledge.audit.jsonl`** — a gitignored audit artifact from the local sanitizer. It records actions like skipped invalid lines, filtered command/log noise, duplicate collapse, and stale-memory downgrades so local cleanup stays explainable.
+
 **Rotation:** When `knowledge.jsonl` exceeds 5000 lines, the oldest 2500 entries are moved to `knowledge.archive.jsonl`. Both files use `merge=union` in `.gitattributes` so concurrent writes from teammates merge cleanly without conflicts.
 
 **Security:** Knowledge entries are auto-injected into agent context at session start. In collaborative projects, treat changes to `knowledge.jsonl` with the same scrutiny as CI config — any collaborator can add entries that influence agent behavior. Recalled entries are sanitized (role prefix stripping, bidirectional char removal) and wrapped in `<untrusted-knowledge>` tags. See [Security Model](SECURITY.md#knowledge-system-injection-defense) for the full threat model and team recommendations.
+
+## Local vs shared memory
+
+Lavra now separates retrieval hygiene from shared history:
+
+- `knowledge.jsonl` is the shared, committed, append-only source of truth
+- `knowledge.active.*` and `knowledge.audit.jsonl` are local-only, gitignored working artifacts
+
+This lets Lavra reduce token usage and improve recall quality locally without rewriting team history every time the sanitizer learns something new.
+
+Future shared cleanup is planned as an explicit review workflow, not an automatic hook. See [Shared Memory Curation](SHARED_CURATION.md).
 
 ## Searching manually
 
@@ -91,3 +104,5 @@ Raw knowledge comments logged during work are functional but often terse. `/lavr
 ```
 
 `/lavra-work` calls `/lavra-learn` automatically at the end of each bead. `/lavra-checkpoint` prompts you to run it if it detects captured knowledge. If you've been coding outside the pipeline — direct edits, quick fixes, exploratory work, run `/lavra-checkpoint` (to file beads for what was fixed/changed, which will prompt to run `/lavra-learn`) or run `/lavra-learn` directly, before ending the session to curate whatever you captured.
+
+`/lavra-learn` improves the quality of captured entries. It does not currently perform shared-memory cleanup or rewrite older memories. That later layer is tracked separately in the shared-curation design.
