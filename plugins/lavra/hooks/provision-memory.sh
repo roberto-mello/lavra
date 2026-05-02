@@ -70,6 +70,7 @@ memory/knowledge.db-shm
 
 # Curated local knowledge cache (rebuilt from append-only JSONL)
 memory/knowledge.active.jsonl
+memory/knowledge.audit.jsonl
 memory/knowledge.active.db
 memory/knowledge.active.db-journal
 memory/knowledge.active.db-wal
@@ -87,6 +88,7 @@ EOF
 
 # Curated local knowledge cache (rebuilt from append-only JSONL)
 memory/knowledge.active.jsonl
+memory/knowledge.audit.jsonl
 memory/knowledge.active.db
 memory/knowledge.active.db-journal
 memory/knowledge.active.db-wal

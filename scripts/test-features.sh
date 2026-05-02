@@ -172,6 +172,12 @@ else
   fail "knowledge.active gitignore" "Curated active file not gitignored"
 fi
 
+if grep -q "knowledge.audit.jsonl" "$TEST_ROOT/project/.lavra/.gitignore"; then
+  pass "knowledge.audit.jsonl gitignored"
+else
+  fail "knowledge.audit gitignore" "Audit file not gitignored"
+fi
+
 cat > "$TEST_ROOT/project/.lavra/memory/knowledge.jsonl" << 'EOF'
 {"key":"decision-auth-callback","type":"decision","content":"OAuth callback URI must match exactly including trailing slash.","source":"user","tags":["auth","oauth"],"ts":10,"bead":"test-001"}
 {"key":"decision-auth-callback","type":"decision","content":"OAuth callback URI must match exactly including trailing slash.","source":"user","tags":["auth","oauth"],"ts":20,"bead":"test-001"}
@@ -201,6 +207,19 @@ else
   fail "memory-sanitize command noise" "Command-like entry was kept in active cache"
 fi
 
+if [[ -f "$TEST_ROOT/project/.lavra/memory/knowledge.audit.jsonl" ]]; then
+  pass "memory-sanitize writes an audit report"
+else
+  fail "memory-sanitize audit" "Audit report not created"
+fi
+
+if grep -q '"action":"skip_invalid_json"' "$TEST_ROOT/project/.lavra/memory/knowledge.audit.jsonl" && \
+   grep -q '"action":"filter_noise"' "$TEST_ROOT/project/.lavra/memory/knowledge.audit.jsonl"; then
+  pass "memory-sanitize audit records invalid and noisy entries"
+else
+  fail "memory-sanitize audit contents" "Expected audit actions missing"
+fi
+
 if [[ -f "$TEST_ROOT/project/.lavra/memory/knowledge.active.db" ]] || ! command -v sqlite3 >/dev/null 2>&1; then
   pass "memory-sanitize builds active sqlite cache when sqlite3 is available"
 else
@@ -221,6 +240,32 @@ else
 fi
 
 rm -f "$TEST_ROOT/project/.lavra/memory/.sanitize-needed"
+
+mkdir -p "$TEST_ROOT/project/src"
+cat > "$TEST_ROOT/project/src/existing.ts" << 'EOF'
+export const existing = true;
+EOF
+
+cat > "$TEST_ROOT/project/.lavra/memory/knowledge.jsonl" << 'EOF'
+{"key":"fact-existing-anchor","type":"fact","content":"Use src/existing.ts for the current validation flow.","source":"user","tags":["fact"],"ts":50,"bead":"test-001"}
+{"key":"fact-missing-anchor","type":"fact","content":"Legacy validation still lives in src/missing.ts.","source":"user","tags":["fact"],"ts":60,"bead":"test-002"}
+EOF
+
+bash "$HOOKS_DIR/memory-sanitize.sh" --run "$TEST_ROOT/project/.lavra/memory" 2>/dev/null || true
+
+if grep -q 'fact-existing-anchor' "$TEST_ROOT/project/.lavra/memory/knowledge.active.jsonl" && \
+   ! grep -q 'fact-missing-anchor' "$TEST_ROOT/project/.lavra/memory/knowledge.active.jsonl"; then
+  pass "memory-sanitize drops stale file-anchor entries from active cache"
+else
+  fail "memory-sanitize stale drop" "File-anchor drift was not enforced"
+fi
+
+if grep -q '"action":"drop_stale_candidate"' "$TEST_ROOT/project/.lavra/memory/knowledge.audit.jsonl" && \
+   grep -q 'fact-missing-anchor' "$TEST_ROOT/project/.lavra/memory/knowledge.audit.jsonl"; then
+  pass "memory-sanitize audit records stale candidates"
+else
+  fail "memory-sanitize stale audit" "Stale candidate missing from audit"
+fi
 
 # ==============================================================================
 # Test 6: Session state lifecycle (write -> read -> delete)
