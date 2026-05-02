@@ -95,7 +95,6 @@ Existing entries stay valid. Shared curation adds optional fields such as:
 Candidate fields:
 
 - `status`
-  - `active`
   - `canonical`
   - `superseded`
   - `needs_review`
@@ -111,6 +110,17 @@ Candidate fields:
   - short free-text explanation
 
 These fields are additive. Legacy entries without them continue to work.
+
+## Status Semantics
+
+- `canonical`
+  - reviewed entry that should rank first for recall in its topic cluster
+- `superseded`
+  - historical entry kept for provenance but replaced by a newer canonical entry
+- `needs_review`
+  - entry is still visible in history but flagged as low-trust for shared recall defaults
+
+`active` should remain a local-cache concept (`knowledge.active.jsonl`) rather than a shared-log status value.
 
 ## Workflow
 
@@ -138,10 +148,12 @@ The workflow should show:
 - the reason for the proposal
 - the exact JSONL lines that would be appended
 
-This can be implemented as:
+This should be implemented as a dedicated explicit command:
 
-- a future `/lavra-curate` command, or
-- a shared-review mode of `/lavra-learn`
+- `/lavra-curate --dry-run` to generate and inspect proposals only
+- `/lavra-curate --apply` to append approved JSONL entries
+
+`/lavra-learn` should continue to focus on session capture quality and remain separate from shared-history review.
 
 ### 3. Append curated shared entries
 
@@ -150,6 +162,24 @@ On approval:
 - append one or more new entries to `knowledge.jsonl`
 - mark relationships via `supersedes`, `superseded_by`, or `merged_from`
 - never delete prior lines
+- require a non-empty `review_reason` for each appended curated entry
+
+## Command UX Contract
+
+Shared curation should use a two-step, review-first flow:
+
+1. `--dry-run` emits a proposal bundle with:
+   - candidate keys
+   - proposed new JSONL lines
+   - relationship links (`supersedes`, `merged_from`, optional `superseded_by`)
+   - rationale text
+2. `--apply` requires explicit operator confirmation and appends exactly the reviewed lines.
+
+Guardrails:
+
+- no hook path can invoke `--apply`
+- `--apply` must fail if proposal content changed since review generation
+- every append operation should log an auditable summary (operator, time, count, keys)
 
 ### 4. Update recall behavior later
 
@@ -206,4 +236,3 @@ Shared curation is a separate concern:
 - shared curation improves the long-lived shared history
 
 They may share UI later, but they should not be conflated in the current implementation.
-
