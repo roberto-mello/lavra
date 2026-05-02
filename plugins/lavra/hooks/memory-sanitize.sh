@@ -36,6 +36,52 @@ resolve_memory_dir() {
   echo "$PROJECT_ROOT/.lavra/memory"
 }
 
+canonical_dir() {
+  local DIR_PATH="$1"
+  cd "$DIR_PATH" 2>/dev/null && pwd -P
+}
+
+assert_safe_memory_path() {
+  local MEMORY_DIR="$1"
+  local TARGET_PATH="$2"
+  local REQUIRE_EXISTING_PARENT="${3:-false}"
+  local MEMORY_REAL
+  local PARENT_REAL
+  local PARENT_DIR
+
+  MEMORY_REAL="$(canonical_dir "$MEMORY_DIR")" || return 1
+
+  if [[ -L "$TARGET_PATH" ]]; then
+    return 1
+  fi
+
+  PARENT_DIR="$(dirname "$TARGET_PATH")"
+  if [[ "$REQUIRE_EXISTING_PARENT" == "true" && ! -d "$PARENT_DIR" ]]; then
+    return 1
+  fi
+
+  PARENT_REAL="$(canonical_dir "$PARENT_DIR")" || return 1
+  [[ "$PARENT_REAL" == "$MEMORY_REAL" ]]
+}
+
+write_marker_file() {
+  local MEMORY_DIR="$1"
+  local TARGET_PATH="$2"
+  local CONTENT="$3"
+  local TMPFILE
+
+  assert_safe_memory_path "$MEMORY_DIR" "$TARGET_PATH" true || return 1
+
+  TMPFILE=$(mktemp "$MEMORY_DIR/.marker.XXXXXX") || return 1
+  printf '%s\n' "$CONTENT" > "$TMPFILE" || {
+    rm -f "$TMPFILE"
+    return 1
+  }
+
+  rm -f "$TARGET_PATH"
+  mv "$TMPFILE" "$TARGET_PATH"
+}
+
 sanitize_once() {
   local MEMORY_DIR="$1"
   local KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
@@ -89,7 +135,11 @@ schedule_run() {
 
   mkdir -p "$MEMORY_DIR"
   TOKEN="$(date +%s)-$$-$REASON"
-  printf '%s\n' "$TOKEN" > "$MARKER_FILE"
+  write_marker_file "$MEMORY_DIR" "$MARKER_FILE" "$TOKEN" || exit 0
+
+  if [[ -L "$LOCK_DIR" ]]; then
+    exit 0
+  fi
 
   if [[ -d "$LOCK_DIR" ]]; then
     exit 0
@@ -110,6 +160,11 @@ run_sanitizer() {
   local PASS=0
 
   mkdir -p "$MEMORY_DIR"
+  assert_safe_memory_path "$MEMORY_DIR" "$MARKER_FILE" true || exit 0
+  assert_safe_memory_path "$MEMORY_DIR" "$LAST_RUN_FILE" true || exit 0
+  if [[ -L "$LOCK_DIR" ]]; then
+    exit 0
+  fi
   if ! mkdir "$LOCK_DIR" 2>/dev/null; then
     exit 0
   fi
@@ -127,7 +182,7 @@ run_sanitizer() {
       exit 1
     fi
 
-    date +%s > "$LAST_RUN_FILE"
+    write_marker_file "$MEMORY_DIR" "$LAST_RUN_FILE" "$(date +%s)" || exit 1
     [[ -f "$MARKER_FILE" ]] && END_MARKER="$(cat "$MARKER_FILE" 2>/dev/null || true)"
 
     if [[ -z "$END_MARKER" || "$END_MARKER" == "$START_MARKER" ]]; then

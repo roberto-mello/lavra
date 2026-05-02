@@ -193,6 +193,21 @@ else
   fail "memory-sanitize sqlite" "knowledge.active.db not created"
 fi
 
+CANARY_FILE="$TEST_ROOT/canary.txt"
+echo "do-not-touch" > "$CANARY_FILE"
+rm -f "$TEST_ROOT/project/.lavra/memory/.sanitize-needed"
+ln -s "$CANARY_FILE" "$TEST_ROOT/project/.lavra/memory/.sanitize-needed"
+
+bash "$HOOKS_DIR/memory-sanitize.sh" --schedule security-test "$TEST_ROOT/project/.lavra/memory" 2>/dev/null || true
+
+if [[ "$(cat "$CANARY_FILE")" == "do-not-touch" ]]; then
+  pass "memory-sanitize refuses symlinked marker targets"
+else
+  fail "memory-sanitize symlink guard" "Symlink target was overwritten"
+fi
+
+rm -f "$TEST_ROOT/project/.lavra/memory/.sanitize-needed"
+
 # ==============================================================================
 # Test 6: Session state lifecycle (write -> read -> delete)
 # ==============================================================================
