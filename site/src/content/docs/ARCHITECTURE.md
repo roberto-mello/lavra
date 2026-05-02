@@ -42,7 +42,7 @@ Knowledge is stored in one shared log plus local derived caches:
 - **Rotation**: After 5000 entries, oldest 2500 archived (JSONL only)
 - **Search**: `.lavra/memory/recall.sh "keyword"` or automatic at session start
 
-Future shared cleanup is intentionally separate from this local pipeline. The planned model is append-only reviewed curation, not hook-based write-back. See [Shared Memory Curation](SHARED_CURATION.md).
+Future shared cleanup is intentionally separate from this local pipeline. The planned model is append-only reviewed curation, not hook-based write-back. See [Knowledge System](knowledge.md#shared-curation).
 
 ## Project Artifacts
 

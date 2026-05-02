@@ -62,7 +62,41 @@ Lavra now separates retrieval hygiene from shared history:
 
 This lets Lavra reduce token usage and improve recall quality locally without rewriting team history every time the sanitizer learns something new.
 
-Future shared cleanup is planned as an explicit review workflow, not an automatic hook. See [Shared Memory Curation](SHARED_CURATION.md).
+## Shared Curation
+
+Local refinement improves recall quality without touching the shared log. Shared curation is the later, review-gated step for promoting those refinements back into `.lavra/memory/knowledge.jsonl` without rewriting history.
+
+The rules are simple:
+
+- keep `knowledge.jsonl` append-only
+- never promote shared memory from a hook
+- use an explicit command, not automatic write-back
+- preserve provenance with relationship fields like `supersedes`, `superseded_by`, and `merged_from`
+
+Recommended shared statuses:
+
+- `canonical`
+  - reviewed entry that should rank first for its topic cluster
+- `superseded`
+  - historical entry kept for provenance but replaced by a newer canonical entry
+- `needs_review`
+  - entry stays visible in history but is flagged as lower-trust for shared recall
+
+`active` remains a local-cache concept for `knowledge.active.jsonl`, not a shared-log status.
+
+The intended UX is a dedicated `/lavra-curate` workflow:
+
+1. `--dry-run` gathers candidates from `knowledge.audit.jsonl`, `knowledge.active.jsonl`, and raw `knowledge.jsonl`, then prints the exact JSONL lines that would be appended.
+2. `--apply` requires explicit confirmation and appends only the reviewed lines.
+
+Guardrails:
+
+- no hook path can invoke `--apply`
+- `review_reason` is required for each curated append
+- `--apply` must fail if the proposal content changed since review generation
+- `/lavra-learn` stays focused on capture quality and does not do shared-history cleanup
+
+This keeps local sanitization and shared memory curation separate: local caches can be opinionated, while the committed shared log stays additive and auditable.
 
 ## Searching manually
 
