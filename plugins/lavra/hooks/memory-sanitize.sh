@@ -98,19 +98,37 @@ sanitize_once() {
     [[ -f "$ARCHIVE_FILE" ]] && INPUTS+=("$ARCHIVE_FILE")
     INPUTS+=("$KNOWLEDGE_FILE")
 
-    jq -c -s '
-      map(select(type == "object" and (.key // "") != "" and (.content // "") != "")) |
+    jq -c -Rcs '
+      def normalize_text:
+        ascii_downcase
+        | gsub("\"[[:space:]]*(2>&1|\\|\\||&&|\\||;).*$"; "")
+        | gsub("[[:space:]]+(2>&1|\\|\\||&&|\\||;).*$"; "")
+        | gsub("[[:space:]]+"; " ")
+        | gsub("^ +| +$"; "");
+      def canonical_text:
+        normalize_text
+        | gsub("[^a-z0-9]+"; " ")
+        | gsub("^ +| +$"; "");
+      def noisy_entry:
+        (.content | normalize_text) as $text
+        | ($text | test("^(bd|git|bash|cat|echo|for|if) ")) or
+          ($text | startswith("## ")) or
+          ($text | test("^```")) or
+          ($text | test("^<[^>]+>$"));
+
+      split("\n")
+      | map(select(length > 0) | fromjson?)
+      | map(select(type == "object" and (.key // "") != "" and (.content // "") != ""))
+      | map(.content = (.content | normalize_text))
+      | map(select((.content | length) > 0))
+      | map(select(noisy_entry | not))
+      |
       sort_by(.ts // 0) |
       reverse |
       unique_by((.key // "") | ascii_downcase) |
       unique_by(
         ((.type // "") | ascii_downcase) + "|" +
-        (
-          (.content // "")
-          | ascii_downcase
-          | gsub("[^a-z0-9]+"; " ")
-          | gsub("^ +| +$"; "")
-        )
+        ((.content // "") | canonical_text)
       ) |
       sort_by(.ts // 0) |
       .[]
@@ -165,11 +183,9 @@ run_sanitizer() {
   if [[ -L "$LOCK_DIR" ]]; then
     exit 0
   fi
-  if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-    exit 0
-  fi
+  mkdir "$LOCK_DIR" 2>/dev/null || exit 0
 
-  trap 'rmdir "$LOCK_DIR" 2>/dev/null || true' EXIT INT TERM
+  trap "rmdir '$LOCK_DIR' 2>/dev/null || true" EXIT INT TERM
 
   while [[ "$PASS" -lt 3 ]]; do
     PASS=$((PASS + 1))

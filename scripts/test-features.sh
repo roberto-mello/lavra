@@ -176,6 +176,8 @@ cat > "$TEST_ROOT/project/.lavra/memory/knowledge.jsonl" << 'EOF'
 {"key":"decision-auth-callback","type":"decision","content":"OAuth callback URI must match exactly including trailing slash.","source":"user","tags":["auth","oauth"],"ts":10,"bead":"test-001"}
 {"key":"decision-auth-callback","type":"decision","content":"OAuth callback URI must match exactly including trailing slash.","source":"user","tags":["auth","oauth"],"ts":20,"bead":"test-001"}
 {"key":"decision-auth-callback-alt","type":"decision","content":"OAuth callback URI must match exactly, including trailing slash.","source":"user","tags":["auth","oauth"],"ts":30,"bead":"test-002"}
+not-json-at-all
+{"key":"investigation-command-noise","type":"investigation","content":"bd close test-001 --reason \\\"done\\\" 2>&1","source":"user","tags":["noise"],"ts":40,"bead":"test-001"}
 EOF
 
 bash "$HOOKS_DIR/memory-sanitize.sh" --run "$TEST_ROOT/project/.lavra/memory" 2>/dev/null || true
@@ -185,6 +187,18 @@ if [[ "$ACTIVE_LINES" -eq 1 ]]; then
   pass "memory-sanitize dedupes identical knowledge into one active entry"
 else
   fail "memory-sanitize dedupe" "Expected 1 active entry, found $ACTIVE_LINES"
+fi
+
+if ! grep -q 'not-json-at-all' "$TEST_ROOT/project/.lavra/memory/knowledge.active.jsonl" 2>/dev/null; then
+  pass "memory-sanitize skips invalid JSONL lines"
+else
+  fail "memory-sanitize invalid json" "Invalid JSON line leaked into active cache"
+fi
+
+if ! grep -q 'investigation-command-noise' "$TEST_ROOT/project/.lavra/memory/knowledge.active.jsonl" 2>/dev/null; then
+  pass "memory-sanitize filters obvious command-noise entries"
+else
+  fail "memory-sanitize command noise" "Command-like entry was kept in active cache"
 fi
 
 if [[ -f "$TEST_ROOT/project/.lavra/memory/knowledge.active.db" ]] || ! command -v sqlite3 >/dev/null 2>&1; then
