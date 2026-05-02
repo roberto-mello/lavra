@@ -76,4 +76,14 @@ After determining Route in Phase 0c:
 - **SINGLE:** `Skill("lavra-work-single")`
 - **MULTI:** `Skill("lavra-work-multi")`
 
+## Shared Guarantees
+
+The command file is a router, but both downstream paths inherit the same operational guarantees. Treat these as part of `/lavra-work` regardless of whether execution routes to `lavra-work-single` or `lavra-work-multi`:
+
+- **Deviation Rules:** implementers must log out-of-scope fixes as `DEVIATION:` entries rather than silently folding them into the bead.
+- **Goal Verification:** before closing work, run the `goal-verifier` review agent so the bead is checked for existence, substance, and wiring.
+- **Session Handoff:** execution paths update `.lavra/memory/session-state.md` so compaction or interruption can resume the current bead cleanly.
+- **Commit Policy:** execution reads `commit_granularity` from `.lavra/config/lavra.json` and follows that commit cadence.
+- **Decision categories:** bead instructions are interpreted through the `Locked`, `Discretion`, and `Deferred` categories defined in the planning workflow.
+
 </process>
