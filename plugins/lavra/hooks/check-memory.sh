@@ -118,7 +118,7 @@ fi
 HOOKS_DIR="$PROJECT_HOOKS_DIR"
 mkdir -p "$HOOKS_DIR"
 
-for hook in memory-capture.sh auto-recall.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh recall.sh; do
+for hook in memory-capture.sh auto-recall.sh subagent-wrapup.sh memory-sanitize.sh knowledge-db.sh provision-memory.sh recall.sh; do
   if [ -f "$HOOKS_SOURCE_DIR/$hook" ]; then
     cp "$HOOKS_SOURCE_DIR/$hook" "$HOOKS_DIR/$hook"
     chmod +x "$HOOKS_DIR/$hook"

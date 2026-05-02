@@ -159,4 +159,10 @@ if [[ "$LINE_COUNT" -gt 5000 ]]; then
   mv "$KNOWLEDGE_FILE.tmp" "$KNOWLEDGE_FILE"
 fi
 
+# Curate active knowledge in the background. Keep this off the hot path:
+# the scheduler only marks memory as dirty and spawns a sanitizer if idle.
+if [[ -f "$SCRIPT_DIR/memory-sanitize.sh" ]]; then
+  "$SCRIPT_DIR/memory-sanitize.sh" --schedule memory-capture "$MEMORY_DIR" >/dev/null 2>&1 || true
+fi
+
 exit 0

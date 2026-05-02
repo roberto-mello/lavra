@@ -13,6 +13,7 @@
 #   kb_insert DB_PATH KEY TYPE CONTENT SOURCE TAGS_TEXT TS BEAD - Insert entry
 #   kb_search DB_PATH QUERY TOP_N - FTS5 search with BM25 ranking
 #   kb_sync DB_PATH MEMORY_DIR     - Incremental sync from JSONL + first-time beads import
+#   kb_rebuild_from_files DB_PATH FILE... - Rebuild DB from one or more JSONL files
 #   kb_backfill DB_PATH MEMORY_DIR - Alias for kb_sync (backward compat)
 #
 
@@ -253,4 +254,24 @@ _kb_sync_jsonl() {
 # Backward-compatible alias
 kb_backfill() {
   kb_sync "$@"
+}
+
+# Rebuild a SQLite FTS5 database from one or more JSONL files.
+# Existing DB and sidecar files are removed first.
+kb_rebuild_from_files() {
+  local DB_PATH="$1"
+  shift || true
+
+  if [[ -z "$DB_PATH" ]]; then
+    return 1
+  fi
+
+  rm -f "$DB_PATH" "$DB_PATH-journal" "$DB_PATH-wal" "$DB_PATH-shm"
+  kb_ensure_db "$DB_PATH"
+
+  local JSONL_FILE
+  for JSONL_FILE in "$@"; do
+    [[ -n "$JSONL_FILE" ]] || continue
+    _kb_sync_jsonl "$DB_PATH" "$JSONL_FILE"
+  done
 }

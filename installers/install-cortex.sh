@@ -178,7 +178,7 @@ if [ "$GLOBAL_INSTALL" = true ]; then
 
   mkdir -p "$TARGET/hooks"
 
-  for hook in check-memory.sh dispatch-hook.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh recall.sh; do
+  for hook in check-memory.sh dispatch-hook.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh memory-sanitize.sh knowledge-db.sh provision-memory.sh recall.sh; do
     if [ -f "$PLUGIN_DIR/hooks/$hook" ]; then
       cp "$PLUGIN_DIR/hooks/$hook" "$TARGET/hooks/$hook"
       chmod +x "$TARGET/hooks/$hook"
@@ -197,7 +197,7 @@ else
   HOOKS_DIR="$TARGET/.cortex/hooks"
   create_dir_with_symlink_handling "$HOOKS_DIR"
 
-  for hook in memory-capture.sh auto-recall.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh; do
+  for hook in memory-capture.sh auto-recall.sh subagent-wrapup.sh memory-sanitize.sh knowledge-db.sh provision-memory.sh; do
     cp "$PLUGIN_DIR/hooks/$hook" "$HOOKS_DIR/$hook"
     chmod +x "$HOOKS_DIR/$hook"
     echo "  - Installed $hook"

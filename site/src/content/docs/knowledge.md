@@ -45,6 +45,8 @@ Knowledge is stored in two places that stay in sync:
 
 The SQLite DB is rebuilt automatically from the JSONL on first use and kept in sync as new entries are added.
 
+**`.lavra/memory/knowledge.active.jsonl`** — a gitignored local cache built by `memory-sanitize.sh`. It removes exact and normalized duplicates from the append-only knowledge log so auto-recall and manual search can use a smaller, cleaner working set without rewriting shared memory history. Its paired `knowledge.active.db` cache serves the same purpose for local FTS search.
+
 **Rotation:** When `knowledge.jsonl` exceeds 5000 lines, the oldest 2500 entries are moved to `knowledge.archive.jsonl`. Both files use `merge=union` in `.gitattributes` so concurrent writes from teammates merge cleanly without conflicts.
 
 **Security:** Knowledge entries are auto-injected into agent context at session start. In collaborative projects, treat changes to `knowledge.jsonl` with the same scrutiny as CI config — any collaborator can add entries that influence agent behavior. Recalled entries are sanitized (role prefix stripping, bidirectional char removal) and wrapped in `<untrusted-knowledge>` tags. See [Security Model](SECURITY.md#knowledge-system-injection-defense) for the full threat model and team recommendations.

@@ -155,10 +155,49 @@ else
 fi
 
 # ==============================================================================
-# Test 5: Session state lifecycle (write -> read -> delete)
+# Test 5: memory-sanitize provisioning and dedupe
 # ==============================================================================
 echo
-echo "Test 5: Session state lifecycle"
+echo "Test 5: memory sanitization pipeline"
+
+if [[ -f "$TEST_ROOT/project/.lavra/memory/memory-sanitize.sh" ]]; then
+  pass "memory-sanitize.sh provisioned into .lavra/memory"
+else
+  fail "memory-sanitize provision" "Script not copied into memory dir"
+fi
+
+if grep -q "knowledge.active.jsonl" "$TEST_ROOT/project/.lavra/.gitignore"; then
+  pass "knowledge.active.jsonl gitignored"
+else
+  fail "knowledge.active gitignore" "Curated active file not gitignored"
+fi
+
+cat > "$TEST_ROOT/project/.lavra/memory/knowledge.jsonl" << 'EOF'
+{"key":"decision-auth-callback","type":"decision","content":"OAuth callback URI must match exactly including trailing slash.","source":"user","tags":["auth","oauth"],"ts":10,"bead":"test-001"}
+{"key":"decision-auth-callback","type":"decision","content":"OAuth callback URI must match exactly including trailing slash.","source":"user","tags":["auth","oauth"],"ts":20,"bead":"test-001"}
+{"key":"decision-auth-callback-alt","type":"decision","content":"OAuth callback URI must match exactly, including trailing slash.","source":"user","tags":["auth","oauth"],"ts":30,"bead":"test-002"}
+EOF
+
+bash "$HOOKS_DIR/memory-sanitize.sh" --run "$TEST_ROOT/project/.lavra/memory" 2>/dev/null || true
+
+ACTIVE_LINES=$(wc -l < "$TEST_ROOT/project/.lavra/memory/knowledge.active.jsonl" 2>/dev/null | tr -d ' ')
+if [[ "$ACTIVE_LINES" -eq 1 ]]; then
+  pass "memory-sanitize dedupes identical knowledge into one active entry"
+else
+  fail "memory-sanitize dedupe" "Expected 1 active entry, found $ACTIVE_LINES"
+fi
+
+if [[ -f "$TEST_ROOT/project/.lavra/memory/knowledge.active.db" ]] || ! command -v sqlite3 >/dev/null 2>&1; then
+  pass "memory-sanitize builds active sqlite cache when sqlite3 is available"
+else
+  fail "memory-sanitize sqlite" "knowledge.active.db not created"
+fi
+
+# ==============================================================================
+# Test 6: Session state lifecycle (write -> read -> delete)
+# ==============================================================================
+echo
+echo "Test 6: Session state lifecycle"
 
 # Write a session state file
 cat > "$TEST_ROOT/project/.lavra/memory/session-state.md" << 'EOF'
@@ -188,10 +227,10 @@ else
 fi
 
 # ==============================================================================
-# Test 6: goal-verifier agent file exists and has correct structure
+# Test 7: goal-verifier agent file exists and has correct structure
 # ==============================================================================
 echo
-echo "Test 6: goal-verifier agent structure"
+echo "Test 7: goal-verifier agent structure"
 
 GOAL_VERIFIER="$PROJECT_ROOT/plugins/lavra/agents/review/goal-verifier.md"
 
@@ -223,10 +262,10 @@ else
 fi
 
 # ==============================================================================
-# Test 7: Agent count verification (30 total, 16 review)
+# Test 8: Agent count verification (30 total, 16 review)
 # ==============================================================================
 echo
-echo "Test 7: Agent counts"
+echo "Test 8: Agent counts"
 
 TOTAL_AGENTS=$(find "$PROJECT_ROOT/plugins/lavra/agents" -name "*.md" | wc -l | tr -d ' ')
 REVIEW_AGENTS=$(find "$PROJECT_ROOT/plugins/lavra/agents/review" -name "*.md" | wc -l | tr -d ' ')
@@ -244,10 +283,10 @@ else
 fi
 
 # ==============================================================================
-# Test 8: DEVIATION in documentation consistency
+# Test 9: DEVIATION in documentation consistency
 # ==============================================================================
 echo
-echo "Test 8: DEVIATION documentation consistency"
+echo "Test 9: DEVIATION documentation consistency"
 
 # hooks-system.md should document DEVIATION:
 if grep -q 'DEVIATION:' "$PROJECT_ROOT/.claude/rules/hooks-system.md"; then

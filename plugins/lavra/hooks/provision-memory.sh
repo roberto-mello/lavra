@@ -39,6 +39,12 @@ provision_memory_dir() {
     chmod +x "$MEMORY_DIR/knowledge-db.sh"
   fi
 
+  # Copy memory-sanitize.sh if available
+  if [[ -f "$HOOKS_SOURCE_DIR/memory-sanitize.sh" ]]; then
+    cp "$HOOKS_SOURCE_DIR/memory-sanitize.sh" "$MEMORY_DIR/memory-sanitize.sh"
+    chmod +x "$MEMORY_DIR/memory-sanitize.sh"
+  fi
+
   # Setup .lavra/.gitattributes for union merge (folder-level, paths use memory/ prefix)
   local GITATTR="$LAVRA_DIR/.gitattributes"
 
@@ -62,14 +68,40 @@ memory/knowledge.db-journal
 memory/knowledge.db-wal
 memory/knowledge.db-shm
 
+# Curated local knowledge cache (rebuilt from append-only JSONL)
+memory/knowledge.active.jsonl
+memory/knowledge.active.db
+memory/knowledge.active.db-journal
+memory/knowledge.active.db-wal
+memory/knowledge.active.db-shm
+memory/.sanitize-needed
+memory/.sanitize.last-run
+memory/.sanitize.lock
+
 # Ephemeral session state (survives compaction, recalled once, then deleted)
 memory/session-state.md
 EOF
-  elif ! grep -q 'session-state.md' "$LAVRA_GITIGNORE" 2>/dev/null; then
-    # Append session-state.md to existing gitignore if missing
-    echo "" >> "$LAVRA_GITIGNORE"
-    echo "# Ephemeral session state (survives compaction, recalled once, then deleted)" >> "$LAVRA_GITIGNORE"
-    echo "memory/session-state.md" >> "$LAVRA_GITIGNORE"
+  else
+    if ! grep -q 'knowledge.active.jsonl' "$LAVRA_GITIGNORE" 2>/dev/null; then
+      cat >> "$LAVRA_GITIGNORE" << 'EOF'
+
+# Curated local knowledge cache (rebuilt from append-only JSONL)
+memory/knowledge.active.jsonl
+memory/knowledge.active.db
+memory/knowledge.active.db-journal
+memory/knowledge.active.db-wal
+memory/knowledge.active.db-shm
+memory/.sanitize-needed
+memory/.sanitize.last-run
+memory/.sanitize.lock
+EOF
+    fi
+
+    if ! grep -q 'session-state.md' "$LAVRA_GITIGNORE" 2>/dev/null; then
+      echo "" >> "$LAVRA_GITIGNORE"
+      echo "# Ephemeral session state (survives compaction, recalled once, then deleted)" >> "$LAVRA_GITIGNORE"
+      echo "memory/session-state.md" >> "$LAVRA_GITIGNORE"
+    fi
   fi
 
   # Create default lavra.json config if missing
@@ -140,6 +172,7 @@ EOF
       .lavra/memory/knowledge.jsonl \
       .lavra/memory/recall.sh \
       .lavra/memory/knowledge-db.sh \
+      .lavra/memory/memory-sanitize.sh \
       2>/dev/null) || true
   fi
 }
