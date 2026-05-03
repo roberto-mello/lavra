@@ -1,3 +1,9 @@
+// memorysanitize is the non-shell half of Lavra's memory sanitizer.
+//
+// The surrounding shell hook schedules work, manages locks, and degrades to a
+// simpler jq path when Go is unavailable. This helper exists because the full
+// sanitizer now needs structured JSONL parsing, dedupe, anchor validation, and
+// audit generation, which are awkward and brittle to maintain in shell alone.
 package main
 
 import (
@@ -17,6 +23,9 @@ import (
 )
 
 var (
+	// These regexes define the lightweight heuristics used to normalize memory
+	// content, detect noisy command output, and extract possible anchors back to
+	// the current repository.
 	pathRE           = regexp.MustCompile(`(?:^|[` + "`" + `(\s])((?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+\.[A-Za-z0-9_-]+)`)
 	backtickSymbolRE = regexp.MustCompile("`([A-Za-z_][A-Za-z0-9_]{2,})`")
 	callSymbolRE     = regexp.MustCompile(`\b([A-Za-z_][A-Za-z0-9_]{2,})\(`)
@@ -55,6 +64,7 @@ type sanitizer struct {
 	symbolCache map[string]bool
 }
 
+// Entry point and CLI parsing.
 func main() {
 	cfg, err := parseConfig()
 	if err != nil {
@@ -68,6 +78,8 @@ func main() {
 	}
 }
 
+// parseConfig reads the wrapper-provided file paths and resolves the project
+// root once up front so later anchor checks operate on canonical paths.
 func parseConfig() (config, error) {
 	var cfg config
 	flag.StringVar(&cfg.knowledgeFile, "knowledge-file", "", "Path to knowledge.jsonl")
@@ -90,6 +102,12 @@ func parseConfig() (config, error) {
 	return cfg, nil
 }
 
+// Top-level pipeline orchestration.
+//
+// The sanitizer always does the same three-stage job:
+// 1. collect and normalize candidate entries from raw/archive JSONL
+// 2. classify them against local file/symbol anchors
+// 3. emit the active view plus an audit trail of what changed
 func run(cfg config) error {
 	s := sanitizer{
 		cfg: cfg,
@@ -138,6 +156,8 @@ func run(cfg config) error {
 	return nil
 }
 
+// Stage 1: collectEntries reads append-only memory, drops malformed/noisy
+// records, and deduplicates first by key and then by normalized content.
 func (s *sanitizer) collectEntries() ([]entry, error) {
 	type source struct {
 		name string
@@ -265,6 +285,9 @@ func (s *sanitizer) collectEntries() ([]entry, error) {
 	return finalEntries, nil
 }
 
+// Stage 2: buildActiveEntries enriches retained memories with local-only
+// status metadata. Shared memory stays append-only; this pass computes the
+// local "is this still anchored to the repo?" view used by recall.
 func (s *sanitizer) buildActiveEntries(entries []entry) ([]entry, error) {
 	activeEntries := make([]entry, 0, len(entries))
 
@@ -372,6 +395,10 @@ func (s *sanitizer) buildActiveEntries(entries []entry) ([]entry, error) {
 	return activeEntries, nil
 }
 
+// Anchor resolution helpers.
+//
+// File anchors are preferred because they are precise and cheap to validate.
+// When no file path is present, the sanitizer falls back to symbol-name probes.
 func (s *sanitizer) resolveAnchor(relPath string) string {
 	if s.cfg.projectRoot == "" {
 		return ""
@@ -435,6 +462,7 @@ func (s *sanitizer) symbolExists(symbol string) (bool, error) {
 	return true, nil
 }
 
+// Output helpers.
 func writeJSONLines[T any](path string, rows []T) error {
 	var builder strings.Builder
 	writer := bufio.NewWriter(&builder)
@@ -459,6 +487,7 @@ func writeJSONLines[T any](path string, rows []T) error {
 	return nil
 }
 
+// Text normalization and extraction helpers.
 func normalizeText(value string) string {
 	value = strings.ToLower(value)
 	value = commandTrimRE1.ReplaceAllString(value, "")
