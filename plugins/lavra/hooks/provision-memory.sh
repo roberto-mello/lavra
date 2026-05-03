@@ -11,6 +11,77 @@
 #   provision_memory_dir "/path/to/project" "/path/to/hooks/dir"
 #
 
+prompt_continue_without_go_helper() {
+  local PROJECT_DIR="$1"
+  local REASON="$2"
+
+  echo ""
+  echo "[!] Warning: Lavra could not prepare the Go memory sanitizer helper."
+  echo "    Reason: $REASON"
+  echo ""
+  echo "    Lavra can still proceed with the simpler shell/jq sanitizer, but you"
+  echo "    will lose richer drift validation and audit behavior until Go is installed."
+  echo ""
+  echo "    To enable the full sanitizer later:"
+  echo "      1. Install Go"
+  echo "      2. Re-run install in: $PROJECT_DIR"
+  echo ""
+
+  if [[ "${BEADS_AUTO_YES:-false}" == "true" ]] || ! [[ -t 0 ]]; then
+    echo "    [non-interactive] Continuing without the Go helper."
+    echo ""
+    return 0
+  fi
+
+  read -r -p "    Continue without the Go helper? [y/N] " response
+  echo ""
+  case "${response:-N}" in
+    [yY]|[yY][eE][sS]) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+build_memory_sanitize_helper() {
+  local PROJECT_DIR="$1"
+  local MEMORY_DIR="$2"
+  local SOURCE_DIR="$MEMORY_DIR/memorysanitize"
+  local BIN_PATH="$MEMORY_DIR/.memory-sanitize-go"
+  local TMP_ROOT="$PROJECT_DIR/.lavra/tmp"
+  local GO_CACHE_DIR="$TMP_ROOT/go-cache"
+  local GO_TMP_DIR="$TMP_ROOT/go-tmp"
+  local TMP_BIN
+
+  if [[ "${BEADS_EAGER_COMPILE_MEMORY_HELPER:-false}" != "true" ]]; then
+    return 0
+  fi
+
+  if [[ ! -d "$SOURCE_DIR" ]] || [[ ! -f "$SOURCE_DIR/main.go" ]] || [[ ! -f "$SOURCE_DIR/go.mod" ]]; then
+    return 0
+  fi
+
+  if ! command -v go &>/dev/null; then
+    prompt_continue_without_go_helper "$PROJECT_DIR" "Go is not installed or not on PATH" || return 1
+    return 0
+  fi
+
+  mkdir -p "$GO_CACHE_DIR" "$GO_TMP_DIR"
+
+  TMP_BIN=$(mktemp "$MEMORY_DIR/.memory-sanitize-go.tmp.XXXXXX") || {
+    prompt_continue_without_go_helper "$PROJECT_DIR" "could not create a temporary binary path" || return 1
+    return 0
+  }
+
+  if ! (cd "$SOURCE_DIR" && GOCACHE="$GO_CACHE_DIR" TMPDIR="$GO_TMP_DIR" TMP="$GO_TMP_DIR" TEMP="$GO_TMP_DIR" go build -o "$TMP_BIN" .) >/dev/null 2>&1; then
+    rm -f "$TMP_BIN"
+    prompt_continue_without_go_helper "$PROJECT_DIR" "go build failed" || return 1
+    return 0
+  fi
+
+  chmod +x "$TMP_BIN"
+  mv "$TMP_BIN" "$BIN_PATH"
+  echo "  - Built Go memory sanitizer helper"
+}
+
 provision_memory_dir() {
   local PROJECT_DIR="$1"
   local HOOKS_SOURCE_DIR="$2"
@@ -49,6 +120,8 @@ provision_memory_dir() {
     rm -rf "$MEMORY_DIR/memorysanitize"
     cp -R "$HOOKS_SOURCE_DIR/memorysanitize" "$MEMORY_DIR/memorysanitize"
   fi
+
+  build_memory_sanitize_helper "$PROJECT_DIR" "$MEMORY_DIR"
 
   # Setup .lavra/.gitattributes for union merge (folder-level, paths use memory/ prefix)
   local GITATTR="$LAVRA_DIR/.gitattributes"

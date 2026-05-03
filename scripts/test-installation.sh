@@ -123,6 +123,12 @@ else
   fail "Claude Code Go helper" "memorysanitize source missing from hooks or .lavra/memory"
 fi
 
+if [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
+  pass "Claude Code Go helper built during install"
+else
+  fail "Claude Code Go helper build" "compiled helper missing immediately after install"
+fi
+
 # Verify settings.json exists and has hooks
 if [[ -f ".claude/settings.json" ]]; then
   if grep -q "SessionStart" ".claude/settings.json" && \
@@ -196,12 +202,11 @@ fi
 seed_memory_fixture ".lavra/memory"
 
 if env GOCACHE="$TEST_ROOT/go-cache" ".lavra/memory/memory-sanitize.sh" --run ".lavra/memory" >/dev/null 2>&1 && \
-   [[ -f ".lavra/memory/.memory-sanitize-go" ]] && \
    [[ -f ".lavra/memory/knowledge.active.jsonl" ]] && \
    grep -q '"key":"alpha"' ".lavra/memory/knowledge.active.jsonl"; then
-  pass "Claude Code Go helper builds and sanitizes knowledge"
+  pass "Claude Code Go helper sanitizes knowledge"
 else
-  fail "Claude Code Go helper runtime" "wrapper did not build helper or produce active knowledge"
+  fail "Claude Code Go helper runtime" "wrapper did not produce active knowledge"
 fi
 
 # ==============================================================================
@@ -259,6 +264,12 @@ else
   fail "OpenCode Go helper" "memorysanitize source missing from .opencode/hooks"
 fi
 
+if [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
+  pass "OpenCode Go helper built during install"
+else
+  fail "OpenCode Go helper build" "compiled helper missing immediately after install"
+fi
+
 # Verify AGENTS.md exists (OpenCode uses this for beads workflow)
 if [[ -f "AGENTS.md" ]]; then
   # Should contain beads workflow instructions
@@ -274,9 +285,9 @@ fi
 seed_memory_fixture ".lavra/memory"
 if env GOCACHE="$TEST_ROOT/go-cache" ".lavra/memory/memory-sanitize.sh" --run ".lavra/memory" >/dev/null 2>&1 && \
    [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
-  pass "OpenCode Go helper builds and sanitizes knowledge"
+  pass "OpenCode Go helper sanitizes knowledge"
 else
-  fail "OpenCode Go helper runtime" "wrapper did not build helper in .lavra/memory"
+  fail "OpenCode Go helper runtime" "wrapper did not use helper in .lavra/memory"
 fi
 
 if run_uninstall "$OPENCODE_TEST" bash "$PROJECT_ROOT/uninstall.sh" --opencode; then
@@ -324,6 +335,12 @@ else
   fail "Gemini Go helper" "memorysanitize source missing from hooks/"
 fi
 
+if [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
+  pass "Gemini Go helper built during install"
+else
+  fail "Gemini Go helper build" "compiled helper missing immediately after install"
+fi
+
 # Verify commands are .toml format (Gemini-specific)
 TOML_COUNT=$(find commands -name "*.toml" 2>/dev/null | wc -l | tr -d ' ')
 if [[ "$TOML_COUNT" -ge 18 ]]; then
@@ -358,9 +375,9 @@ fi
 seed_memory_fixture ".lavra/memory"
 if env GOCACHE="$TEST_ROOT/go-cache" ".lavra/memory/memory-sanitize.sh" --run ".lavra/memory" >/dev/null 2>&1 && \
    [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
-  pass "Gemini Go helper builds and sanitizes knowledge"
+  pass "Gemini Go helper sanitizes knowledge"
 else
-  fail "Gemini Go helper runtime" "wrapper did not build helper in .lavra/memory"
+  fail "Gemini Go helper runtime" "wrapper did not use helper in .lavra/memory"
 fi
 
 if run_uninstall "$GEMINI_TEST" bash "$PROJECT_ROOT/uninstall.sh" --gemini; then
@@ -419,6 +436,12 @@ if [[ -f ".cortex/hooks/memorysanitize/main.go" ]]; then
   pass "Cortex Code Go helper source installed"
 else
   fail "Cortex Code Go helper" "memorysanitize source missing from .cortex/hooks"
+fi
+
+if [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
+  pass "Cortex Code Go helper built during install"
+else
+  fail "Cortex Code Go helper build" "compiled helper missing immediately after install"
 fi
 
 # Verify teammate-idle-check.sh is NOT present (TeammateIdle not supported)
@@ -503,9 +526,9 @@ fi
 seed_memory_fixture ".lavra/memory"
 if env GOCACHE="$TEST_ROOT/go-cache" ".lavra/memory/memory-sanitize.sh" --run ".lavra/memory" >/dev/null 2>&1 && \
    [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
-  pass "Cortex Code Go helper builds and sanitizes knowledge"
+  pass "Cortex Code Go helper sanitizes knowledge"
 else
-  fail "Cortex Code Go helper runtime" "wrapper did not build helper in .lavra/memory"
+  fail "Cortex Code Go helper runtime" "wrapper did not use helper in .lavra/memory"
 fi
 
 if run_uninstall "$CORTEX_TEST" env HOME="$HOME" bash "$PROJECT_ROOT/uninstall.sh" --cortex; then

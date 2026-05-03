@@ -251,7 +251,7 @@ else
 
   source "$PLUGIN_DIR/hooks/provision-memory.sh"
   migrate_beads_to_lavra "$TARGET"
-  provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
+  BEADS_AUTO_YES="$AUTO_YES" BEADS_EAGER_COMPILE_MEMORY_HELPER=true provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
 
   echo "  - Memory system ready"
   echo ""

@@ -167,7 +167,7 @@ else
   if [ -f "$PROVISION_SCRIPT" ]; then
     source "$PROVISION_SCRIPT"
     migrate_beads_to_lavra "$TARGET"
-    provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
+    BEADS_AUTO_YES="$AUTO_YES" BEADS_EAGER_COMPILE_MEMORY_HELPER=true provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
     echo "  - Memory system configured"
   fi
 fi
