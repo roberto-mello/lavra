@@ -52,6 +52,17 @@ echo ""
 
 REMOVED_COUNT=0
 
+remove_path_if_present() {
+  local TARGET_PATH="$1"
+  local LABEL="$2"
+
+  if [ -L "$TARGET_PATH" ] || [ -e "$TARGET_PATH" ]; then
+    rm -rf "$TARGET_PATH"
+    echo "  - Removed $LABEL"
+    REMOVED_COUNT=$((REMOVED_COUNT + 1))
+  fi
+}
+
 # Remove hooks
 echo "[1/5] Removing hooks..."
 
@@ -69,6 +80,7 @@ if [ -d "$HOOKS_DIR" ]; then
       REMOVED_COUNT=$((REMOVED_COUNT + 1))
     fi
   done
+  remove_path_if_present "$HOOKS_DIR/memorysanitize" "memorysanitize/"
 else
   echo "  - No hooks directory found"
 fi
@@ -175,6 +187,11 @@ if [ -d "$SKILLS_DIR" ]; then
   fi
 else
   echo "  - No skills directory found"
+fi
+
+if [ -d "$TARGET/.lavra/memory" ]; then
+  remove_path_if_present "$TARGET/.lavra/memory/memorysanitize" "memorysanitize/"
+  remove_path_if_present "$TARGET/.lavra/memory/.memory-sanitize-go" ".memory-sanitize-go"
 fi
 
 # Update settings.json to remove hook configuration

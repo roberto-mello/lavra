@@ -27,6 +27,16 @@ fi
 
 TARGET="$(cd "$TARGET" && pwd)"
 
+remove_path_if_present() {
+  local TARGET_PATH="$1"
+  local LABEL="$2"
+
+  if [ -L "$TARGET_PATH" ] || [ -e "$TARGET_PATH" ]; then
+    rm -rf "$TARGET_PATH"
+    echo "  ✓ Removed $LABEL"
+  fi
+}
+
 echo "🗑️  lavra OpenCode Uninstaller"
 echo ""
 echo "Target: $TARGET"
@@ -87,6 +97,7 @@ if [ -d "$BASE_DIR/hooks" ]; then
       echo "  ✓ Removed $hook"
     fi
   done
+  remove_path_if_present "$BASE_DIR/hooks/memorysanitize" "memorysanitize/"
 fi
 
 # Remove commands
@@ -142,6 +153,8 @@ if [ -d "$TARGET/.lavra/memory" ]; then
     rm "$TARGET/.lavra/memory/memory-sanitize.sh"
     echo "  ✓ Removed memory-sanitize.sh"
   fi
+  remove_path_if_present "$TARGET/.lavra/memory/memorysanitize" "memorysanitize/"
+  remove_path_if_present "$TARGET/.lavra/memory/.memory-sanitize-go" ".memory-sanitize-go"
 
   # Note: knowledge.jsonl and knowledge.archive.jsonl are preserved (user data)
   if [ -f "$TARGET/.lavra/memory/knowledge.jsonl" ]; then
