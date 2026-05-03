@@ -175,6 +175,13 @@ echo "=== Compatibility tests ==="
 (cd scripts && bun run test-compatibility.ts) && { echo "  PASS  Compatibility tests"; ((PASS++)) || true; } || fail "Compatibility tests" "see output above"
 
 echo ""
+echo "=== Go helper ==="
+check "memory sanitize helper module" test -f plugins/lavra/hooks/memorysanitize/go.mod
+(cd plugins/lavra/hooks/memorysanitize && go test -race ./...) && { echo "  PASS  Go helper tests"; ((PASS++)) || true; } || fail "Go helper tests" "go test -race failed"
+(cd plugins/lavra/hooks/memorysanitize && go vet ./...) && { echo "  PASS  Go helper vet"; ((PASS++)) || true; } || fail "Go helper vet" "go vet failed"
+bash scripts/build-memory-sanitize-helper.sh >/dev/null && { echo "  PASS  Go helper release builds"; ((PASS++)) || true; } || fail "Go helper release builds" "cross-platform build failed"
+
+echo ""
 echo "=== Prose style check ==="
 FILLER='Make sure to|Note that|Be sure to|you will|In order to|simply|basically|actually'
 if ! command -v rg &>/dev/null; then

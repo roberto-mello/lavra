@@ -18,8 +18,9 @@ Knowledge is stored in one shared log plus local derived caches:
 - **SQLite FTS5** (`knowledge.db`) -- local search index built from the JSONL
 - **Curated local cache** (`knowledge.active.jsonl`, `knowledge.active.db`) -- sanitizer-produced active working set for lower-noise recall
 - **Audit log** (`knowledge.audit.jsonl`) -- local explanation of what the sanitizer filtered, merged, downgraded, or skipped
+- **Compiled helper** (`.memory-sanitize-go`) -- gitignored local binary built from the Go sanitizer source when Go is available
 
-`memory-capture.sh` writes raw shared memory. `memory-sanitize.sh` then builds local curated artifacts asynchronously. If `sqlite3` is unavailable, JSONL still works and grep-based search remains available automatically.
+`memory-capture.sh` writes raw shared memory. `memory-sanitize.sh` then builds local curated artifacts asynchronously. The shell script is only an orchestrator now: it schedules work, compiles/runs the Go helper from `plugins/lavra/hooks/memorysanitize/` when `go` is available, and falls back to a reduced `jq` sanitizer path otherwise. If `sqlite3` is unavailable, JSONL still works and grep-based search remains available automatically.
 
 ```json
 {

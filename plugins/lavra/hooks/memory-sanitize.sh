@@ -85,7 +85,9 @@ write_marker_file() {
 
 build_go_helper() {
   local MEMORY_DIR="$1"
-  local BIN_PATH="$MEMORY_DIR/.memory-sanitize-go"
+  local MEMORY_REAL
+  MEMORY_REAL="$(canonical_dir "$MEMORY_DIR")" || return 1
+  local BIN_PATH="$MEMORY_REAL/.memory-sanitize-go"
 
   if [[ ! -d "$GO_HELPER_DIR" ]]; then
     return 1
@@ -101,7 +103,7 @@ build_go_helper() {
   fi
 
   local TMP_BIN
-  TMP_BIN=$(mktemp "$MEMORY_DIR/.memory-sanitize-go.tmp.XXXXXX") || return 1
+  TMP_BIN=$(mktemp "$MEMORY_REAL/.memory-sanitize-go.tmp.XXXXXX") || return 1
 
   if ! (cd "$GO_HELPER_DIR" && go build -o "$TMP_BIN" .) >/dev/null 2>&1; then
     rm -f "$TMP_BIN"

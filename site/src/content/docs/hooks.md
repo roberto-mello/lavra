@@ -43,6 +43,21 @@ bd comments add beads-abc "LEARNED: Astro 5 uses id not slug for glob loader ent
 
 The hook auto-tags entries based on keywords in the content. After 1000 entries, the oldest 500 are archived to `knowledge.archive.jsonl`.
 
+After capture, the hook also schedules `memory-sanitize.sh` in the background. That wrapper uses the Go helper when `go` is available and falls back to a reduced shell/`jq` sanitizer otherwise, so the local active cache keeps working even on machines without a Go toolchain.
+
+## memory-sanitize (background helper)
+
+`memory-sanitize.sh` is not a direct Claude hook event. It is scheduled by `memory-capture.sh` and `auto-recall.sh` whenever the local active cache is missing or stale.
+
+**How it works:**
+1. The shell wrapper marks the memory directory dirty and acquires a lock
+2. If `go` is available, it builds `.lavra/memory/.memory-sanitize-go` from the bundled `memorysanitize/` source and runs it
+3. The helper writes `knowledge.active.jsonl` and `knowledge.audit.jsonl`
+4. If `sqlite3` is available, `knowledge.active.db` is rebuilt for fast local recall
+5. If `go` is unavailable, the wrapper falls back to a reduced `jq` sanitizer path
+
+The Go path is the authoritative sanitizer. The shell fallback exists so recall still works on machines that do not have Go installed.
+
 ## subagent-wrapup (SubagentStop)
 
 Runs when a subagent finishes. Blocks the subagent from completing until it has logged at least one knowledge comment.

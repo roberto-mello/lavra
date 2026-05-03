@@ -72,6 +72,7 @@ Release notes live at `site/src/content/docs/releases/vX.Y.Z.md`.
 - Run a final `/humanizer` pass on the release notes file
 - Set the release date in the frontmatter
 - Remove `draft: true`
+- If the release touches `plugins/lavra/hooks/memorysanitize/`, update the draft notes to mention the Go helper and fallback behavior explicitly
 
 ## 3. Run pre-release checks (MUST PASS before tagging)
 
@@ -225,6 +226,23 @@ cd ~/Documents/projects/lavra
 
 **Do not proceed if any verification fails.**
 
+## 4b. Build helper artifacts for macOS and Linux
+
+If the release touches `plugins/lavra/hooks/memorysanitize/`, build the helper binaries that should be attached to the GitHub release:
+
+```bash
+bash scripts/build-memory-sanitize-helper.sh
+ls dist/memorysanitize/
+# Must contain:
+#   memory-sanitize-darwin-amd64
+#   memory-sanitize-darwin-arm64
+#   memory-sanitize-linux-amd64
+#   memory-sanitize-linux-arm64
+#   SHA256SUMS.txt
+```
+
+These assets are cross-compiled from the single Go helper source. They are not consumed by the installer today, but they are the release artifacts we keep for manual distribution, validation, and future binary-first installs.
+
 ## 5. Push commits
 
 ```bash
@@ -239,6 +257,12 @@ Before tagging: finalize release notes at `site/src/content/docs/releases/vX.Y.Z
 git tag vX.Y.Z
 git push origin vX.Y.Z
 gh release create vX.Y.Z --title "vX.Y.Z" --generate-notes
+```
+
+If helper artifacts were built in step 4b, upload them to the GitHub release:
+
+```bash
+gh release upload vX.Y.Z dist/memorysanitize/memory-sanitize-* dist/memorysanitize/SHA256SUMS.txt
 ```
 
 ## 7. Verify CI passes

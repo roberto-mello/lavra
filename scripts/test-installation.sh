@@ -69,6 +69,12 @@ else
   fail "Claude Code hooks" "Missing hook files"
 fi
 
+if [[ -f ".claude/hooks/memorysanitize/main.go" && -f ".lavra/memory/memorysanitize/main.go" ]]; then
+  pass "Claude Code Go helper source installed"
+else
+  fail "Claude Code Go helper" "memorysanitize source missing from hooks or .lavra/memory"
+fi
+
 # Verify settings.json exists and has hooks
 if [[ -f ".claude/settings.json" ]]; then
   if grep -q "SessionStart" ".claude/settings.json" && \
@@ -138,6 +144,21 @@ else
   pass "Claude Code MCP not configured (optional)"
 fi
 
+# Verify the wrapper can build and run the Go helper end-to-end
+cat > ".lavra/memory/knowledge.jsonl" <<'EOF'
+{"key":"alpha","type":"learned","content":"OAuth redirect URI must match exactly","ts":10}
+{"key":"noise","type":"learned","content":"git status","ts":9}
+EOF
+
+if env GOCACHE="$TEST_ROOT/go-cache" ".lavra/memory/memory-sanitize.sh" --run ".lavra/memory" >/dev/null 2>&1 && \
+   [[ -f ".lavra/memory/.memory-sanitize-go" ]] && \
+   [[ -f ".lavra/memory/knowledge.active.jsonl" ]] && \
+   grep -q '"key":"alpha"' ".lavra/memory/knowledge.active.jsonl"; then
+  pass "Claude Code Go helper builds and sanitizes knowledge"
+else
+  fail "Claude Code Go helper runtime" "wrapper did not build helper or produce active knowledge"
+fi
+
 # ==============================================================================
 # Test 2: OpenCode Installation
 # ==============================================================================
@@ -152,7 +173,8 @@ git init -q
 bd init -q 2>/dev/null || true
 
 # Run installer with --opencode flag (--yes skips interactive model selection)
-if bash "$PROJECT_ROOT/install.sh" --opencode --yes "$OPENCODE_TEST" >/dev/null 2>&1; then
+mkdir -p "$TEST_ROOT/tmp"
+if env TMPDIR="$TEST_ROOT/tmp" bash "$PROJECT_ROOT/install.sh" --opencode --yes "$OPENCODE_TEST" >/dev/null 2>&1; then
   pass "Installer completed for OpenCode"
 else
   fail "OpenCode install" "Installer failed"
@@ -184,6 +206,12 @@ if [[ -f ".opencode/hooks/auto-recall.sh" ]]; then
   pass "OpenCode hook files installed"
 else
   fail "OpenCode hooks" "Hook files missing"
+fi
+
+if [[ -f ".opencode/hooks/memorysanitize/main.go" ]]; then
+  pass "OpenCode Go helper source installed"
+else
+  fail "OpenCode Go helper" "memorysanitize source missing from .opencode/hooks"
 fi
 
 # Verify AGENTS.md exists (OpenCode uses this for beads workflow)
@@ -223,6 +251,12 @@ if [[ -d "hooks" ]]; then
   pass "Gemini directory structure created"
 else
   fail "Gemini structure" "Missing hooks directory"
+fi
+
+if [[ -f "hooks/memorysanitize/main.go" ]]; then
+  pass "Gemini Go helper source installed"
+else
+  fail "Gemini Go helper" "memorysanitize source missing from hooks/"
 fi
 
 # Verify commands are .toml format (Gemini-specific)
@@ -294,6 +328,12 @@ if [[ -f ".cortex/hooks/auto-recall.sh" && -f ".cortex/hooks/memory-capture.sh" 
   pass "Cortex Code hook files installed"
 else
   fail "Cortex Code hooks" "Missing hook files"
+fi
+
+if [[ -f ".cortex/hooks/memorysanitize/main.go" ]]; then
+  pass "Cortex Code Go helper source installed"
+else
+  fail "Cortex Code Go helper" "memorysanitize source missing from .cortex/hooks"
 fi
 
 # Verify teammate-idle-check.sh is NOT present (TeammateIdle not supported)
