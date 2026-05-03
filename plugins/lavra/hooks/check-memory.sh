@@ -124,6 +124,10 @@ for hook in memory-capture.sh auto-recall.sh subagent-wrapup.sh memory-sanitize.
     chmod +x "$HOOKS_DIR/$hook"
   fi
 done
+if [ -d "$HOOKS_SOURCE_DIR/memorysanitize" ]; then
+  rm -rf "$HOOKS_DIR/memorysanitize"
+  cp -R "$HOOKS_SOURCE_DIR/memorysanitize" "$HOOKS_DIR/memorysanitize"
+fi
 
 # Write version marker so future updates are detected
 if [ -n "$GLOBAL_VERSION" ]; then

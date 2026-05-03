@@ -45,6 +45,11 @@ provision_memory_dir() {
     chmod +x "$MEMORY_DIR/memory-sanitize.sh"
   fi
 
+  if [[ -d "$HOOKS_SOURCE_DIR/memorysanitize" ]]; then
+    rm -rf "$MEMORY_DIR/memorysanitize"
+    cp -R "$HOOKS_SOURCE_DIR/memorysanitize" "$MEMORY_DIR/memorysanitize"
+  fi
+
   # Setup .lavra/.gitattributes for union merge (folder-level, paths use memory/ prefix)
   local GITATTR="$LAVRA_DIR/.gitattributes"
 
@@ -75,6 +80,7 @@ memory/knowledge.active.db
 memory/knowledge.active.db-journal
 memory/knowledge.active.db-wal
 memory/knowledge.active.db-shm
+memory/.memory-sanitize-go
 memory/.sanitize-needed
 memory/.sanitize.last-run
 memory/.sanitize.lock
@@ -93,6 +99,7 @@ memory/knowledge.active.db
 memory/knowledge.active.db-journal
 memory/knowledge.active.db-wal
 memory/knowledge.active.db-shm
+memory/.memory-sanitize-go
 memory/.sanitize-needed
 memory/.sanitize.last-run
 memory/.sanitize.lock
@@ -175,6 +182,8 @@ EOF
       .lavra/memory/recall.sh \
       .lavra/memory/knowledge-db.sh \
       .lavra/memory/memory-sanitize.sh \
+      .lavra/memory/memorysanitize/go.mod \
+      .lavra/memory/memorysanitize/main.go \
       2>/dev/null) || true
   fi
 }

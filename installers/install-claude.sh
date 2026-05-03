@@ -163,6 +163,11 @@ else
     chmod +x "$HOOKS_DIR/$hook"
     echo "  - Installed $hook"
   done
+  if [[ -d "$PLUGIN_DIR/hooks/memorysanitize" ]]; then
+    rm -rf "$HOOKS_DIR/memorysanitize"
+    cp -R "$PLUGIN_DIR/hooks/memorysanitize" "$HOOKS_DIR/memorysanitize"
+    echo "  - Installed memorysanitize/"
+  fi
 
   # Write version marker so check-memory.sh can detect future updates
   INSTALLER_VERSION=$(get_lavra_version "$PLUGIN_DIR")
@@ -387,6 +392,10 @@ if [ "$GLOBAL_INSTALL" = true ]; then
       chmod +x "$TARGET/hooks/$hook"
     fi
   done
+  if [[ -d "$PLUGIN_DIR/hooks/memorysanitize" ]]; then
+    rm -rf "$TARGET/hooks/memorysanitize"
+    cp -R "$PLUGIN_DIR/hooks/memorysanitize" "$TARGET/hooks/memorysanitize"
+  fi
 
   # Write version marker for hook auto-update
   LAVRA_VERSION=$(get_lavra_version "$PLUGIN_DIR")
