@@ -204,18 +204,6 @@ else
   fail "Claude Code Go helper runtime" "wrapper did not build helper or produce active knowledge"
 fi
 
-if bash "$PROJECT_ROOT/uninstall.sh" "$CLAUDE_TEST" >/dev/null 2>&1; then
-  pass "Claude Code uninstall completed"
-else
-  fail "Claude Code uninstall" "Uninstaller failed"
-fi
-
-assert_file_absent "Claude Code hook helper removed" ".claude/hooks/memorysanitize" "memorysanitize directory still present in .claude/hooks"
-assert_file_absent "Claude Code memory helper source removed" ".lavra/memory/memorysanitize" "memorysanitize directory still present in .lavra/memory"
-assert_file_absent "Claude Code compiled helper removed" ".lavra/memory/.memory-sanitize-go" "compiled helper still present after uninstall"
-assert_file_exists "Claude Code knowledge preserved" ".lavra/memory/knowledge.jsonl" "knowledge.jsonl should be preserved"
-assert_file_exists "Claude Code archive preserved" ".lavra/memory/knowledge.archive.jsonl" "knowledge.archive.jsonl should be preserved"
-
 # ==============================================================================
 # Test 2: OpenCode Installation
 # ==============================================================================
@@ -591,6 +579,18 @@ if [[ "$ORIGINAL_CONTENT" == "$AFTER_CONTENT" ]]; then
 else
   fail "lavra.json idempotency" "File was overwritten on re-install"
 fi
+
+if bash "$PROJECT_ROOT/uninstall.sh" "$CLAUDE_TEST" >/dev/null 2>&1; then
+  pass "Claude Code uninstall completed"
+else
+  fail "Claude Code uninstall" "Uninstaller failed"
+fi
+
+assert_file_absent "Claude Code hook helper removed" "$CLAUDE_TEST/.claude/hooks/memorysanitize" "memorysanitize directory still present in .claude/hooks"
+assert_file_absent "Claude Code memory helper source removed" "$CLAUDE_TEST/.lavra/memory/memorysanitize" "memorysanitize directory still present in .lavra/memory"
+assert_file_absent "Claude Code compiled helper removed" "$CLAUDE_TEST/.lavra/memory/.memory-sanitize-go" "compiled helper still present after uninstall"
+assert_file_exists "Claude Code knowledge preserved" "$CLAUDE_TEST/.lavra/memory/knowledge.jsonl" "knowledge.jsonl should be preserved"
+assert_file_exists "Claude Code archive preserved" "$CLAUDE_TEST/.lavra/memory/knowledge.archive.jsonl" "knowledge.archive.jsonl should be preserved"
 
 # ==============================================================================
 # Test 6: Migration (upgrade from .beads/ to .lavra/)
