@@ -158,11 +158,16 @@ else
   HOOKS_DIR="$TARGET/.claude/hooks"
   create_dir_with_symlink_handling "$HOOKS_DIR"
 
-  for hook in sanitize-content.sh memory-capture.sh auto-recall.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh extract-bead-context.sh; do
+  for hook in sanitize-content.sh memory-capture.sh auto-recall.sh subagent-wrapup.sh memory-sanitize.sh knowledge-db.sh provision-memory.sh extract-bead-context.sh; do
     cp "$PLUGIN_DIR/hooks/$hook" "$HOOKS_DIR/$hook"
     chmod +x "$HOOKS_DIR/$hook"
     echo "  - Installed $hook"
   done
+  if [[ -d "$PLUGIN_DIR/hooks/memorysanitize" ]]; then
+    rm -rf "$HOOKS_DIR/memorysanitize"
+    cp -R "$PLUGIN_DIR/hooks/memorysanitize" "$HOOKS_DIR/memorysanitize"
+    echo "  - Installed memorysanitize/"
+  fi
 
   # Write version marker so check-memory.sh can detect future updates
   INSTALLER_VERSION=$(get_lavra_version "$PLUGIN_DIR")
@@ -381,12 +386,16 @@ if [ "$GLOBAL_INSTALL" = true ]; then
   # Install all hook scripts for auto-installation in beads projects
   mkdir -p "$TARGET/hooks"
 
-  for hook in sanitize-content.sh check-memory.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh recall.sh extract-bead-context.sh; do
+  for hook in sanitize-content.sh check-memory.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh memory-sanitize.sh knowledge-db.sh provision-memory.sh recall.sh extract-bead-context.sh; do
     if [ -f "$PLUGIN_DIR/hooks/$hook" ]; then
       cp "$PLUGIN_DIR/hooks/$hook" "$TARGET/hooks/$hook"
       chmod +x "$TARGET/hooks/$hook"
     fi
   done
+  if [[ -d "$PLUGIN_DIR/hooks/memorysanitize" ]]; then
+    rm -rf "$TARGET/hooks/memorysanitize"
+    cp -R "$PLUGIN_DIR/hooks/memorysanitize" "$TARGET/hooks/memorysanitize"
+  fi
 
   # Write version marker for hook auto-update
   LAVRA_VERSION=$(get_lavra_version "$PLUGIN_DIR")

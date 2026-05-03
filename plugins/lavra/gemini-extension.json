@@ -43,6 +43,7 @@
     "hooks/auto-recall.sh",
     "hooks/memory-capture.sh",
     "hooks/subagent-wrapup.sh",
+    "hooks/memory-sanitize.sh",
     "hooks/provision-memory.sh",
     "hooks/recall.sh",
     "hooks/knowledge-db.sh"

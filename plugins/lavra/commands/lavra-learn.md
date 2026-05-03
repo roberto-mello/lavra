@@ -33,6 +33,8 @@ Work session -> inline bd comments (raw) -> /lavra-learn (structured) -> auto-re
 
 Raw comments logged during work are often terse, context-dependent, and untagged beyond auto-detection. This command reviews them with full context, produces well-titled entries with accurate tags, deduplicates against existing knowledge, and synthesizes higher-level patterns where entries connect.
 
+This command improves capture quality. It does not perform shared-memory history cleanup or rewrite older entries in `knowledge.jsonl`. Any future shared curation workflow is separate and review-gated.
+
 **Usage:**
 ```bash
 /lavra-learn                       # Process all beads closed today

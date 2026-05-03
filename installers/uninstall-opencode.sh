@@ -81,7 +81,7 @@ fi
 
 # Remove hooks
 if [ -d "$BASE_DIR/hooks" ]; then
-  for hook in auto-recall.sh memory-capture.sh subagent-wrapup.sh; do
+  for hook in auto-recall.sh memory-capture.sh subagent-wrapup.sh memory-sanitize.sh; do
     if [ -f "$BASE_DIR/hooks/$hook" ]; then
       rm "$BASE_DIR/hooks/$hook"
       echo "  ✓ Removed $hook"
@@ -137,6 +137,10 @@ if [ -d "$TARGET/.lavra/memory" ]; then
   if [ -f "$TARGET/.lavra/memory/knowledge-db.sh" ]; then
     rm "$TARGET/.lavra/memory/knowledge-db.sh"
     echo "  ✓ Removed knowledge-db.sh"
+  fi
+  if [ -f "$TARGET/.lavra/memory/memory-sanitize.sh" ]; then
+    rm "$TARGET/.lavra/memory/memory-sanitize.sh"
+    echo "  ✓ Removed memory-sanitize.sh"
   fi
 
   # Note: knowledge.jsonl and knowledge.archive.jsonl are preserved (user data)

@@ -8,6 +8,7 @@
 #   recall.sh --recent 10                  # Show latest N entries
 #   recall.sh --stats                      # Knowledge base stats
 #   recall.sh "keyword" --all              # Include archive
+#   recall.sh "keyword" --raw              # Search raw append-only memory
 #   recall.sh --topic BD-005               # Filter by epic parent
 #
 
@@ -26,6 +27,7 @@ fi
 MEMORY_DIR="$PROJECT_ROOT/.lavra/memory"
 KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 ARCHIVE_FILE="$MEMORY_DIR/knowledge.archive.jsonl"
+ACTIVE_FILE="$MEMORY_DIR/knowledge.active.jsonl"
 
 if [[ ! -f "$KNOWLEDGE_FILE" ]]; then
   echo "No knowledge base found at $KNOWLEDGE_FILE"
@@ -39,6 +41,7 @@ RECENT=0
 SHOW_STATS=false
 INCLUDE_ARCHIVE=false
 TOPIC_ID=""
+USE_RAW=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -46,10 +49,19 @@ while [[ $# -gt 0 ]]; do
     --recent) RECENT="$2"; shift 2 ;;
     --stats) SHOW_STATS=true; shift ;;
     --all) INCLUDE_ARCHIVE=true; shift ;;
+    --raw) USE_RAW=true; shift ;;
     --topic) TOPIC_ID="$2"; shift 2 ;;
     *) QUERY="$1"; shift ;;
   esac
 done
+
+BASE_FILE="$KNOWLEDGE_FILE"
+DB_PATH="$MEMORY_DIR/knowledge.db"
+
+if [[ "$USE_RAW" = false ]] && [[ -s "$ACTIVE_FILE" ]]; then
+  BASE_FILE="$ACTIVE_FILE"
+  DB_PATH="$MEMORY_DIR/knowledge.active.db"
+fi
 
 # Validate numeric parameters
 if ! [[ "$RECENT" =~ ^[0-9]+$ ]]; then
@@ -59,18 +71,21 @@ fi
 # Stats mode
 if $SHOW_STATS; then
   TOTAL=$(wc -l < "$KNOWLEDGE_FILE" | tr -d ' ')
+  ACTIVE_COUNT=0
   ARCHIVE_COUNT=0
   [[ -f "$ARCHIVE_FILE" ]] && ARCHIVE_COUNT=$(wc -l < "$ARCHIVE_FILE" | tr -d ' ')
+  [[ -f "$ACTIVE_FILE" ]] && ACTIVE_COUNT=$(wc -l < "$ACTIVE_FILE" | tr -d ' ')
 
   echo "Knowledge base: $KNOWLEDGE_FILE"
-  echo "Active entries: $TOTAL"
+  echo "Raw entries: $TOTAL"
+  echo "Curated active entries: $ACTIVE_COUNT"
   echo "Archived: $ARCHIVE_COUNT"
   echo ""
   echo "By type:"
-  jq -r '.type' "$KNOWLEDGE_FILE" 2>/dev/null | sort | uniq -c | sort -rn
+  jq -r '.type' "$BASE_FILE" 2>/dev/null | sort | uniq -c | sort -rn
   echo ""
   echo "Top tags:"
-  jq -r '.tags[]' "$KNOWLEDGE_FILE" 2>/dev/null | sort | uniq -c | sort -rn | head -15
+  jq -r '.tags[]' "$BASE_FILE" 2>/dev/null | sort | uniq -c | sort -rn | head -15
   exit 0
 fi
 
@@ -95,8 +110,11 @@ if [[ -n "$TOPIC_ID" ]]; then
 fi
 
 # Build input (optionally include archive)
-INPUT_FILES="$KNOWLEDGE_FILE"
-$INCLUDE_ARCHIVE && [[ -f "$ARCHIVE_FILE" ]] && INPUT_FILES="$ARCHIVE_FILE $KNOWLEDGE_FILE"
+INPUT_FILES="$BASE_FILE"
+if $INCLUDE_ARCHIVE; then
+  INPUT_FILES="$KNOWLEDGE_FILE"
+  [[ -f "$ARCHIVE_FILE" ]] && INPUT_FILES="$ARCHIVE_FILE $KNOWLEDGE_FILE"
+fi
 
 # Recent mode
 if [[ "$RECENT" -gt 0 ]]; then
@@ -106,7 +124,7 @@ fi
 
 # Search mode
 if [[ -z "$QUERY" ]]; then
-  echo "Usage: recall.sh \"keyword\" [--type TYPE] [--recent N] [--stats] [--all] [--topic ID]"
+  echo "Usage: recall.sh \"keyword\" [--type TYPE] [--recent N] [--stats] [--all] [--raw] [--topic ID]"
   exit 0
 fi
 
@@ -114,7 +132,6 @@ fi
 USED_FTS5=false
 
 if command -v sqlite3 &>/dev/null; then
-  DB_PATH="$MEMORY_DIR/knowledge.db"
   SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
   if [[ -f "$DB_PATH" ]] && [[ -f "$SCRIPT_DIR/knowledge-db.sh" ]]; then

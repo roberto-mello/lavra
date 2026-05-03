@@ -62,7 +62,7 @@ else
 fi
 
 if [ -d "$HOOKS_DIR" ]; then
-  for hook in memory-capture.sh auto-recall.sh subagent-wrapup.sh knowledge-db.sh provision-memory.sh check-memory.sh; do
+  for hook in memory-capture.sh auto-recall.sh subagent-wrapup.sh memory-sanitize.sh knowledge-db.sh provision-memory.sh check-memory.sh; do
     if [ -f "$HOOKS_DIR/$hook" ]; then
       rm "$HOOKS_DIR/$hook"
       echo "  - Removed $hook"
