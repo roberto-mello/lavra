@@ -12,12 +12,15 @@ Memory system design, plugin structure, and changes from the upstream Compound E
 
 ## Memory System
 
-Knowledge is stored in two formats:
+Knowledge is stored in one shared log plus local derived caches:
 
-- **SQLite FTS5** (`knowledge.db`) -- Primary search backend with full-text search and BM25 ranking
-- **JSONL** (`knowledge.jsonl`) -- Portable export format, grep-compatible fallback
+- **JSONL** (`knowledge.jsonl`) -- shared append-only source of truth committed to git
+- **SQLite FTS5** (`knowledge.db`) -- local search index built from the JSONL
+- **Curated local cache** (`knowledge.active.jsonl`, `knowledge.active.db`) -- sanitizer-produced active working set for lower-noise recall
+- **Audit log** (`knowledge.audit.jsonl`) -- local explanation of what the sanitizer filtered, merged, downgraded, or skipped
+- **Compiled helper** (`.memory-sanitize-go`) -- gitignored local binary built from the Go sanitizer source when Go is available
 
-Both are written to simultaneously. If `sqlite3` is unavailable, only JSONL is written and grep-based search is used automatically.
+`memory-capture.sh` writes raw shared memory. `memory-sanitize.sh` then builds local curated artifacts asynchronously. The shell script is only an orchestrator now: it schedules work, compiles/runs the Go helper from `plugins/lavra/hooks/memorysanitize/` when `go` is available, and falls back to a reduced `jq` sanitizer path otherwise. If `sqlite3` is unavailable, JSONL still works and grep-based search remains available automatically.
 
 ```json
 {
@@ -36,8 +39,11 @@ Both are written to simultaneously. If `sqlite3` is unavailable, only JSONL is w
 - **Git-tracked**: Knowledge files can be committed to git for team sharing and portability
 - **Conflict-free collaboration**: Multiple users can capture knowledge simultaneously without merge conflicts
 - **Auto-sync**: First session after `git pull` automatically imports new knowledge into local search index
+- **Local refinement**: dedupe, noise filtering, and drift validation happen in gitignored caches, not by rewriting shared history
 - **Rotation**: After 5000 entries, oldest 2500 archived (JSONL only)
 - **Search**: `.lavra/memory/recall.sh "keyword"` or automatic at session start
+
+Future shared cleanup is intentionally separate from this local pipeline. The planned model is append-only reviewed curation, not hook-based write-back. See [Knowledge System](knowledge.md#shared-curation).
 
 ## Project Artifacts
 

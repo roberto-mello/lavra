@@ -109,11 +109,16 @@ echo "[2/4] Installing hooks..."
 HOOKS_DIR="$TARGET/hooks"
 create_dir_with_symlink_handling "$HOOKS_DIR"
 
-for hook in sanitize-content.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh extract-bead-context.sh; do
+for hook in sanitize-content.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh memory-sanitize.sh extract-bead-context.sh; do
   cp "$PLUGIN_DIR/hooks/$hook" "$HOOKS_DIR/"
   chmod 755 "$HOOKS_DIR/$hook"
   echo "  - $hook"
 done
+if [[ -d "$PLUGIN_DIR/hooks/memorysanitize" ]]; then
+  rm -rf "$HOOKS_DIR/memorysanitize"
+  cp -R "$PLUGIN_DIR/hooks/memorysanitize" "$HOOKS_DIR/memorysanitize"
+  echo "  - memorysanitize/"
+fi
 
 # Write version marker for hook auto-update
 echo "$INSTALLER_VERSION" > "$HOOKS_DIR/.lavra-version"
@@ -246,7 +251,7 @@ else
 
   source "$PLUGIN_DIR/hooks/provision-memory.sh"
   migrate_beads_to_lavra "$TARGET"
-  provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
+  BEADS_AUTO_YES="$AUTO_YES" BEADS_EAGER_COMPILE_MEMORY_HELPER=true provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
 
   echo "  - Memory system ready"
   echo ""

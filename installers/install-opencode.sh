@@ -87,6 +87,16 @@ if ! command -v jq &>/dev/null; then
   exit 1
 fi
 
+setup_bun_tempdir() {
+  local ROOT_DIR="$1"
+  local BUN_TMP_ROOT="$ROOT_DIR/.lavra/tmp/bun"
+  mkdir -p "$BUN_TMP_ROOT"
+  chmod 700 "$BUN_TMP_ROOT" 2>/dev/null || true
+  export TMPDIR="$BUN_TMP_ROOT"
+  export TMP="$BUN_TMP_ROOT"
+  export TEMP="$BUN_TMP_ROOT"
+}
+
 # Step 1: Model selection (interactive unless --yes or non-interactive)
 if [ "$AUTO_YES" = false ] && [[ -t 0 ]] && command -v opencode &>/dev/null; then
   echo "[1/6] Model selection..."
@@ -117,6 +127,8 @@ if ! command -v bun &>/dev/null; then
   echo "    Install Bun: curl -fsSL https://bun.sh/install | bash"
   exit 1
 fi
+
+setup_bun_tempdir "$TARGET"
 
 # Install conversion dependencies (js-yaml) if needed
 cd "$SCRIPT_DIR/scripts"
@@ -156,12 +168,14 @@ echo "  - Installed plugin.ts and package.json"
 
 # Install plugin dependencies
 cd "$PLUGINS_DIR"
-if ! bun install --frozen-lockfile 2>/dev/null; then
-  echo "  - Frozen lockfile not found, running regular install..."
-  bun install
+setup_bun_tempdir "$TARGET"
+if bun install --frozen-lockfile >/dev/null 2>&1; then
+  echo "  - Installed plugin dependencies"
+elif bun install >/dev/null 2>&1; then
+  echo "  - Installed plugin dependencies"
+else
+  echo "  - Warning: could not install plugin dependencies; continuing with source-only plugin install"
 fi
-
-echo "  - Installed plugin dependencies"
 echo ""
 
 # Step 4: Copy hooks
@@ -176,11 +190,16 @@ fi
 
 create_dir_with_symlink_handling "$HOOKS_DIR"
 
-for hook in sanitize-content.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh extract-bead-context.sh; do
+for hook in sanitize-content.sh auto-recall.sh memory-capture.sh subagent-wrapup.sh memory-sanitize.sh extract-bead-context.sh; do
   cp "$PLUGIN_DIR/hooks/$hook" "$HOOKS_DIR/"
   chmod 755 "$HOOKS_DIR/$hook"
   echo "  - $hook"
 done
+if [[ -d "$PLUGIN_DIR/hooks/memorysanitize" ]]; then
+  rm -rf "$HOOKS_DIR/memorysanitize"
+  cp -R "$PLUGIN_DIR/hooks/memorysanitize" "$HOOKS_DIR/memorysanitize"
+  echo "  - memorysanitize/"
+fi
 
 # Write version marker for hook auto-update
 if [ "$GLOBAL_INSTALL" = true ]; then
@@ -324,7 +343,7 @@ else
 
   source "$PLUGIN_DIR/hooks/provision-memory.sh"
   migrate_beads_to_lavra "$TARGET"
-  provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
+  BEADS_AUTO_YES="$AUTO_YES" BEADS_EAGER_COMPILE_MEMORY_HELPER=true provision_memory_dir "$TARGET" "$PLUGIN_DIR/hooks"
 
   echo "  - Memory system ready"
   echo ""

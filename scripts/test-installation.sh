@@ -21,6 +21,54 @@ fail() {
   echo "[FAIL] $1: $2"
 }
 
+assert_file_exists() {
+  local LABEL="$1"
+  local FILE_PATH="$2"
+  local MESSAGE="$3"
+
+  if [[ -e "$FILE_PATH" || -L "$FILE_PATH" ]]; then
+    pass "$LABEL"
+  else
+    fail "$LABEL" "$MESSAGE"
+  fi
+}
+
+assert_file_absent() {
+  local LABEL="$1"
+  local FILE_PATH="$2"
+  local MESSAGE="$3"
+
+  if [[ -e "$FILE_PATH" || -L "$FILE_PATH" ]]; then
+    fail "$LABEL" "$MESSAGE"
+  else
+    pass "$LABEL"
+  fi
+}
+
+seed_memory_fixture() {
+  local MEMORY_DIR="$1"
+
+  mkdir -p "$MEMORY_DIR"
+  cat > "$MEMORY_DIR/knowledge.jsonl" <<'EOF'
+{"key":"alpha","type":"learned","content":"OAuth redirect URI must match exactly","ts":10}
+{"key":"noise","type":"learned","content":"git status","ts":9}
+EOF
+  cat > "$MEMORY_DIR/knowledge.archive.jsonl" <<'EOF'
+{"key":"older","type":"learned","content":"Old auth flow detail","ts":1}
+EOF
+}
+
+run_uninstall() {
+  local TARGET_DIR="$1"
+  shift
+
+  if printf 'y\n' | "$@" "$TARGET_DIR" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  return 1
+}
+
 cleanup() {
   rm -rf "$TEST_ROOT"
 }
@@ -67,6 +115,18 @@ if [[ -f ".claude/hooks/auto-recall.sh" && -f ".claude/hooks/memory-capture.sh" 
   pass "Claude Code hook files installed"
 else
   fail "Claude Code hooks" "Missing hook files"
+fi
+
+if [[ -f ".claude/hooks/memorysanitize/main.go" && -f ".lavra/memory/memorysanitize/main.go" ]]; then
+  pass "Claude Code Go helper source installed"
+else
+  fail "Claude Code Go helper" "memorysanitize source missing from hooks or .lavra/memory"
+fi
+
+if [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
+  pass "Claude Code Go helper built during install"
+else
+  fail "Claude Code Go helper build" "compiled helper missing immediately after install"
 fi
 
 # Verify settings.json exists and has hooks
@@ -138,6 +198,17 @@ else
   pass "Claude Code MCP not configured (optional)"
 fi
 
+# Verify the wrapper can build and run the Go helper end-to-end
+seed_memory_fixture ".lavra/memory"
+
+if env GOCACHE="$TEST_ROOT/go-cache" ".lavra/memory/memory-sanitize.sh" --run ".lavra/memory" >/dev/null 2>&1 && \
+   [[ -f ".lavra/memory/knowledge.active.jsonl" ]] && \
+   grep -q '"key":"alpha"' ".lavra/memory/knowledge.active.jsonl"; then
+  pass "Claude Code Go helper sanitizes knowledge"
+else
+  fail "Claude Code Go helper runtime" "wrapper did not produce active knowledge"
+fi
+
 # ==============================================================================
 # Test 2: OpenCode Installation
 # ==============================================================================
@@ -152,7 +223,8 @@ git init -q
 bd init -q 2>/dev/null || true
 
 # Run installer with --opencode flag (--yes skips interactive model selection)
-if bash "$PROJECT_ROOT/install.sh" --opencode --yes "$OPENCODE_TEST" >/dev/null 2>&1; then
+mkdir -p "$TEST_ROOT/tmp"
+if env TMPDIR="$TEST_ROOT/tmp" bash "$PROJECT_ROOT/install.sh" --opencode --yes "$OPENCODE_TEST" >/dev/null 2>&1; then
   pass "Installer completed for OpenCode"
 else
   fail "OpenCode install" "Installer failed"
@@ -186,6 +258,18 @@ else
   fail "OpenCode hooks" "Hook files missing"
 fi
 
+if [[ -f ".opencode/hooks/memorysanitize/main.go" ]]; then
+  pass "OpenCode Go helper source installed"
+else
+  fail "OpenCode Go helper" "memorysanitize source missing from .opencode/hooks"
+fi
+
+if [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
+  pass "OpenCode Go helper built during install"
+else
+  fail "OpenCode Go helper build" "compiled helper missing immediately after install"
+fi
+
 # Verify AGENTS.md exists (OpenCode uses this for beads workflow)
 if [[ -f "AGENTS.md" ]]; then
   # Should contain beads workflow instructions
@@ -197,6 +281,26 @@ if [[ -f "AGENTS.md" ]]; then
 else
   fail "OpenCode AGENTS" "AGENTS.md not created"
 fi
+
+seed_memory_fixture ".lavra/memory"
+if env GOCACHE="$TEST_ROOT/go-cache" ".lavra/memory/memory-sanitize.sh" --run ".lavra/memory" >/dev/null 2>&1 && \
+   [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
+  pass "OpenCode Go helper sanitizes knowledge"
+else
+  fail "OpenCode Go helper runtime" "wrapper did not use helper in .lavra/memory"
+fi
+
+if run_uninstall "$OPENCODE_TEST" bash "$PROJECT_ROOT/uninstall.sh" --opencode; then
+  pass "OpenCode uninstall completed"
+else
+  fail "OpenCode uninstall" "Uninstaller failed"
+fi
+
+assert_file_absent "OpenCode hook helper removed" ".opencode/hooks/memorysanitize" "memorysanitize directory still present in .opencode/hooks"
+assert_file_absent "OpenCode memory helper source removed" ".lavra/memory/memorysanitize" "memorysanitize directory still present in .lavra/memory"
+assert_file_absent "OpenCode compiled helper removed" ".lavra/memory/.memory-sanitize-go" "compiled helper still present after uninstall"
+assert_file_exists "OpenCode knowledge preserved" ".lavra/memory/knowledge.jsonl" "knowledge.jsonl should be preserved"
+assert_file_exists "OpenCode archive preserved" ".lavra/memory/knowledge.archive.jsonl" "knowledge.archive.jsonl should be preserved"
 
 # ==============================================================================
 # Test 3: Gemini Installation
@@ -223,6 +327,18 @@ if [[ -d "hooks" ]]; then
   pass "Gemini directory structure created"
 else
   fail "Gemini structure" "Missing hooks directory"
+fi
+
+if [[ -f "hooks/memorysanitize/main.go" ]]; then
+  pass "Gemini Go helper source installed"
+else
+  fail "Gemini Go helper" "memorysanitize source missing from hooks/"
+fi
+
+if [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
+  pass "Gemini Go helper built during install"
+else
+  fail "Gemini Go helper build" "compiled helper missing immediately after install"
 fi
 
 # Verify commands are .toml format (Gemini-specific)
@@ -255,6 +371,26 @@ if [[ "$GEMINI_SKILL_COUNT" -ge 7 ]]; then
 else
   fail "Gemini skills" "Expected 7+, found $GEMINI_SKILL_COUNT"
 fi
+
+seed_memory_fixture ".lavra/memory"
+if env GOCACHE="$TEST_ROOT/go-cache" ".lavra/memory/memory-sanitize.sh" --run ".lavra/memory" >/dev/null 2>&1 && \
+   [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
+  pass "Gemini Go helper sanitizes knowledge"
+else
+  fail "Gemini Go helper runtime" "wrapper did not use helper in .lavra/memory"
+fi
+
+if run_uninstall "$GEMINI_TEST" bash "$PROJECT_ROOT/uninstall.sh" --gemini; then
+  pass "Gemini uninstall completed"
+else
+  fail "Gemini uninstall" "Uninstaller failed"
+fi
+
+assert_file_absent "Gemini hook helper removed" "hooks/memorysanitize" "memorysanitize directory still present in hooks"
+assert_file_absent "Gemini memory helper source removed" ".lavra/memory/memorysanitize" "memorysanitize directory still present in .lavra/memory"
+assert_file_absent "Gemini compiled helper removed" ".lavra/memory/.memory-sanitize-go" "compiled helper still present after uninstall"
+assert_file_exists "Gemini knowledge preserved" ".lavra/memory/knowledge.jsonl" "knowledge.jsonl should be preserved"
+assert_file_exists "Gemini archive preserved" ".lavra/memory/knowledge.archive.jsonl" "knowledge.archive.jsonl should be preserved"
 
 # ==============================================================================
 # Test 4: Cortex Code Installation
@@ -294,6 +430,18 @@ if [[ -f ".cortex/hooks/auto-recall.sh" && -f ".cortex/hooks/memory-capture.sh" 
   pass "Cortex Code hook files installed"
 else
   fail "Cortex Code hooks" "Missing hook files"
+fi
+
+if [[ -f ".cortex/hooks/memorysanitize/main.go" ]]; then
+  pass "Cortex Code Go helper source installed"
+else
+  fail "Cortex Code Go helper" "memorysanitize source missing from .cortex/hooks"
+fi
+
+if [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
+  pass "Cortex Code Go helper built during install"
+else
+  fail "Cortex Code Go helper build" "compiled helper missing immediately after install"
 fi
 
 # Verify teammate-idle-check.sh is NOT present (TeammateIdle not supported)
@@ -375,6 +523,26 @@ else
   fail "Cortex Code headers" "No 'Generated by lavra' header found in commands"
 fi
 
+seed_memory_fixture ".lavra/memory"
+if env GOCACHE="$TEST_ROOT/go-cache" ".lavra/memory/memory-sanitize.sh" --run ".lavra/memory" >/dev/null 2>&1 && \
+   [[ -f ".lavra/memory/.memory-sanitize-go" ]]; then
+  pass "Cortex Code Go helper sanitizes knowledge"
+else
+  fail "Cortex Code Go helper runtime" "wrapper did not use helper in .lavra/memory"
+fi
+
+if run_uninstall "$CORTEX_TEST" env HOME="$HOME" bash "$PROJECT_ROOT/uninstall.sh" --cortex; then
+  pass "Cortex Code uninstall completed"
+else
+  fail "Cortex Code uninstall" "Uninstaller failed"
+fi
+
+assert_file_absent "Cortex Code hook helper removed" ".cortex/hooks/memorysanitize" "memorysanitize directory still present in .cortex/hooks"
+assert_file_absent "Cortex Code memory helper source removed" ".lavra/memory/memorysanitize" "memorysanitize directory still present in .lavra/memory"
+assert_file_absent "Cortex Code compiled helper removed" ".lavra/memory/.memory-sanitize-go" "compiled helper still present after uninstall"
+assert_file_exists "Cortex Code knowledge preserved" ".lavra/memory/knowledge.jsonl" "knowledge.jsonl should be preserved"
+assert_file_exists "Cortex Code archive preserved" ".lavra/memory/knowledge.archive.jsonl" "knowledge.archive.jsonl should be preserved"
+
 # Restore real HOME
 export HOME="$REAL_HOME"
 
@@ -434,6 +602,18 @@ if [[ "$ORIGINAL_CONTENT" == "$AFTER_CONTENT" ]]; then
 else
   fail "lavra.json idempotency" "File was overwritten on re-install"
 fi
+
+if bash "$PROJECT_ROOT/uninstall.sh" "$CLAUDE_TEST" >/dev/null 2>&1; then
+  pass "Claude Code uninstall completed"
+else
+  fail "Claude Code uninstall" "Uninstaller failed"
+fi
+
+assert_file_absent "Claude Code hook helper removed" "$CLAUDE_TEST/.claude/hooks/memorysanitize" "memorysanitize directory still present in .claude/hooks"
+assert_file_absent "Claude Code memory helper source removed" "$CLAUDE_TEST/.lavra/memory/memorysanitize" "memorysanitize directory still present in .lavra/memory"
+assert_file_absent "Claude Code compiled helper removed" "$CLAUDE_TEST/.lavra/memory/.memory-sanitize-go" "compiled helper still present after uninstall"
+assert_file_exists "Claude Code knowledge preserved" "$CLAUDE_TEST/.lavra/memory/knowledge.jsonl" "knowledge.jsonl should be preserved"
+assert_file_exists "Claude Code archive preserved" "$CLAUDE_TEST/.lavra/memory/knowledge.archive.jsonl" "knowledge.archive.jsonl should be preserved"
 
 # ==============================================================================
 # Test 6: Migration (upgrade from .beads/ to .lavra/)
@@ -508,13 +688,6 @@ if [[ "$LINES_BEFORE_SECOND" -eq "$LINES_AFTER_SECOND" ]]; then
 else
   fail "Migration: idempotency" "knowledge.jsonl changed on second install (before=$LINES_BEFORE_SECOND after=$LINES_AFTER_SECOND)"
 fi
-
-# ==============================================================================
-# Test 7: Uninstallation (Optional - requires user confirmation)
-# ==============================================================================
-echo
-echo "  Test 7: Uninstallation (skipped - requires interactive confirmation)"
-echo "  [WARN]  Uninstallers require confirmation prompt - test manually if needed"
 
 # ==============================================================================
 # Summary

@@ -39,6 +39,7 @@ Knowledge stored in `.lavra/memory/knowledge.jsonl`:
 - **Rotation**: After 5000 lines, oldest 2500 archived to `knowledge.archive.jsonl`
 - **Search**: `.lavra/memory/recall.sh` (use `--all` to include archive)
 - **Security**: Recalled entries are sanitized (strip role prefixes, bidirectional chars) and wrapped in `<untrusted-knowledge>` tags before injection into system messages
+- **Local sanitizer**: `memory-sanitize.sh` is a shell wrapper. The authoritative sanitizer logic lives in `plugins/lavra/hooks/memorysanitize/` (Go). Keep the `jq` path as a reduced fallback only.
 
 ## Memory Capture Detection
 

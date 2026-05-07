@@ -159,6 +159,16 @@ Then prefix all `.lavra/` paths with `"$PROJECT_ROOT/"` when invoking them via B
 bd comments add {BEAD_ID} "DEVIATION: Unable to fix {issue} after 3 attempts. Documented for manual resolution."
 ```
 
+**DEVIATION escalation (anti-pattern found but out of scope):** When you spot a recurring wrong pattern and defer it because it is out of scope, you MUST do one of the following:
+
+1. **Add a `MUST-CHECK` knowledge entry** so future agents recall it before writing similar code:
+   ```bash
+   bd comments add {BEAD_ID} "MUST-CHECK: Before writing any [X], verify [specific check]. Anti-pattern [Y] was found in [file] — deferred from this bead."
+   ```
+2. **Propose a project-level rule addition** to the user: *"I found anti-pattern X in [file] while working on this bead. It is out of scope to fix now, but it will recur. Should I add a project-level agent rule in the repo's rules directory so all agents pick it up automatically?"*
+
+A DEVIATION comment alone records the missed fix, but it does not create a reusable reminder for future agents. A `MUST-CHECK` entry or a project-level rule addition is the minimum that makes the warning durable.
+
 **Read workflow config (no-op if missing):**
 
 ```bash

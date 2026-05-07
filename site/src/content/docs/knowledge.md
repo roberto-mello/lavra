@@ -33,7 +33,7 @@ You can add your own knowledge entries manually using `bd comments add` and they
 
 ## Storage
 
-Knowledge is stored in two places that stay in sync:
+Knowledge is stored as one shared log plus local derived artifacts:
 
 **`.lavra/memory/knowledge.jsonl`** — the source of truth, committed to git so knowledge is shared across your team and persists across machines:
 
@@ -45,9 +45,62 @@ Knowledge is stored in two places that stay in sync:
 
 The SQLite DB is rebuilt automatically from the JSONL on first use and kept in sync as new entries are added.
 
+**`.lavra/memory/knowledge.active.jsonl`** — a gitignored local cache built by `memory-sanitize.sh`. The shell wrapper compiles and runs the Go helper in `memorysanitize/` when `go` is available, and falls back to the reduced `jq` path when it is not. The active cache removes exact and normalized duplicates from the append-only knowledge log so auto-recall and manual search can use a smaller, cleaner working set without rewriting shared memory history. Its paired `knowledge.active.db` cache serves the same purpose for local FTS search.
+
+**`.lavra/memory/knowledge.audit.jsonl`** — a gitignored audit artifact from the local sanitizer. In Go-helper mode it records actions like skipped invalid lines, filtered command/log noise, duplicate collapse, symbol/file anchor checks, and stale-memory downgrades so local cleanup stays explainable.
+
+**`.lavra/memory/.memory-sanitize-go`** — a gitignored compiled helper binary built locally from `.lavra/memory/memorysanitize/` the first time advanced sanitization runs on a machine with Go installed.
+
 **Rotation:** When `knowledge.jsonl` exceeds 5000 lines, the oldest 2500 entries are moved to `knowledge.archive.jsonl`. Both files use `merge=union` in `.gitattributes` so concurrent writes from teammates merge cleanly without conflicts.
 
 **Security:** Knowledge entries are auto-injected into agent context at session start. In collaborative projects, treat changes to `knowledge.jsonl` with the same scrutiny as CI config — any collaborator can add entries that influence agent behavior. Recalled entries are sanitized (role prefix stripping, bidirectional char removal) and wrapped in `<untrusted-knowledge>` tags. See [Security Model](SECURITY.md#knowledge-system-injection-defense) for the full threat model and team recommendations.
+
+## Local vs shared memory
+
+Lavra now separates retrieval hygiene from shared history:
+
+- `knowledge.jsonl` is the shared, committed, append-only source of truth
+- `knowledge.active.*` and `knowledge.audit.jsonl` are local-only, gitignored working artifacts
+
+This lets Lavra reduce token usage and improve recall quality locally without rewriting team history every time the sanitizer learns something new.
+
+On machines without Go, Lavra still builds `knowledge.active.jsonl` through the shell/`jq` fallback. That keeps recall working, but the richer anchor-validation and audit path is only available through the Go helper.
+
+## Shared Curation
+
+Local refinement improves recall quality without touching the shared log. Shared curation is the later, review-gated step for promoting those refinements back into `.lavra/memory/knowledge.jsonl` without rewriting history.
+
+The rules are simple:
+
+- keep `knowledge.jsonl` append-only
+- never promote shared memory from a hook
+- use an explicit command, not automatic write-back
+- preserve provenance with relationship fields like `supersedes`, `superseded_by`, and `merged_from`
+
+Recommended shared statuses:
+
+- `canonical`
+  - reviewed entry that should rank first for its topic cluster
+- `superseded`
+  - historical entry kept for provenance but replaced by a newer canonical entry
+- `needs_review`
+  - entry stays visible in history but is flagged as lower-trust for shared recall
+
+`active` remains a local-cache concept for `knowledge.active.jsonl`, not a shared-log status.
+
+The intended UX is a dedicated `/lavra-curate` workflow:
+
+1. `--dry-run` gathers candidates from `knowledge.audit.jsonl`, `knowledge.active.jsonl`, and raw `knowledge.jsonl`, then prints the exact JSONL lines that would be appended.
+2. `--apply` requires explicit confirmation and appends only the reviewed lines.
+
+Guardrails:
+
+- no hook path can invoke `--apply`
+- `review_reason` is required for each curated append
+- `--apply` must fail if the proposal content changed since review generation
+- `/lavra-learn` stays focused on capture quality and does not do shared-history cleanup
+
+This keeps local sanitization and shared memory curation separate: local caches can be opinionated, while the committed shared log stays additive and auditable.
 
 ## Searching manually
 
@@ -89,3 +142,5 @@ Raw knowledge comments logged during work are functional but often terse. `/lavr
 ```
 
 `/lavra-work` calls `/lavra-learn` automatically at the end of each bead. `/lavra-checkpoint` prompts you to run it if it detects captured knowledge. If you've been coding outside the pipeline — direct edits, quick fixes, exploratory work, run `/lavra-checkpoint` (to file beads for what was fixed/changed, which will prompt to run `/lavra-learn`) or run `/lavra-learn` directly, before ending the session to curate whatever you captured.
+
+`/lavra-learn` improves the quality of captured entries. It does not currently perform shared-memory cleanup or rewrite older memories. That later layer is tracked separately in the shared-curation design.

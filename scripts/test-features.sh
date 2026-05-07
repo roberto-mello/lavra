@@ -155,10 +155,123 @@ else
 fi
 
 # ==============================================================================
-# Test 5: Session state lifecycle (write -> read -> delete)
+# Test 5: memory-sanitize provisioning and dedupe
 # ==============================================================================
 echo
-echo "Test 5: Session state lifecycle"
+echo "Test 5: memory sanitization pipeline"
+
+if [[ -f "$TEST_ROOT/project/.lavra/memory/memory-sanitize.sh" ]]; then
+  pass "memory-sanitize.sh provisioned into .lavra/memory"
+else
+  fail "memory-sanitize provision" "Script not copied into memory dir"
+fi
+
+if grep -q "knowledge.active.jsonl" "$TEST_ROOT/project/.lavra/.gitignore"; then
+  pass "knowledge.active.jsonl gitignored"
+else
+  fail "knowledge.active gitignore" "Curated active file not gitignored"
+fi
+
+if grep -q "knowledge.audit.jsonl" "$TEST_ROOT/project/.lavra/.gitignore"; then
+  pass "knowledge.audit.jsonl gitignored"
+else
+  fail "knowledge.audit gitignore" "Audit file not gitignored"
+fi
+
+cat > "$TEST_ROOT/project/.lavra/memory/knowledge.jsonl" << 'EOF'
+{"key":"decision-auth-callback","type":"decision","content":"OAuth callback URI must match exactly including trailing slash.","source":"user","tags":["auth","oauth"],"ts":10,"bead":"test-001"}
+{"key":"decision-auth-callback","type":"decision","content":"OAuth callback URI must match exactly including trailing slash.","source":"user","tags":["auth","oauth"],"ts":20,"bead":"test-001"}
+{"key":"decision-auth-callback-alt","type":"decision","content":"OAuth callback URI must match exactly, including trailing slash.","source":"user","tags":["auth","oauth"],"ts":30,"bead":"test-002"}
+not-json-at-all
+{"key":"investigation-command-noise","type":"investigation","content":"bd close test-001 --reason \\\"done\\\" 2>&1","source":"user","tags":["noise"],"ts":40,"bead":"test-001"}
+EOF
+
+bash "$HOOKS_DIR/memory-sanitize.sh" --run "$TEST_ROOT/project/.lavra/memory" 2>/dev/null || true
+
+ACTIVE_LINES=$(wc -l < "$TEST_ROOT/project/.lavra/memory/knowledge.active.jsonl" 2>/dev/null | tr -d ' ')
+if [[ "$ACTIVE_LINES" -eq 1 ]]; then
+  pass "memory-sanitize dedupes identical knowledge into one active entry"
+else
+  fail "memory-sanitize dedupe" "Expected 1 active entry, found $ACTIVE_LINES"
+fi
+
+if ! grep -q 'not-json-at-all' "$TEST_ROOT/project/.lavra/memory/knowledge.active.jsonl" 2>/dev/null; then
+  pass "memory-sanitize skips invalid JSONL lines"
+else
+  fail "memory-sanitize invalid json" "Invalid JSON line leaked into active cache"
+fi
+
+if ! grep -q 'investigation-command-noise' "$TEST_ROOT/project/.lavra/memory/knowledge.active.jsonl" 2>/dev/null; then
+  pass "memory-sanitize filters obvious command-noise entries"
+else
+  fail "memory-sanitize command noise" "Command-like entry was kept in active cache"
+fi
+
+if [[ -f "$TEST_ROOT/project/.lavra/memory/knowledge.audit.jsonl" ]]; then
+  pass "memory-sanitize writes an audit report"
+else
+  fail "memory-sanitize audit" "Audit report not created"
+fi
+
+if grep -q '"action":"skip_invalid_json"' "$TEST_ROOT/project/.lavra/memory/knowledge.audit.jsonl" && \
+   grep -q '"action":"filter_noise"' "$TEST_ROOT/project/.lavra/memory/knowledge.audit.jsonl"; then
+  pass "memory-sanitize audit records invalid and noisy entries"
+else
+  fail "memory-sanitize audit contents" "Expected audit actions missing"
+fi
+
+if [[ -f "$TEST_ROOT/project/.lavra/memory/knowledge.active.db" ]] || ! command -v sqlite3 >/dev/null 2>&1; then
+  pass "memory-sanitize builds active sqlite cache when sqlite3 is available"
+else
+  fail "memory-sanitize sqlite" "knowledge.active.db not created"
+fi
+
+CANARY_FILE="$TEST_ROOT/canary.txt"
+echo "do-not-touch" > "$CANARY_FILE"
+rm -f "$TEST_ROOT/project/.lavra/memory/.sanitize-needed"
+ln -s "$CANARY_FILE" "$TEST_ROOT/project/.lavra/memory/.sanitize-needed"
+
+bash "$HOOKS_DIR/memory-sanitize.sh" --schedule security-test "$TEST_ROOT/project/.lavra/memory" 2>/dev/null || true
+
+if [[ "$(cat "$CANARY_FILE")" == "do-not-touch" ]]; then
+  pass "memory-sanitize refuses symlinked marker targets"
+else
+  fail "memory-sanitize symlink guard" "Symlink target was overwritten"
+fi
+
+rm -f "$TEST_ROOT/project/.lavra/memory/.sanitize-needed"
+
+mkdir -p "$TEST_ROOT/project/src"
+cat > "$TEST_ROOT/project/src/existing.ts" << 'EOF'
+export const existing = true;
+EOF
+
+cat > "$TEST_ROOT/project/.lavra/memory/knowledge.jsonl" << 'EOF'
+{"key":"fact-existing-anchor","type":"fact","content":"Use src/existing.ts for the current validation flow.","source":"user","tags":["fact"],"ts":50,"bead":"test-001"}
+{"key":"fact-missing-anchor","type":"fact","content":"Legacy validation still lives in src/missing.ts.","source":"user","tags":["fact"],"ts":60,"bead":"test-002"}
+EOF
+
+bash "$HOOKS_DIR/memory-sanitize.sh" --run "$TEST_ROOT/project/.lavra/memory" 2>/dev/null || true
+
+if grep -q 'fact-existing-anchor' "$TEST_ROOT/project/.lavra/memory/knowledge.active.jsonl" && \
+   ! grep -q 'fact-missing-anchor' "$TEST_ROOT/project/.lavra/memory/knowledge.active.jsonl"; then
+  pass "memory-sanitize drops stale file-anchor entries from active cache"
+else
+  fail "memory-sanitize stale drop" "File-anchor drift was not enforced"
+fi
+
+if grep -q '"action":"drop_stale_candidate"' "$TEST_ROOT/project/.lavra/memory/knowledge.audit.jsonl" && \
+   grep -q 'fact-missing-anchor' "$TEST_ROOT/project/.lavra/memory/knowledge.audit.jsonl"; then
+  pass "memory-sanitize audit records stale candidates"
+else
+  fail "memory-sanitize stale audit" "Stale candidate missing from audit"
+fi
+
+# ==============================================================================
+# Test 6: Session state lifecycle (write -> read -> delete)
+# ==============================================================================
+echo
+echo "Test 6: Session state lifecycle"
 
 # Write a session state file
 cat > "$TEST_ROOT/project/.lavra/memory/session-state.md" << 'EOF'
@@ -188,10 +301,10 @@ else
 fi
 
 # ==============================================================================
-# Test 6: goal-verifier agent file exists and has correct structure
+# Test 7: goal-verifier agent file exists and has correct structure
 # ==============================================================================
 echo
-echo "Test 6: goal-verifier agent structure"
+echo "Test 7: goal-verifier agent structure"
 
 GOAL_VERIFIER="$PROJECT_ROOT/plugins/lavra/agents/review/goal-verifier.md"
 
@@ -223,10 +336,10 @@ else
 fi
 
 # ==============================================================================
-# Test 7: Agent count verification (30 total, 16 review)
+# Test 8: Agent count verification (30 total, 16 review)
 # ==============================================================================
 echo
-echo "Test 7: Agent counts"
+echo "Test 8: Agent counts"
 
 TOTAL_AGENTS=$(find "$PROJECT_ROOT/plugins/lavra/agents" -name "*.md" | wc -l | tr -d ' ')
 REVIEW_AGENTS=$(find "$PROJECT_ROOT/plugins/lavra/agents/review" -name "*.md" | wc -l | tr -d ' ')
@@ -244,10 +357,10 @@ else
 fi
 
 # ==============================================================================
-# Test 8: DEVIATION in documentation consistency
+# Test 9: DEVIATION in documentation consistency
 # ==============================================================================
 echo
-echo "Test 8: DEVIATION documentation consistency"
+echo "Test 9: DEVIATION documentation consistency"
 
 # hooks-system.md should document DEVIATION:
 if grep -q 'DEVIATION:' "$PROJECT_ROOT/.claude/rules/hooks-system.md"; then

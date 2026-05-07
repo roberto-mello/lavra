@@ -14,6 +14,17 @@ Each line in the JSONL file is a complete, valid JSON object representing one kn
 - **ts** (integer): Unix timestamp of when the knowledge was captured
 - **bead** (string): Bead ID (e.g., `BD-001`) if linked to a specific bead, or empty string `""` if not linked
 
+## Optional Shared-Curation Fields
+
+These fields are reserved for future shared curation workflows. They are optional and should be absent for ordinary captured entries unless a reviewed shared-curation workflow adds them.
+
+- **status** (string): One of `active`, `canonical`, `superseded`, `needs_review`
+- **supersedes** (array of strings): Entry keys that this curated entry replaces conceptually
+- **superseded_by** (string): Key of the newer entry that supersedes this one
+- **merged_from** (array of strings): Entry keys folded into this canonical entry
+- **review_source** (string): One of `local-audit`, `manual`, `team-review`
+- **review_reason** (string): Short explanation for the curation action
+
 ## Knowledge Type Definitions
 
 | Type | Description | Use When |
@@ -33,6 +44,8 @@ Each line in the JSONL file is a complete, valid JSON object representing one kn
 5. **tags** must be an array of lowercase strings, max 8 items
 6. **ts** must be a valid Unix timestamp (integer)
 7. **bead** must be a string (bead ID or empty string)
+8. **Optional shared-curation fields** must not be used by automatic hooks until a reviewed shared-memory workflow exists
+9. **status** values, when present, must come from the allowed shared-curation set above
 
 ## Auto-Tag Detection
 
@@ -61,6 +74,12 @@ When writing entries, detect keywords in content and auto-add relevant tags:
 {"key":"fact-postgres-jsonb-array-cast","type":"fact","content":"PostgreSQL JSONB columns require explicit casting for array operations. Use jsonb_array_elements() for iteration, not direct array syntax. Without cast, query returns empty result instead of error.","source":"agent","tags":["database","postgres"],"ts":1706918600,"bead":"BD-003"}
 {"key":"pattern-check-nil-before-nested-hash","type":"pattern","content":"Always use dig() or safe navigation (&.) when accessing nested hash keys in API responses. Direct access raises NoMethodError on nil, which crashes background jobs silently.","source":"agent","tags":["api","errors","pattern"],"ts":1706918700,"bead":"BD-004"}
 {"key":"investigation-memory-leak-retained-objects","type":"investigation","content":"Debugged memory leak in worker process. Profiler (memory_profiler gem) showed retained String objects from log formatting. Logger was interpolating large request bodies into debug messages even when debug level was disabled. Fix: wrap debug logs in block form logger.debug { expensive_string }.","source":"agent","tags":["performance","memory","investigation"],"ts":1706918800,"bead":"BD-005"}
+```
+
+Example future curated shared entry:
+
+```jsonl
+{"key":"pattern-auth-redirect-uri-must-be-exact","type":"pattern","content":"OAuth redirect URIs must match exactly, including trailing slash and environment-specific hostnames. Treat URI mismatches as a first-pass auth check before debugging provider configuration.","source":"user","tags":["auth","oauth","security"],"ts":1706918900,"bead":"BD-006","status":"canonical","supersedes":["learned-oauth-redirect-must-match-exactly"],"review_source":"team-review","review_reason":"Promoted duplicate auth redirect guidance into one canonical shared memory"}
 ```
 
 ## Rotation Policy
@@ -94,11 +113,17 @@ bd comments add BD-001 "LEARNED: [content from entry]"
 
 ## Search Behavior
 
-The `auto-recall.sh` hook searches knowledge.jsonl using these strategies:
+The `auto-recall.sh` hook prefers local derived caches when available and falls back to raw shared memory when needed:
 
 1. Extract keywords (4+ chars) from open/in-progress bead titles
 2. Add keywords from git branch name
-3. Search knowledge.jsonl for each keyword (case-insensitive grep)
+3. Search the active cache and local index when present; otherwise search shared JSONL directly
 4. Deduplicate results
 5. Return top 10 most relevant entries
 6. Fall back to 10 most recent entries if no search terms
+
+## Local vs Shared
+
+`knowledge.jsonl` is the shared append-only history. Local sanitization may build smaller derived caches for retrieval, but those caches do not mutate the JSONL log automatically.
+
+Future shared curation is expected to append reviewed canonical entries back into `knowledge.jsonl`, not rewrite old lines in place.

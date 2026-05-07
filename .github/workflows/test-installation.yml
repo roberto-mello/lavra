@@ -20,6 +20,11 @@ jobs:
         with:
           bun-version: "1.3.6"
 
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.1"
+
       - name: Install dependencies
         run: cd scripts && bun install
 
@@ -32,6 +37,15 @@ jobs:
 
       - name: Run compatibility tests
         run: cd scripts && bun run test-compatibility.ts
+
+      - name: Run Go helper tests
+        run: |
+          cd plugins/lavra/hooks/memorysanitize
+          go test -race ./...
+          go vet ./...
+
+      - name: Build Go helper release artifacts
+        run: bash scripts/build-memory-sanitize-helper.sh
 
       - name: Verify catalog accuracy
         # SYNC: This step must stay in sync with the "Catalog accuracy" section
@@ -73,6 +87,11 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.3.6"
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.1"
 
       - name: Install script dependencies
         run: cd scripts && bun install --frozen-lockfile
@@ -196,6 +215,15 @@ jobs:
           [[ "$CORTEX_COMMANDS" -ge 18 ]] || { echo "FAIL Cortex .md commands missing"; exit 1; }
 
           echo "PASS All source files and conversion outputs verified"
+
+      - name: Verify Go helper
+        run: |
+          test -f plugins/lavra/hooks/memorysanitize/go.mod || { echo "FAIL Go helper module missing"; exit 1; }
+          cd plugins/lavra/hooks/memorysanitize
+          go test -race ./...
+          go vet ./...
+          cd "$GITHUB_WORKSPACE"
+          bash scripts/build-memory-sanitize-helper.sh
 
       - name: Verify catalog accuracy
         # SYNC: This step must stay in sync with the "Catalog accuracy" section
