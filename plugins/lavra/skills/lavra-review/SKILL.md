@@ -114,9 +114,9 @@ Discover all installed agents by scanning platform-appropriate directories, proj
 DISCOVERED_AGENTS=$(
   {
     # Project-local (all platforms)
-    find .claude/agents .opencode/agents .cortex/agents hooks/agents -name "*.md" 2>/dev/null
+    find . -type f -path "*/agents/*.md" 2>/dev/null
     # Global / user-level
-    find ~/.claude/agents ~/.config/opencode/agents ~/.cortex/agents -name "*.md" 2>/dev/null
+    find "" -type f -path "*/agents/*.md" 2>/dev/null
     # Plugin source (fallback if nothing else found)
     find plugins/lavra/agents -name "*.md" 2>/dev/null
   } | xargs -I{} basename {} .md 2>/dev/null | grep -E '^[a-z][a-z0-9-]+$' | sort -u

@@ -1,23 +1,22 @@
 ---
 title: Platform Support
-description: Installation and setup for Claude Code, OpenCode, Gemini CLI, and Cortex Code
+description: Installation and setup for Claude Code, OpenCode, Gemini CLI, Cortex Code, and Codex
 order: 4
 ---
 
 # Multi-Platform Support
 
-Lavra supports four AI coding agents. The core memory system (hooks, knowledge capture, auto-recall) works identically across all platforms. Commands, agents, and skills are available on all platforms.
+Lavra supports five AI coding agents. The core memory system (hooks, knowledge capture, auto-recall) works across all platforms.
 
 ## What works where
 
-| Feature | Claude Code | OpenCode | Gemini CLI | Cortex Code |
-|---------|-------------|----------|------------|-------------|
-| Memory capture | ✓ | ✓ | ✓ | ✓ |
-| Auto-recall | ✓ | ✓ | ✓ | ✓ |
-| Commands | ✓ | ✓ | ✓ | ✓ |
-| Agents | ✓ | ✓ | ✓ | ✓ |
-| Skills | ✓ | ✓ | ✓ | ✓ |
-| Context7 MCP | ✓ | ✓ | ✓ | manual |
+| Feature | Claude Code | OpenCode | Gemini CLI | Cortex Code | Codex |
+|---------|-------------|----------|------------|-------------|-------|
+| Memory capture | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Auto-recall | ✓ | ✓ | ✓ | ✓ | via skill workflow |
+| Slash commands (`/lavra-*`) | ✓ | ✓ | ✓ | ✓ | ✗ (direct install) |
+| Skills invocation (`$lavra-*`) | n/a | n/a | n/a | n/a | ✓ |
+| Context7 MCP | ✓ | ✓ | ✓ | manual | manual |
 
 ## Claude Code
 
@@ -86,7 +85,37 @@ Context7 MCP is not installed automatically. To enable framework documentation l
 
 > Cortex Code also reads `.claude/` directories for compatibility, but native `.cortex/` paths are preferred.
 
+## Codex
+
+```bash
+npx @lavralabs/lavra@latest --codex       # local project
+npx @lavralabs/lavra@latest --codex --global
+```
+
+The installer writes global integration to `~/.codex/` and project hooks to `.codex/hooks/`.
+
+**Command model (important):**
+- Current direct Codex install uses **skills invocation**: `$lavra-plan ...`, `$lavra-work ...`
+- Claude-style slash commands (`/lavra-*`) are not exposed in the current direct-install path
+- Slash-command parity is planned through the plugin marketplace path
+
+**Plugin marketplace (local validation path):**
+```bash
+# From lavra repository root (contains .agents/plugins/marketplace.json)
+codex plugin marketplace add .
+```
+
+After marketplace install, Lavra still invokes through skills in current Codex builds (`$lavra-*`), not slash commands.
+
+**Verify:**
+```bash
+ls -la ~/.codex/hooks/
+ls -la ~/.codex/skills/lavra-plan/SKILL.md
+```
+
 ## See Also
 
 - [Model Selection](/docs/model-selection) — customize which models map to each tier in OpenCode
 - [Cost Optimization](/docs/cost) — how Lavra assigns agents to model tiers
+- [Codex Publish Checklist](/docs/codex-publish-checklist) — preflight and release checks for Codex packaging
+- [Codex vs Claude Parity Report](/docs/codex-claude-parity-report) — current feature parity and known gaps

@@ -1,0 +1,20 @@
+{
+  "name": "lavra-local-marketplace",
+  "interface": {
+    "displayName": "Lavra Local"
+  },
+  "plugins": [
+    {
+      "name": "lavra",
+      "source": {
+        "source": "local",
+        "path": "./plugins/lavra"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Coding"
+    }
+  ]
+}

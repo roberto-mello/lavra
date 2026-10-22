@@ -23,7 +23,11 @@ echo "$COMMAND" | grep -qE 'SKIP:' && exit 0
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck source=sanitize-content.sh
-source "$SCRIPT_DIR/sanitize-content.sh"
+if [[ -f "$SCRIPT_DIR/sanitize-content.sh" ]]; then
+  source "$SCRIPT_DIR/sanitize-content.sh"
+else
+  sanitize_untrusted_content() { cat; }
+fi
 
 # Validate CLAUDE_PROJECT_DIR to prevent redirect attacks
 # Placed AFTER early-exit guards (PostToolUse fires very frequently; this runs on ~1% of calls)
@@ -35,30 +39,38 @@ if [[ -n "$CLAUDE_PROJECT_DIR" ]]; then
   fi
 fi
 
-# Scope extraction to the first bd comments add line that contains a knowledge prefix.
-# Running on the full COMMAND causes two bugs when multiple commands are chained (&&, ;, newlines):
-#   1. BEAD_ID: sed passes non-matching lines through unchanged, polluting the value with
-#      subsequent shell commands (e.g. "bd close ... 2>&1 | grep ...").
-#   2. COMMENT_BODY: the greedy .* matches to the *last* bd comments add in the string,
-#      concatenating all comment bodies into one blob with embedded shell operators.
-MATCH_LINE=$(echo "$COMMAND" \
-  | grep -E 'bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+' \
-  | grep -m1 -E '(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:|MUST-CHECK:)')
-[[ -z "$MATCH_LINE" ]] && exit 0
+# Scope extraction to the first bd comments add call that carries a knowledge prefix.
+# A shell line can hold several chained calls ("a && b", "a; b"). A pattern with a
+# leading greedy .* matches the *last* call, so the first body was dropped and the
+# second body was attributed to the first bead id. Put every call on its own line
+# first, then keep the first line that has a prefix after the bead id.
+CALLS=$(echo "$COMMAND" \
+  | sed -E 's/bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+/\nBDCOMMENTADD /g' \
+  | grep -E '^BDCOMMENTADD ')
+[[ -z "$CALLS" ]] && exit 0
 
-# Extract BEAD_ID from that line only
-BEAD_ID=$(echo "$MATCH_LINE" | sed -E 's/.*bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+([A-Za-z0-9._-]+)[[:space:]]+.*/\1/')
-[[ -z "$BEAD_ID" || "$BEAD_ID" == "$MATCH_LINE" ]] && exit 0
+PREFIX_RE='(INVESTIGATION:|LEARNED:|DECISION:|FACT:|PATTERN:|DEVIATION:|MUST-CHECK:)'
+MATCH_LINE=$(echo "$CALLS" | grep -m1 -E "^BDCOMMENTADD [A-Za-z0-9._-]+[[:space:]]+[\"']?${PREFIX_RE}")
+[[ -z "$MATCH_LINE" ]] && exit 0
+MATCH_LINE=${MATCH_LINE#BDCOMMENTADD }
+
+# Extract BEAD_ID: the token right after the subcommand.
+BEAD_ID=${MATCH_LINE%%[[:space:]]*}
 # Explicit post-extraction strip: makes sanitization intent visible at the use-site
 BEAD_ID=$(echo "$BEAD_ID" | tr -cd 'A-Za-z0-9._-')
 [[ -z "$BEAD_ID" ]] && exit 0
 
-# Extract comment body: strip prefix up to opening quote, then strip from the
-# closing quote onward (handles trailing 2>&1, &&, |, ; operators)
-COMMENT_BODY=$(echo "$MATCH_LINE" \
-  | sed -E 's/.*bd[[:space:]]+comments?[[:space:]]+add[[:space:]]+[A-Za-z0-9._-]+[[:space:]]+["'\'']//' \
-  | sed -E 's/["'\''][[:space:]]*(2>&1|\|\||&&|\||;).*$|["'\''][[:space:]]*$//' \
-  | head -c 4096)
+# Extract comment body as the text between the first and the last quote.
+# `#` strips the shortest prefix and `%` the shortest suffix, so neither runs past
+# the first opening quote or the last closing quote. The previous sed stripped
+# from the first quote that sat before a shell operator, which cut the body at an
+# embedded quoted term ("... a separate 'qmd embed' pass" became "... a separate ").
+# ponytail: heuristic parser, a body that ends with an unbalanced quote still loses
+# its tail; use a real tokenizer if comment bodies ever need exact round-trips.
+QUOTE_CHARS="\"'"
+COMMENT_BODY=${MATCH_LINE#*[$QUOTE_CHARS]}
+COMMENT_BODY=${COMMENT_BODY%[$QUOTE_CHARS]*}
+COMMENT_BODY=$(echo "$COMMENT_BODY" | head -c 4096)
 [[ -z "$COMMENT_BODY" ]] && exit 0
 
 # Detect type from prefix

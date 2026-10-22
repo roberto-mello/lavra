@@ -82,11 +82,13 @@ bash scripts/pre-release-check.sh
 
 This replicates the CI `verify-release` job locally:
 - Version consistency between `plugin.json` and `marketplace.json`
-- Conversion outputs generated (OpenCode + Gemini)
+- Generated outputs match source (OpenCode + Gemini + Cortex + Codex)
 - Component counts (23+ commands, 30+ agents, 15+ skills)
 - Source files present
 - Catalog accuracy: ghost commands (in CATALOG.md, no file) and missing entries (file exists, not in catalog) both fail
 - Compatibility tests pass
+
+If the generated-output drift check fails, regenerate and commit the updated files before tagging.
 
 **Do not proceed if any check fails.**
 
@@ -282,7 +284,7 @@ Do NOT delete and recreate the tag. Bump to a patch version, fix, and release th
 
 **When modifying either file, always update the other.** Both files have a `SYNC:` comment pointing to each other as a reminder. If CI adds a new check, add it to the script. If the script adds a new check, add it to CI.
 
-The catalog accuracy check (`=== Catalog accuracy ===`) also appears in the `test-compatibility` job, which runs on every PR to `main`. If you change the catalog check logic in pre-release-check.sh, update both CI locations.
+The generated-output drift check and catalog accuracy check also appear in the `test-compatibility` job, which runs on every PR to `main`. If you change either check in `pre-release-check.sh`, update the matching CI locations.
 
 ## Key facts
 

@@ -5,12 +5,16 @@ globs: "**/scripts/**,**/opencode/**,**/gemini/**"
 
 # Platform Conversion Scripts
 
-OpenCode and Gemini CLI require conversion from Claude Code format:
+OpenCode, Gemini CLI, Cortex Code, and Codex require conversion from Claude Code format:
 
 - `scripts/convert-opencode.ts` - Converts to OpenCode format
 - `scripts/convert-gemini.ts` - Converts to Gemini CLI format
+- `scripts/convert-cortex.ts` - Converts to Cortex Code format
+- `scripts/convert-codex.ts` - Converts Codex output from Cortex output
 - Run automatically during platform-specific installation
 - Requires Bun runtime (`bun run convert-opencode.ts`)
+
+Generated outputs are checked in for release/install compatibility, but they must always match the canonical source in `plugins/lavra/`. The CI and pre-release gate use `scripts/check-generated-outputs.sh` to fail if the generated trees drift.
 
 ## Model Tier Mapping
 

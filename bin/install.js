@@ -42,6 +42,7 @@ const FLAG = {
   opencode: args.includes("--opencode"),
   gemini: args.includes("--gemini"),
   cortex: args.includes("--cortex"),
+  codex: args.includes("--codex"),
   global: args.includes("--global"),
   local: args.includes("--local"),
   uninstall: args.includes("--uninstall"),
@@ -77,8 +78,10 @@ function usage() {
   console.log("    npx @lavralabs/lavra@latest --opencode     OpenCode (local project)");
   console.log("    npx @lavralabs/lavra@latest --gemini       Gemini CLI (local project)");
   console.log("    npx @lavralabs/lavra@latest --cortex       Cortex Code (local project)");
+  console.log("    npx @lavralabs/lavra@latest --codex        Codex (local project)");
   console.log("    npx @lavralabs/lavra@latest --global       Install globally (~/.claude/)");
   console.log("    npx @lavralabs/lavra@latest --uninstall    Uninstall from current project");
+  console.log("    npx @lavralabs/lavra@latest --codex --uninstall --global");
   console.log("    npx @lavralabs/lavra@latest --yes          Skip confirmation prompts");
   console.log("");
   console.log("  Flags can be combined:");
@@ -129,6 +132,7 @@ async function promptRuntime(rl) {
   console.log("  2. OpenCode");
   console.log("  3. Gemini CLI");
   console.log("  4. Cortex Code");
+  console.log("  5. Codex");
   console.log("");
 
   while (true) {
@@ -138,8 +142,9 @@ async function promptRuntime(rl) {
       case "2": return "opencode";
       case "3": return "gemini";
       case "4": return "cortex";
+      case "5": return "codex";
       default:
-        console.log("  Please enter 1, 2, 3, or 4.");
+        console.log("  Please enter 1, 2, 3, 4, or 5.");
     }
   }
 }
@@ -150,6 +155,7 @@ function globalPathForRuntime(runtime) {
     case "opencode": return `${home}/.config/opencode/`;
     case "gemini":   return `${home}/.config/gemini/`;
     case "cortex":   return `${home}/.snowflake/cortex/`;
+    case "codex":    return `${home}/.codex/`;
     default:         return `${home}/.claude/`;
   }
 }
@@ -221,6 +227,7 @@ function buildInstallArgs(runtime, scope) {
   if (runtime === "opencode") scriptArgs.push("-opencode");
   if (runtime === "gemini") scriptArgs.push("-gemini");
   if (runtime === "cortex") scriptArgs.push("-cortex");
+  if (runtime === "codex") scriptArgs.push("-codex");
   // Claude Code is the default — no flag needed
 
   // --yes passthrough
@@ -252,13 +259,35 @@ async function main() {
   ensureBash();
   banner();
 
+  const runtimeFlags = [FLAG.claude, FLAG.opencode, FLAG.gemini, FLAG.cortex, FLAG.codex].filter(Boolean).length;
+  if (runtimeFlags > 1) {
+    die("Specify only one runtime: --claude, --opencode, --gemini, --cortex, or --codex");
+  }
+
+  let runtime;
+  if (FLAG.claude) runtime = "claude";
+  else if (FLAG.opencode) runtime = "opencode";
+  else if (FLAG.gemini) runtime = "gemini";
+  else if (FLAG.cortex) runtime = "cortex";
+  else if (FLAG.codex) runtime = "codex";
+
   // --- Uninstall path ---
   if (FLAG.uninstall) {
     ensureScript(UNINSTALL_SH, "uninstall.sh");
-    const target = TARGET_PATH || process.cwd();
-    console.log(`  Uninstalling lavra from ${target}...\n`);
+    const scriptArgs = [];
+    if (runtime) {
+      scriptArgs.push(`--${runtime}`);
+    }
+    if (FLAG.global) {
+      // No target path needed: platform uninstallers default to global root.
+      console.log(`  Uninstalling lavra ${runtime ? `for ${runtime} ` : ""}globally...\n`);
+    } else {
+      const target = TARGET_PATH || process.cwd();
+      scriptArgs.push(target);
+      console.log(`  Uninstalling lavra from ${target}...\n`);
+    }
     try {
-      await runScript(UNINSTALL_SH, [target]);
+      await runScript(UNINSTALL_SH, scriptArgs);
       console.log("\n  Uninstall complete.\n");
     } catch (err) {
       die(err.message);
@@ -267,18 +296,6 @@ async function main() {
   }
 
   ensureScript(INSTALL_SH, "install.sh");
-
-  // Determine runtime
-  let runtime;
-  const runtimeFlags = [FLAG.claude, FLAG.opencode, FLAG.gemini, FLAG.cortex].filter(Boolean).length;
-  if (runtimeFlags > 1) {
-    die("Specify only one runtime: --claude, --opencode, --gemini, or --cortex");
-  }
-
-  if (FLAG.claude) runtime = "claude";
-  else if (FLAG.opencode) runtime = "opencode";
-  else if (FLAG.gemini) runtime = "gemini";
-  else if (FLAG.cortex) runtime = "cortex";
 
   // Determine scope
   let scope;
@@ -314,6 +331,7 @@ async function main() {
     opencode: "OpenCode",
     gemini: "Gemini CLI",
     cortex: "Cortex Code",
+    codex: "Codex",
   }[runtime];
   const scopeLabel = scope === "global" ? "globally" : "in current project";
 

@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# Uninstall lavra plugin from Cortex Code
+# Uninstall lavra plugin from Cortex Code / Codex
 #
 # What this removes:
-#   - Hooks from .cortex/hooks/ (or ~/.snowflake/cortex/hooks/)
-#   - Commands from .cortex/commands/ (or ~/.snowflake/cortex/commands/)
-#   - Agents from .cortex/agents/ (or ~/.snowflake/cortex/agents/)
-#   - Skills from .cortex/skills/ (or ~/.snowflake/cortex/skills/)
-#   - Hook configuration from ~/.snowflake/cortex/hooks.json
+#   - Hooks from .cortex/hooks/ or .codex/hooks/
+#   - Commands from .cortex/commands/ or .codex/commands/
+#   - Agents from .cortex/agents/ or .codex/agents/
+#   - Skills from .cortex/skills/ or .codex/skills/
+#   - Hook configuration from ~/.snowflake/cortex/hooks.json or ~/.codex/hooks.json
 #
 # What this PRESERVES:
 #   - .beads/ directory and all data
@@ -30,18 +30,30 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Default to ~/.snowflake/cortex if no argument provided
+# Runtime variant: cortex (default) or codex
+RUNTIME_VARIANT="${LAVRA_RUNTIME_VARIANT:-cortex}"
+if [ "$RUNTIME_VARIANT" = "codex" ]; then
+  PRODUCT_NAME="Codex"
+  GLOBAL_ROOT="$HOME/.codex"
+  PROJECT_CONFIG_DIR=".codex"
+else
+  PRODUCT_NAME="Cortex Code"
+  GLOBAL_ROOT="$HOME/.snowflake/cortex"
+  PROJECT_CONFIG_DIR=".cortex"
+fi
+
+# Default to platform global root if no argument provided
 if [ $# -eq 0 ]; then
-  TARGET="$HOME/.snowflake/cortex"
+  TARGET="$GLOBAL_ROOT"
   GLOBAL_UNINSTALL=true
 else
   TARGET="${1}"
   GLOBAL_UNINSTALL=false
 fi
 
-TARGET="$(cd "$TARGET" && pwd)"
+TARGET="$(cd "$TARGET" 2>/dev/null && pwd || echo "$TARGET")"
 
-echo "lavra plugin uninstaller (Cortex Code)"
+echo "lavra plugin uninstaller ($PRODUCT_NAME)"
 if [ "$GLOBAL_UNINSTALL" = true ]; then
   echo "Target: $TARGET (global)"
 else
@@ -68,7 +80,7 @@ echo "[1/5] Removing hooks..."
 if [ "$GLOBAL_UNINSTALL" = true ]; then
   HOOKS_DIR="$TARGET/hooks"
 else
-  HOOKS_DIR="$TARGET/.cortex/hooks"
+  HOOKS_DIR="$TARGET/$PROJECT_CONFIG_DIR/hooks"
 fi
 
 if [ -d "$HOOKS_DIR" ]; then
@@ -97,7 +109,7 @@ echo "[2/5] Removing workflow commands..."
 if [ "$GLOBAL_UNINSTALL" = true ]; then
   COMMANDS_DIR="$TARGET/commands"
 else
-  COMMANDS_DIR="$TARGET/.cortex/commands"
+  COMMANDS_DIR="$TARGET/$PROJECT_CONFIG_DIR/commands"
 fi
 
 if [ -d "$COMMANDS_DIR" ]; then
@@ -129,7 +141,7 @@ echo "[3/5] Removing agents..."
 if [ "$GLOBAL_UNINSTALL" = true ]; then
   AGENTS_DIR="$TARGET/agents"
 else
-  AGENTS_DIR="$TARGET/.cortex/agents"
+  AGENTS_DIR="$TARGET/$PROJECT_CONFIG_DIR/agents"
 fi
 
 if [ -d "$AGENTS_DIR" ]; then
@@ -159,7 +171,7 @@ echo "[4/5] Removing skills..."
 if [ "$GLOBAL_UNINSTALL" = true ]; then
   SKILLS_DIR="$TARGET/skills"
 else
-  SKILLS_DIR="$TARGET/.cortex/skills"
+  SKILLS_DIR="$TARGET/$PROJECT_CONFIG_DIR/skills"
 fi
 
 if [ -d "$SKILLS_DIR" ]; then
@@ -196,8 +208,8 @@ fi
 # Update hooks.json to remove hook configuration
 echo "[5/5] Updating hooks.json..."
 
-# Cortex hooks are always global at ~/.snowflake/cortex/hooks.json
-HOOKS_JSON="$HOME/.snowflake/cortex/hooks.json"
+# Cortex/Codex hooks are always global
+HOOKS_JSON="$GLOBAL_ROOT/hooks.json"
 
 if [ -f "$HOOKS_JSON" ]; then
   if command -v jq &>/dev/null; then
@@ -242,7 +254,7 @@ if [ $REMOVED_COUNT -gt 0 ]; then
   echo "To fully remove Lavra data:"
   echo "  rm -rf $TARGET/.lavra/"
   echo ""
-  echo "Restart Cortex Code to complete uninstallation."
+  echo "Restart $PRODUCT_NAME to complete uninstallation."
 else
   echo "Nothing to uninstall. lavra may not be installed here."
 fi

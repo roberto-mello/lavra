@@ -1,6 +1,7 @@
 .DS_Store
 .claude/launch.json
 .claude/worktrees
+.codex/
 __pycache__
 
 # bv (beads viewer) local config and caches
@@ -15,6 +16,7 @@ plans/
 plugins/lavra/opencode/
 plugins/lavra/gemini/
 plugins/lavra/cortex/
+plugins/lavra/codex/
 
 # Dolt database files (added by bd init)
 .dolt/

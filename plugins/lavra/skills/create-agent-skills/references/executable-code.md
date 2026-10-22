@@ -45,7 +45,7 @@ skill-name/
 **Reference pattern**: In SKILL.md, reference scripts using the `scripts/` path:
 
 ```bash
-python ~/.claude/skills/skill-name/scripts/analyze.py input.har
+python ~/.agent/skills/skill-name/scripts/analyze.py input.har
 ```
 </scripts_directory>
 </file_organization>

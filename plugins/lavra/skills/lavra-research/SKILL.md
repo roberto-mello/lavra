@@ -136,10 +136,10 @@ Scan available skills and note which ones are relevant. Don't spawn a sub-agent 
 
 ```bash
 # Project-local skills
-ls .claude/skills/ 2>/dev/null
+find . -type f -name SKILL.md 2>/dev/null
 
 # User's global skills
-ls ~/.claude/skills/ 2>/dev/null
+ls ~/.codex/skills ~/.config/opencode/agent/skills ~/.cortex/skills ~/.snowflake/cortex/skills ~/.agent/skills 2>/dev/null
 ```
 
 For each skill directory found, read its `SKILL.md` and check if it matches the plan's domain. Build a list:

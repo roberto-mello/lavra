@@ -1,0 +1,39 @@
+{
+  "name": "lavra",
+  "version": "0.7.7",
+  "description": "Compound engineering with persistent memory and multi-agent workflows based on beads for coding agents.",
+  "author": {
+    "name": "Roberto Mello",
+    "email": "roberto.mello@gmail.com",
+    "url": "https://lavra.dev"
+  },
+  "homepage": "https://lavra.dev",
+  "repository": "https://github.com/roberto-mello/lavra",
+  "license": "MIT",
+  "keywords": [
+    "beads",
+    "memory",
+    "multi-agent",
+    "workflow",
+    "planning",
+    "review"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Lavra",
+    "shortDescription": "Memory-backed multi-agent software workflows",
+    "longDescription": "Lavra provides memory-aware planning, execution, and review workflows for coding agents using beads. It captures knowledge during implementation and reuses it in future work.",
+    "developerName": "Roberto Mello",
+    "category": "Coding",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://lavra.dev",
+    "defaultPrompt": [
+      "Plan this feature as an epic with child tasks",
+      "Execute ready beads and capture learnings",
+      "Review this change with specialized perspectives"
+    ]
+  }
+}

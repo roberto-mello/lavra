@@ -41,10 +41,10 @@ skill-name/
 ## Step 4: Create Directory
 
 ```bash
-mkdir -p ~/.claude/skills/{skill-name}
+mkdir -p ~/.agent/skills/{skill-name}
 # If complex:
-mkdir -p ~/.claude/skills/{skill-name}/workflows
-mkdir -p ~/.claude/skills/{skill-name}/references
+mkdir -p ~/.agent/skills/{skill-name}/workflows
+mkdir -p ~/.agent/skills/{skill-name}/references
 ```
 
 ## Step 5: Write SKILL.md

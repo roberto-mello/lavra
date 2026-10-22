@@ -14,22 +14,22 @@ When Claude executes this, the full command with expanded `$API_KEY` appears in 
 </the_problem>
 
 <the_solution>
-Use `~/.claude/scripts/secure-api.sh` - a wrapper that loads credentials internally.
+Use `~/.agent/scripts/secure-api.sh` - a wrapper that loads credentials internally.
 
 <for_supported_services>
 ```bash
 # GOOD - No credentials visible
-~/.claude/scripts/secure-api.sh <service> <operation> [args]
+~/.agent/scripts/secure-api.sh <service> <operation> [args]
 
 # Examples:
-~/.claude/scripts/secure-api.sh facebook list-campaigns
-~/.claude/scripts/secure-api.sh ghl search-contact "email@example.com"
+~/.agent/scripts/secure-api.sh facebook list-campaigns
+~/.agent/scripts/secure-api.sh ghl search-contact "email@example.com"
 ```
 </for_supported_services>
 </the_solution>
 
 <credential_storage>
-**Location:** `~/.claude/.env` (global for all skills, accessible from any directory)
+**Location:** `~/.agent/.env` (global for all skills, accessible from any directory)
 
 **Format:**
 ```bash
@@ -45,7 +45,7 @@ OTHER_BASE_URL=https://api.other.com
 **Loading in script:**
 ```bash
 set -a
-source ~/.claude/.env 2>/dev/null || { echo "Error: ~/.claude/.env not found" >&2; exit 1; }
+source ~/.agent/.env 2>/dev/null || { echo "Error: ~/.agent/.env not found" >&2; exit 1; }
 set +a
 ```
 </credential_storage>
@@ -53,8 +53,8 @@ set +a
 <best_practices>
 1. **Never use raw curl with `$VARIABLE` in skill examples** - always use the wrapper
 2. **Add all operations to the wrapper** - don't make users figure out curl syntax
-3. **Auto-create credential placeholders** - add empty fields to `~/.claude/.env` immediately when creating the skill
-4. **Keep credentials in `~/.claude/.env`** - one central location, works everywhere
+3. **Auto-create credential placeholders** - add empty fields to `~/.agent/.env` immediately when creating the skill
+4. **Keep credentials in `~/.agent/.env`** - one central location, works everywhere
 5. **Document each operation** - show examples in SKILL.md
 6. **Handle errors gracefully** - check for missing env vars, show helpful error messages
 </best_practices>
